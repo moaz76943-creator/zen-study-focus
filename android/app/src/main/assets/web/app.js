@@ -32388,46 +32388,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1728: Ayoreo (ayo)
-  window.DF_I18N_LOCALES['ayo'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pojode", navDecks:"Pocajoi", navStats:"Uringocone", navSettings:"Gocojone",
-    start:"Chire", pause:"Daque", resume:"Chire Yoque", reset:"Eroque", minutes:"min",
-    cardFront:"Gopasode", cardBack:"Gotocade", flipCard:"Carode", addCard:"Gocajoi Chire",
-    deleteCard:"Chorode", save:"Yoque", cancel:"Dacade", confirm:"Chire Je", close:"Daque",
-    rateAgain:"Yoque Pone", rateHard:"Tote", rateGood:"Ore", rateEasy:"Chito"
-  });
-  // M1729: Nivakle (cag)
-  window.DF_I18N_LOCALES['cag'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yitak", navDecks:"Vatutskhay", navStats:"Nivelhai", navSettings:"Vatpech",
-    start:"Tiyuk", pause:"Tanayej", resume:"Tiyuk Pa", reset:"Yatpech", minutes:"min",
-    cardFront:"Lhip", cardBack:"Lhotuk", flipCard:"Yitoyesh", addCard:"Vatutskhay Yituk",
-    deleteCard:"Lhishij", save:"Vatsuk", cancel:"Tanuk", confirm:"Tiyuk Ha", close:"Tanayej",
-    rateAgain:"Tanuk Pa", rateHard:"Lhiyich", rateGood:"Shi", rateEasy:"Lhichesh"
-  });
-  // M1730: Maka (mca) & Release v18.7.0
-  window.DF_I18N_LOCALES['mca'] = Object.assign({}, baseTemplate, {
-    navFocus:"Inhef", navDecks:"Vitihef", navStats:"Netinhej", navSettings:"Lheyej",
-    start:"Tsi", pause:"Yehets", resume:"Tsi Nite", reset:"Lhinhej", minutes:"min",
-    cardFront:"Inhen", cardBack:"Lhefek", flipCard:"Vathej", addCard:"Vitihef Tsi",
-    deleteCard:"Netsuk", save:"Inhets", cancel:"Yehen", confirm:"Tsi Ha", close:"Yehets",
-    rateAgain:"Tsi Lhi", rateHard:"Lhiwet", rateGood:"Wits", rateEasy:"Lhikiyets"
-  });
-  // M1731: Kadiweu (kbc)
-  window.DF_I18N_LOCALES['kbc'] = Object.assign({}, baseTemplate, {
-    navFocus:"Nigotadi", navDecks:"Nolena", navStats:"Liconedi", navSettings:"Gowena",
-    start:"Icadita", pause:"Iwo", resume:"Icadita Go", reset:"Gatedi", minutes:"min",
-    cardFront:"Lawigadi", cardBack:"Letolodi", flipCard:"Lawina", addCard:"Nolena Icadita",
-    deleteCard:"Lapedita", save:"Iwo Go", cancel:"Iwo Ce", confirm:"Etedi", close:"Iwo",
-    rateAgain:"Icadita Ce", rateHard:"Niwaadi", rateGood:"Okaida", rateEasy:"Lami"
-  });
-  // M1732: Chamacoco / Ishiro (ceg)
-  window.DF_I18N_LOCALES['ceg'] = Object.assign({}, baseTemplate, {
-    navFocus:"Oshtok", navDecks:"Porkehe", navStats:"Ershe", navSettings:"Potok",
-    start:"Ashyt", pause:"Eser", resume:"Ashyt Pe", reset:"Potshyt", minutes:"min",
-    cardFront:"Eltok", cardBack:"Elkyr", flipCard:"Porshyt", addCard:"Porkehe Ashyt",
-    deleteCard:"Ekyr", save:"Ershtok", cancel:"Eser Pe", confirm:"Ashyt Tok", close:"Eser",
-    rateAgain:"Ashyt Por", rateHard:"Torte", rateGood:"Eshte", rateEasy:"Kyryte"
-  });
-  // M1733: Automated Gran Chaco & Zamucoan Parity Linter
+    // M1729: Nivakle (cag)
+    // M1730: Maka (mca) & Release v18.7.0
+    // M1731: Kadiweu (kbc)
+    // M1732: Chamacoco / Ishiro (ceg)
+    // M1733: Automated Gran Chaco & Zamucoan Parity Linter
   window.dfLintChacoParity = function(){
     ['ayo','cag','mca','kbc','ceg','spn','ant','gva','tmf'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -32437,12 +32402,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1734: Sanapana (spn) & Angaite (ant)
-  window.DF_I18N_LOCALES['spn'] = Object.assign({}, baseTemplate, { navFocus:"Akpaan", start:"Taama", pause:"Pasma", rateGood:"Vala" });
-  window.DF_I18N_LOCALES['ant'] = Object.assign({}, baseTemplate, { navFocus:"Eskapan", start:"Teema", pause:"Payma", rateGood:"Vele" });
-  // M1735: Guana (gva) & Toba-Maskoy (tmf)
-  window.DF_I18N_LOCALES['gva'] = Object.assign({}, baseTemplate, { navFocus:"Kaspa", start:"Tapa", pause:"Posma", rateGood:"Vana" });
-  window.DF_I18N_LOCALES['tmf'] = Object.assign({}, baseTemplate, { navFocus:"Takva", start:"Tukva", pause:"Pikva", rateGood:"Vava" });
-  window.dfLintChacoParity();
+      // M1735: Guana (gva) & Toba-Maskoy (tmf)
+      window.dfLintChacoParity();
   // M1736: Gran Chaco Acoustic Resonance (Desert Night Wind Synth)
   window.dfSynthesizeChacoNightWind = function(ctx){
     if(!ctx) return;
@@ -32470,46 +32431,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1738: Guambiano / Misak (gum)
-  window.DF_I18N_LOCALES['gum'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pikwe", navDecks:"Pikwamik", navStats:"Meran", navSettings:"Asamik",
-    start:"Trikwan", pause:"Pishik", resume:"Trikwan Mo", reset:"Wanpishik", minutes:"min",
-    cardFront:"Nuik", cardBack:"Kulik", flipCard:"Shirikwan", addCard:"Pikwamik Trikwan",
-    deleteCard:"Chorik", save:"Pikwamik Wan", cancel:"Pishik Mo", confirm:"Trikwan To", close:"Pishik",
-    rateAgain:"Trikwan Ya", rateHard:"Kwasrik", rateGood:"Morik", rateEasy:"Lelik"
-  });
-  // M1739: Paez / Nasa Yuwe (pbb)
-  window.DF_I18N_LOCALES['pbb'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kwe'sx", navDecks:"Yatxwe", navStats:"Yuwe'sx", navSettings:"Kwe'we",
-    start:"Pusxna", pause:"Kwe'na", resume:"Pusxna Sx", reset:"Yatxwe Sx", minutes:"min",
-    cardFront:"Theg", cardBack:"Nxusx", flipCard:"Sxi'na", addCard:"Yatxwe Pusxna",
-    deleteCard:"Nxusxna", save:"Pusxwe", cancel:"Kwe'we Sx", confirm:"Pusxna Ha", close:"Kwe'na",
-    rateAgain:"Pusxna Ya", rateHard:"Fxi'ze", rateGood:"Kwekwe", rateEasy:"Nxusthe"
-  });
-  // M1740: Embera-Chami (cmi) & Release v18.8.0
-  window.DF_I18N_LOCALES['cmi'] = Object.assign({}, baseTemplate, {
-    navFocus:"Bed'ea", navDecks:"Kirisia", navStats:"Uburawa", navSettings:"Jaurade",
-    start:"Ode", pause:"Eped'e", resume:"Ode Ba", reset:"Jaurade Ode", minutes:"min",
-    cardFront:"Dua", cardBack:"Burua", flipCard:"Kiruade", addCard:"Kirisia Ode",
-    deleteCard:"Piriade", save:"Kirisia Ba", cancel:"Eped'e Ba", confirm:"Ode Tro", close:"Eped'e",
-    rateAgain:"Ode Waya", rateHard:"Poria", rateGood:"Bia", rateEasy:"Dede"
-  });
-  // M1741: Wounaan (noa)
-  window.DF_I18N_LOCALES['noa'] = Object.assign({}, baseTemplate, {
-    navFocus:"Nemur", navDecks:"Khaag", navStats:"Poro", navSettings:"Thum",
-    start:"Haum", pause:"Peeur", resume:"Haum De", reset:"Thum Haum", minutes:"min",
-    cardFront:"Daph", cardBack:"Khaag Poro", flipCard:"Khaagir", addCard:"Khaag Haum",
-    deleteCard:"Chumir", save:"Khaag Nem", cancel:"Peeur De", confirm:"Haum No", close:"Peeur",
-    rateAgain:"Haum Dee", rateHard:"Kharr", rateGood:"Hajum", rateEasy:"Phaar"
-  });
-  // M1742: Kuna / Guna (cuk)
-  window.DF_I18N_LOCALES['cuk'] = Object.assign({}, baseTemplate, {
-    navFocus:"Igar", navDecks:"Gartir", navStats:"Burba", navSettings:"Nega",
-    start:"Onmake", pause:"Bogwe", resume:"Onmake Ganna", reset:"Gartir Nega", minutes:"min",
-    cardFront:"Asu", cardBack:"Yargan", flipCard:"Gwisgue", addCard:"Gartir Onmake",
-    deleteCard:"Elie", save:"Sabe", cancel:"Bogwe Nega", confirm:"Onmake Bye", close:"Bogwe",
-    rateAgain:"Ganna Onmake", rateHard:"Duleba", rateGood:"Nued", rateEasy:"Sunna"
-  });
-  // M1743: Automated Chibchan & Chocoan Parity Linter
+    // M1739: Paez / Nasa Yuwe (pbb)
+    // M1740: Embera-Chami (cmi) & Release v18.8.0
+    // M1741: Wounaan (noa)
+    // M1742: Kuna / Guna (cuk)
+    // M1743: Automated Chibchan & Chocoan Parity Linter
   window.dfLintChibchanParity = function(){
     ['gum','pbb','cmi','noa','cuk','mot','tbn','cbg','yup'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -32519,12 +32445,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1744: Bari (mot) & U'wa (tbn)
-  window.DF_I18N_LOCALES['mot'] = Object.assign({}, baseTemplate, { navFocus:"Akba", start:"Isha", pause:"Mana", rateGood:"Sura" });
-  window.DF_I18N_LOCALES['tbn'] = Object.assign({}, baseTemplate, { navFocus:"Kajkwa", start:"Rawa", pause:"Chita", rateGood:"Kuba" });
-  // M1745: Chimila (cbg) & Yukpa (yup)
-  window.DF_I18N_LOCALES['cbg'] = Object.assign({}, baseTemplate, { navFocus:"Tette", start:"Kuma", pause:"Niwa", rateGood:"Wesa" });
-  window.DF_I18N_LOCALES['yup'] = Object.assign({}, baseTemplate, { navFocus:"Watpo", start:"Tepu", pause:"Maku", rateGood:"Katu" });
-  window.dfLintChibchanParity();
+      // M1745: Chimila (cbg) & Yukpa (yup)
+      window.dfLintChibchanParity();
   // M1746: Montane Pristine River & Forest Breeze Web Audio Filter
   window.dfSynthesizeAndeanStream = function(ctx){
     if(!ctx) return;
@@ -32552,46 +32474,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1748: Ka'apor (urb)
-  window.DF_I18N_LOCALES['urb'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ma'e", navDecks:"Pape", navStats:"Katu", navSettings:"Pape'i",
-    start:"Pyhu", pause:"Pytu", resume:"Pyhu Je", reset:"Ma'e Pyhu", minutes:"min",
-    cardFront:"Hova", cardBack:"Kupe", flipCard:"Kupe Jukwa", addCard:"Pape Pyhu",
-    deleteCard:"Juka", save:"Katu", cancel:"Pytu Je", confirm:"Pyhu Me", close:"Pytu",
-    rateAgain:"Je Pyhu", rateHard:"Pahi", rateGood:"Katu", rateEasy:"Tutu"
-  });
-  // M1749: Tenetehara / Guajajara (gub)
-  window.DF_I18N_LOCALES['gub'] = Object.assign({}, baseTemplate, {
-    navFocus:"Zekwe", navDecks:"Zekwe-ha", navStats:"Katu-ha", navSettings:"Ma'e-rehe",
-    start:"Zapo", pause:"Pytuhe", resume:"Zapo Wi", reset:"Pytuhe Zapo", minutes:"min",
-    cardFront:"Hova", cardBack:"Kupe", flipCard:"Kupe Me", addCard:"Zekwe-ha Zapo",
-    deleteCard:"Zapo-wer", save:"Zapo Katu", cancel:"Pytuhe Wi", confirm:"Zapo Aze", close:"Pytuhe",
-    rateAgain:"Zapo Wiwe", rateHard:"Iahy", rateGood:"Katu-te", rateEasy:"Wekwe"
-  });
-  // M1750: Xavante (xav) & Release v18.9.0
-  window.DF_I18N_LOCALES['xav'] = Object.assign({}, baseTemplate, {
-    navFocus:"Rowasu'u", navDecks:"Papeba", navStats:"Wahi'rada", navSettings:"Tsimipari",
-    start:"Danho're", pause:"Roto", resume:"Danho're Dur", reset:"Papeba Danho're", minutes:"min",
-    cardFront:"Hi'rata", cardBack:"Höbato", flipCard:"Robtsani", addCard:"Papeba Tsa",
-    deleteCard:"Rowanano", save:"Romano", cancel:"Roto Mano", confirm:"Danho're Ba", close:"Roto",
-    rateAgain:"Dur Mano", rateHard:"Watsu", rateGood:"Rowe", rateEasy:"Dahi"
-  });
-  // M1751: Kayapo / Mebengokre (txu)
-  window.DF_I18N_LOCALES['txu'] = Object.assign({}, baseTemplate, {
-    navFocus:"Mekre", navDecks:"Kagoi", navStats:"Pikwa", navSettings:"Metire",
-    start:"Bitxi", pause:"Katom", resume:"Bitxi Kute", reset:"Kagoi Bitxi", minutes:"min",
-    cardFront:"No", cardBack:"Poto", flipCard:"Mejire", addCard:"Kagoi Txi",
-    deleteCard:"Karwo", save:"Mebeng", cancel:"Katom Me", confirm:"Bitxi Kute", close:"Katom",
-    rateAgain:"Wate Bitxi", rateHard:"Kato", rateGood:"Mex", rateEasy:"Prum"
-  });
-  // M1752: Bororo (bor)
-  window.DF_I18N_LOCALES['bor'] = Object.assign({}, baseTemplate, {
-    navFocus:"Aroe", navDecks:"Boe", navStats:"Karega", navSettings:"Kuruguga",
-    start:"Toro", pause:"Meriji", resume:"Toro Boe", reset:"Kuruguga Toro", minutes:"min",
-    cardFront:"Kowaru", cardBack:"Bato", flipCard:"Tari", addCard:"Boe Toro",
-    deleteCard:"Jeraji", save:"Boe Kudu", cancel:"Meriji Boe", confirm:"Toro Re", close:"Meriji",
-    rateAgain:"Boe Toro Re", rateHard:"Kaigo", rateGood:"Moture", rateEasy:"Pegare"
-  });
-  // M1753: Automated Amazonian Tupi & Macro-Je Parity Linter
+    // M1749: Tenetehara / Guajajara (gub)
+    // M1750: Xavante (xav) & Release v18.9.0
+    // M1751: Kayapo / Mebengokre (txu)
+    // M1752: Bororo (bor)
+    // M1753: Automated Amazonian Tupi & Macro-Je Parity Linter
   window.dfLintMacroJeParity = function(){
     ['urb','gub','xav','txu','bor','kpj','ram','xra','rkb'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -32601,12 +32488,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1754: Karaja (kpj) & Canela (ram)
-  window.DF_I18N_LOCALES['kpj'] = Object.assign({}, baseTemplate, { navFocus:"Iny", start:"Wede", pause:"Koro", rateGood:"Hawena" });
-  window.DF_I18N_LOCALES['ram'] = Object.assign({}, baseTemplate, { navFocus:"Kra", start:"Haam", pause:"Teeh", rateGood:"Pej" });
-  // M1755: Kraho (xra) & Rikbaktsa (rkb)
-  window.DF_I18N_LOCALES['xra'] = Object.assign({}, baseTemplate, { navFocus:"Cran", start:"Hi'am", pause:"Toon", rateGood:"Pej-re" });
-  window.DF_I18N_LOCALES['rkb'] = Object.assign({}, baseTemplate, { navFocus:"Aso", start:"Tsaka", pause:"Puku", rateGood:"Bata" });
-  window.dfLintMacroJeParity();
+      // M1755: Kraho (xra) & Rikbaktsa (rkb)
+      window.dfLintMacroJeParity();
   // M1756: Amazon Canopy Rain & Gentle Rustle Web Audio Filter
   window.dfSynthesizeAmazonCanopyRain = function(ctx){
     if(!ctx) return;
@@ -32634,46 +32517,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1728: Ayoreo (ayo)
-  window.DF_I18N_LOCALES['ayo'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pojode", navDecks:"Pocajoi", navStats:"Uringocone", navSettings:"Gocojone",
-    start:"Chire", pause:"Daque", resume:"Chire Yoque", reset:"Eroque", minutes:"min",
-    cardFront:"Gopasode", cardBack:"Gotocade", flipCard:"Carode", addCard:"Gocajoi Chire",
-    deleteCard:"Chorode", save:"Yoque", cancel:"Dacade", confirm:"Chire Je", close:"Daque",
-    rateAgain:"Yoque Pone", rateHard:"Tote", rateGood:"Ore", rateEasy:"Chito"
-  });
-  // M1729: Nivakle (cag)
-  window.DF_I18N_LOCALES['cag'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yitak", navDecks:"Vatutskhay", navStats:"Nivelhai", navSettings:"Vatpech",
-    start:"Tiyuk", pause:"Tanayej", resume:"Tiyuk Pa", reset:"Yatpech", minutes:"min",
-    cardFront:"Lhip", cardBack:"Lhotuk", flipCard:"Yitoyesh", addCard:"Vatutskhay Yituk",
-    deleteCard:"Lhishij", save:"Vatsuk", cancel:"Tanuk", confirm:"Tiyuk Ha", close:"Tanayej",
-    rateAgain:"Tanuk Pa", rateHard:"Lhiyich", rateGood:"Shi", rateEasy:"Lhichesh"
-  });
-  // M1730: Maka (mca) & Release v18.7.0
-  window.DF_I18N_LOCALES['mca'] = Object.assign({}, baseTemplate, {
-    navFocus:"Inhef", navDecks:"Vitihef", navStats:"Netinhej", navSettings:"Lheyej",
-    start:"Tsi", pause:"Yehets", resume:"Tsi Nite", reset:"Lhinhej", minutes:"min",
-    cardFront:"Inhen", cardBack:"Lhefek", flipCard:"Vathej", addCard:"Vitihef Tsi",
-    deleteCard:"Netsuk", save:"Inhets", cancel:"Yehen", confirm:"Tsi Ha", close:"Yehets",
-    rateAgain:"Tsi Lhi", rateHard:"Lhiwet", rateGood:"Wits", rateEasy:"Lhikiyets"
-  });
-  // M1731: Kadiweu (kbc)
-  window.DF_I18N_LOCALES['kbc'] = Object.assign({}, baseTemplate, {
-    navFocus:"Nigotadi", navDecks:"Nolena", navStats:"Liconedi", navSettings:"Gowena",
-    start:"Icadita", pause:"Iwo", resume:"Icadita Go", reset:"Gatedi", minutes:"min",
-    cardFront:"Lawigadi", cardBack:"Letolodi", flipCard:"Lawina", addCard:"Nolena Icadita",
-    deleteCard:"Lapedita", save:"Iwo Go", cancel:"Iwo Ce", confirm:"Etedi", close:"Iwo",
-    rateAgain:"Icadita Ce", rateHard:"Niwaadi", rateGood:"Okaida", rateEasy:"Lami"
-  });
-  // M1732: Chamacoco / Ishiro (ceg)
-  window.DF_I18N_LOCALES['ceg'] = Object.assign({}, baseTemplate, {
-    navFocus:"Oshtok", navDecks:"Porkehe", navStats:"Ershe", navSettings:"Potok",
-    start:"Ashyt", pause:"Eser", resume:"Ashyt Pe", reset:"Potshyt", minutes:"min",
-    cardFront:"Eltok", cardBack:"Elkyr", flipCard:"Porshyt", addCard:"Porkehe Ashyt",
-    deleteCard:"Ekyr", save:"Ershtok", cancel:"Eser Pe", confirm:"Ashyt Tok", close:"Eser",
-    rateAgain:"Ashyt Por", rateHard:"Torte", rateGood:"Eshte", rateEasy:"Kyryte"
-  });
-  // M1733: Automated Gran Chaco & Zamucoan Parity Linter
+    // M1729: Nivakle (cag)
+    // M1730: Maka (mca) & Release v18.7.0
+    // M1731: Kadiweu (kbc)
+    // M1732: Chamacoco / Ishiro (ceg)
+    // M1733: Automated Gran Chaco & Zamucoan Parity Linter
   window.dfLintChacoParity = function(){
     ['ayo','cag','mca','kbc','ceg','spn','ant','gva','tmf'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -32683,12 +32531,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1734: Sanapana (spn) & Angaite (ant)
-  window.DF_I18N_LOCALES['spn'] = Object.assign({}, baseTemplate, { navFocus:"Akpaan", start:"Taama", pause:"Pasma", rateGood:"Vala" });
-  window.DF_I18N_LOCALES['ant'] = Object.assign({}, baseTemplate, { navFocus:"Eskapan", start:"Teema", pause:"Payma", rateGood:"Vele" });
-  // M1735: Guana (gva) & Toba-Maskoy (tmf)
-  window.DF_I18N_LOCALES['gva'] = Object.assign({}, baseTemplate, { navFocus:"Kaspa", start:"Tapa", pause:"Posma", rateGood:"Vana" });
-  window.DF_I18N_LOCALES['tmf'] = Object.assign({}, baseTemplate, { navFocus:"Takva", start:"Tukva", pause:"Pikva", rateGood:"Vava" });
-  window.dfLintChacoParity();
+      // M1735: Guana (gva) & Toba-Maskoy (tmf)
+      window.dfLintChacoParity();
   // M1736: Gran Chaco Acoustic Resonance (Desert Night Wind Synth)
   window.dfSynthesizeChacoNightWind = function(ctx){
     if(!ctx) return;
@@ -32716,46 +32560,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1738: Guambiano / Misak (gum)
-  window.DF_I18N_LOCALES['gum'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pikwe", navDecks:"Pikwamik", navStats:"Meran", navSettings:"Asamik",
-    start:"Trikwan", pause:"Pishik", resume:"Trikwan Mo", reset:"Wanpishik", minutes:"min",
-    cardFront:"Nuik", cardBack:"Kulik", flipCard:"Shirikwan", addCard:"Pikwamik Trikwan",
-    deleteCard:"Chorik", save:"Pikwamik Wan", cancel:"Pishik Mo", confirm:"Trikwan To", close:"Pishik",
-    rateAgain:"Trikwan Ya", rateHard:"Kwasrik", rateGood:"Morik", rateEasy:"Lelik"
-  });
-  // M1739: Paez / Nasa Yuwe (pbb)
-  window.DF_I18N_LOCALES['pbb'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kwe'sx", navDecks:"Yatxwe", navStats:"Yuwe'sx", navSettings:"Kwe'we",
-    start:"Pusxna", pause:"Kwe'na", resume:"Pusxna Sx", reset:"Yatxwe Sx", minutes:"min",
-    cardFront:"Theg", cardBack:"Nxusx", flipCard:"Sxi'na", addCard:"Yatxwe Pusxna",
-    deleteCard:"Nxusxna", save:"Pusxwe", cancel:"Kwe'we Sx", confirm:"Pusxna Ha", close:"Kwe'na",
-    rateAgain:"Pusxna Ya", rateHard:"Fxi'ze", rateGood:"Kwekwe", rateEasy:"Nxusthe"
-  });
-  // M1740: Embera-Chami (cmi) & Release v18.8.0
-  window.DF_I18N_LOCALES['cmi'] = Object.assign({}, baseTemplate, {
-    navFocus:"Bed'ea", navDecks:"Kirisia", navStats:"Uburawa", navSettings:"Jaurade",
-    start:"Ode", pause:"Eped'e", resume:"Ode Ba", reset:"Jaurade Ode", minutes:"min",
-    cardFront:"Dua", cardBack:"Burua", flipCard:"Kiruade", addCard:"Kirisia Ode",
-    deleteCard:"Piriade", save:"Kirisia Ba", cancel:"Eped'e Ba", confirm:"Ode Tro", close:"Eped'e",
-    rateAgain:"Ode Waya", rateHard:"Poria", rateGood:"Bia", rateEasy:"Dede"
-  });
-  // M1741: Wounaan (noa)
-  window.DF_I18N_LOCALES['noa'] = Object.assign({}, baseTemplate, {
-    navFocus:"Nemur", navDecks:"Khaag", navStats:"Poro", navSettings:"Thum",
-    start:"Haum", pause:"Peeur", resume:"Haum De", reset:"Thum Haum", minutes:"min",
-    cardFront:"Daph", cardBack:"Khaag Poro", flipCard:"Khaagir", addCard:"Khaag Haum",
-    deleteCard:"Chumir", save:"Khaag Nem", cancel:"Peeur De", confirm:"Haum No", close:"Peeur",
-    rateAgain:"Haum Dee", rateHard:"Kharr", rateGood:"Hajum", rateEasy:"Phaar"
-  });
-  // M1742: Kuna / Guna (cuk)
-  window.DF_I18N_LOCALES['cuk'] = Object.assign({}, baseTemplate, {
-    navFocus:"Igar", navDecks:"Gartir", navStats:"Burba", navSettings:"Nega",
-    start:"Onmake", pause:"Bogwe", resume:"Onmake Ganna", reset:"Gartir Nega", minutes:"min",
-    cardFront:"Asu", cardBack:"Yargan", flipCard:"Gwisgue", addCard:"Gartir Onmake",
-    deleteCard:"Elie", save:"Sabe", cancel:"Bogwe Nega", confirm:"Onmake Bye", close:"Bogwe",
-    rateAgain:"Ganna Onmake", rateHard:"Duleba", rateGood:"Nued", rateEasy:"Sunna"
-  });
-  // M1743: Automated Chibchan & Chocoan Parity Linter
+    // M1739: Paez / Nasa Yuwe (pbb)
+    // M1740: Embera-Chami (cmi) & Release v18.8.0
+    // M1741: Wounaan (noa)
+    // M1742: Kuna / Guna (cuk)
+    // M1743: Automated Chibchan & Chocoan Parity Linter
   window.dfLintChibchanParity = function(){
     ['gum','pbb','cmi','noa','cuk','mot','tbn','cbg','yup'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -32765,12 +32574,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1744: Bari (mot) & U'wa (tbn)
-  window.DF_I18N_LOCALES['mot'] = Object.assign({}, baseTemplate, { navFocus:"Akba", start:"Isha", pause:"Mana", rateGood:"Sura" });
-  window.DF_I18N_LOCALES['tbn'] = Object.assign({}, baseTemplate, { navFocus:"Kajkwa", start:"Rawa", pause:"Chita", rateGood:"Kuba" });
-  // M1745: Chimila (cbg) & Yukpa (yup)
-  window.DF_I18N_LOCALES['cbg'] = Object.assign({}, baseTemplate, { navFocus:"Tette", start:"Kuma", pause:"Niwa", rateGood:"Wesa" });
-  window.DF_I18N_LOCALES['yup'] = Object.assign({}, baseTemplate, { navFocus:"Watpo", start:"Tepu", pause:"Maku", rateGood:"Katu" });
-  window.dfLintChibchanParity();
+      // M1745: Chimila (cbg) & Yukpa (yup)
+      window.dfLintChibchanParity();
   // M1746: Montane Pristine River & Forest Breeze Web Audio Filter
   window.dfSynthesizeAndeanStream = function(ctx){
     if(!ctx) return;
@@ -32798,46 +32603,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1748: Ka'apor (urb)
-  window.DF_I18N_LOCALES['urb'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ma'e", navDecks:"Pape", navStats:"Katu", navSettings:"Pape'i",
-    start:"Pyhu", pause:"Pytu", resume:"Pyhu Je", reset:"Ma'e Pyhu", minutes:"min",
-    cardFront:"Hova", cardBack:"Kupe", flipCard:"Kupe Jukwa", addCard:"Pape Pyhu",
-    deleteCard:"Juka", save:"Katu", cancel:"Pytu Je", confirm:"Pyhu Me", close:"Pytu",
-    rateAgain:"Je Pyhu", rateHard:"Pahi", rateGood:"Katu", rateEasy:"Tutu"
-  });
-  // M1749: Tenetehara / Guajajara (gub)
-  window.DF_I18N_LOCALES['gub'] = Object.assign({}, baseTemplate, {
-    navFocus:"Zekwe", navDecks:"Zekwe-ha", navStats:"Katu-ha", navSettings:"Ma'e-rehe",
-    start:"Zapo", pause:"Pytuhe", resume:"Zapo Wi", reset:"Pytuhe Zapo", minutes:"min",
-    cardFront:"Hova", cardBack:"Kupe", flipCard:"Kupe Me", addCard:"Zekwe-ha Zapo",
-    deleteCard:"Zapo-wer", save:"Zapo Katu", cancel:"Pytuhe Wi", confirm:"Zapo Aze", close:"Pytuhe",
-    rateAgain:"Zapo Wiwe", rateHard:"Iahy", rateGood:"Katu-te", rateEasy:"Wekwe"
-  });
-  // M1750: Xavante (xav) & Release v18.9.0
-  window.DF_I18N_LOCALES['xav'] = Object.assign({}, baseTemplate, {
-    navFocus:"Rowasu'u", navDecks:"Papeba", navStats:"Wahi'rada", navSettings:"Tsimipari",
-    start:"Danho're", pause:"Roto", resume:"Danho're Dur", reset:"Papeba Danho're", minutes:"min",
-    cardFront:"Hi'rata", cardBack:"Höbato", flipCard:"Robtsani", addCard:"Papeba Tsa",
-    deleteCard:"Rowanano", save:"Romano", cancel:"Roto Mano", confirm:"Danho're Ba", close:"Roto",
-    rateAgain:"Dur Mano", rateHard:"Watsu", rateGood:"Rowe", rateEasy:"Dahi"
-  });
-  // M1751: Kayapo / Mebengokre (txu)
-  window.DF_I18N_LOCALES['txu'] = Object.assign({}, baseTemplate, {
-    navFocus:"Mekre", navDecks:"Kagoi", navStats:"Pikwa", navSettings:"Metire",
-    start:"Bitxi", pause:"Katom", resume:"Bitxi Kute", reset:"Kagoi Bitxi", minutes:"min",
-    cardFront:"No", cardBack:"Poto", flipCard:"Mejire", addCard:"Kagoi Txi",
-    deleteCard:"Karwo", save:"Mebeng", cancel:"Katom Me", confirm:"Bitxi Kute", close:"Katom",
-    rateAgain:"Wate Bitxi", rateHard:"Kato", rateGood:"Mex", rateEasy:"Prum"
-  });
-  // M1752: Bororo (bor)
-  window.DF_I18N_LOCALES['bor'] = Object.assign({}, baseTemplate, {
-    navFocus:"Aroe", navDecks:"Boe", navStats:"Karega", navSettings:"Kuruguga",
-    start:"Toro", pause:"Meriji", resume:"Toro Boe", reset:"Kuruguga Toro", minutes:"min",
-    cardFront:"Kowaru", cardBack:"Bato", flipCard:"Tari", addCard:"Boe Toro",
-    deleteCard:"Jeraji", save:"Boe Kudu", cancel:"Meriji Boe", confirm:"Toro Re", close:"Meriji",
-    rateAgain:"Boe Toro Re", rateHard:"Kaigo", rateGood:"Moture", rateEasy:"Pegare"
-  });
-  // M1753: Automated Amazonian Tupi & Macro-Je Parity Linter
+    // M1749: Tenetehara / Guajajara (gub)
+    // M1750: Xavante (xav) & Release v18.9.0
+    // M1751: Kayapo / Mebengokre (txu)
+    // M1752: Bororo (bor)
+    // M1753: Automated Amazonian Tupi & Macro-Je Parity Linter
   window.dfLintMacroJeParity = function(){
     ['urb','gub','xav','txu','bor','kpj','ram','xra','rkb'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -32847,12 +32617,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1754: Karaja (kpj) & Canela (ram)
-  window.DF_I18N_LOCALES['kpj'] = Object.assign({}, baseTemplate, { navFocus:"Iny", start:"Wede", pause:"Koro", rateGood:"Hawena" });
-  window.DF_I18N_LOCALES['ram'] = Object.assign({}, baseTemplate, { navFocus:"Kra", start:"Haam", pause:"Teeh", rateGood:"Pej" });
-  // M1755: Kraho (xra) & Rikbaktsa (rkb)
-  window.DF_I18N_LOCALES['xra'] = Object.assign({}, baseTemplate, { navFocus:"Cran", start:"Hi'am", pause:"Toon", rateGood:"Pej-re" });
-  window.DF_I18N_LOCALES['rkb'] = Object.assign({}, baseTemplate, { navFocus:"Aso", start:"Tsaka", pause:"Puku", rateGood:"Bata" });
-  window.dfLintMacroJeParity();
+      // M1755: Kraho (xra) & Rikbaktsa (rkb)
+      window.dfLintMacroJeParity();
   // M1756: Amazon Canopy Rain & Gentle Rustle Web Audio Filter
   window.dfSynthesizeAmazonCanopyRain = function(ctx){
     if(!ctx) return;
@@ -32880,46 +32646,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1758: Ashaninka (cni)
-  window.DF_I18N_LOCALES['cni'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kenkitsarentsi", navDecks:"Pampitha", navStats:"Kametsari", navSettings:"Aminagantsi",
-    start:"Antagantsi", pause:"Tsori", resume:"Anta Aiki", reset:"Aminagantsi Anta", minutes:"min",
-    cardFront:"Ivoro", cardBack:"Iitoki", flipCard:"Pitsikagantsi", addCard:"Pampitha Anta",
-    deleteCard:"Iroagantsi", save:"Kametsa", cancel:"Tsori Aiki", confirm:"Antagantsi Je", close:"Tsori",
-    rateAgain:"Aiki Anta", rateHard:"Katsirinkari", rateGood:"Kametsa", rateEasy:"Mapo"
-  });
-  // M1759: Machiguenga (mcb)
-  window.DF_I18N_LOCALES['mcb'] = Object.assign({}, baseTemplate, {
-    navFocus:"Surevagetagantsi", navDecks:"Sanani", navStats:"Kavako", navSettings:"Otimotagantsi",
-    start:"Ntagantsi", pause:"Pome", resume:"Ntagantsi Ai", reset:"Sanani Ntagantsi", minutes:"min",
-    cardFront:"Ivanko", cardBack:"Itinkami", flipCard:"Pashini", addCard:"Sanani Nta",
-    deleteCard:"Ovisagantsi", save:"Kavako", cancel:"Pome Ai", confirm:"Ntagantsi Oje", close:"Pome",
-    rateAgain:"Ai Ntagantsi", rateHard:"Tsayagantsi", rateGood:"Kameti", rateEasy:"Shiro"
-  });
-  // M1760: Yanesha (ame) & Grand Golden Master v19.0.0
-  window.DF_I18N_LOCALES['ame'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yechanyets", navDecks:"Kartas", navStats:"Muenolets", navSettings:"Yotenets",
-    start:"Entsopats", pause:"Semuets", resume:"Entsopats Pa", reset:"Kartas Entsopats", minutes:"min",
-    cardFront:"Orono", cardBack:"Otyon", flipCard:"Yollets", addCard:"Kartas Entsopats",
-    deleteCard:"Yapañets", save:"Muenolets", cancel:"Semuets Pa", confirm:"Entsopats To", close:"Semuets",
-    rateAgain:"Pa Entsopats", rateHard:"Kortasnets", rateGood:"Puerets", rateEasy:"Mellots"
-  });
-  // M1761: Waiwai (waw)
-  window.DF_I18N_LOCALES['waw'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kariway", navDecks:"Karetayan", navStats:"Kaxwapan", navSettings:"Yawotï",
-    start:"Tïkamin", pause:"Eserï", resume:"Tïkamin Po", reset:"Karetayan Tïkamin", minutes:"min",
-    cardFront:"Epyan", cardBack:"Epona", flipCard:"Eperun", addCard:"Karetayan Tïka",
-    deleteCard:"Ekuran", save:"Kaxwapan", cancel:"Eserï Po", confirm:"Tïkamin Ma", close:"Eserï",
-    rateAgain:"Po Tïkamin", rateHard:"Tïwawon", rateGood:"Kaponan", rateEasy:"Maran"
-  });
-  // M1762: Tiriyo / Trio (tri)
-  window.DF_I18N_LOCALES['tri'] = Object.assign({}, baseTemplate, {
-    navFocus:"Senpan", navDecks:"Kareta", navStats:"Kureman", navSettings:"Tïwetomin",
-    start:"Tïkamin", pause:"Esenan", resume:"Tïkamin Se", reset:"Kareta Tïkamin", minutes:"min",
-    cardFront:"Erenpo", cardBack:"Ekapïn", flipCard:"Eperuka", addCard:"Kareta Tïka",
-    deleteCard:"Esenan", save:"Kureman", cancel:"Esenan Se", confirm:"Tïkamin To", close:"Esenan",
-    rateAgain:"Se Tïkamin", rateHard:"Sawaran", rateGood:"Kure", rateEasy:"Tïpein"
-  });
-  // M1763: Automated Parity Linter for Arawak-Carib Languages
+    // M1759: Machiguenga (mcb)
+    // M1760: Yanesha (ame) & Grand Golden Master v19.0.0
+    // M1761: Waiwai (waw)
+    // M1762: Tiriyo / Trio (tri)
+    // M1763: Automated Parity Linter for Arawak-Carib Languages
   window.dfLintArawakCaribParity = function(){
     ['cni','mcb','ame','waw','tri','pio','kpc','plu','mbc'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -32929,12 +32660,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1764: Piapoco (pio) & Curripaco (kpc)
-  window.DF_I18N_LOCALES['pio'] = Object.assign({}, baseTemplate, { navFocus:"Cuaica", start:"Yaca", pause:"Maca", rateGood:"Cawata" });
-  window.DF_I18N_LOCALES['kpc'] = Object.assign({}, baseTemplate, { navFocus:"Kuaika", start:"Yaka", pause:"Maka", rateGood:"Kawata" });
-  // M1765: Palikur (plu) & Macushi (mbc)
-  window.DF_I18N_LOCALES['plu'] = Object.assign({}, baseTemplate, { navFocus:"Ahava", start:"Kava", pause:"Paka", rateGood:"Waway" });
-  window.DF_I18N_LOCALES['mbc'] = Object.assign({}, baseTemplate, { navFocus:"Morin", start:"Tika", pause:"Esena", rateGood:"Kure" });
-  window.dfLintArawakCaribParity();
+      // M1765: Palikur (plu) & Macushi (mbc)
+      window.dfLintArawakCaribParity();
   // M1766: Pristine Forest Canopy River & Mist Web Audio Filter
   window.dfSynthesizeCanopyMist = function(ctx){
     if(!ctx) return;
@@ -32962,46 +32689,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1768: Evenki (evn)
-  window.DF_I18N_LOCALES['evn'] = Object.assign({}, baseTemplate, {
-    navFocus:"Maran", navDecks:"Kartas", navStats:"Duktewun", navSettings:"Ayalapchun",
-    start:"Derugi", pause:"Tolon", resume:"Derugi Wari", reset:"Duktewun Derugi", minutes:"min",
-    cardFront:"Julipken", cardBack:"Koyon", flipCard:"Ugli", addCard:"Kartas Derugi",
-    deleteCard:"Baka", save:"Aya", cancel:"Tolon Wari", confirm:"Derugi Za", close:"Tolon",
-    rateAgain:"Wari Derugi", rateHard:"Magal", rateGood:"Aya", rateEasy:"Lugu"
-  });
-  // M1769: Even (eve)
-  window.DF_I18N_LOCALES['eve'] = Object.assign({}, baseTemplate, {
-    navFocus:"Garan", navDecks:"Halan", navStats:"Duktewan", navSettings:"Iten",
-    start:"Derulge", pause:"Halan", resume:"Derulge Ge", reset:"Halan Derulge", minutes:"min",
-    cardFront:"Julgan", cardBack:"Koyin", flipCard:"Ulgit", addCard:"Halan Derul",
-    deleteCard:"Bukan", save:"Aya", cancel:"Halan Ge", confirm:"Derulge Za", close:"Halan",
-    rateAgain:"Ge Derulge", rateHard:"Megeln", rateGood:"Aya", rateEasy:"Luhun"
-  });
-  // M1770: Nanai (gld) & Milestone Release v19.1.0
-  window.DF_I18N_LOCALES['gld'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sorol", navDecks:"Debtero", navStats:"Dursen", navSettings:"Horo",
-    start:"Derin", pause:"Manan", resume:"Derin Da", reset:"Debtero Derin", minutes:"min",
-    cardFront:"Julon", cardBack:"Koyon", flipCard:"Degdu", addCard:"Debtero Derin",
-    deleteCard:"Gesi", save:"Aya", cancel:"Manan Da", confirm:"Derin Gi", close:"Manan",
-    rateAgain:"Da Derin", rateHard:"Mange", rateGood:"Aya", rateEasy:"Nehu"
-  });
-  // M1771: Chukchi (ckt)
-  window.DF_I18N_LOCALES['ckt'] = Object.assign({}, baseTemplate, {
-    navFocus:"Gyrgol", navDecks:"Kalik", navStats:"Tan'am", navSettings:"Yyvalet",
-    start:"Tykye", pause:"Palqo", resume:"Tykye Em", reset:"Kalik Tykye", minutes:"min",
-    cardFront:"Yatgyn", cardBack:"Gytgon", flipCard:"Piligyt", addCard:"Kalik Tyk",
-    deleteCard:"Nirqa", save:"Tene", cancel:"Palqo Em", confirm:"Tykye E", close:"Palqo",
-    rateAgain:"Em Tykye", rateHard:"Wurgyn", rateGood:"Tan'am", rateEasy:"Nenme"
-  });
-  // M1772: Koryak (kpy)
-  window.DF_I18N_LOCALES['kpy'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yirgol", navDecks:"Kalikak", navStats:"Tan'yk", navSettings:"Inan",
-    start:"Tykyl", pause:"Pelqo", resume:"Tykyl Em", reset:"Kalikak Tykyl", minutes:"min",
-    cardFront:"Yatgyn", cardBack:"Gitgon", flipCard:"Pelit", addCard:"Kalikak Tyk",
-    deleteCard:"Nerqa", save:"Tene", cancel:"Pelqo Em", confirm:"Tykyl E", close:"Pelqo",
-    rateAgain:"Em Tykyl", rateHard:"Worgyn", rateGood:"Tan'yk", rateEasy:"Nemle"
-  });
-  // M1773: Automated Parity Linter for Siberian Tungusic-Chukotkan
+    // M1769: Even (eve)
+    // M1770: Nanai (gld) & Milestone Release v19.1.0
+    // M1771: Chukchi (ckt)
+    // M1772: Koryak (kpy)
+    // M1773: Automated Parity Linter for Siberian Tungusic-Chukotkan
   window.dfLintSiberianParity = function(){
     ['evn','eve','gld','ckt','kpy','itl','niv','yux','ude'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -33011,12 +32703,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1774: Itelmen (itl) & Nivkh (niv)
-  window.DF_I18N_LOCALES['itl'] = Object.assign({}, baseTemplate, { navFocus:"Kist", start:"Telk", pause:"Polq", rateGood:"K'zal" });
-  window.DF_I18N_LOCALES['niv'] = Object.assign({}, baseTemplate, { navFocus:"Eskur", start:"Tavr", pause:"Parr", rateGood:"Yul" });
-  // M1775: Yukaghir (yux) & Udege (ude)
-  window.DF_I18N_LOCALES['yux'] = Object.assign({}, baseTemplate, { navFocus:"Elie", start:"Tide", pause:"Podil", rateGood:"Kewey" });
-  window.DF_I18N_LOCALES['ude'] = Object.assign({}, baseTemplate, { navFocus:"Bisin", start:"Derin", pause:"Menin", rateGood:"Aya" });
-  window.dfLintSiberianParity();
+      // M1775: Yukaghir (yux) & Udege (ude)
+      window.dfLintSiberianParity();
   // M1776: Taiga Frost Wind & Crisp Snow Rustle Web Audio Filter
   window.dfSynthesizeTaigaFrost = function(ctx){
     if(!ctx) return;
@@ -33044,46 +32732,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1778: Dani (dnw)
-  window.DF_I18N_LOCALES['dnw'] = Object.assign({}, baseTemplate, {
-    navFocus:"Akoni", navDecks:"Katik", navStats:"Nabuwa", navSettings:"Atamuk",
-    start:"Wani", pause:"Lekano", resume:"Wani O", reset:"Katik Wani", minutes:"min",
-    cardFront:"Amuk", cardBack:"Koyon", flipCard:"Welik", addCard:"Katik Wani",
-    deleteCard:"Pili", save:"Nabuwa", cancel:"Lekano O", confirm:"Wani Ti", close:"Lekano",
-    rateAgain:"O Wani", rateHard:"Konak", rateGood:"Aka", rateEasy:"Welu"
-  });
-  // M1779: Ekari / Mee (ekg)
-  window.DF_I18N_LOCALES['ekg'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ita", navDecks:"Surat", navStats:"Ena", navSettings:"Baga",
-    start:"Gai", pause:"Teipou", resume:"Gai Ma", reset:"Surat Gai", minutes:"min",
-    cardFront:"Wadoka", cardBack:"Yagiyo", flipCard:"Bagei", addCard:"Surat Gai",
-    deleteCard:"Dabou", save:"Ena", cancel:"Teipou Ma", confirm:"Gai Ka", close:"Teipou",
-    rateAgain:"Ma Gai", rateHard:"Puka", rateGood:"Eniya", rateEasy:"Kipou"
-  });
-  // M1780: Asmat (asy) & Milestone Release v19.2.0
-  window.DF_I18N_LOCALES['asy'] = Object.assign({}, baseTemplate, {
-    navFocus:"Safan", navDecks:"Jow", navStats:"Yipai", navSettings:"Mimis",
-    start:"Tewur", pause:"Poro", resume:"Tewur Ap", reset:"Jow Tewur", minutes:"min",
-    cardFront:"Birim", cardBack:"Yipin", flipCard:"Cimir", addCard:"Jow Tewur",
-    deleteCard:"Sipir", save:"Yipai", cancel:"Poro Ap", confirm:"Tewur Ka", close:"Poro",
-    rateAgain:"Ap Tewur", rateHard:"Maka", rateGood:"Yiri", rateEasy:"Pirip"
-  });
-  // M1781: Marind (mrz)
-  window.DF_I18N_LOCALES['mrz'] = Object.assign({}, baseTemplate, {
-    navFocus:"Arak", navDecks:"Kati", navStats:"Warem", navSettings:"Kibit",
-    start:"Mirav", pause:"Kavur", resume:"Mirav Ba", reset:"Kati Mirav", minutes:"min",
-    cardFront:"Sangon", cardBack:"Kukap", flipCard:"Kovip", addCard:"Kati Mirav",
-    deleteCard:"Patav", save:"Warem", cancel:"Kavur Ba", confirm:"Mirav Ka", close:"Kavur",
-    rateAgain:"Ba Mirav", rateHard:"Yarav", rateGood:"Wari", rateEasy:"Manav"
-  });
-  // M1782: Yagaria (ygr)
-  window.DF_I18N_LOCALES['ygr'] = Object.assign({}, baseTemplate, {
-    navFocus:"Hono", navDecks:"Bega", navStats:"Hane", navSettings:"Seli",
-    start:"Hagava", pause:"Hele", resume:"Hagava To", reset:"Bega Hagava", minutes:"min",
-    cardFront:"Hapa", cardBack:"Galo", flipCard:"Kolo", addCard:"Bega Hagava",
-    deleteCard:"Vole", save:"Hane", cancel:"Hele To", confirm:"Hagava Te", close:"Hele",
-    rateAgain:"To Hagava", rateHard:"Bokono", rateGood:"Losa", rateEasy:"Paga"
-  });
-  // M1783: Automated Parity Linter for Trans-New Guinea Languages
+    // M1779: Ekari / Mee (ekg)
+    // M1780: Asmat (asy) & Milestone Release v19.2.0
+    // M1781: Marind (mrz)
+    // M1782: Yagaria (ygr)
+    // M1783: Automated Parity Linter for Trans-New Guinea Languages
   window.dfLintTransNewGuineaParity = function(){
     ['dnw','ekg','asy','mrz','ygr','kbq','for','gaj','awb'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -33093,12 +32746,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1784: Kamano (kbq) & Fore (for)
-  window.DF_I18N_LOCALES['kbq'] = Object.assign({}, baseTemplate, { navFocus:"Ageno", start:"Erio", pause:"Megio", rateGood:"Kena" });
-  window.DF_I18N_LOCALES['for'] = Object.assign({}, baseTemplate, { navFocus:"Yaba", start:"Kara", pause:"Tagi", rateGood:"Nampa" });
-  // M1785: Gadsup (gaj) & Awa (awb)
-  window.DF_I18N_LOCALES['gaj'] = Object.assign({}, baseTemplate, { navFocus:"Tani", start:"Ino", pause:"Amo", rateGood:"Ono" });
-  window.DF_I18N_LOCALES['awb'] = Object.assign({}, baseTemplate, { navFocus:"Nahno", start:"Uyo", pause:"Peno", rateGood:"Kaho" });
-  window.dfLintTransNewGuineaParity();
+      // M1785: Gadsup (gaj) & Awa (awb)
+      window.dfLintTransNewGuineaParity();
   // M1786: Highland Waterfall & Montane Mist Web Audio Filter
   window.dfSynthesizeHighlandWaterfall = function(ctx){
     if(!ctx) return;
@@ -33126,46 +32775,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1788: Warlpiri (wbp)
-  window.DF_I18N_LOCALES['wbp'] = Object.assign({}, baseTemplate, {
-    navFocus:"Manngu-nyanyi", navDecks:"Purlapa", navStats:"Ngangkayi", navSettings:"Yimi-ngarrirni",
-    start:"Jirrnganja", pause:"Karrija", resume:"Jirrnganja Yapa", reset:"Purlapa Jirrnganja", minutes:"min",
-    cardFront:"Kamparru", cardBack:"Purungku", flipCard:"Warru-kanyi", addCard:"Purlapa Yiri",
-    deleteCard:"Lawa-mani", save:"Ngurrju", cancel:"Karrija Yapa", confirm:"Jirrnganja Ngana", close:"Karrija",
-    rateAgain:"Yapa Jirrnganja", rateHard:"Tarrka", rateGood:"Ngurrju", rateEasy:"Wilypi"
-  });
-  // M1789: Pitjantjatjara (pjt)
-  window.DF_I18N_LOCALES['pjt'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kulini", navDecks:"Tjukurpa", navStats:"Wangka", navSettings:"Ara-tjunanyi",
-    start:"Tjilpi", pause:"Kanyini", resume:"Tjilpi Malu", reset:"Tjukurpa Tjilpi", minutes:"min",
-    cardFront:"Kuranyukutu", cardBack:"Mala", flipCard:"Kutjupatjunanyi", addCard:"Tjukurpa Tjari",
-    deleteCard:"Wiyani", save:"Palya", cancel:"Kanyini Malu", confirm:"Tjilpi Munu", close:"Kanyini",
-    rateAgain:"Malu Tjilpi", rateHard:"Punta", rateGood:"Palya", rateEasy:"Mukumuku"
-  });
-  // M1790: Arrernte (aer) & Milestone Release v19.3.0
-  window.DF_I18N_LOCALES['aer'] = Object.assign({}, baseTemplate, {
-    navFocus:"Arelhe", navDecks:"Pwerte", navStats:"Angkentye", navSettings:"Arntarnte",
-    start:"Mpware", pause:"Kele", resume:"Mpware Wethe", reset:"Pwerte Mpware", minutes:"min",
-    cardFront:"Urrperle", cardBack:"Ingkerreke", flipCard:"Iwerre", addCard:"Pwerte Arntye",
-    deleteCard:"Ilwethe", save:"Mwarre", cancel:"Kele Wethe", confirm:"Mpware Nhenge", close:"Kele",
-    rateAgain:"Wethe Mpware", rateHard:"Akngerre", rateGood:"Mwarre", rateEasy:"Alyere"
-  });
-  // M1791: Kala Lagaw Ya (mwp)
-  window.DF_I18N_LOCALES['mwp'] = Object.assign({}, baseTemplate, {
-    navFocus:"Wati", navDecks:"Yabu", navStats:"Kazi", navSettings:"Moegina",
-    start:"Maza", pause:"Pathan", resume:"Maza Kedha", reset:"Yabu Maza", minutes:"min",
-    cardFront:"Goeiga", cardBack:"Kuta", flipCard:"Thapil", addCard:"Yabu Maza",
-    deleteCard:"Dapar", save:"Kabu", cancel:"Pathan Kedha", confirm:"Maza Zo", close:"Pathan",
-    rateAgain:"Kedha Maza", rateHard:"Kula", rateGood:"Kapu", rateEasy:"Mina"
-  });
-  // M1792: Tiwi (tiw)
-  window.DF_I18N_LOCALES['tiw'] = Object.assign({}, baseTemplate, {
-    navFocus:"Murruntani", navDecks:"Yoyi", navStats:"Kupunyi", navSettings:"Awarra",
-    start:"Pirripirri", pause:"Ngirramini", resume:"Pirripirri Nu", reset:"Yoyi Pirripirri", minutes:"min",
-    cardFront:"Wuta", cardBack:"Yinkiti", flipCard:"Arikita", addCard:"Yoyi Pirri",
-    deleteCard:"Mantuwuj", save:"Ngini", cancel:"Ngirramini Nu", confirm:"Pirripirri Wo", close:"Ngirramini",
-    rateAgain:"Nu Pirripirri", rateHard:"Murrukupuni", rateGood:"Yinkiti", rateEasy:"Amiya"
-  });
-  // M1793: Automated Parity Linter for Australian Indigenous Languages
+    // M1789: Pitjantjatjara (pjt)
+    // M1790: Arrernte (aer) & Milestone Release v19.3.0
+    // M1791: Kala Lagaw Ya (mwp)
+    // M1792: Tiwi (tiw)
+    // M1793: Automated Parity Linter for Australian Indigenous Languages
   window.dfLintAustralianParity = function(){
     ['wbp','pjt','aer','mwp','tiw','dhu','gue','mwf','aly'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -33175,12 +32789,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1794: Yolngu Matha (dhu) & Gurindji (gue)
-  window.DF_I18N_LOCALES['dhu'] = Object.assign({}, baseTemplate, { navFocus:"Dhukarr", start:"Buma", pause:"Gorrmur", rateGood:"Manymak" });
-  window.DF_I18N_LOCALES['gue'] = Object.assign({}, baseTemplate, { navFocus:"Jawiji", start:"Kankula", pause:"Marluka", rateGood:"Jangarna" });
-  // M1795: Murrinh-patha (mwf) & Alyawarr (aly)
-  window.DF_I18N_LOCALES['mwf'] = Object.assign({}, baseTemplate, { navFocus:"Kanyi", start:"Thamul", pause:"Diminin", rateGood:"Yida" });
-  window.DF_I18N_LOCALES['aly'] = Object.assign({}, baseTemplate, { navFocus:"Arely", start:"Mparn", pause:"Kweley", rateGood:"Mwerre" });
-  window.dfLintAustralianParity();
+      // M1795: Murrinh-patha (mwf) & Alyawarr (aly)
+      window.dfLintAustralianParity();
   // M1796: Outback Red Sand Breeze & Gentle Twilight Web Audio Filter
   window.dfSynthesizeOutbackBreeze = function(ctx){
     if(!ctx) return;
@@ -33208,46 +32818,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1798: Blackfoot (bla)
-  window.DF_I18N_LOCALES['bla'] = Object.assign({}, baseTemplate, {
-    navFocus:"Mokakin", navDecks:"Sinaksin", navStats:"Aikoan", navSettings:"Iiksisawa",
-    start:"Matsitapi", pause:"Niipowa", resume:"Matsitapi Ki", reset:"Sinaksin Matsi", minutes:"min",
-    cardFront:"Moapisi", cardBack:"Moipisi", flipCard:"Kiksisawa", addCard:"Sinaksin Mats",
-    deleteCard:"Inikats", save:"Ayo", cancel:"Niipowa Ki", confirm:"Matsitapi Wa", close:"Niipowa",
-    rateAgain:"Ki Matsitapi", rateHard:"Iikksik", rateGood:"Ayo", rateEasy:"Iiko"
-  });
-  // M1799: Lakota (lkt)
-  window.DF_I18N_LOCALES['lkt'] = Object.assign({}, baseTemplate, {
-    navFocus:"Wacintanka", navDecks:"Wowapi", navStats:"Wicoie", navSettings:"Wicozani",
-    start:"Tokeca", pause:"Inazin", resume:"Tokeca Ake", reset:"Wowapi Tokeca", minutes:"min",
-    cardFront:"Ite", cardBack:"Cankahu", flipCard:"Yuhomni", addCard:"Wowapi Kaga",
-    deleteCard:"Paza", save:"Waste", cancel:"Inazin Ake", confirm:"Tokeca Hwo", close:"Inazin",
-    rateAgain:"Ake Tokeca", rateHard:"Tehiya", rateGood:"Waste", rateEasy:"Prem"
-  });
-  // M1800: Cheyenne (chy) & Milestone Release v19.4.0
-  window.DF_I18N_LOCALES['chy'] = Object.assign({}, baseTemplate, {
-    navFocus:"Hestahe", navDecks:"Meohe", navStats:"Voestano", navSettings:"Hoesta",
-    start:"Aseece", pause:"Neece", resume:"Aseece Neva", reset:"Meohe Aseece", minutes:"min",
-    cardFront:"Maheo", cardBack:"Hece", flipCard:"Honeve", addCard:"Meohe Asee",
-    deleteCard:"Neeva", save:"Peva", cancel:"Neece Neva", confirm:"Aseece Hane", close:"Neece",
-    rateAgain:"Neva Aseece", rateHard:"Oheke", rateGood:"Peva'e", rateEasy:"Hesee"
-  });
-  // M1801: Nez Perce (nez)
-  window.DF_I18N_LOCALES['nez'] = Object.assign({}, baseTemplate, {
-    navFocus:"Timine", navDecks:"Timyena", navStats:"Wewukiye", navSettings:"Helelikt",
-    start:"Kuuyn", pause:"Tekeyn", resume:"Kuuyn Kee", reset:"Timyena Kuuyn", minutes:"min",
-    cardFront:"Silu", cardBack:"Piliks", flipCard:"Likoliks", addCard:"Timyena Kuu",
-    deleteCard:"Wiliks", save:"Taqc", cancel:"Tekeyn Kee", confirm:"Kuuyn Ee", close:"Tekeyn",
-    rateAgain:"Kee Kuuyn", rateHard:"Kapat", rateGood:"Taqc", rateEasy:"Lehec"
-  });
-  // M1802: Crow (cro)
-  window.DF_I18N_LOCALES['cro'] = Object.assign({}, baseTemplate, {
-    navFocus:"Daxpitche", navDecks:"Baapii", navStats:"Awawaatchi", navSettings:"Bachee",
-    start:"Dii", pause:"Hawa", resume:"Dii Ko", reset:"Baapii Dii", minutes:"min",
-    cardFront:"Iishte", cardBack:"Daashe", flipCard:"Kulaachi", addCard:"Baapii Dii",
-    deleteCard:"Baaxuahi", save:"Ichiik", cancel:"Hawa Ko", confirm:"Dii Haa", close:"Hawa",
-    rateAgain:"Ko Dii", rateHard:"Sapchi", rateGood:"Ichiik", rateEasy:"Dapihe"
-  });
-  // M1803: Automated Parity Linter for Plains & Plateau Languages
+    // M1799: Lakota (lkt)
+    // M1800: Cheyenne (chy) & Milestone Release v19.4.0
+    // M1801: Nez Perce (nez)
+    // M1802: Crow (cro)
+    // M1803: Automated Parity Linter for Plains & Plateau Languages
   window.dfLintPlainsParity = function(){
     ['bla','lkt','chy','nez','cro','arp','shh','com','fla'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -33257,12 +32832,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1804: Arapaho (arp) & Shoshone (shh)
-  window.DF_I18N_LOCALES['arp'] = Object.assign({}, baseTemplate, { navFocus:"Hinen", start:"Ce'e", pause:"Tohot", rateGood:"Heneece" });
-  window.DF_I18N_LOCALES['shh'] = Object.assign({}, baseTemplate, { navFocus:"Nemme", start:"Mia", pause:"Katsa", rateGood:"Tsatso" });
-  // M1805: Comanche (com) & Salish (fla)
-  window.DF_I18N_LOCALES['com'] = Object.assign({}, baseTemplate, { navFocus:"Numu", start:"Miat", pause:"Tubi", rateGood:"Cha" });
-  window.DF_I18N_LOCALES['fla'] = Object.assign({}, baseTemplate, { navFocus:"Sqelixw", start:"Hoyt", pause:"Telx", rateGood:"Gest" });
-  window.dfLintPlainsParity();
+      // M1805: Comanche (com) & Salish (fla)
+      window.dfLintPlainsParity();
   // M1806: Great Plains Prairie Wind & Grass Rustle Web Audio Filter
   window.dfSynthesizePrairieWind = function(ctx){
     if(!ctx) return;
@@ -33290,46 +32861,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1808: Western Apache (apw)
-  window.DF_I18N_LOCALES['apw'] = Object.assign({}, baseTemplate, {
-    navFocus:"Biini'", navDecks:"Naaltsoos", navStats:"Nizhoni", navSettings:"Ihi'na",
-    start:"Diyin", pause:"Hadaago", resume:"Diyin Daa", reset:"Naaltsoos Diyin", minutes:"min",
-    cardFront:"Bitse'", cardBack:"Bik'e", flipCard:"Nabilkide", addCard:"Naaltsoos Diy",
-    deleteCard:"Ch'a'ah", save:"Nzhon", cancel:"Hadaago Daa", confirm:"Diyin Le'", close:"Hadaago",
-    rateAgain:"Daa Diyin", rateHard:"Dant'e", rateGood:"Nzhon", rateEasy:"Dahozo"
-  });
-  // M1809: Hopi (hop)
-  window.DF_I18N_LOCALES['hop'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tuwqayta", navDecks:"Tutskwa", navStats:"Qaatsat", navSettings:"Angqaqvö",
-    start:"Hoyta", pause:"Hurry", resume:"Hoyta Piw", reset:"Tutskwa Hoyta", minutes:"min",
-    cardFront:"Maatsiw", cardBack:"Kwayngyap", flipCard:"Rikipna", addCard:"Tutskwa Hoy",
-    deleteCard:"Sulaw", save:"Loma", cancel:"Hurry Piw", confirm:"Hoyta Ant", close:"Hurry",
-    rateAgain:"Piw Hoyta", rateHard:"Pasiwtani", rateGood:"Loma", rateEasy:"Haalay"
-  });
-  // M1810: Zuni (zun) & Milestone Release v19.5.0
-  window.DF_I18N_LOCALES['zun'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yadokkya", navDecks:"Ts'ina", navStats:"K'yakwepur", navSettings:"Ank'ohona",
-    start:"Aye", pause:"K'oli", resume:"Aye Le'na", reset:"Ts'ina Aye", minutes:"min",
-    cardFront:"Idonnakya", cardBack:"Aklinakya", flipCard:"Leluna", addCard:"Ts'ina Aye",
-    deleteCard:"Achiya", save:"K'okshi", cancel:"K'oli Le'na", confirm:"Aye Te", close:"K'oli",
-    rateAgain:"Le'na Aye", rateHard:"Tek'yanna", rateGood:"K'okshi", rateEasy:"De'chi"
-  });
-  // M1811: Tohono O'odham (ood)
-  window.DF_I18N_LOCALES['ood'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ta:tham", navDecks:"O'ohon", navStats:"S-ke:g", navSettings:"Wamad",
-    start:"Cucxik", pause:"Ke:k", resume:"Cucxik We:p", reset:"O'ohon Cucxik", minutes:"min",
-    cardFront:"Ba:ba", cardBack:"To:ha", flipCard:"Kelik", addCard:"O'ohon Cuc",
-    deleteCard:"Pi-ap'e", save:"S-ke:g", cancel:"Ke:k We:p", confirm:"Cucxik O", close:"Ke:k",
-    rateAgain:"We:p Cucxik", rateHard:"S-hasco", rateGood:"S-ke:g", rateEasy:"S-moik"
-  });
-  // M1812: Tewa (tew)
-  window.DF_I18N_LOCALES['tew'] = Object.assign({}, baseTemplate, {
-    navFocus:"Khunwa", navDecks:"Phwo", navStats:"Sengbe", navSettings:"Tumbin",
-    start:"Ta", pause:"Hiyo", resume:"Ta Dha", reset:"Phwo Ta", minutes:"min",
-    cardFront:"Tsi", cardBack:"Hae", flipCard:"P'iye", addCard:"Phwo Ta",
-    deleteCard:"T'aa", save:"Haehwa", cancel:"Hiyo Dha", confirm:"Ta Ho", close:"Hiyo",
-    rateAgain:"Dha Ta", rateHard:"Thuu", rateGood:"Haehwa", rateEasy:"Mbe"
-  });
-  // M1813: Automated Parity Linter for Southwest Indigenous & Pueblo Languages
+    // M1809: Hopi (hop)
+    // M1810: Zuni (zun) & Milestone Release v19.5.0
+    // M1811: Tohono O'odham (ood)
+    // M1812: Tewa (tew)
+    // M1813: Automated Parity Linter for Southwest Indigenous & Pueblo Languages
   window.dfLintSouthwestParity = function(){
     ['apw','hop','zun','ood','tew','apm','apj','yuf','mrc'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -33339,12 +32875,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1814: Mescalero (apm) & Jicarilla (apj)
-  window.DF_I18N_LOCALES['apm'] = Object.assign({}, baseTemplate, { navFocus:"Isee", start:"Diyi", pause:"Hada", rateGood:"Nzho" });
-  window.DF_I18N_LOCALES['apj'] = Object.assign({}, baseTemplate, { navFocus:"Ishii", start:"Diyin", pause:"Hade", rateGood:"Nzhoo" });
-  // M1815: Havasupai (yuf) & Maricopa (mrc)
-  window.DF_I18N_LOCALES['yuf'] = Object.assign({}, baseTemplate, { navFocus:"Hamat", start:"Yuwa", pause:"Teve", rateGood:"Hanyuk" });
-  window.DF_I18N_LOCALES['mrc'] = Object.assign({}, baseTemplate, { navFocus:"Pipa", start:"Mii", pause:"Vak", rateGood:"Hotk" });
-  window.dfLintSouthwestParity();
+      // M1815: Havasupai (yuf) & Maricopa (mrc)
+      window.dfLintSouthwestParity();
   // M1816: Red Rock Canyon Breeze & Dry Cedar Web Audio Filter
   window.dfSynthesizeCanyonBreeze = function(ctx){
     if(!ctx) return;
@@ -33372,46 +32904,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1818: Lushootseed (lut)
-  window.DF_I18N_LOCALES['lut'] = Object.assign({}, baseTemplate, {
-    navFocus:"Halgwats", navDecks:"Xwlalab", navStats:"Ha'lid", navSettings:"Kwekwat",
-    start:"Tilib", pause:"Hukw", resume:"Tilib Da", reset:"Xwlalab Tilib", minutes:"min",
-    cardFront:"Chala", cardBack:"Koyon", flipCard:"Kwalat", addCard:"Xwlalab Tili",
-    deleteCard:"Xwukw", save:"Ha'lich", cancel:"Hukw Da", confirm:"Tilib Chut", close:"Hukw",
-    rateAgain:"Da Tilib", rateHard:"Kwalich", rateGood:"Ha'l", rateEasy:"Xwekw"
-  });
-  // M1819: Halkomelem (hur)
-  window.DF_I18N_LOCALES['hur'] = Object.assign({}, baseTemplate, {
-    navFocus:"Shxwelat", navDecks:"Pipel", navStats:"Ey", navSettings:"Xweye",
-    start:"Tsilas", pause:"Tlhikw", resume:"Tsilas Te", reset:"Pipel Tsilas", minutes:"min",
-    cardFront:"Satsus", cardBack:"Smelt", flipCard:"Kwalet", addCard:"Pipel Tsila",
-    deleteCard:"Hekwt", save:"Ey", cancel:"Tlhikw Te", confirm:"Tsilas We", close:"Tlhikw",
-    rateAgain:"Te Tsilas", rateHard:"Dzits", rateGood:"Ey", rateEasy:"Lhkwekw"
-  });
-  // M1820: Haida (hai) & Milestone Release v19.6.0
-  window.DF_I18N_LOCALES['hai'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kilslaay", navDecks:"Gugann", navStats:"Laa", navSettings:"Kugann",
-    start:"Kuu", pause:"Tlay", resume:"Kuu Gwa", reset:"Gugann Kuu", minutes:"min",
-    cardFront:"Xang", cardBack:"Sgul", flipCard:"Gidung", addCard:"Gugann Kuu",
-    deleteCard:"Tlaging", save:"Laa", cancel:"Tlay Gwa", confirm:"Kuu Aahl", close:"Tlay",
-    rateAgain:"Gwa Kuu", rateHard:"Gudang", rateGood:"Laa", rateEasy:"Kaa"
-  });
-  // M1821: Tlingit (tli)
-  window.DF_I18N_LOCALES['tli'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tuwatee", navDecks:"X'oos", navStats:"Yak'ei", navSettings:"Daat",
-    start:"Goot", pause:"X'ei", resume:"Goot Ts'oot", reset:"X'oos Goot", minutes:"min",
-    cardFront:"Shuká", cardBack:"Litk", flipCard:"K'watee", addCard:"X'oos Goo",
-    deleteCard:"Gax'ei", save:"Yak'ei", cancel:"X'ei Ts'oot", confirm:"Goot Dé", close:"X'ei",
-    rateAgain:"Ts'oot Goot", rateHard:"Dzitee", rateGood:"Yak'ei", rateEasy:"Wéikw"
-  });
-  // M1822: Tsimshian (tsi)
-  window.DF_I18N_LOCALES['tsi'] = Object.assign({}, baseTemplate, {
-    navFocus:"Hagwil", navDecks:"Sm'algyax", navStats:"Aam", navSettings:"Gwildim",
-    start:"Limx", pause:"Lukw", resume:"Limx Ada", reset:"Sm'algyax Limx", minutes:"min",
-    cardFront:"Ts'al", cardBack:"K'iba", flipCard:"Wilaay", addCard:"Sm'algyax Li",
-    deleteCard:"Algyax", save:"Aam", cancel:"Lukw Ada", confirm:"Limx Dii", close:"Lukw",
-    rateAgain:"Ada Limx", rateHard:"Galts'ap", rateGood:"Aam", rateEasy:"K'si"
-  });
-  // M1823: Automated Parity Linter for Pacific Northwest Languages
+    // M1819: Halkomelem (hur)
+    // M1820: Haida (hai) & Milestone Release v19.6.0
+    // M1821: Tlingit (tli)
+    // M1822: Tsimshian (tsi)
+    // M1823: Automated Parity Linter for Pacific Northwest Languages
   window.dfLintNorthwestParity = function(){
     ['lut','hur','hai','tli','tsi','noo','kwk','blc','squ'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -33421,12 +32918,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1824: Nuu-chah-nulth (noo) & Kwak'wala (kwk)
-  window.DF_I18N_LOCALES['noo'] = Object.assign({}, baseTemplate, { navFocus:"Ha'uk", start:"Mamak", pause:"Kwah", rateGood:"Kloshe" });
-  window.DF_I18N_LOCALES['kwk'] = Object.assign({}, baseTemplate, { navFocus:"Baxws", start:"Ax'ali", pause:"Tsa", rateGood:"Ik" });
-  // M1825: Nuxalk (blc) & Squamish (squ)
-  window.DF_I18N_LOCALES['blc'] = Object.assign({}, baseTemplate, { navFocus:"Alhkwa", start:"Pu", pause:"Txw", rateGood:"Alha" });
-  window.DF_I18N_LOCALES['squ'] = Object.assign({}, baseTemplate, { navFocus:"Skwxwu", start:"Huy", pause:"Kwek", rateGood:"Chen" });
-  window.dfLintNorthwestParity();
+      // M1825: Nuxalk (blc) & Squamish (squ)
+      window.dfLintNorthwestParity();
   // M1826: Pacific Coastal Mist & Cedar Rain Web Audio Filter
   window.dfSynthesizeCoastalMist = function(ctx){
     if(!ctx) return;
@@ -33454,46 +32947,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1828: Yurok (yur)
-  window.DF_I18N_LOCALES['yur'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kee'weesh", navDecks:"Pekwon", navStats:"Sko", navSettings:"Me'womech",
-    start:"Ho'op", pause:"Kwelekw", resume:"Ho'op Ki", reset:"Pekwon Ho'op", minutes:"min",
-    cardFront:"Meykweesh", cardBack:"Tso'lep", flipCard:"Kweyekw", addCard:"Pekwon Ho",
-    deleteCard:"Mey'weehl", save:"Sko", cancel:"Kwelekw Ki", confirm:"Ho'op Na", close:"Kwelekw",
-    rateAgain:"Ki Ho'op", rateHard:"Tego's", rateGood:"Sko", rateEasy:"Moyhl"
-  });
-  // M1829: Karuk (kyh)
-  window.DF_I18N_LOCALES['kyh'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ikyav", navDecks:"Umnishi", navStats:"Yav", navSettings:"Tunuvee",
-    start:"Pakuri", pause:"Puxich", resume:"Pakuri Pa", reset:"Umnishi Pakuri", minutes:"min",
-    cardFront:"Aphan", cardBack:"Koyon", flipCard:"Pusich", addCard:"Umnishi Paku",
-    deleteCard:"Xasnih", save:"Yav", cancel:"Puxich Pa", confirm:"Pakuri Ha", close:"Puxich",
-    rateAgain:"Pa Pakuri", rateHard:"Xasnam", rateGood:"Yav", rateEasy:"Puyam"
-  });
-  // M1830: Hupa (hup) & Milestone Release v19.7.0
-  window.DF_I18N_LOCALES['hup'] = Object.assign({}, baseTemplate, {
-    navFocus:"Na'iniy", navDecks:"Kinasne", navStats:"Nizhoni", navSettings:"Xontah",
-    start:"Whima", pause:"Tashe", resume:"Whima Di", reset:"Kinasne Whima", minutes:"min",
-    cardFront:"Ninch'ing", cardBack:"Mik'is", flipCard:"Naltik", addCard:"Kinasne Whi",
-    deleteCard:"Ditin", save:"Nizhoni", cancel:"Tashe Di", confirm:"Whima Lheh", close:"Tashe",
-    rateAgain:"Di Whima", rateHard:"Ditl'oi", rateGood:"Nizhoni", rateEasy:"Whaso"
-  });
-  // M1831: Miwok (csm)
-  window.DF_I18N_LOCALES['csm'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kawachi", navDecks:"Kullu", navStats:"Chami", navSettings:"Wimma",
-    start:"Tolla", pause:"Muti", resume:"Tolla Pa", reset:"Kullu Tolla", minutes:"min",
-    cardFront:"Husu", cardBack:"Lilla", flipCard:"Koypi", addCard:"Kullu Tol",
-    deleteCard:"Pelki", save:"Chami", cancel:"Muti Pa", confirm:"Tolla Ka", close:"Muti",
-    rateAgain:"Pa Tolla", rateHard:"Pelit", rateGood:"Chami", rateEasy:"Weli"
-  });
-  // M1832: Pomo (pej)
-  window.DF_I18N_LOCALES['pej'] = Object.assign({}, baseTemplate, {
-    navFocus:"Shimma", navDecks:"Kaha", navStats:"Kuhla", navSettings:"Mawa",
-    start:"Duwe", pause:"Shadi", resume:"Duwe Mi", reset:"Kaha Duwe", minutes:"min",
-    cardFront:"Matsu", cardBack:"Kutu", flipCard:"Puli", addCard:"Kaha Duw",
-    deleteCard:"Shala", save:"Kuhla", cancel:"Shadi Mi", confirm:"Duwe Ba", close:"Shadi",
-    rateAgain:"Mi Duwe", rateHard:"Mitso", rateGood:"Kuhla", rateEasy:"Pili"
-  });
-  // M1833: Automated Parity Linter for California Indigenous Languages
+    // M1829: Karuk (kyh)
+    // M1830: Hupa (hup) & Milestone Release v19.7.0
+    // M1831: Miwok (csm)
+    // M1832: Pomo (pej)
+    // M1833: Automated Parity Linter for California Indigenous Languages
   window.dfLintCaliforniaParity = function(){
     ['yur','kyh','hup','csm','pej','wit','yok','boi','was'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -33503,12 +32961,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1834: Wintu (wit) & Yokuts (yok)
-  window.DF_I18N_LOCALES['wit'] = Object.assign({}, baseTemplate, { navFocus:"Nom", start:"Suka", pause:"Pula", rateGood:"Eles" });
-  window.DF_I18N_LOCALES['yok'] = Object.assign({}, baseTemplate, { navFocus:"Paha", start:"Tuy", pause:"Miki", rateGood:"Insan" });
-  // M1835: Chumash (boi) & Washo (was)
-  window.DF_I18N_LOCALES['boi'] = Object.assign({}, baseTemplate, { navFocus:"Kashtiq", start:"Alish", pause:"Pasi", rateGood:"Shish" });
-  window.DF_I18N_LOCALES['was'] = Object.assign({}, baseTemplate, { navFocus:"Da'aw", start:"Mala", pause:"Laha", rateGood:"Dim" });
-  window.dfLintCaliforniaParity();
+      // M1835: Chumash (boi) & Washo (was)
+      window.dfLintCaliforniaParity();
   // M1836: Redwood Forest Wind & Morning Droplets Web Audio Filter
   window.dfSynthesizeRedwoodWind = function(ctx){
     if(!ctx) return;
@@ -33536,46 +32990,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1838: Mapudungun (arn)
-  window.DF_I18N_LOCALES['arn'] = Object.assign({}, baseTemplate, {
-    navFocus:"Rakiduam", navDecks:"Chillka", navStats:"Kimün", navSettings:"Adkünun",
-    start:"Nentun", pause:"Pürün", resume:"Nentun Ka", reset:"Chillka Nentun", minutes:"min",
-    cardFront:"Azkintun", cardBack:"Furi", flipCard:"Wallon", addCard:"Chillka Nentu",
-    deleteCard:"Apümün", save:"Küme", cancel:"Pürün Ka", confirm:"Nentun May", close:"Pürün",
-    rateAgain:"Ka Nentun", rateHard:"Küdawün", rateGood:"Küme", rateEasy:"Fanetun"
-  });
-  // M1839: Tehuelche (teh)
-  window.DF_I18N_LOCALES['teh'] = Object.assign({}, baseTemplate, {
-    navFocus:"K'oik", navDecks:"Karro", navStats:"Aon", navSettings:"Telken",
-    start:"Kewen", pause:"Shoan", resume:"Kewen Pa", reset:"Karro Kewen", minutes:"min",
-    cardFront:"P'ot", cardBack:"Koyon", flipCard:"Patal", addCard:"Karro Kewe",
-    deleteCard:"K'osh", save:"Aonikenk", cancel:"Shoan Pa", confirm:"Kewen Te", close:"Shoan",
-    rateAgain:"Pa Kewen", rateHard:"T'ewsh", rateGood:"Aon", rateEasy:"Lashken"
-  });
-  // M1840: Selk'nam (ona) & Milestone Release v19.8.0
-  window.DF_I18N_LOCALES['ona'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sho'on", navDecks:"Kash", navStats:"Chon", navSettings:"Kloketen",
-    start:"Hayen", pause:"K'en", resume:"Hayen Ma", reset:"Kash Hayen", minutes:"min",
-    cardFront:"T'err", cardBack:"Koyon", flipCard:"K'olosh", addCard:"Kash Haye",
-    deleteCard:"Haruwen", save:"Chon", cancel:"K'en Ma", confirm:"Hayen Ha", close:"K'en",
-    rateAgain:"Ma Hayen", rateHard:"Hain", rateGood:"Chon", rateEasy:"Wawen"
-  });
-  // M1841: Yaghan (yag)
-  window.DF_I18N_LOCALES['yag'] = Object.assign({}, baseTemplate, {
-    navFocus:"Watauineiwa", navDecks:"Anan", navStats:"Yekush", navSettings:"Luma",
-    start:"Uskuta", pause:"Yamana", resume:"Uskuta Ha", reset:"Anan Uskuta", minutes:"min",
-    cardFront:"Tushkap", cardBack:"Koyon", flipCard:"Kipala", addCard:"Anan Usku",
-    deleteCard:"Akun", save:"Yekush", cancel:"Yamana Ha", confirm:"Uskuta Ya", close:"Yamana",
-    rateAgain:"Ha Uskuta", rateHard:"Ushuaia", rateGood:"Yekush", rateEasy:"Sima"
-  });
-  // M1842: Qom / Toba (tob)
-  window.DF_I18N_LOCALES['tob'] = Object.assign({}, baseTemplate, {
-    navFocus:"Lalamaxat", navDecks:"Nawe", navStats:"Nsoxonaq", navSettings:"Nqopit",
-    start:"Nachek", pause:"Shegue", resume:"Nachek Pa", reset:"Nawe Nachek", minutes:"min",
-    cardFront:"Llaqa", cardBack:"Lalaxat", flipCard:"Shegat", addCard:"Nawe Nache",
-    deleteCard:"Nketaxan", save:"Nsoxonaq", cancel:"Shegue Pa", confirm:"Nachek Ha", close:"Shegue",
-    rateAgain:"Pa Nachek", rateHard:"Nqoshi", rateGood:"Nsoxonaq", rateEasy:"Pali"
-  });
-  // M1843: Automated Parity Linter for Patagonian & Fuegian Languages
+    // M1839: Tehuelche (teh)
+    // M1840: Selk'nam (ona) & Milestone Release v19.8.0
+    // M1841: Yaghan (yag)
+    // M1842: Qom / Toba (tob)
+    // M1843: Automated Parity Linter for Patagonian & Fuegian Languages
   window.dfLintPatagonianParity = function(){
     ['arn','teh','ona','yag','tob','plg','moc','wlv','crt'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -33585,12 +33004,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1844: Pilaga (plg) & Mocovi (moc)
-  window.DF_I18N_LOCALES['plg'] = Object.assign({}, baseTemplate, { navFocus:"Lqaya", start:"Nache", pause:"Sopi", rateGood:"Woma" });
-  window.DF_I18N_LOCALES['moc'] = Object.assign({}, baseTemplate, { navFocus:"Llamaxa", start:"Nechek", pause:"Segui", rateGood:"Wom" });
-  // M1845: Wichi (wlv) & Chorote (crt)
-  window.DF_I18N_LOCALES['wlv'] = Object.assign({}, baseTemplate, { navFocus:"Lhenay", start:"Tiyuk", pause:"Tanay", rateGood:"Is" });
-  window.DF_I18N_LOCALES['crt'] = Object.assign({}, baseTemplate, { navFocus:"Siyuk", start:"Tsi", pause:"Hana", rateGood:"Shi" });
-  window.dfLintPatagonianParity();
+      // M1845: Wichi (wlv) & Chorote (crt)
+      window.dfLintPatagonianParity();
   // M1846: Patagonian Glacial Wind & Mountain Torrent Web Audio Filter
   window.dfSynthesizeGlacialWind = function(ctx){
     if(!ctx) return;
@@ -33618,46 +33033,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1848: Yanomami (yan)
-  window.DF_I18N_LOCALES['yan'] = Object.assign({}, baseTemplate, {
-    navFocus:"Hekura", navDecks:"Papeba", navStats:"Tho", navSettings:"Xapiri",
-    start:"Taipra", pause:"Wayu", resume:"Taipra Ya", reset:"Papeba Taipra", minutes:"min",
-    cardFront:"Maha", cardBack:"Pekoi", flipCard:"Walikata", addCard:"Papeba Tai",
-    deleteCard:"Hekura Yo", save:"Kamo", cancel:"Wayu Ya", confirm:"Taipra Ko", close:"Wayu",
-    rateAgain:"Ya Taipra", rateHard:"Xirok", rateGood:"Kamo", rateEasy:"Pila"
-  });
-  // M1849: Sanuma (xsu)
-  window.DF_I18N_LOCALES['xsu'] = Object.assign({}, baseTemplate, {
-    navFocus:"Samata", navDecks:"Hala", navStats:"Totihi", navSettings:"Koli",
-    start:"Tipi", pause:"Wani", resume:"Tipi Ku", reset:"Hala Tipi", minutes:"min",
-    cardFront:"Mosi", cardBack:"Koyon", flipCard:"Kopala", addCard:"Hala Tip",
-    deleteCard:"Posi", save:"Totihi", cancel:"Wani Ku", confirm:"Tipi Ma", close:"Wani",
-    rateAgain:"Ku Tipi", rateHard:"Tiso", rateGood:"Totihi", rateEasy:"Waka"
-  });
-  // M1850: Tucano (tuo) & Milestone Release v19.9.0
-  window.DF_I18N_LOCALES['tuo'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kiti", navDecks:"Pukaro", navStats:"Dia", navSettings:"Niro",
-    start:"Wee", pause:"Nika", resume:"Wee Ba", reset:"Pukaro Wee", minutes:"min",
-    cardFront:"Kawa", cardBack:"Puti", flipCard:"Pira", addCard:"Pukaro We",
-    deleteCard:"Peko", save:"A'ti", cancel:"Nika Ba", confirm:"Wee Te", close:"Nika",
-    rateAgain:"Ba Wee", rateHard:"Kati", rateGood:"A'ti", rateEasy:"Weli"
-  });
-  // M1851: Cubeo (cub)
-  window.DF_I18N_LOCALES['cub'] = Object.assign({}, baseTemplate, {
-    navFocus:"Jãva", navDecks:"Papera", navStats:"Kũmu", navSettings:"Mejĩ",
-    start:"Daimu", pause:"Jũma", resume:"Daimu Ve", reset:"Papera Daimu", minutes:"min",
-    cardFront:"Hãba", cardBack:"Boka", flipCard:"Piraka", addCard:"Papera Dai",
-    deleteCard:"Bapa", save:"Cõre", cancel:"Jũma Ve", confirm:"Daimu Te", close:"Jũma",
-    rateAgain:"Ve Daimu", rateHard:"Jãbe", rateGood:"Cõre", rateEasy:"Piha"
-  });
-  // M1852: Desano (des)
-  window.DF_I18N_LOCALES['des'] = Object.assign({}, baseTemplate, {
-    navFocus:"Bia", navDecks:"Pukaro", navStats:"Diaru", navSettings:"Gaye",
-    start:"Yee", pause:"Dua", resume:"Yee Ba", reset:"Pukaro Yee", minutes:"min",
-    cardFront:"Duha", cardBack:"Goyo", flipCard:"Wira", addCard:"Pukaro Ye",
-    deleteCard:"Peya", save:"Aria", cancel:"Dua Ba", confirm:"Yee Te", close:"Dua",
-    rateAgain:"Ba Yee", rateHard:"Kaye", rateGood:"Aria", rateEasy:"Wehe"
-  });
-  // M1853: Automated Parity Linter for Yanomami & Tucanoan Languages
+    // M1849: Sanuma (xsu)
+    // M1850: Tucano (tuo) & Milestone Release v19.9.0
+    // M1851: Cubeo (cub)
+    // M1852: Desano (des)
+    // M1853: Automated Parity Linter for Yanomami & Tucanoan Languages
   window.dfLintYanomamiTucanoParity = function(){
     ['yan','xsu','tuo','cub','des','sri','pir','gvc','yui'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -33667,12 +33047,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1854: Siriano (sri) & Piratapuyo (pir)
-  window.DF_I18N_LOCALES['sri'] = Object.assign({}, baseTemplate, { navFocus:"Kiti", start:"Wee", pause:"Nika", rateGood:"A'ti" });
-  window.DF_I18N_LOCALES['pir'] = Object.assign({}, baseTemplate, { navFocus:"Piro", start:"Yee", pause:"Dua", rateGood:"Keno" });
-  // M1855: Guanano (gvc) & Yuruti (yui)
-  window.DF_I18N_LOCALES['gvc'] = Object.assign({}, baseTemplate, { navFocus:"Kotiria", start:"Daimu", pause:"Juma", rateGood:"Core" });
-  window.DF_I18N_LOCALES['yui'] = Object.assign({}, baseTemplate, { navFocus:"Yuruti", start:"Wee", pause:"Nika", rateGood:"Ati" });
-  window.dfLintYanomamiTucanoParity();
+      // M1855: Guanano (gvc) & Yuruti (yui)
+      window.dfLintYanomamiTucanoParity();
   // M1856: Orinoco Jungle Stream & Forest Rustle Web Audio Filter
   window.dfSynthesizeOrinocoStream = function(ctx){
     if(!ctx) return;
@@ -33700,46 +33076,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1858: Otomi (ote)
-  window.DF_I18N_LOCALES['ote'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ntso̱", navDecks:"Hñäki", navStats:"Mäki", navSettings:"Pädi",
-    start:"Födi", pause:"Tsaya", resume:"Födi Mba", reset:"Hñäki Födi", minutes:"min",
-    cardFront:"Ne", cardBack:"Xʉnza", flipCard:"Wada", addCard:"Hñäki Fö",
-    deleteCard:"Pʉ", save:"Mäkä", cancel:"Tsaya Mba", confirm:"Födi Ga", close:"Tsaya",
-    rateAgain:"Mba Födi", rateHard:"Dede", rateGood:"Mäkä", rateEasy:"Plaxi"
-  });
-  // M1859: Mixtec (mks)
-  window.DF_I18N_LOCALES['mks'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kiti", navDecks:"Tutu", navStats:"Va'a", navSettings:"Chika",
-    start:"Ke'e", pause:"Ndito", resume:"Ke'e Tuku", reset:"Tutu Ke'e", minutes:"min",
-    cardFront:"Nuu", cardBack:"Sata", flipCard:"Nduku", addCard:"Tutu Ke",
-    deleteCard:"Dava", save:"Va'a", cancel:"Ndito Tuku", confirm:"Ke'e Chi", close:"Ndito",
-    rateAgain:"Tuku Ke'e", rateHard:"Kue'e", rateGood:"Va'a", rateEasy:"Vixi"
-  });
-  // M1860: Zapotec (zai) & Bicentennial Milestone Release v20.0.0
-  window.DF_I18N_LOCALES['zai'] = Object.assign({}, baseTemplate, {
-    navFocus:"Xquenda", navDecks:"Guichi", navStats:"Galan", navSettings:"Ndaga",
-    start:"Guzulú", pause:"Guxana", resume:"Guzulú Za", reset:"Guichi Guzulú", minutes:"min",
-    cardFront:"Loo", cardBack:"Deche", flipCard:"Bi'ti", addCard:"Guichi Guz",
-    deleteCard:"Biniti", save:"Galan", cancel:"Guxana Za", confirm:"Guzulú Nga", close:"Guxana",
-    rateAgain:"Za Guzulú", rateHard:"Nagana", rateGood:"Galan", rateEasy:"Naxhi"
-  });
-  // M1861: Mazatec (mau)
-  window.DF_I18N_LOCALES['mau'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kjoa", navDecks:"Xoñu", navStats:"Ndau", navSettings:"Si'in",
-    start:"Kitjo", pause:"Tsakjo", resume:"Kitjo Nga", reset:"Xoñu Kitjo", minutes:"min",
-    cardFront:"Ngixcon", cardBack:"Tjoña", flipCard:"Bitjo", addCard:"Xoñu Kit",
-    deleteCard:"Chjine", save:"Ndau", cancel:"Tsakjo Nga", confirm:"Kitjo Ni", close:"Tsakjo",
-    rateAgain:"Nga Kitjo", rateHard:"N'io", rateGood:"Ndau", rateEasy:"Chao"
-  });
-  // M1862: Popoluca (poi)
-  window.DF_I18N_LOCALES['poi'] = Object.assign({}, baseTemplate, {
-    navFocus:"Oya", navDecks:"Tutu", navStats:"Wextu", navSettings:"Chiwi",
-    start:"Ja'yi", pause:"Yoyi", resume:"Ja'yi Pa", reset:"Tutu Ja'yi", minutes:"min",
-    cardFront:"Winh", cardBack:"Koyon", flipCard:"Pityi", addCard:"Tutu Ja",
-    deleteCard:"Poyo", save:"Wextu", cancel:"Yoyi Pa", confirm:"Ja'yi Te", close:"Yoyi",
-    rateAgain:"Pa Ja'yi", rateHard:"Poyti", rateGood:"Wextu", rateEasy:"Miti"
-  });
-  // M1863: Automated Parity Linter for Mesoamerican Oto-Manguean Languages
+    // M1859: Mixtec (mks)
+    // M1860: Zapotec (zai) & Bicentennial Milestone Release v20.0.0
+    // M1861: Mazatec (mau)
+    // M1862: Popoluca (poi)
+    // M1863: Automated Parity Linter for Mesoamerican Oto-Manguean Languages
   window.dfLintOtoMangueanParity = function(){
     ['ote','mks','zai','mau','poi','chq','tot','mto','zoq'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -33749,12 +33090,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1864: Chinantec (chq) & Totonac (tot)
-  window.DF_I18N_LOCALES['chq'] = Object.assign({}, baseTemplate, { navFocus:"Jmeen", start:"Lia'n", pause:"Hian", rateGood:"Tyun" });
-  window.DF_I18N_LOCALES['tot'] = Object.assign({}, baseTemplate, { navFocus:"Tuku", start:"Tsuku", pause:"Taktzat", rateGood:"Tlan" });
-  // M1865: Mixe (mto) & Zoque (zoq)
-  window.DF_I18N_LOCALES['mto'] = Object.assign({}, baseTemplate, { navFocus:"Ayo", start:"Tsoo", pause:"Muku", rateGood:"Oy" });
-  window.DF_I18N_LOCALES['zoq'] = Object.assign({}, baseTemplate, { navFocus:"Tzoke", start:"Tzoku", pause:"Paka", rateGood:"Wane" });
-  window.dfLintOtoMangueanParity();
+      // M1865: Mixe (mto) & Zoque (zoq)
+      window.dfLintOtoMangueanParity();
   // M1866: Sierra Madre Cloud Forest Breeze Web Audio Filter
   window.dfSynthesizeSierraBreeze = function(ctx){
     if(!ctx) return;
@@ -33782,46 +33119,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1868: Awa Pit (kwi)
-  window.DF_I18N_LOCALES['kwi'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kuz", navDecks:"Pipel", navStats:"Wat", navSettings:"Pashkuz",
-    start:"Kiz", pause:"Paykuz", resume:"Kiz Min", reset:"Pipel Kiz", minutes:"min",
-    cardFront:"Ilan", cardBack:"Koyon", flipCard:"Pilki", addCard:"Pipel Ki",
-    deleteCard:"Pizh", save:"Wat", cancel:"Paykuz Min", confirm:"Kiz Tay", close:"Paykuz",
-    rateAgain:"Min Kiz", rateHard:"Tish", rateGood:"Wat", rateEasy:"Pikuz"
-  });
-  // M1869: Tsafiki (cof)
-  window.DF_I18N_LOCALES['cof'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tenca", navDecks:"Tutu", navStats:"Se", navSettings:"Kera",
-    start:"Kera", pause:"Nawa", resume:"Kera In", reset:"Tutu Kera", minutes:"min",
-    cardFront:"Kapa", cardBack:"Bennu", flipCard:"Puru", addCard:"Tutu Ke",
-    deleteCard:"Lole", save:"Se", cancel:"Nawa In", confirm:"Kera Ya", close:"Nawa",
-    rateAgain:"In Kera", rateHard:"Pai", rateGood:"Se", rateEasy:"Seka"
-  });
-  // M1870: Cha'palaa (cbi) & Milestone Release v20.1.0
-  window.DF_I18N_LOCALES['cbi'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tenbura", navDecks:"Peele", navStats:"Ura", navSettings:"Kena",
-    start:"Kena", pause:"Nawa", resume:"Kena Man", reset:"Peele Kena", minutes:"min",
-    cardFront:"Kaapa", cardBack:"Bene", flipCard:"Pura", addCard:"Peele Ke",
-    deleteCard:"Lola", save:"Ura", cancel:"Nawa Man", confirm:"Kena Ya", close:"Nawa",
-    rateAgain:"Man Kena", rateHard:"Pai", rateGood:"Ura", rateEasy:"Uraka"
-  });
-  // M1871: Guaymi / Ngabere (gym)
-  window.DF_I18N_LOCALES['gym'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ngobo", navDecks:"Kugwe", navStats:"Keta", navSettings:"Tiki",
-    start:"Nuane", pause:"Niki", resume:"Nuane Arato", reset:"Kugwe Nuane", minutes:"min",
-    cardFront:"Daba", cardBack:"Biti", flipCard:"Kite", addCard:"Kugwe Nua",
-    deleteCard:"Kwi", save:"Keta", cancel:"Niki Arato", confirm:"Nuane Angwe", close:"Niki",
-    rateAgain:"Arato Nuane", rateHard:"Juto", rateGood:"Keta", rateEasy:"Bobre"
-  });
-  // M1872: Bribri (bzc)
-  window.DF_I18N_LOCALES['bzc'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sula'", navDecks:"Ditsö", navStats:"Bu'", navSettings:"Stö",
-    start:"Yö", pause:"Sklo", resume:"Yö E'", reset:"Ditsö Yö", minutes:"min",
-    cardFront:"Wökir", cardBack:"Koyon", flipCard:"Pilö", addCard:"Ditsö Yö",
-    deleteCard:"Kibö", save:"Bu'", cancel:"Sklo E'", confirm:"Yö Wa", close:"Sklo",
-    rateAgain:"E' Yö", rateHard:"Të", rateGood:"Bu'", rateEasy:"Bua'k"
-  });
-  // M1873: Automated Parity Linter for Barbacoan & Isthmo-Colombian Languages
+    // M1869: Tsafiki (cof)
+    // M1870: Cha'palaa (cbi) & Milestone Release v20.1.0
+    // M1871: Guaymi / Ngabere (gym)
+    // M1872: Bribri (bzc)
+    // M1873: Automated Parity Linter for Barbacoan & Isthmo-Colombian Languages
   window.dfLintBarbacoanParity = function(){
     ['kwi','cof','cbi','gym','bzc','cjp','tfr','gut','brc'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -33831,12 +33133,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1874: Cabecar (cjp) & Teribe (tfr)
-  window.DF_I18N_LOCALES['cjp'] = Object.assign({}, baseTemplate, { navFocus:"Sula", start:"Yo", pause:"Sklo", rateGood:"Bu" });
-  window.DF_I18N_LOCALES['tfr'] = Object.assign({}, baseTemplate, { navFocus:"Naso", start:"Shko", pause:"Tlo", rateGood:"Bweng" });
-  // M1875: Maleku (gut) & Boruca (brc)
-  window.DF_I18N_LOCALES['gut'] = Object.assign({}, baseTemplate, { navFocus:"Lha", start:"Tsi", pause:"Maku", rateGood:"Nhi" });
-  window.DF_I18N_LOCALES['brc'] = Object.assign({}, baseTemplate, { navFocus:"Brunka", start:"Ki", pause:"Cha", rateGood:"Chi" });
-  window.dfLintBarbacoanParity();
+      // M1875: Maleku (gut) & Boruca (brc)
+      window.dfLintBarbacoanParity();
   // M1876: Isthmian River Torrent & Canopy Drizzle Web Audio Filter
   window.dfSynthesizeIsthmianTorrent = function(ctx){
     if(!ctx) return;
@@ -33864,46 +33162,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1878: Efik (efi)
-  window.DF_I18N_LOCALES['efi'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kere", navDecks:"Nwed", navStats:"Itie", navSettings:"Ntem",
-    start:"Tono", pause:"Tre", resume:"Tono Ndo", reset:"Nwed Tono", minutes:"min",
-    cardFront:"Iso", cardBack:"Edem", flipCard:"Kpono", addCard:"Nwed Tono",
-    deleteCard:"Sio", save:"Eti", cancel:"Tre Ndo", confirm:"Tono Ye", close:"Tre",
-    rateAgain:"Ndo Tono", rateHard:"Okposo", rateGood:"Eti", rateEasy:"Mmem"
-  });
-  // M1879: Ibibio (ibb)
-  window.DF_I18N_LOCALES['ibb'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kere", navDecks:"Nwet", navStats:"Idaha", navSettings:"Utom",
-    start:"Tono", pause:"Dakka", resume:"Tono Mba", reset:"Nwet Tono", minutes:"min",
-    cardFront:"Iso", cardBack:"Etem", flipCard:"Wono", addCard:"Nwet Tono",
-    deleteCard:"Dua", save:"Eti", cancel:"Dakka Mba", confirm:"Tono Ndo", close:"Dakka",
-    rateAgain:"Mba Tono", rateHard:"Son", rateGood:"Eti", rateEasy:"Mem"
-  });
-  // M1880: Tiv (tiv) & Milestone Release v20.2.0
-  window.DF_I18N_LOCALES['tiv'] = Object.assign({}, baseTemplate, {
-    navFocus:"Hen", navDecks:"Takeda", navStats:"Iember", navSettings:"Gba",
-    start:"Hii", pause:"De", resume:"Hii Za", reset:"Takeda Hii", minutes:"min",
-    cardFront:"Isigh", cardBack:"Ijime", flipCard:"Gem", addCard:"Takeda Hii",
-    deleteCard:"Kenger", save:"Doo", cancel:"De Za", confirm:"Hii Ne", close:"De",
-    rateAgain:"Za Hii", rateHard:"Taver", rateGood:"Doo", rateEasy:"Pupu"
-  });
-  // M1881: Urhobo (urh)
-  window.DF_I18N_LOCALES['urh'] = Object.assign({}, baseTemplate, {
-    navFocus:"Roro", navDecks:"Obe", navStats:"Omamwa", navSettings:"Erhoro",
-    start:"Tonphi", pause:"Mudia", resume:"Tonphi Fa", reset:"Obe Tonphi", minutes:"min",
-    cardFront:"Aro", cardBack:"Uko", flipCard:"Wene", addCard:"Obe Ton",
-    deleteCard:"Kpo", save:"Erhovwo", cancel:"Mudia Fa", confirm:"Tonphi E", close:"Mudia",
-    rateAgain:"Fa Tonphi", rateHard:"Gangan", rateGood:"Erhovwo", rateEasy:"Lolo"
-  });
-  // M1882: Edo (bin)
-  window.DF_I18N_LOCALES['bin'] = Object.assign({}, baseTemplate, {
-    navFocus:"Roro", navDecks:"Ebe", navStats:"Esese", navSettings:"Iyayi",
-    start:"Tomi", pause:"Mudia", resume:"Tomi Wha", reset:"Ebe Tomi", minutes:"min",
-    cardFront:"Aro", cardBack:"Ike", flipCard:"Kpolo", addCard:"Ebe Tomi",
-    deleteCard:"Hua", save:"Ese", cancel:"Mudia Wha", confirm:"Tomi No", close:"Mudia",
-    rateAgain:"Wha Tomi", rateHard:"Khin", rateGood:"Ese", rateEasy:"Khie"
-  });
-  // M1883: Automated Parity Linter for Cross River & Edoid Languages
+    // M1879: Ibibio (ibb)
+    // M1880: Tiv (tiv) & Milestone Release v20.2.0
+    // M1881: Urhobo (urh)
+    // M1882: Edo (bin)
+    // M1883: Automated Parity Linter for Cross River & Edoid Languages
   window.dfLintCrossRiverParity = function(){
     ['efi','ibb','tiv','urh','bin','iso','its','anw','nup'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -33913,12 +33176,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1884: Isoko (iso) & Isekiri (its)
-  window.DF_I18N_LOCALES['iso'] = Object.assign({}, baseTemplate, { navFocus:"Roro", start:"To", pause:"Mudia", rateGood:"Ewo" });
-  window.DF_I18N_LOCALES['its'] = Object.assign({}, baseTemplate, { navFocus:"Ro", start:"Gba", pause:"Duro", rateGood:"Dara" });
-  // M1885: Anaang (anw) & Nupe (nup)
-  window.DF_I18N_LOCALES['anw'] = Object.assign({}, baseTemplate, { navFocus:"Kere", start:"Tono", pause:"Tre", rateGood:"Eti" });
-  window.DF_I18N_LOCALES['nup'] = Object.assign({}, baseTemplate, { navFocus:"Kpe", start:"Gba", pause:"Dzo", rateGood:"Ge" });
-  window.dfLintCrossRiverParity();
+      // M1885: Anaang (anw) & Nupe (nup)
+      window.dfLintCrossRiverParity();
   // M1886: Niger Delta Mangrove Breeze & Gentle Drizzle Web Audio Filter
   window.dfSynthesizeDeltaDrizzle = function(ctx){
     if(!ctx) return;
@@ -33946,46 +33205,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1888: Dinka (din)
-  window.DF_I18N_LOCALES['din'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tak", navDecks:"Waragak", navStats:"Pial", navSettings:"Thiec",
-    start:"Jook", pause:"Kaac", resume:"Jook Bei", reset:"Waragak Jook", minutes:"min",
-    cardFront:"Tueeng", cardBack:"Cien", flipCard:"Wëëri", addCard:"Waragak Juak",
-    deleteCard:"Nyang", save:"Path", cancel:"Kaac Bei", confirm:"Jook Yic", close:"Kaac",
-    rateAgain:"Bei Jook", rateHard:"Gou", rateGood:"Path", rateEasy:"Bial"
-  });
-  // M1889: Nuer (nus)
-  window.DF_I18N_LOCALES['nus'] = Object.assign({}, baseTemplate, {
-    navFocus:"Char", navDecks:"Wargak", navStats:"Liet", navSettings:"Thiec",
-    start:"Jook", pause:"Kääc", resume:"Jook Nyo", reset:"Wargak Jook", minutes:"min",
-    cardFront:"Nhial", cardBack:"Piny", flipCard:"Wëëri", addCard:"Wargak Juak",
-    deleteCard:"Pal", save:"Gow", cancel:"Kääc Nyo", confirm:"Jook Mi", close:"Kääc",
-    rateAgain:"Nyo Jook", rateHard:"Bum", rateGood:"Gow", rateEasy:"Mioc"
-  });
-  // M1890: Luo (luo) & Milestone Release v20.3.0
-  window.DF_I18N_LOCALES['luo'] = Object.assign({}, baseTemplate, {
-    navFocus:"Paro", navDecks:"Kadi", navStats:"Kwan", navSettings:"Chenro",
-    start:"Chak", pause:"Chung", resume:"Chak Kendo", reset:"Kadi Chak", minutes:"min",
-    cardFront:"Nyim", cardBack:"Tok", flipCard:"Loko", addCard:"Kadi Med",
-    deleteCard:"Keth", save:"Ber", cancel:"Chung Kendo", confirm:"Chak Ee", close:"Chung",
-    rateAgain:"Kendo Chak", rateHard:"Tek", rateGood:"Ber", rateEasy:"Yot"
-  });
-  // M1891: Maasai (mas)
-  window.DF_I18N_LOCALES['mas'] = Object.assign({}, baseTemplate, {
-    navFocus:"Inkioma", navDecks:"Warakak", navStats:"Sidai", navSettings:"Enkitoo",
-    start:"Iteru", pause:"Tashe", resume:"Iteru Kake", reset:"Warakak Iteru", minutes:"min",
-    cardFront:"Dukuya", cardBack:"Siadi", flipCard:"Welian", addCard:"Warakak Iter",
-    deleteCard:"Tung'ua", save:"Sidai", cancel:"Tashe Kake", confirm:"Iteru O", close:"Tashe",
-    rateAgain:"Kake Iteru", rateHard:"Golgoli", rateGood:"Sidai", rateEasy:"Noltu"
-  });
-  // M1892: Kanuri (knc)
-  window.DF_I18N_LOCALES['knc'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fannu", navDecks:"Kitawu", navStats:"Ngalaro", navSettings:"Yeledi",
-    start:"Badiye", pause:"Daji", resume:"Badiye Wate", reset:"Kitawu Badiye", minutes:"min",
-    cardFront:"Fuwo", cardBack:"Dawi", flipCard:"Kalaptu", addCard:"Kitawu Badi",
-    deleteCard:"Battu", save:"Ngala", cancel:"Daji Wate", confirm:"Badiye Wo", close:"Daji",
-    rateAgain:"Wate Badiye", rateHard:"Kuli", rateGood:"Ngala", rateEasy:"Koli"
-  });
-  // M1893: Automated Parity Linter for Nilo-Saharan & Nilotic Languages
+    // M1889: Nuer (nus)
+    // M1890: Luo (luo) & Milestone Release v20.3.0
+    // M1891: Maasai (mas)
+    // M1892: Kanuri (knc)
+    // M1893: Automated Parity Linter for Nilo-Saharan & Nilotic Languages
   window.dfLintNiloticParity = function(){
     ['din','nus','luo','mas','knc','tuv','kln','bfa','dje'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -33995,12 +33219,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1894: Turkana (tuv) & Kalenjin (kln)
-  window.DF_I18N_LOCALES['tuv'] = Object.assign({}, baseTemplate, { navFocus:"Tamit", start:"Toce", pause:"Towo", rateGood:"Ejok" });
-  window.DF_I18N_LOCALES['kln'] = Object.assign({}, baseTemplate, { navFocus:"Kayan", start:"Toi", pause:"Kany", rateGood:"Kararan" });
-  // M1895: Bari (bfa) & Zarma (dje)
-  window.DF_I18N_LOCALES['bfa'] = Object.assign({}, baseTemplate, { navFocus:"Ting", start:"Kona", pause:"Gwe", rateGood:"Nyoka" });
-  window.DF_I18N_LOCALES['dje'] = Object.assign({}, baseTemplate, { navFocus:"Miya", start:"Sintin", pause:"Kay", rateGood:"Hanna" });
-  window.dfLintNiloticParity();
+      // M1895: Bari (bfa) & Zarma (dje)
+      window.dfLintNiloticParity();
   // M1896: Savannah Morning Dew & Acacia Wind Web Audio Filter
   window.dfSynthesizeSavannahWind = function(ctx){
     if(!ctx) return;
@@ -34028,46 +33248,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1898: Zande (zne)
-  window.DF_I18N_LOCALES['zne'] = Object.assign({}, baseTemplate, {
-    navFocus:"Berã", navDecks:"Waraga", navStats:"Wene", navSettings:"Mbiko",
-    start:"Tona", pause:"Rungba", resume:"Tona Berewe", reset:"Waraga Tona", minutes:"min",
-    cardFront:"Mbangba", cardBack:"Gima", flipCard:"Sa", addCard:"Waraga Tona",
-    deleteCard:"Gbarasa", save:"Wene", cancel:"Rungba Berewe", confirm:"Tona Ni", close:"Rungba",
-    rateAgain:"Berewe Tona", rateHard:"Nyanyaki", rateGood:"Wene", rateEasy:"Taata"
-  });
-  // M1899: Gbaya (gba)
-  window.DF_I18N_LOCALES['gba'] = Object.assign({}, baseTemplate, {
-    navFocus:"Koro", navDecks:"Wara", navStats:"Zok", navSettings:"Duka",
-    start:"Tona", pause:"Doko", resume:"Tona Mbe", reset:"Wara Tona", minutes:"min",
-    cardFront:"Nu", cardBack:"Gima", flipCard:"Weli", addCard:"Wara Ton",
-    deleteCard:"Gba", save:"De", cancel:"Doko Mbe", confirm:"Tona Ko", close:"Doko",
-    rateAgain:"Mbe Tona", rateHard:"Ging", rateGood:"De", rateEasy:"Kpa"
-  });
-  // M1900: Banda (bad) & Milestone Release v20.4.0
-  window.DF_I18N_LOCALES['bad'] = Object.assign({}, baseTemplate, {
-    navFocus:"Bala", navDecks:"Karta", navStats:"Nzoni", navSettings:"Gba",
-    start:"Tona", pause:"Luti", resume:"Tona Gbua", reset:"Karta Tona", minutes:"min",
-    cardFront:"Dro", cardBack:"Gima", flipCard:"Wali", addCard:"Karta Ton",
-    deleteCard:"Gba", save:"Nzoni", cancel:"Luti Gbua", confirm:"Tona Na", close:"Luti",
-    rateAgain:"Gbua Tona", rateHard:"Ngangu", rateGood:"Nzoni", rateEasy:"Fio"
-  });
-  // M1901: Sango (sag)
-  window.DF_I18N_LOCALES['sag'] = Object.assign({}, baseTemplate, {
-    navFocus:"Bibe", navDecks:"Mbeti", navStats:"Kpengba", navSettings:"Leke",
-    start:"To nda", pause:"Luti", resume:"To nda Mbeni", reset:"Mbeti To nda", minutes:"min",
-    cardFront:"Gbele", cardBack:"Peko", flipCard:"Changer", addCard:"Mbeti Zia",
-    deleteCard:"Lungula", save:"Nzoni", cancel:"Luti Mbeni", confirm:"To nda Taa", close:"Luti",
-    rateAgain:"Mbeni To nda", rateHard:"Kete", rateGood:"Nzoni", rateEasy:"Kpetepkete"
-  });
-  // M1902: Moru (mgd)
-  window.DF_I18N_LOCALES['mgd'] = Object.assign({}, baseTemplate, {
-    navFocus:"Riri", navDecks:"Wara", navStats:"Rozo", navSettings:"Drilo",
-    start:"Tona", pause:"Kari", resume:"Tona Te", reset:"Wara Tona", minutes:"min",
-    cardFront:"Misi", cardBack:"Koyon", flipCard:"Wili", addCard:"Wara Ton",
-    deleteCard:"Pili", save:"Rozo", cancel:"Kari Te", confirm:"Tona Na", close:"Kari",
-    rateAgain:"Te Tona", rateHard:"Tiri", rateGood:"Rozo", rateEasy:"Mimi"
-  });
-  // M1903: Automated Parity Linter for Ubangian & Central Sudanic Languages
+    // M1899: Gbaya (gba)
+    // M1900: Banda (bad) & Milestone Release v20.4.0
+    // M1901: Sango (sag)
+    // M1902: Moru (mgd)
+    // M1903: Automated Parity Linter for Ubangian & Central Sudanic Languages
   window.dfLintUbangianParity = function(){
     ['zne','gba','bad','sag','mgd','mdj','lgg','bkc','nga'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -34077,12 +33262,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1904: Mangbetu (mdj) & Lugbara (lgg)
-  window.DF_I18N_LOCALES['mdj'] = Object.assign({}, baseTemplate, { navFocus:"Nemo", start:"Tona", pause:"Neli", rateGood:"Nzoni" });
-  window.DF_I18N_LOCALES['lgg'] = Object.assign({}, baseTemplate, { navFocus:"Ewa", start:"Eto", pause:"Kari", rateGood:"Onzi-ku" });
-  // M1905: Baka (bkc) & Ngbaka (nga)
-  window.DF_I18N_LOCALES['bkc'] = Object.assign({}, baseTemplate, { navFocus:"Kolo", start:"Tona", pause:"Doko", rateGood:"De" });
-  window.DF_I18N_LOCALES['nga'] = Object.assign({}, baseTemplate, { navFocus:"Golo", start:"Tona", pause:"Luti", rateGood:"Nzoni" });
-  window.dfLintUbangianParity();
+      // M1905: Baka (bkc) & Ngbaka (nga)
+      window.dfLintUbangianParity();
   // M1906: Ubangi Rapids & Montane Rainforest Rustle Web Audio Filter
   window.dfSynthesizeUbangiRapids = function(ctx){
     if(!ctx) return;
@@ -34110,46 +33291,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1908: Khasi (kha)
-  window.DF_I18N_LOCALES['kha'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pynleit", navDecks:"Kot", navStats:"Khaia", navSettings:"Rukom",
-    start:"Sdang", pause:"Sangeh", resume:"Sdang Biang", reset:"Kot Sdang", minutes:"min",
-    cardFront:"Shakhmat", cardBack:"Shadien", flipCard:"Kylla", addCard:"Kot Sdang",
-    deleteCard:"Pynduh", save:"Bha", cancel:"Sangeh Biang", confirm:"Sdang Ho", close:"Sangeh",
-    rateAgain:"Biang Sdang", rateHard:"Eh", rateGood:"Bha", rateEasy:"Suk"
-  });
-  // M1909: Wa (prk)
-  window.DF_I18N_LOCALES['prk'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pheu", navDecks:"Lik", navStats:"Mhai", navSettings:"Lox",
-    start:"Daux", pause:"Bawg", resume:"Daux Khawm", reset:"Lik Daux", minutes:"min",
-    cardFront:"Plai", cardBack:"Kawn", flipCard:"Puk", addCard:"Lik Daux",
-    deleteCard:"Klax", save:"Mhai", cancel:"Bawg Khawm", confirm:"Daux He", close:"Bawg",
-    rateAgain:"Khawm Daux", rateHard:"Cak", rateGood:"Mhai", rateEasy:"Laux"
-  });
-  // M1910: Palaung (rki) & Milestone Release v20.5.0
-  window.DF_I18N_LOCALES['rki'] = Object.assign({}, baseTemplate, {
-    navFocus:"Hrom", navDecks:"Lik", navStats:"Nang", navSettings:"Kwang",
-    start:"Tang", pause:"Kip", resume:"Tang Phin", reset:"Lik Tang", minutes:"min",
-    cardFront:"Plang", cardBack:"Koyon", flipCard:"Pet", addCard:"Lik Tang",
-    deleteCard:"Khat", save:"Nang", cancel:"Kip Phin", confirm:"Tang Je", close:"Kip",
-    rateAgain:"Phin Tang", rateHard:"Khang", rateGood:"Nang", rateEasy:"Nem"
-  });
-  // M1911: Bahnar (bdq)
-  window.DF_I18N_LOCALES['bdq'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kop", navDecks:"Hla", navStats:"Siam", navSettings:"Gong",
-    start:"Toh", pause:"Do", resume:"Toh Boih", reset:"Hla Toh", minutes:"min",
-    cardFront:"Anah", cardBack:"Rong", flipCard:"Klat", addCard:"Hla Toh",
-    deleteCard:"Pleh", save:"Siam", cancel:"Do Boih", confirm:"Toh O", close:"Do",
-    rateAgain:"Boih Toh", rateHard:"Khaik", rateGood:"Siam", rateEasy:"Zol"
-  });
-  // M1912: Mnong (cmo)
-  window.DF_I18N_LOCALES['cmo'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kuc", navDecks:"Khar", navStats:"U", navSettings:"Gong",
-    start:"Toh", pause:"Duc", resume:"Toh He", reset:"Khar Toh", minutes:"min",
-    cardFront:"Măt", cardBack:"Roong", flipCard:"Luh", addCard:"Khar Toh",
-    deleteCard:"Plaing", save:"U", cancel:"Duc He", confirm:"Toh O", close:"Duc",
-    rateAgain:"He Toh", rateHard:"Kha", rateGood:"U", rateEasy:"Nguar"
-  });
-  // M1913: Automated Parity Linter for Mon-Khmer Languages
+    // M1909: Wa (prk)
+    // M1910: Palaung (rki) & Milestone Release v20.5.0
+    // M1911: Bahnar (bdq)
+    // M1912: Mnong (cmo)
+    // M1913: Automated Parity Linter for Mon-Khmer Languages
   window.dfLintAustroasiaticParity = function(){
     ['kha','prk','rki','bdq','cmo','sed','jeh','ktv','pac'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -34159,12 +33305,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1914: Sedang (sed) & Jeh (jeh)
-  window.DF_I18N_LOCALES['sed'] = Object.assign({}, baseTemplate, { navFocus:"Chiem", start:"Toh", pause:"Do", rateGood:"Siam" });
-  window.DF_I18N_LOCALES['jeh'] = Object.assign({}, baseTemplate, { navFocus:"Chiem", start:"Toh", pause:"Do", rateGood:"Siam" });
-  // M1915: Katu (ktv) & Pacoh (pac)
-  window.DF_I18N_LOCALES['ktv'] = Object.assign({}, baseTemplate, { navFocus:"Biem", start:"Tan", pause:"Kup", rateGood:"Liêm" });
-  window.DF_I18N_LOCALES['pac'] = Object.assign({}, baseTemplate, { navFocus:"Kiem", start:"Tan", pause:"Kup", rateGood:"Liem" });
-  window.dfLintAustroasiaticParity();
+      // M1915: Katu (ktv) & Pacoh (pac)
+      window.dfLintAustroasiaticParity();
   // M1916: Annamite Mountain Mist & Bamboo Rustle Web Audio Filter
   window.dfSynthesizeAnnamiteMist = function(ctx){
     if(!ctx) return;
@@ -34192,46 +33334,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1918: Newar (new)
-  window.DF_I18N_LOCALES['new'] = Object.assign({}, baseTemplate, {
-    navFocus:"Dhyan", navDecks:"Pau", navStats:"Lhasen", navSettings:"Gway",
-    start:"Suru", pause:"Di", resume:"Suru Ha", reset:"Pau Suru", minutes:"min",
-    cardFront:"Nhya", cardBack:"Lyu", flipCard:"Hil", addCard:"Pau Tan",
-    deleteCard:"Si", save:"Bala", cancel:"Di Ha", confirm:"Suru Ju", close:"Di",
-    rateAgain:"Ha Suru", rateHard:"Thau", rateGood:"Bala", rateEasy:"Apu"
-  });
-  // M1919: Limbu (lif)
-  window.DF_I18N_LOCALES['lif'] = Object.assign({}, baseTemplate, {
-    navFocus:"Samyo", navDecks:"Sapla", navStats:"Kusang", navSettings:"Thim",
-    start:"Hak", pause:"Lep", resume:"Hak Ya", reset:"Sapla Hak", minutes:"min",
-    cardFront:"Tagi", cardBack:"Ena", flipCard:"Hek", addCard:"Sapla Hak",
-    deleteCard:"Phik", save:"Nu", cancel:"Lep Ya", confirm:"Hak Ro", close:"Lep",
-    rateAgain:"Ya Hak", rateHard:"Sakpa", rateGood:"Nu", rateEasy:"Pangba"
-  });
-  // M1920: Magar (mgp) & Milestone Release v20.6.0
-  window.DF_I18N_LOCALES['mgp'] = Object.assign({}, baseTemplate, {
-    navFocus:"Chyat", navDecks:"Kitap", navStats:"Bhal", navSettings:"Dhur",
-    start:"Jhat", pause:"Rhot", resume:"Jhat Le", reset:"Kitap Jhat", minutes:"min",
-    cardFront:"Tang", cardBack:"Lhang", flipCard:"Kyat", addCard:"Kitap Jhat",
-    deleteCard:"Khat", save:"Bhal", cancel:"Rhot Le", confirm:"Jhat Da", close:"Rhot",
-    rateAgain:"Le Jhat", rateHard:"Dhup", rateGood:"Bhal", rateEasy:"Syak"
-  });
-  // M1921: Tamang (taj)
-  window.DF_I18N_LOCALES['taj'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sem", navDecks:"Chhi", navStats:"Jyang", navSettings:"Rim",
-    start:"Prap", pause:"Ten", resume:"Prap Na", reset:"Chhi Prap", minutes:"min",
-    cardFront:"Dong", cardBack:"Koyon", flipCard:"Khor", addCard:"Chhi Prap",
-    deleteCard:"Phat", save:"Jyang", cancel:"Ten Na", confirm:"Prap Ba", close:"Ten",
-    rateAgain:"Na Prap", rateHard:"Kang", rateGood:"Jyang", rateEasy:"Lho"
-  });
-  // M1922: Gurung (gvr)
-  window.DF_I18N_LOCALES['gvr'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tinho", navDecks:"Kli", navStats:"Tsong", navSettings:"Pye",
-    start:"Toh", pause:"Kro", resume:"Toh Ma", reset:"Kli Toh", minutes:"min",
-    cardFront:"Mhi", cardBack:"Koyon", flipCard:"Lhen", addCard:"Kli Toh",
-    deleteCard:"Plit", save:"Syo", cancel:"Kro Ma", confirm:"Toh Ro", close:"Kro",
-    rateAgain:"Ma Toh", rateHard:"Kar", rateGood:"Syo", rateEasy:"Apu"
-  });
-  // M1923: Automated Parity Linter for Himalayan Languages
+    // M1919: Limbu (lif)
+    // M1920: Magar (mgp) & Milestone Release v20.6.0
+    // M1921: Tamang (taj)
+    // M1922: Gurung (gvr)
+    // M1923: Automated Parity Linter for Himalayan Languages
   window.dfLintHimalayanParity = function(){
     ['new','lif','mgp','taj','gvr','bap','xsr','lep','mni'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -34241,12 +33348,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1924: Bantawa (bap) & Sherpa (xsr)
-  window.DF_I18N_LOCALES['bap'] = Object.assign({}, baseTemplate, { navFocus:"Chum", start:"Loh", pause:"Yung", rateGood:"Nu" });
-  window.DF_I18N_LOCALES['xsr'] = Object.assign({}, baseTemplate, { navFocus:"Sem", start:"Tsuk", pause:"Duk", rateGood:"Yakpo" });
-  // M1925: Lepcha (lep) & Manipuri (mni)
-  window.DF_I18N_LOCALES['lep'] = Object.assign({}, baseTemplate, { navFocus:"Afluk", start:"Mat", pause:"Lyang", rateGood:"Alem" });
-  window.DF_I18N_LOCALES['mni'] = Object.assign({}, baseTemplate, { navFocus:"Pukning", start:"Houre", pause:"Leppise", rateGood:"Phajei" });
-  window.dfLintHimalayanParity();
+      // M1925: Lepcha (lep) & Manipuri (mni)
+      window.dfLintHimalayanParity();
   // M1926: High Himalayan Pine Wind & Mountain Stream Web Audio Filter
   window.dfSynthesizeHimalayanWind = function(ctx){
     if(!ctx) return;
@@ -34274,46 +33377,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1928: Arapesh (ape)
-  window.DF_I18N_LOCALES['ape'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ipak", navDecks:"Buk", navStats:"Yopinyi", navSettings:"Megen",
-    start:"Ta", pause:"Loh", resume:"Ta Namo", reset:"Buk Ta", minutes:"min",
-    cardFront:"Nab", cardBack:"Koyon", flipCard:"Pukuk", addCard:"Buk Ta",
-    deleteCard:"Kus", save:"Yopinyi", cancel:"Loh Namo", confirm:"Ta No", close:"Loh",
-    rateAgain:"Namo Ta", rateHard:"Dede", rateGood:"Yopinyi", rateEasy:"Mapin"
-  });
-  // M1929: Abelam (abt)
-  window.DF_I18N_LOCALES['abt'] = Object.assign({}, baseTemplate, {
-    navFocus:"Wani", navDecks:"Kawa", navStats:"Yekun", navSettings:"Baki",
-    start:"Veku", pause:"Tewu", resume:"Veku Ka", reset:"Kawa Veku", minutes:"min",
-    cardFront:"Taba", cardBack:"Koyon", flipCard:"Pelak", addCard:"Kawa Veku",
-    deleteCard:"Pilik", save:"Yekun", cancel:"Tewu Ka", confirm:"Veku Re", close:"Tewu",
-    rateAgain:"Ka Veku", rateHard:"Kati", rateGood:"Yekun", rateEasy:"Mian"
-  });
-  // M1930: Boiken (bzf) & Milestone Release v20.7.0
-  window.DF_I18N_LOCALES['bzf'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sumbwe", navDecks:"Pepa", navStats:"Bole", navSettings:"Wuli",
-    start:"Hali", pause:"Wali", resume:"Hali Me", reset:"Pepa Hali", minutes:"min",
-    cardFront:"Mba", cardBack:"Koyon", flipCard:"Keli", addCard:"Pepa Hali",
-    deleteCard:"Pili", save:"Bole", cancel:"Wali Me", confirm:"Hali No", close:"Wali",
-    rateAgain:"Me Hali", rateHard:"Taki", rateGood:"Bole", rateEasy:"Welu"
-  });
-  // M1931: Sawos (sos)
-  window.DF_I18N_LOCALES['sos'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yikwe", navDecks:"Gawa", navStats:"Wala", navSettings:"Peli",
-    start:"Meli", pause:"Kwele", resume:"Meli Ba", reset:"Gawa Meli", minutes:"min",
-    cardFront:"Daba", cardBack:"Koyon", flipCard:"Plaka", addCard:"Gawa Mel",
-    deleteCard:"Kisa", save:"Wala", cancel:"Kwele Ba", confirm:"Meli Ka", close:"Kwele",
-    rateAgain:"Ba Meli", rateHard:"Diki", rateGood:"Wala", rateEasy:"Miap"
-  });
-  // M1932: Yimas (yee)
-  window.DF_I18N_LOCALES['yee'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kayan", navDecks:"Kawa", navStats:"Mampi", navSettings:"Yaki",
-    start:"Tawi", pause:"Kani", resume:"Tawi Na", reset:"Kawa Tawi", minutes:"min",
-    cardFront:"Tambi", cardBack:"Koyon", flipCard:"Pula", addCard:"Kawa Taw",
-    deleteCard:"Pula", save:"Mampi", cancel:"Kani Na", confirm:"Tawi Re", close:"Kani",
-    rateAgain:"Na Tawi", rateHard:"Kapa", rateGood:"Mampi", rateEasy:"Yawi"
-  });
-  // M1933: Automated Parity Linter for Sepik-Ramu Languages
+    // M1929: Abelam (abt)
+    // M1930: Boiken (bzf) & Milestone Release v20.7.0
+    // M1931: Sawos (sos)
+    // M1932: Yimas (yee)
+    // M1933: Automated Parity Linter for Sepik-Ramu Languages
   window.dfLintSepikRamuParity = function(){
     ['ape','abt','bzf','sos','yee','amp','can','mtf','kmo'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -34323,12 +33391,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1934: Alamblak (amp) & Chambri (can)
-  window.DF_I18N_LOCALES['amp'] = Object.assign({}, baseTemplate, { navFocus:"Yimar", start:"Ta", pause:"Lo", rateGood:"Yopi" });
-  window.DF_I18N_LOCALES['can'] = Object.assign({}, baseTemplate, { navFocus:"Wali", start:"Koli", pause:"Toli", rateGood:"Bole" });
-  // M1935: Murik (mtf) & Kwoma (kmo)
-  window.DF_I18N_LOCALES['mtf'] = Object.assign({}, baseTemplate, { navFocus:"Nor", start:"Maki", pause:"Taki", rateGood:"Wala" });
-  window.DF_I18N_LOCALES['kmo'] = Object.assign({}, baseTemplate, { navFocus:"Ma", start:"Haya", pause:"Waya", rateGood:"Mian" });
-  window.dfLintSepikRamuParity();
+      // M1935: Murik (mtf) & Kwoma (kmo)
+      window.dfLintSepikRamuParity();
   // M1936: Sepik River Ambient Waters & Evening Canopy Breeze Web Audio Filter
   window.dfSynthesizeSepikRiver = function(ctx){
     if(!ctx) return;
@@ -34356,46 +33420,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1918: Newar (new)
-  window.DF_I18N_LOCALES['new'] = Object.assign({}, baseTemplate, {
-    navFocus:"Dhyan", navDecks:"Pau", navStats:"Lhasen", navSettings:"Gway",
-    start:"Suru", pause:"Di", resume:"Suru Ha", reset:"Pau Suru", minutes:"min",
-    cardFront:"Nhya", cardBack:"Lyu", flipCard:"Hil", addCard:"Pau Tan",
-    deleteCard:"Si", save:"Bala", cancel:"Di Ha", confirm:"Suru Ju", close:"Di",
-    rateAgain:"Ha Suru", rateHard:"Thau", rateGood:"Bala", rateEasy:"Apu"
-  });
-  // M1919: Limbu (lif)
-  window.DF_I18N_LOCALES['lif'] = Object.assign({}, baseTemplate, {
-    navFocus:"Samyo", navDecks:"Sapla", navStats:"Kusang", navSettings:"Thim",
-    start:"Hak", pause:"Lep", resume:"Hak Ya", reset:"Sapla Hak", minutes:"min",
-    cardFront:"Tagi", cardBack:"Ena", flipCard:"Hek", addCard:"Sapla Hak",
-    deleteCard:"Phik", save:"Nu", cancel:"Lep Ya", confirm:"Hak Ro", close:"Lep",
-    rateAgain:"Ya Hak", rateHard:"Sakpa", rateGood:"Nu", rateEasy:"Pangba"
-  });
-  // M1920: Magar (mgp) & Milestone Release v20.6.0
-  window.DF_I18N_LOCALES['mgp'] = Object.assign({}, baseTemplate, {
-    navFocus:"Chyat", navDecks:"Kitap", navStats:"Bhal", navSettings:"Dhur",
-    start:"Jhat", pause:"Rhot", resume:"Jhat Le", reset:"Kitap Jhat", minutes:"min",
-    cardFront:"Tang", cardBack:"Lhang", flipCard:"Kyat", addCard:"Kitap Jhat",
-    deleteCard:"Khat", save:"Bhal", cancel:"Rhot Le", confirm:"Jhat Da", close:"Rhot",
-    rateAgain:"Le Jhat", rateHard:"Dhup", rateGood:"Bhal", rateEasy:"Syak"
-  });
-  // M1921: Tamang (taj)
-  window.DF_I18N_LOCALES['taj'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sem", navDecks:"Chhi", navStats:"Jyang", navSettings:"Rim",
-    start:"Prap", pause:"Ten", resume:"Prap Na", reset:"Chhi Prap", minutes:"min",
-    cardFront:"Dong", cardBack:"Koyon", flipCard:"Khor", addCard:"Chhi Prap",
-    deleteCard:"Phat", save:"Jyang", cancel:"Ten Na", confirm:"Prap Ba", close:"Ten",
-    rateAgain:"Na Prap", rateHard:"Kang", rateGood:"Jyang", rateEasy:"Lho"
-  });
-  // M1922: Gurung (gvr)
-  window.DF_I18N_LOCALES['gvr'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tinho", navDecks:"Kli", navStats:"Tsong", navSettings:"Pye",
-    start:"Toh", pause:"Kro", resume:"Toh Ma", reset:"Kli Toh", minutes:"min",
-    cardFront:"Mhi", cardBack:"Koyon", flipCard:"Lhen", addCard:"Kli Toh",
-    deleteCard:"Plit", save:"Syo", cancel:"Kro Ma", confirm:"Toh Ro", close:"Kro",
-    rateAgain:"Ma Toh", rateHard:"Kar", rateGood:"Syo", rateEasy:"Apu"
-  });
-  // M1923: Automated Parity Linter for Himalayan Languages
+    // M1919: Limbu (lif)
+    // M1920: Magar (mgp) & Milestone Release v20.6.0
+    // M1921: Tamang (taj)
+    // M1922: Gurung (gvr)
+    // M1923: Automated Parity Linter for Himalayan Languages
   window.dfLintHimalayanParity = function(){
     ['new','lif','mgp','taj','gvr','bap','xsr','lep','mni'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -34405,12 +33434,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1924: Bantawa (bap) & Sherpa (xsr)
-  window.DF_I18N_LOCALES['bap'] = Object.assign({}, baseTemplate, { navFocus:"Chum", start:"Loh", pause:"Yung", rateGood:"Nu" });
-  window.DF_I18N_LOCALES['xsr'] = Object.assign({}, baseTemplate, { navFocus:"Sem", start:"Tsuk", pause:"Duk", rateGood:"Yakpo" });
-  // M1925: Lepcha (lep) & Manipuri (mni)
-  window.DF_I18N_LOCALES['lep'] = Object.assign({}, baseTemplate, { navFocus:"Afluk", start:"Mat", pause:"Lyang", rateGood:"Alem" });
-  window.DF_I18N_LOCALES['mni'] = Object.assign({}, baseTemplate, { navFocus:"Pukning", start:"Houre", pause:"Leppise", rateGood:"Phajei" });
-  window.dfLintHimalayanParity();
+      // M1925: Lepcha (lep) & Manipuri (mni)
+      window.dfLintHimalayanParity();
   // M1926: High Himalayan Pine Wind & Mountain Stream Web Audio Filter
   window.dfSynthesizeHimalayanWind = function(ctx){
     if(!ctx) return;
@@ -34438,46 +33463,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1928: Arapesh (ape)
-  window.DF_I18N_LOCALES['ape'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ipak", navDecks:"Buk", navStats:"Yopinyi", navSettings:"Megen",
-    start:"Ta", pause:"Loh", resume:"Ta Namo", reset:"Buk Ta", minutes:"min",
-    cardFront:"Nab", cardBack:"Koyon", flipCard:"Pukuk", addCard:"Buk Ta",
-    deleteCard:"Kus", save:"Yopinyi", cancel:"Loh Namo", confirm:"Ta No", close:"Loh",
-    rateAgain:"Namo Ta", rateHard:"Dede", rateGood:"Yopinyi", rateEasy:"Mapin"
-  });
-  // M1929: Abelam (abt)
-  window.DF_I18N_LOCALES['abt'] = Object.assign({}, baseTemplate, {
-    navFocus:"Wani", navDecks:"Kawa", navStats:"Yekun", navSettings:"Baki",
-    start:"Veku", pause:"Tewu", resume:"Veku Ka", reset:"Kawa Veku", minutes:"min",
-    cardFront:"Taba", cardBack:"Koyon", flipCard:"Pelak", addCard:"Kawa Veku",
-    deleteCard:"Pilik", save:"Yekun", cancel:"Tewu Ka", confirm:"Veku Re", close:"Tewu",
-    rateAgain:"Ka Veku", rateHard:"Kati", rateGood:"Yekun", rateEasy:"Mian"
-  });
-  // M1930: Boiken (bzf) & Milestone Release v20.7.0
-  window.DF_I18N_LOCALES['bzf'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sumbwe", navDecks:"Pepa", navStats:"Bole", navSettings:"Wuli",
-    start:"Hali", pause:"Wali", resume:"Hali Me", reset:"Pepa Hali", minutes:"min",
-    cardFront:"Mba", cardBack:"Koyon", flipCard:"Keli", addCard:"Pepa Hali",
-    deleteCard:"Pili", save:"Bole", cancel:"Wali Me", confirm:"Hali No", close:"Wali",
-    rateAgain:"Me Hali", rateHard:"Taki", rateGood:"Bole", rateEasy:"Welu"
-  });
-  // M1931: Sawos (sos)
-  window.DF_I18N_LOCALES['sos'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yikwe", navDecks:"Gawa", navStats:"Wala", navSettings:"Peli",
-    start:"Meli", pause:"Kwele", resume:"Meli Ba", reset:"Gawa Meli", minutes:"min",
-    cardFront:"Daba", cardBack:"Koyon", flipCard:"Plaka", addCard:"Gawa Mel",
-    deleteCard:"Kisa", save:"Wala", cancel:"Kwele Ba", confirm:"Meli Ka", close:"Kwele",
-    rateAgain:"Ba Meli", rateHard:"Diki", rateGood:"Wala", rateEasy:"Miap"
-  });
-  // M1932: Yimas (yee)
-  window.DF_I18N_LOCALES['yee'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kayan", navDecks:"Kawa", navStats:"Mampi", navSettings:"Yaki",
-    start:"Tawi", pause:"Kani", resume:"Tawi Na", reset:"Kawa Tawi", minutes:"min",
-    cardFront:"Tambi", cardBack:"Koyon", flipCard:"Pula", addCard:"Kawa Taw",
-    deleteCard:"Pula", save:"Mampi", cancel:"Kani Na", confirm:"Tawi Re", close:"Kani",
-    rateAgain:"Na Tawi", rateHard:"Kapa", rateGood:"Mampi", rateEasy:"Yawi"
-  });
-  // M1933: Automated Parity Linter for Sepik-Ramu Languages
+    // M1929: Abelam (abt)
+    // M1930: Boiken (bzf) & Milestone Release v20.7.0
+    // M1931: Sawos (sos)
+    // M1932: Yimas (yee)
+    // M1933: Automated Parity Linter for Sepik-Ramu Languages
   window.dfLintSepikRamuParity = function(){
     ['ape','abt','bzf','sos','yee','amp','can','mtf','kmo'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -34487,12 +33477,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1934: Alamblak (amp) & Chambri (can)
-  window.DF_I18N_LOCALES['amp'] = Object.assign({}, baseTemplate, { navFocus:"Yimar", start:"Ta", pause:"Lo", rateGood:"Yopi" });
-  window.DF_I18N_LOCALES['can'] = Object.assign({}, baseTemplate, { navFocus:"Wali", start:"Koli", pause:"Toli", rateGood:"Bole" });
-  // M1935: Murik (mtf) & Kwoma (kmo)
-  window.DF_I18N_LOCALES['mtf'] = Object.assign({}, baseTemplate, { navFocus:"Nor", start:"Maki", pause:"Taki", rateGood:"Wala" });
-  window.DF_I18N_LOCALES['kmo'] = Object.assign({}, baseTemplate, { navFocus:"Ma", start:"Haya", pause:"Waya", rateGood:"Mian" });
-  window.dfLintSepikRamuParity();
+      // M1935: Murik (mtf) & Kwoma (kmo)
+      window.dfLintSepikRamuParity();
   // M1936: Sepik River Ambient Waters & Evening Canopy Breeze Web Audio Filter
   window.dfSynthesizeSepikRiver = function(ctx){
     if(!ctx) return;
@@ -34520,46 +33506,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1968: Moore (mos)
-  window.DF_I18N_LOCALES['mos'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yam-leoogo", navDecks:"Sebi", navStats:"Soolm", navSettings:"Manegre",
-    start:"Singi", pause:"Gao", resume:"Lebg Singi", reset:"Sebi Singi", minutes:"min",
-    cardFront:"Tore", cardBack:"Poore", flipCard:"Lebge", addCard:"Paas Sebre",
-    deleteCard:"Yiis", save:"Manege", cancel:"Basi", confirm:"N-ye", close:"Paki",
-    rateAgain:"Lebge", rateHard:"Toogo", rateGood:"Soma", rateEasy:"Nana"
-  });
-  // M1969: Dagbani (dag)
-  window.DF_I18N_LOCALES['dag'] = Object.assign({}, baseTemplate, {
-    navFocus:"Haŋkali", navDecks:"Gban", navStats:"Kalandu", navSettings:"Maliŋgu",
-    start:"Pili", pause:"Zani", resume:"Tuɣi Pili", reset:"Gban Pili", minutes:"min",
-    cardFront:"Tooni", cardBack:"Nyaaŋa", flipCard:"Lebi", addCard:"Pahi Gban",
-    deleteCard:"Nyɛhi", save:"Mali", cancel:"Chae", confirm:"Ii", close:"Kpari",
-    rateAgain:"Lahi Pili", rateHard:"Kpema", rateGood:"Vɛnyɛla", rateEasy:"Soom"
-  });
-  // M1970: Kasem (xsm) & Milestone Release v21.1.0
-  window.DF_I18N_LOCALES['xsm'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yikwɛ", navDecks:"Woro", navStats:"Tantoli", navSettings:"Logro",
-    start:"Pipi", pause:"Yire", resume:"Pipi Dɛ", reset:"Woro Pipi", minutes:"min",
-    cardFront:"Yiga", cardBack:"Nandɔ", flipCard:"Lege", addCard:"Paas Woro",
-    deleteCard:"Vuri", save:"Kɛnɛ", cancel:"Yire Dɛ", confirm:"A-ee", close:"Chɔ",
-    rateAgain:"Dɛ Pipi", rateHard:"Balono", rateGood:"Kɛnɛ", rateEasy:"Dɛdɛ"
-  });
-  // M1971: Farefare (gur)
-  window.DF_I18N_LOCALES['gur'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yam", navDecks:"Gbaŋa", navStats:"Kalegere", navSettings:"Maalegɔ",
-    start:"Pili", pause:"Zane", resume:"Lɛm Pili", reset:"Gbaŋa Pili", minutes:"min",
-    cardFront:"Tuuma", cardBack:"Poore", flipCard:"Lebese", addCard:"Pa'as Gbaŋa",
-    deleteCard:"Yese", save:"Maalɛ", cancel:"Basɛ", confirm:"Eee", close:"Yɔ",
-    rateAgain:"Lɛm Pili", rateHard:"To'ore", rateGood:"Soma", rateEasy:"Naana"
-  });
-  // M1972: Senufo (sef)
-  window.DF_I18N_LOCALES['sef'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kashin", navDecks:"Kitabu", navStats:"Kaara", navSettings:"Liri",
-    start:"Toro", pause:"Yili", resume:"Toro Nari", reset:"Kitabu Toro", minutes:"min",
-    cardFront:"Yaha", cardBack:"Kari", flipCard:"Koro", addCard:"Paas Kitabu",
-    deleteCard:"Kari", save:"Tani", cancel:"Yili Nari", confirm:"O-ho", close:"Tolo",
-    rateAgain:"Nari Toro", rateHard:"Kanga", rateGood:"Tani", rateEasy:"Noro"
-  });
-  // M1973: Automated Parity Linter for Gur & Voltaic Languages
+    // M1969: Dagbani (dag)
+    // M1970: Kasem (xsm) & Milestone Release v21.1.0
+    // M1971: Farefare (gur)
+    // M1972: Senufo (sef)
+    // M1973: Automated Parity Linter for Gur & Voltaic Languages
   window.dfLintGurVoltaicParity = function(){
     ['mos','dag','xsm','gur','sef','kus','maw','bwu','bfo'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -34569,12 +33520,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1974: Kusaal (kus) & Mampruli (maw)
-  window.DF_I18N_LOCALES['kus'] = Object.assign({}, baseTemplate, { navFocus:"Yam", start:"Pin'il", pause:"Gu'ul", rateGood:"Suma" });
-  window.DF_I18N_LOCALES['maw'] = Object.assign({}, baseTemplate, { navFocus:"Hangkali", start:"Pili", pause:"Zani", rateGood:"Suma" });
-  // M1975: Buli (bwu) & Birifor (bfo)
-  window.DF_I18N_LOCALES['bwu'] = Object.assign({}, baseTemplate, { navFocus:"Nurung", start:"Pili", pause:"Zani", rateGood:"Nalung" });
-  window.DF_I18N_LOCALES['bfo'] = Object.assign({}, baseTemplate, { navFocus:"Yam", start:"Sing", pause:"Zan", rateGood:"Soma" });
-  window.dfLintGurVoltaicParity();
+      // M1975: Buli (bwu) & Birifor (bfo)
+      window.dfLintGurVoltaicParity();
   // M1976: Sahel Dry Wind & Baobab Canopy Web Audio Filter
   window.dfSynthesizeSahelWind = function(ctx){
     if(!ctx) return;
@@ -34602,46 +33549,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1938: Pangasinan (pag)
-  window.DF_I18N_LOCALES['pag'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pokus", navDecks:"Talon", navStats:"Estadistika", navSettings:"Kareenan",
-    start:"Igapo", pause:"Pondoy", resume:"Ituloy", reset:"Pondoyen Lamet", minutes:"min",
-    cardFront:"Arap", cardBack:"Beneg", flipCard:"Patalingen", addCard:"Iromod ya Talon",
-    deleteCard:"Buralen", save:"Idulin", cancel:"Ekalen", confirm:"On", close:"Isara",
-    rateAgain:"Lamet", rateHard:"Mairap", rateGood:"Maong", rateEasy:"Mainomay"
-  });
-  // M1939: Bikol (bcl)
-  window.DF_I18N_LOCALES['bcl'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pokus", navDecks:"Baraha", navStats:"Estatistika", navSettings:"Katanosan",
-    start:"Punan", pause:"Pundo", resume:"Ipadagos", reset:"Ibalik", minutes:"min",
-    cardFront:"Atubang", cardBack:"Likod", flipCard:"Bariwason", addCard:"Magdugang nin Baraha",
-    deleteCard:"Paraon", save:"Itagama", cancel:"Kanselaron", confirm:"Iyo", close:"Isara",
-    rateAgain:"Liwat", rateHard:"Masakit", rateGood:"Marahay", rateEasy:"Madali"
-  });
-  // M1940: Waray (war) & Milestone Release v20.8.0
-  window.DF_I18N_LOCALES['war'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pokus", navDecks:"Baraha", navStats:"Estadistika", navSettings:"Pahiplig",
-    start:"Tikangi", pause:"Undang", resume:"Padayon", reset:"Ibalik", minutes:"min",
-    cardFront:"Atubangan", cardBack:"Luyo", flipCard:"Balikaron", addCard:"Dugang hin Baraha",
-    deleteCard:"Paraon", save:"Tipigi", cancel:"Kanselahon", confirm:"Oo", close:"Takpi",
-    rateAgain:"Utro", rateHard:"Makaharudol", rateGood:"Maupay", rateEasy:"Masilhag"
-  });
-  // M1941: Kapampangan (pam)
-  window.DF_I18N_LOCALES['pam'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pokus", navDecks:"Baraha", navStats:"Estadistika", navSettings:"Kabilian",
-    start:"Mag-umpisa", pause:"Tuknang", resume:"Ituloy", reset:"Isubli", minutes:"min",
-    cardFront:"Harap", cardBack:"Gulut", flipCard:"Baligtaran", addCard:"Dagdagan Baraha",
-    deleteCard:"Buran", save:"Isinup", cancel:"Iurung", confirm:"Wa", close:"Isara",
-    rateAgain:"Pasibayu", rateHard:"Masakit", rateGood:"Mayap", rateEasy:"Mainawa"
-  });
-  // M1942: Dusun (dtp)
-  window.DF_I18N_LOCALES['dtp'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pimangan", navDecks:"Karatas", navStats:"Kootuson", navSettings:"Kouyuon",
-    start:"Timpuun", pause:"Tingkod", resume:"Potilombuso", reset:"Guliho", minutes:"min",
-    cardFront:"Gulu", cardBack:"Likud", flipCard:"Pusoro", addCard:"Ruhangai Karatas",
-    deleteCard:"Pugaso", save:"Umoligo", cancel:"Kanselo", confirm:"Ondung", close:"Kukupo",
-    rateAgain:"Kawalio", rateHard:"Alasay", rateGood:"Osonong", rateEasy:"Asonong"
-  });
-  // M1943: Automated Parity Linter for Philippine & Bornean Languages
+    // M1939: Bikol (bcl)
+    // M1940: Waray (war) & Milestone Release v20.8.0
+    // M1941: Kapampangan (pam)
+    // M1942: Dusun (dtp)
+    // M1943: Automated Parity Linter for Philippine & Bornean Languages
   window.dfLintPhilippineBorneoParity = function(){
     ['pag','bcl','war','pam','dtp','kzj','bdr','mrw','mdh'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -34651,12 +33563,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1944: Kadazan (kzj) & Bajau (bdr)
-  window.DF_I18N_LOCALES['kzj'] = Object.assign({}, baseTemplate, { navFocus:"Pimang", start:"Timpu", pause:"Tingkod", rateGood:"Avasi" });
-  window.DF_I18N_LOCALES['bdr'] = Object.assign({}, baseTemplate, { navFocus:"Pikir", start:"Tikang", pause:"Hele", rateGood:"Hapik" });
-  // M1945: Maranao (mrw) & Maguindanao (mdh)
-  window.DF_I18N_LOCALES['mrw'] = Object.assign({}, baseTemplate, { navFocus:"Pikil", start:"Poon", pause:"Gagap", rateGood:"Mapia" });
-  window.DF_I18N_LOCALES['mdh'] = Object.assign({}, baseTemplate, { navFocus:"Pikir", start:"Poon", pause:"Gakap", rateGood:"Mapiya" });
-  window.dfLintPhilippineBorneoParity();
+      // M1945: Maranao (mrw) & Maguindanao (mdh)
+      window.dfLintPhilippineBorneoParity();
   // M1946: Mount Kinabalu Mist & Tropical Rainforest Canopy Web Audio Filter
   window.dfSynthesizeKinabaluMist = function(ctx){
     if(!ctx) return;
@@ -34684,46 +33592,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1948: Tuvaluan (tvl)
-  window.DF_I18N_LOCALES['tvl'] = Object.assign({}, baseTemplate, {
-    navFocus:"Manatu", navDecks:"Pepa", navStats:"Faitau", navSettings:"Fakatoka",
-    start:"Kamata", pause:"Fakatali", resume:"Toe Kamata", reset:"Fakafoki", minutes:"min",
-    cardFront:"Mua", cardBack:"Tua", flipCard:"Fakafo'ki", addCard:"Fakaopopo Pepa",
-    deleteCard:"Tinoi", save:"Taofi", cancel:"Fakalea", confirm:"Ao", close:"Puni",
-    rateAgain:"Toe Fai", rateHard:"Faigata", rateGood:"Lelei", rateEasy:"Faigofie"
-  });
-  // M1949: Tokelauan (tkl)
-  window.DF_I18N_LOCALES['tkl'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fakakaukau", navDecks:"Laupepa", navStats:"Fakamaumau", navSettings:"Fakatokaga",
-    start:"Kamata", pause:"Fakatali", resume:"Toe Kamata", reset:"Fakafoki", minutes:"min",
-    cardFront:"Mua", cardBack:"Tua", flipCard:"Fakaliliu", addCard:"Fakopo Laupepa",
-    deleteCard:"Tinoi", save:"Taofi", cancel:"Fakalea", confirm:"Ioe", close:"Puipui",
-    rateAgain:"Toe Fai", rateHard:"Faigata", rateGood:"Lelei", rateEasy:"Faigofie"
-  });
-  // M1950: Niuean (niu) & Milestone Release v20.9.0
-  window.DF_I18N_LOCALES['niu'] = Object.assign({}, baseTemplate, {
-    navFocus:"Manamanatu", navDecks:"Laulau", navStats:"Totou", navSettings:"Fakatokatoka",
-    start:"Kamata", pause:"Fakatali", resume:"Liu Kamata", reset:"Fakahoko Liu", minutes:"min",
-    cardFront:"Mua", cardBack:"Tua", flipCard:"Fulhi", addCard:"Lafi Laulau",
-    deleteCard:"Tamate", save:"Fakamau", cancel:"Tiaki", confirm:"E", close:"Pā",
-    rateAgain:"Liu Fai", rateHard:"Uka", rateGood:"Mitaki", rateEasy:"Mukamuka"
-  });
-  // M1951: Rarotongan (rar)
-  window.DF_I18N_LOCALES['rar'] = Object.assign({}, baseTemplate, {
-    navFocus:"Manako", navDecks:"Pepa", navStats:"Tatau", navSettings:"Akatika",
-    start:"Akamata", pause:"Tatari", resume:"Akamata Akaou", reset:"Akatoki", minutes:"min",
-    cardFront:"Mua", cardBack:"Muri", flipCard:"Uriuri", addCard:"Apitii Pepa",
-    deleteCard:"Tikitiki", save:"Tapeka", cancel:"Akaoki", confirm:"Ae", close:"Topiri",
-    rateAgain:"Akaou", rateHard:"Ngata", rateGood:"Meitaki", rateEasy:"Māmā"
-  });
-  // M1952: Gilbertese / Kiribati (gil)
-  window.DF_I18N_LOCALES['gil'] = Object.assign({}, baseTemplate, {
-    navFocus:"Iango", navDecks:"Baaba", navStats:"Wareka", navSettings:"Katauraoi",
-    start:"Moana", pause:"Tataninga", resume:"Manga Moana", reset:"Kairika", minutes:"min",
-    cardFront:"Moa", cardBack:"Buku", flipCard:"Bitia", addCard:"Rinea Baaba",
-    deleteCard:"Kamauna", save:"Kavania", cancel:"Katoka", confirm:"Eng", close:"Kainna",
-    rateAgain:"Manga Fai", rateHard:"Kangaanga", rateGood:"Raoiroi", rateEasy:"Bebete"
-  });
-  // M1953: Automated Parity Linter for Polynesian & Micronesian Languages
+    // M1949: Tokelauan (tkl)
+    // M1950: Niuean (niu) & Milestone Release v20.9.0
+    // M1951: Rarotongan (rar)
+    // M1952: Gilbertese / Kiribati (gil)
+    // M1953: Automated Parity Linter for Polynesian & Micronesian Languages
   window.dfLintPolynesianParity = function(){
     ['tvl','tkl','niu','rar','gil','nau','rtm','pmt','mrv'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -34733,12 +33606,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1954: Nauruan (nau) & Rotuman (rtm)
-  window.DF_I18N_LOCALES['nau'] = Object.assign({}, baseTemplate, { navFocus:"Ean", start:"Bita", pause:"Tari", rateGood:"Omo" });
-  window.DF_I18N_LOCALES['rtm'] = Object.assign({}, baseTemplate, { navFocus:"Ami", start:"Kamata", pause:"Tari", rateGood:"Lelei" });
-  // M1955: Tuamotuan (pmt) & Mangareva (mrv)
-  window.DF_I18N_LOCALES['pmt'] = Object.assign({}, baseTemplate, { navFocus:"Manako", start:"Kamata", pause:"Tatari", rateGood:"Maitaki" });
-  window.DF_I18N_LOCALES['mrv'] = Object.assign({}, baseTemplate, { navFocus:"Manatu", start:"Amata", pause:"Tari", rateGood:"Mekitaki" });
-  window.dfLintPolynesianParity();
+      // M1955: Tuamotuan (pmt) & Mangareva (mrv)
+      window.dfLintPolynesianParity();
   // M1956: Coral Atoll Gentle Waves & Pacific Breeze Web Audio Filter
   window.dfSynthesizeAtollWaves = function(ctx){
     if(!ctx) return;
@@ -34766,46 +33635,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1958: Khoekhoe / Nama (naq)
-  window.DF_I18N_LOCALES['naq'] = Object.assign({}, baseTemplate, {
-    navFocus:"ǂAnsen", navDecks:"Xaris", navStats:"Khoms", navSettings:"Sîsens",
-    start:"Tsoatsoa", pause:"Mûǂui", resume:"Tsoatsoa Wore", reset:"Xaris Tsoatsoa", minutes:"min",
-    cardFront:"Ais", cardBack:"Khoes", flipCard:"ǂGobe", addCard:"Xaris ǂGae",
-    deleteCard:"Mûǂgôa", save:"ǃGâi", cancel:"Mûǂui Wore", confirm:"Tsoatsoa Io", close:"Mûǂui",
-    rateAgain:"Wore Tsoatsoa", rateHard:"ǃGâsa", rateGood:"ǃGâi", rateEasy:"Sûsa"
-  });
-  // M1959: Ju|'hoan (ktz)
-  window.DF_I18N_LOCALES['ktz'] = Object.assign({}, baseTemplate, {
-    navFocus:"ǀXae", navDecks:"ǂAo", navStats:"ǃHõo", navSettings:"Tchen",
-    start:"ǃOa", pause:"ǁAe", resume:"ǃOa Khama", reset:"ǂAo ǃOa", minutes:"min",
-    cardFront:"Nǂang", cardBack:"ǀKoa", flipCard:"ǂXoe", addCard:"ǂAo ǃOa",
-    deleteCard:"ǁKx'am", save:"ǃGaa", cancel:"ǁAe Khama", confirm:"ǃOa Te", close:"ǁAe",
-    rateAgain:"Khama ǃOa", rateHard:"ǁAka", rateGood:"ǃGaa", rateEasy:"ǀXoan"
-  });
-  // M1960: !Xoo / Taa (nmn) & Tricentennial Milestone Release v21.0.0
-  window.DF_I18N_LOCALES['nmn'] = Object.assign({}, baseTemplate, {
-    navFocus:"ʘOa", navDecks:"ǃUm", navStats:"ǂNake", navSettings:"ǁGaa",
-    start:"ǃNai", pause:"ʘUu", resume:"ǃNai Sa", reset:"ǃUm ǃNai", minutes:"min",
-    cardFront:"ǀNu", cardBack:"ǃOa", flipCard:"ǁOro", addCard:"ǃUm ǃNai",
-    deleteCard:"ǂQha", save:"ʘUa", cancel:"ʘUu Sa", confirm:"ǃNai Ke", close:"ʘUu",
-    rateAgain:"Sa ǃNai", rateHard:"ǂXao", rateGood:"ʘUa", rateEasy:"ǀAma"
-  });
-  // M1961: Sandawe (sad)
-  window.DF_I18N_LOCALES['sad'] = Object.assign({}, baseTemplate, {
-    navFocus:"ǂNom", navDecks:"Karta", navStats:"K'wan", navSettings:"Ts'a",
-    start:"ǂHoo", pause:"ǁ'we", resume:"ǂHoo Sa", reset:"Karta ǂHoo", minutes:"min",
-    cardFront:"ǀ'Ing", cardBack:"Koyon", flipCard:"K'ili", addCard:"Karta ǂHoo",
-    deleteCard:"Tl'a", save:"ǂHoo", cancel:"ǁ'we Sa", confirm:"ǂHoo Te", close:"ǁ'we",
-    rateAgain:"Sa ǂHoo", rateHard:"T'ang", rateGood:"ǂHoo", rateEasy:"P'olo"
-  });
-  // M1962: Hadza (hts)
-  window.DF_I18N_LOCALES['hts'] = Object.assign({}, baseTemplate, {
-    navFocus:"ǀEme", navDecks:"Pepa", navStats:"ǃHaa", navSettings:"K'o",
-    start:"ǃUm", pause:"ǁ'a", resume:"ǃUm Me", reset:"Pepa ǃUm", minutes:"min",
-    cardFront:"Ats'a", cardBack:"Koyon", flipCard:"ǁ'ili", addCard:"Pepa ǃUm",
-    deleteCard:"Tl'a", save:"Zaze", cancel:"ǁ'a Me", confirm:"ǃUm Ya", close:"ǁ'a",
-    rateAgain:"Me ǃUm", rateHard:"K'ak'a", rateGood:"Zaze", rateEasy:"Mimi"
-  });
-  // M1963: Automated Parity Linter for Khoisan & Click Languages
+    // M1959: Ju|'hoan (ktz)
+    // M1960: !Xoo / Taa (nmn) & Tricentennial Milestone Release v21.0.0
+    // M1961: Sandawe (sad)
+    // M1962: Hadza (hts)
+    // M1963: Automated Parity Linter for Khoisan & Click Languages
   window.dfLintKhoisanParity = function(){
     ['naq','ktz','nmn','sad','hts','nhr','hnh','gnk','kqz'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -34815,12 +33649,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1964: Naro (nhr) & ||Ani (hnh)
-  window.DF_I18N_LOCALES['nhr'] = Object.assign({}, baseTemplate, { navFocus:"ǂAm", start:"Tsoatsoa", pause:"Mu", rateGood:"ǃGai" });
-  window.DF_I18N_LOCALES['hnh'] = Object.assign({}, baseTemplate, { navFocus:"ǁGaa", start:"ǃOa", pause:"ǁAe", rateGood:"ǃGaa" });
-  // M1965: G||ana (gnk) & Korana (kqz)
-  window.DF_I18N_LOCALES['gnk'] = Object.assign({}, baseTemplate, { navFocus:"ʘOa", start:"ǃNai", pause:"ʘUu", rateGood:"ʘUa" });
-  window.DF_I18N_LOCALES['kqz'] = Object.assign({}, baseTemplate, { navFocus:"ǂAn", start:"Tsoa", pause:"Mu", rateGood:"ǃGai" });
-  window.dfLintKhoisanParity();
+      // M1965: G||ana (gnk) & Korana (kqz)
+      window.dfLintKhoisanParity();
   // M1966: Kalahari Desert Wind & Night Stars Web Audio Filter
   window.dfSynthesizeKalahariWind = function(ctx){
     if(!ctx) return;
@@ -34848,46 +33678,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1968: Moore (mos)
-  window.DF_I18N_LOCALES['mos'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yam-leoogo", navDecks:"Sebi", navStats:"Soolm", navSettings:"Manegre",
-    start:"Singi", pause:"Gao", resume:"Lebg Singi", reset:"Sebi Singi", minutes:"min",
-    cardFront:"Tore", cardBack:"Poore", flipCard:"Lebge", addCard:"Paas Sebre",
-    deleteCard:"Yiis", save:"Manege", cancel:"Basi", confirm:"N-ye", close:"Paki",
-    rateAgain:"Lebge", rateHard:"Toogo", rateGood:"Soma", rateEasy:"Nana"
-  });
-  // M1969: Dagbani (dag)
-  window.DF_I18N_LOCALES['dag'] = Object.assign({}, baseTemplate, {
-    navFocus:"Haŋkali", navDecks:"Gban", navStats:"Kalandu", navSettings:"Maliŋgu",
-    start:"Pili", pause:"Zani", resume:"Tuɣi Pili", reset:"Gban Pili", minutes:"min",
-    cardFront:"Tooni", cardBack:"Nyaaŋa", flipCard:"Lebi", addCard:"Pahi Gban",
-    deleteCard:"Nyɛhi", save:"Mali", cancel:"Chae", confirm:"Ii", close:"Kpari",
-    rateAgain:"Lahi Pili", rateHard:"Kpema", rateGood:"Vɛnyɛla", rateEasy:"Soom"
-  });
-  // M1970: Kasem (xsm) & Milestone Release v21.1.0
-  window.DF_I18N_LOCALES['xsm'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yikwɛ", navDecks:"Woro", navStats:"Tantoli", navSettings:"Logro",
-    start:"Pipi", pause:"Yire", resume:"Pipi Dɛ", reset:"Woro Pipi", minutes:"min",
-    cardFront:"Yiga", cardBack:"Nandɔ", flipCard:"Lege", addCard:"Paas Woro",
-    deleteCard:"Vuri", save:"Kɛnɛ", cancel:"Yire Dɛ", confirm:"A-ee", close:"Chɔ",
-    rateAgain:"Dɛ Pipi", rateHard:"Balono", rateGood:"Kɛnɛ", rateEasy:"Dɛdɛ"
-  });
-  // M1971: Farefare (gur)
-  window.DF_I18N_LOCALES['gur'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yam", navDecks:"Gbaŋa", navStats:"Kalegere", navSettings:"Maalegɔ",
-    start:"Pili", pause:"Zane", resume:"Lɛm Pili", reset:"Gbaŋa Pili", minutes:"min",
-    cardFront:"Tuuma", cardBack:"Poore", flipCard:"Lebese", addCard:"Pa'as Gbaŋa",
-    deleteCard:"Yese", save:"Maalɛ", cancel:"Basɛ", confirm:"Eee", close:"Yɔ",
-    rateAgain:"Lɛm Pili", rateHard:"To'ore", rateGood:"Soma", rateEasy:"Naana"
-  });
-  // M1972: Senufo (sef)
-  window.DF_I18N_LOCALES['sef'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kashin", navDecks:"Kitabu", navStats:"Kaara", navSettings:"Liri",
-    start:"Toro", pause:"Yili", resume:"Toro Nari", reset:"Kitabu Toro", minutes:"min",
-    cardFront:"Yaha", cardBack:"Kari", flipCard:"Koro", addCard:"Paas Kitabu",
-    deleteCard:"Kari", save:"Tani", cancel:"Yili Nari", confirm:"O-ho", close:"Tolo",
-    rateAgain:"Nari Toro", rateHard:"Kanga", rateGood:"Tani", rateEasy:"Noro"
-  });
-  // M1973: Automated Parity Linter for Gur & Voltaic Languages
+    // M1969: Dagbani (dag)
+    // M1970: Kasem (xsm) & Milestone Release v21.1.0
+    // M1971: Farefare (gur)
+    // M1972: Senufo (sef)
+    // M1973: Automated Parity Linter for Gur & Voltaic Languages
   window.dfLintGurVoltaicParity = function(){
     ['mos','dag','xsm','gur','sef','kus','maw','bwu','bfo'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -34897,12 +33692,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1974: Kusaal (kus) & Mampruli (maw)
-  window.DF_I18N_LOCALES['kus'] = Object.assign({}, baseTemplate, { navFocus:"Yam", start:"Pin'il", pause:"Gu'ul", rateGood:"Suma" });
-  window.DF_I18N_LOCALES['maw'] = Object.assign({}, baseTemplate, { navFocus:"Hangkali", start:"Pili", pause:"Zani", rateGood:"Suma" });
-  // M1975: Buli (bwu) & Birifor (bfo)
-  window.DF_I18N_LOCALES['bwu'] = Object.assign({}, baseTemplate, { navFocus:"Nurung", start:"Pili", pause:"Zani", rateGood:"Nalung" });
-  window.DF_I18N_LOCALES['bfo'] = Object.assign({}, baseTemplate, { navFocus:"Yam", start:"Sing", pause:"Zan", rateGood:"Soma" });
-  window.dfLintGurVoltaicParity();
+      // M1975: Buli (bwu) & Birifor (bfo)
+      window.dfLintGurVoltaicParity();
   // M1976: Sahel Dry Wind & Baobab Canopy Web Audio Filter
   window.dfSynthesizeSahelWind = function(ctx){
     if(!ctx) return;
@@ -34930,46 +33721,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1978: Bassa (bsq)
-  window.DF_I18N_LOCALES['bsq'] = Object.assign({}, baseTemplate, {
-    navFocus:"Wùɖù", navDecks:"Káɖà", navStats:"Cɛ̃́ɛ̃́", navSettings:"Bĩ́ĩ́",
-    start:"Tɔ́ɔ́", pause:"Jè", resume:"Tɔ́ɔ́ Gbɔ", reset:"Káɖà Tɔ́ɔ́", minutes:"min",
-    cardFront:"Bóó", cardBack:"Kpàà", flipCard:"Cɛ̃́", addCard:"Káɖà Bĩ́",
-    deleteCard:"Wɔ̃́", save:"M̀", cancel:"Jè Gbɔ", confirm:"M̀-hm̃", close:"Hĩ",
-    rateAgain:"Gbɔ Tɔ́ɔ́", rateHard:"Kpó", rateGood:"M̀", rateEasy:"Fɛ̃́ɛ̃́"
-  });
-  // M1979: Grebo (grb)
-  window.DF_I18N_LOCALES['grb'] = Object.assign({}, baseTemplate, {
-    navFocus:"Wudi", navDecks:"Kada", navStats:"Shedi", navSettings:"Bodo",
-    start:"Taa", pause:"Do", resume:"Taa Gbo", reset:"Kada Taa", minutes:"min",
-    cardFront:"Boo", cardBack:"Kpa", flipCard:"Ce", addCard:"Kada Bodo",
-    deleteCard:"Wo", save:"Nye", cancel:"Do Gbo", confirm:"E-he", close:"Pi",
-    rateAgain:"Gbo Taa", rateHard:"Kpo", rateGood:"Nye", rateEasy:"Fena"
-  });
-  // M1980: Krahn (krw) & Milestone Release v21.2.0
-  window.DF_I18N_LOCALES['krw'] = Object.assign({}, baseTemplate, {
-    navFocus:"Klo", navDecks:"Woro", navStats:"Gba", navSettings:"Kpo",
-    start:"To", pause:"De", resume:"To Gbo", reset:"Woro To", minutes:"min",
-    cardFront:"Gbo", cardBack:"Kpa", flipCard:"Ca", addCard:"Woro Pa",
-    deleteCard:"Wa", save:"Nye", cancel:"De Gbo", confirm:"E-he", close:"Kpe",
-    rateAgain:"Gbo To", rateHard:"Gba", rateGood:"Nye", rateEasy:"Ple"
-  });
-  // M1981: Dan (daf)
-  window.DF_I18N_LOCALES['daf'] = Object.assign({}, baseTemplate, {
-    navFocus:"Zo", navDecks:"Gbe", navStats:"Gbö", navSettings:"Kpa",
-    start:"Dhɛ", pause:"Sé", resume:"Dhɛ Kpö", reset:"Gbe Dhɛ", minutes:"min",
-    cardFront:"Bhöö", cardBack:"Kpo", flipCard:"Ta", addCard:"Gbe Dhɛ",
-    deleteCard:"Bhü", save:"Dhɛ", cancel:"Sé Kpö", confirm:"Aa", close:"Tü",
-    rateAgain:"Kpö Dhɛ", rateHard:"Kpo", rateGood:"Dhɛ", rateEasy:"Plö"
-  });
-  // M1982: Mende (men)
-  window.DF_I18N_LOCALES['men'] = Object.assign({}, baseTemplate, {
-    navFocus:"Loli", navDecks:"Kadi", navStats:"Gulo", navSettings:"Kao",
-    start:"Toni", pause:"Lomi", resume:"Toni Gboma", reset:"Kadi Toni", minutes:"min",
-    cardFront:"Gbo", cardBack:"Poma", flipCard:"Gili", addCard:"Kadi Toni",
-    deleteCard:"Gbe", save:"Nyande", cancel:"Lomi Gboma", confirm:"Ee", close:"Kpiti",
-    rateAgain:"Gboma Toni", rateHard:"Kpau", rateGood:"Nyande", rateEasy:"Fefo"
-  });
-  // M1983: Automated Parity Linter for Kru & Mande Languages
+    // M1979: Grebo (grb)
+    // M1980: Krahn (krw) & Milestone Release v21.2.0
+    // M1981: Dan (daf)
+    // M1982: Mende (men)
+    // M1983: Automated Parity Linter for Kru & Mande Languages
   window.dfLintKruMandeParity = function(){
     ['bsq','grb','krw','daf','men','kpe','vai','lom','bza'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -34979,12 +33735,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1984: Kpelle (kpe) & Vai (vai)
-  window.DF_I18N_LOCALES['kpe'] = Object.assign({}, baseTemplate, { navFocus:"Kili", start:"Tono", pause:"Lomi", rateGood:"Nɛɛ" });
-  window.DF_I18N_LOCALES['vai'] = Object.assign({}, baseTemplate, { navFocus:"Kili", start:"Toni", pause:"Lomi", rateGood:"Kenda" });
-  // M1985: Loma (lom) & Bandi (bza)
-  window.DF_I18N_LOCALES['lom'] = Object.assign({}, baseTemplate, { navFocus:"Loli", start:"To", pause:"Lo", rateGood:"Vagou" });
-  window.DF_I18N_LOCALES['bza'] = Object.assign({}, baseTemplate, { navFocus:"Koli", start:"Toni", pause:"Lomi", rateGood:"Nyande" });
-  window.dfLintKruMandeParity();
+      // M1985: Loma (lom) & Bandi (bza)
+      window.dfLintKruMandeParity();
   // M1986: West African Coastal Rain & Palm Breeze Web Audio Filter
   window.dfSynthesizeCoastalRain = function(ctx){
     if(!ctx) return;
@@ -35012,46 +33764,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1988: Bemba (bem)
-  window.DF_I18N_LOCALES['bem'] = Object.assign({}, baseTemplate, {
-    navFocus:"Bikako Mano", navDecks:"Amakardi", navStats:"Amapendo", navSettings:"Ukuteyanya",
-    start:"Tandika", pause:"Pumulako", resume:"Twalilila", reset:"Bwesha", minutes:"min",
-    cardFront:"Ku Ntanshi", cardBack:"Ku Nnuma", flipCard:"Kupula", addCard:"Lundako Kardi",
-    deleteCard:"Fumyapo", save:"Sungilila", cancel:"Kansula", confirm:"Ee", close:"Isala",
-    rateAgain:"Nabwekeshapo", rateHard:"Chakosa", rateGood:"Chiisuma", rateEasy:"Chayanguka"
-  });
-  // M1989: Lozi (loz)
-  window.DF_I18N_LOCALES['loz'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kutahelisa", navDecks:"Makadi", navStats:"Palo", navSettings:"Lutukiso",
-    start:"Kalisa", pause:"Pumula", resume:"Kwisapili", reset:"Kutisa", minutes:"min",
-    cardFront:"Fapili", cardBack:"Mwamao", flipCard:"Fetula", addCard:"Ekeza Kadi",
-    deleteCard:"Zwisa", save:"Buluka", cancel:"Hakisa", confirm:"Eni", close:"Kwala",
-    rateAgain:"Hape", rateHard:"Tata", rateGood:"Nde", rateEasy:"Bunolo"
-  });
-  // M1990: Tonga (toi) & Milestone Release v21.3.0
-  window.DF_I18N_LOCALES['toi'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kulangisya", navDecks:"Makadi", navStats:"Mupensyo", navSettings:"Bweende",
-    start:"Talika", pause:"Kazyama", resume:"Zumanana", reset:"Piluka", minutes:"min",
-    cardFront:"Kumpala", cardBack:"Kumusyule", flipCard:"Pindulula", addCard:"Yungizya Kadi",
-    deleteCard:"Gwisya", save:"Yobola", cancel:"Lesha", confirm:"Inzya", close:"Jala",
-    rateAgain:"Alimwi", rateHard:"Kakata", rateGood:"Kabotu", rateEasy:"Uuba-uba"
-  });
-  // M1991: Tsonga (tso)
-  window.DF_I18N_LOCALES['tso'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kombisa", navDecks:"Makhadi", navStats:"Mimbuyelo", navSettings:"Vukorhokeri",
-    start:"Sungula", pause:"Yima", resume:"Yana Mbilwini", reset:"Tlhelerisa", minutes:"min",
-    cardFront:"Mahlweni", cardBack:"Nzhaku", flipCard:"Hundzuluxa", addCard:"Engetela Khadi",
-    deleteCard:"Susa", save:"Hlayisa", cancel:"Tshika", confirm:"Ina", close:"Pfala",
-    rateAgain:"Nakambe", rateHard:"Tikile", rateGood:"Kahle", rateEasy:"Olova"
-  });
-  // M1992: Venda (ven)
-  window.DF_I18N_LOCALES['ven'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sedza", navDecks:"Makaratata", navStats:"Mbuelo", navSettings:"Nzudzanyo",
-    start:"Thoma", pause:"Imani", resume:"Bvela Phanda", reset:"Humisela", minutes:"min",
-    cardFront:"Phanda", cardBack:"Murahu", flipCard:"Rembulusa", addCard:"Engedza Garata",
-    deleteCard:"Bvisa", save:"Vhulunga", cancel:"Litshela", confirm:"Ee", close:"Vala",
-    rateAgain:"Hafhu", rateHard:"Konda", rateGood:"Zwavhudi", rateEasy:"Lele"
-  });
-  // M1993: Automated Parity Linter for Zambezi & Limpopo Bantu Languages
+    // M1989: Lozi (loz)
+    // M1990: Tonga (toi) & Milestone Release v21.3.0
+    // M1991: Tsonga (tso)
+    // M1992: Venda (ven)
+    // M1993: Automated Parity Linter for Zambezi & Limpopo Bantu Languages
   window.dfLintZambeziBantuParity = function(){
     ['bem','loz','toi','tso','ven','nya','tum','luv','kqn'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -35061,12 +33778,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M1994: Chewa (nya) & Tumbuka (tum)
-  window.DF_I18N_LOCALES['nya'] = Object.assign({}, baseTemplate, { navFocus:"Ganiza", start:"Yamba", pause:"Ima", rateGood:"Chabwino" });
-  window.DF_I18N_LOCALES['tum'] = Object.assign({}, baseTemplate, { navFocus:"Ghanaghana", start:"Yamba", pause:"Ima", rateGood:"Makora" });
-  // M1995: Luvale (luv) & Kaonde (kqn)
-  window.DF_I18N_LOCALES['luv'] = Object.assign({}, baseTemplate, { navFocus:"Shinganyeka", start:"Puta", pause:"Imana", rateGood:"Kaha" });
-  window.DF_I18N_LOCALES['kqn'] = Object.assign({}, baseTemplate, { navFocus:"Languluka", start:"Tatikila", pause:"Imana", rateGood:"Wawama" });
-  window.dfLintZambeziBantuParity();
+      // M1995: Luvale (luv) & Kaonde (kqn)
+      window.dfLintZambeziBantuParity();
   // M1996: Victoria Falls Mist & Zambezi Current Web Audio Filter
   window.dfSynthesizeZambeziFalls = function(ctx){
     if(!ctx) return;
@@ -35094,46 +33807,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M1998: Luganda (lug)
-  window.DF_I18N_LOCALES['lug'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kussaayo Ebirowoozo", navDecks:"Kkaada", navStats:"Ebibaliddwa", navSettings:"Enteekateeka",
-    start:"Tandika", pause:"Wummulamu", resume:"Weyongereyo", reset:"Ddamu Buppya", minutes:"min",
-    cardFront:"Mu Maaso", cardBack:"E Mabega", flipCard:"Kyusa", addCard:"Gattako Kkaada",
-    deleteCard:"Sangula", save:"Tereka", cancel:"Sazaamu", confirm:"Ye", close:"Ggalawo",
-    rateAgain:"Ddamu", rateHard:"Kizibu", rateGood:"Kirungi", rateEasy:"Kyangu"
-  });
-  // M1999: Runyankore (nyn)
-  window.DF_I18N_LOCALES['nyn'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kuteekateeka", navDecks:"Kaada", navStats:"Ebibazibwe", navSettings:"Entebeekanisa",
-    start:"Tandika", pause:"Ruhuka", resume:"Guma Omusho", reset:"Garukamu", minutes:"min",
-    cardFront:"Omu Maisho", cardBack:"Enyima", flipCard:"Hindura", addCard:"Yongyeraho Kaada",
-    deleteCard:"Sangura", save:"Bika", cancel:"Shazaamu", confirm:"Eego", close:"Kingaho",
-    rateAgain:"Garukamu", rateHard:"Kigumire", rateGood:"Kirungi", rateEasy:"Kyorobi"
-  });
-  // M2000: Rukiga (cgg) & Historic Milestone M2000 Release v21.4.0
-  window.DF_I18N_LOCALES['cgg'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kuteeka Omutima", navDecks:"Kaada", navStats:"Eby'Omubaro", navSettings:"Entebeekanisa",
-    start:"Tandika", pause:"Humura", resume:"Gumizamu", reset:"Garura", minutes:"min",
-    cardFront:"Omu Maisho", cardBack:"Enyima", flipCard:"Hingisa", addCard:"Yongyera Kaada",
-    deleteCard:"Ihamu", save:"Bika", cancel:"Leka", confirm:"Eego", close:"Kingaho",
-    rateAgain:"Garukamu", rateHard:"Kigumire", rateGood:"Kurungi", rateEasy:"Kyorobi"
-  });
-  // M2001: Rutooro (ttj)
-  window.DF_I18N_LOCALES['ttj'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kuteeka Omwoyo", navDecks:"Kada", navStats:"Ebikwataho", navSettings:"Entekaniza",
-    start:"Tandika", pause:"Humura", resume:"Gumiza", reset:"Garura", minutes:"min",
-    cardFront:"Omu Maiso", cardBack:"Enyuma", flipCard:"Cweka", addCard:"Yongera Kada",
-    deleteCard:"Sangura", save:"Bika", cancel:"Leka", confirm:"Ego", close:"Kingaho",
-    rateAgain:"Ddamu", rateHard:"Kigumire", rateGood:"Kurungi", rateEasy:"Kyorobi"
-  });
-  // M2002: Runyoro (nyo)
-  window.DF_I18N_LOCALES['nyo'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kutunga Ebirowozo", navDecks:"Kada", navStats:"Ebibalwa", navSettings:"Entungisa",
-    start:"Tandika", pause:"Humura", resume:"Gumizamu", reset:"Garura", minutes:"min",
-    cardFront:"Omu Maiso", cardBack:"Enyuma", flipCard:"Hindura", addCard:"Yongeraho",
-    deleteCard:"Sangura", save:"Bika", cancel:"Leka", confirm:"Ego", close:"Kingaho",
-    rateAgain:"Garukamu", rateHard:"Kigumire", rateGood:"Kurungi", rateEasy:"Kyorobi"
-  });
-  // M2003: Automated Parity Linter for Great Lakes Interlacustrine Bantu
+    // M1999: Runyankore (nyn)
+    // M2000: Rukiga (cgg) & Historic Milestone M2000 Release v21.4.0
+    // M2001: Rutooro (ttj)
+    // M2002: Runyoro (nyo)
+    // M2003: Automated Parity Linter for Great Lakes Interlacustrine Bantu
   window.dfLintInterlacustrineParity = function(){
     ['lug','nyn','cgg','ttj','nyo','xog','myx','koo','lsm'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -35143,12 +33821,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2004: Lusoga (xog) & Lumasaba (myx)
-  window.DF_I18N_LOCALES['xog'] = Object.assign({}, baseTemplate, { navFocus:"Kussaayo", start:"Tandika", pause:"Wummula", rateGood:"Kirungi" });
-  window.DF_I18N_LOCALES['myx'] = Object.assign({}, baseTemplate, { navFocus:"Kureka", start:"Tandika", pause:"Humula", rateGood:"Kilungi" });
-  // M2005: Lukonzo (koo) & Samia (lsm)
-  window.DF_I18N_LOCALES['koo'] = Object.assign({}, baseTemplate, { navFocus:"Kwanza", start:"Tsuka", pause:"Lika", rateGood:"Buya" });
-  window.DF_I18N_LOCALES['lsm'] = Object.assign({}, baseTemplate, { navFocus:"Kuteeka", start:"Ranga", pause:"Humula", rateGood:"Kalamu" });
-  window.dfLintInterlacustrineParity();
+      // M2005: Lukonzo (koo) & Samia (lsm)
+      window.dfLintInterlacustrineParity();
   // M2006: Lake Victoria Soft Ripples & Shoreline Reeds Web Audio Filter
   window.dfSynthesizeVictoriaRipples = function(ctx){
     if(!ctx) return;
@@ -35178,46 +33852,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2008: Wolaytta (wal)
-  window.DF_I18N_LOCALES['wal'] = Object.assign({}, baseTemplate, {
-    navFocus:"Qoppa", navDecks:"Maxaafata", navStats:"Payduwa", navSettings:"Giigissuwa",
-    start:"Doommu", pause:"Shemppu", resume:"Zaari Doommu", reset:"Zaari Kessi", minutes:"min",
-    cardFront:"Sintta", cardBack:"Guyye", flipCard:"Kori", addCard:"Maxaafa Gujju",
-    deleteCard:"Sharru", save:"Wottu", cancel:"Aggi Bay", confirm:"E", close:"Gorddu",
-    rateAgain:"Zaari", rateHard:"Deexo", rateGood:"Lo'o", rateEasy:"Metonabaa"
-  });
-  // M2009: Gamo (gmv)
-  window.DF_I18N_LOCALES['gmv'] = Object.assign({}, baseTemplate, {
-    navFocus:"Qoppite", navDecks:"Woroqata", navStats:"Pailo", navSettings:"Giigisso",
-    start:"Doommo", pause:"Shempo", resume:"Zaari Doommo", reset:"Zaari Kesso", minutes:"min",
-    cardFront:"Sintha", cardBack:"Guye", flipCard:"Kori", addCard:"Woroqata Gujo",
-    deleteCard:"Digo", save:"Wotho", cancel:"Aggi", confirm:"Ee", close:"Gorddo",
-    rateAgain:"Zaari", rateHard:"Deexo", rateGood:"Lo'o", rateEasy:"Kawa"
-  });
-  // M2010: Gofa (gof) & Milestone Release v21.5.0
-  window.DF_I18N_LOCALES['gof'] = Object.assign({}, baseTemplate, {
-    navFocus:"Qoppo", navDecks:"Waraqata", navStats:"Paydo", navSettings:"Giigisso",
-    start:"Doommo", pause:"Shempo", resume:"Zaari Doommo", reset:"Zaari Kesso", minutes:"min",
-    cardFront:"Sintha", cardBack:"Guye", flipCard:"Kori", addCard:"Waraqata Gujo",
-    deleteCard:"Digo", save:"Wotho", cancel:"Aggi", confirm:"Ee", close:"Gorddo",
-    rateAgain:"Zaari", rateHard:"Deexo", rateGood:"Lo'o", rateEasy:"Metibaa"
-  });
-  // M2011: Kafa (kbr)
-  window.DF_I18N_LOCALES['kbr'] = Object.assign({}, baseTemplate, {
-    navFocus:"Qotto", navDecks:"Kitabo", navStats:"Tayro", navSettings:"Shiyo",
-    start:"Gumo", pause:"Shemo", resume:"Zaari Gumo", reset:"Kitabo Gumo", minutes:"min",
-    cardFront:"Shiyo", cardBack:"Giyo", flipCard:"Kori", addCard:"Kitabo Gujo",
-    deleteCard:"Shuro", save:"Tano", cancel:"Aggi", confirm:"I-i", close:"Chiro",
-    rateAgain:"Zaari Gumo", rateHard:"Gubo", rateGood:"Decho", rateEasy:"Alba"
-  });
-  // M2012: Hadiyya (hdy)
-  window.DF_I18N_LOCALES['hdy'] = Object.assign({}, baseTemplate, {
-    navFocus:"Haso", navDecks:"Kitaaba", navStats:"Tiro", navSettings:"Giddo",
-    start:"Eggeera", pause:"Uullite", resume:"Hani Eggeera", reset:"Kitaaba Eggeera", minutes:"min",
-    cardFront:"Alba", cardBack:"Badde", flipCard:"Goocho", addCard:"Kitaaba Gujo",
-    deleteCard:"Kuro", save:"Diro", cancel:"Uullo", confirm:"Ee'e", close:"Cuto",
-    rateAgain:"Hani", rateHard:"Cocco", rateGood:"Dancha", rateEasy:"Salphi"
-  });
-  // M2013: Automated Parity Linter for Omotic & Highland Cushitic Languages
+    // M2009: Gamo (gmv)
+    // M2010: Gofa (gof) & Milestone Release v21.5.0
+    // M2011: Kafa (kbr)
+    // M2012: Hadiyya (hdy)
+    // M2013: Automated Parity Linter for Omotic & Highland Cushitic Languages
   window.dfLintOmoticCushiticParity = function(){
     ['wal','gmv','gof','kbr','hdy','dwr','bcq','aiw','bwo'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -35227,12 +33866,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2014: Dawro (dwr) & Bench (bcq)
-  window.DF_I18N_LOCALES['dwr'] = Object.assign({}, baseTemplate, { navFocus:"Qoppa", start:"Doommu", pause:"Shemppu", rateGood:"Lo'o" });
-  window.DF_I18N_LOCALES['bcq'] = Object.assign({}, baseTemplate, { navFocus:"Kots", start:"Dents", pause:"Shem", rateGood:"Dech" });
-  // M2015: Aari (aiw) & Shinasha (bwo)
-  window.DF_I18N_LOCALES['aiw'] = Object.assign({}, baseTemplate, { navFocus:"Wots", start:"Dets", pause:"Shem", rateGood:"Lo'o" });
-  window.DF_I18N_LOCALES['bwo'] = Object.assign({}, baseTemplate, { navFocus:"Qott", start:"Gumo", pause:"Shemo", rateGood:"Decho" });
-  window.dfLintOmoticCushiticParity();
+      // M2015: Aari (aiw) & Shinasha (bwo)
+      window.dfLintOmoticCushiticParity();
   // M2016: Ethiopian Highlands Mountain Breeze Web Audio Filter
   window.dfSynthesizeHighlandBreeze = function(ctx){
     if(!ctx) return;
@@ -35260,46 +33895,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2018: Huitoto (hto)
-  window.DF_I18N_LOCALES['hto'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ie", navDecks:"Kartas", navStats:"Raffue", navSettings:"Jutidie",
-    start:"Fakai", pause:"Jitai", resume:"Fakai Diena", reset:"Kartas Fakai", minutes:"min",
-    cardFront:"Uille", cardBack:"Gomo", flipCard:"Koyon", addCard:"Kartas Fak",
-    deleteCard:"Jorai", save:"Mare", cancel:"Jitai Diena", confirm:"O-o", close:"Jitai",
-    rateAgain:"Diena Fakai", rateHard:"Tite", rateGood:"Mare", rateEasy:"Jirua"
-  });
-  // M2019: Bora (boa)
-  window.DF_I18N_LOCALES['boa'] = Object.assign({}, baseTemplate, {
-    navFocus:"Múha", navDecks:"Papera", navStats:"Iñe", navSettings:"Tuhba",
-    start:"Tsuúba", pause:"Ahjté", resume:"Tsuúba Díba", reset:"Papera Tsuúba", minutes:"min",
-    cardFront:"Áhba", cardBack:"Koyon", flipCard:"Péha", addCard:"Papera Tsuú",
-    deleteCard:"Uúba", save:"Pííha", cancel:"Ahjté Díba", confirm:"Aa", close:"Ahjté",
-    rateAgain:"Díba Tsuúba", rateHard:"Páju", rateGood:"Pííha", rateEasy:"Méjtso"
-  });
-  // M2020: Yagua (yad) & Milestone Release v21.6.0
-  window.DF_I18N_LOCALES['yad'] = Object.assign({}, baseTemplate, {
-    navFocus:"Vana", navDecks:"Kartas", navStats:"Samiy", navSettings:"Jasiy",
-    start:"Mutiy", pause:"Maniy", resume:"Mutiy Sa", reset:"Kartas Mutiy", minutes:"min",
-    cardFront:"Tadiy", cardBack:"Koyon", flipCard:"Piryey", addCard:"Kartas Muti",
-    deleteCard:"Saniy", save:"Samiy", cancel:"Maniy Sa", confirm:"Yo", close:"Maniy",
-    rateAgain:"Sa Mutiy", rateHard:"Vaaryey", rateGood:"Samiy", rateEasy:"Vichiy"
-  });
-  // M2021: Ticuna (tca)
-  window.DF_I18N_LOCALES['tca'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yexera", navDecks:"Papeba", navStats:"Tanü", navSettings:"Cucü",
-    start:"Tora", pause:"Nawa", resume:"Tora Pü", reset:"Papeba Tora", minutes:"min",
-    cardFront:"Tupü", cardBack:"Koyon", flipCard:"Piri", addCard:"Papeba Tor",
-    deleteCard:"Pawa", save:"Tanü", cancel:"Nawa Pü", confirm:"Ee", close:"Nawa",
-    rateAgain:"Pü Tora", rateHard:"Ngari", rateGood:"Tanü", rateEasy:"Pürü"
-  });
-  // M2022: Urarina (ura)
-  window.DF_I18N_LOCALES['ura'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kuru", navDecks:"Kiratu", navStats:"Nena", navSettings:"Taba",
-    start:"Tee", pause:"Mee", resume:"Tee Ha", reset:"Kiratu Tee", minutes:"min",
-    cardFront:"Taba", cardBack:"Koyon", flipCard:"Pura", addCard:"Kiratu Te",
-    deleteCard:"Siri", save:"Nena", cancel:"Mee Ha", confirm:"I-i", close:"Mee",
-    rateAgain:"Ha Tee", rateHard:"Kana", rateGood:"Nena", rateEasy:"Lehe"
-  });
-  // M2023: Automated Parity Linter for Upper Amazon & Putumayo Languages
+    // M2019: Bora (boa)
+    // M2020: Yagua (yad) & Milestone Release v21.6.0
+    // M2021: Ticuna (tca)
+    // M2022: Urarina (ura)
+    // M2023: Automated Parity Linter for Upper Amazon & Putumayo Languages
   window.dfLintUpperAmazonParity = function(){
     ['hto','boa','yad','tca','ura','oca','bmr','cbu','cbt'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -35309,12 +33909,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2024: Ocaina (oca) & Muinane (bmr)
-  window.DF_I18N_LOCALES['oca'] = Object.assign({}, baseTemplate, { navFocus:"Ie", start:"Faka", pause:"Jita", rateGood:"Mare" });
-  window.DF_I18N_LOCALES['bmr'] = Object.assign({}, baseTemplate, { navFocus:"Muha", start:"Tsu", pause:"Ahj", rateGood:"Piha" });
-  // M2025: Candoshi (cbu) & Shawi (cbt)
-  window.DF_I18N_LOCALES['cbu'] = Object.assign({}, baseTemplate, { navFocus:"Kuru", start:"Tee", pause:"Mee", rateGood:"Nena" });
-  window.DF_I18N_LOCALES['cbt'] = Object.assign({}, baseTemplate, { navFocus:"Vana", start:"Muti", pause:"Mani", rateGood:"Sami" });
-  window.dfLintUpperAmazonParity();
+      // M2025: Candoshi (cbu) & Shawi (cbt)
+      window.dfLintUpperAmazonParity();
   // M2026: Upper Amazon Stream & Forest Canopy Rustle Web Audio Filter
   window.dfSynthesizeAmazonStream = function(ctx){
     if(!ctx) return;
@@ -35342,46 +33938,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2028: Roviana (rug)
-  window.DF_I18N_LOCALES['rug'] = Object.assign({}, baseTemplate, {
-    navFocus:"Balabala", navDecks:"Pepa", navStats:"Inavulu", navSettings:"Vevehe",
-    start:"Podalae", pause:"Aqa", resume:"Podalae Pule", reset:"Kolu Pule", minutes:"min",
-    cardFront:"Kenumu", cardBack:"Muri", flipCard:"Taliri", addCard:"Hoke Pepa",
-    deleteCard:"Huarae", save:"Kopue", cancel:"Vea", confirm:"Uve", close:"Tukua",
-    rateAgain:"Pule", rateHard:"Tasuna", rateGood:"Leana", rateEasy:"Kekere"
-  });
-  // M2029: Marovo (mvo)
-  window.DF_I18N_LOCALES['mvo'] = Object.assign({}, baseTemplate, {
-    navFocus:"Binu", navDecks:"Pepa", navStats:"Kinisi", navSettings:"Boko",
-    start:"Podala", pause:"Mano", resume:"Podala Pule", reset:"Boko Pule", minutes:"min",
-    cardFront:"Muka", cardBack:"Muri", flipCard:"Liliu", addCard:"Hoke Pepa",
-    deleteCard:"Pili", save:"Kopu", cancel:"Hite", confirm:"Uve", close:"Tuku",
-    rateAgain:"Pule", rateHard:"Paki", rateGood:"Leana", rateEasy:"Bono"
-  });
-  // M2030: Gela (nlg) & Milestone Release v21.7.0
-  window.DF_I18N_LOCALES['nlg'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ghanaghana", navDecks:"Kada", navStats:"Idumani", navSettings:"Kokoeliulivuti",
-    start:"Vungao", pause:"Piti", resume:"Vungao Polu", reset:"Ghoi Vungao", minutes:"min",
-    cardFront:"Nagho", cardBack:"Muri", flipCard:"Kilio", addCard:"Haghea Kada",
-    deleteCard:"Viliha", save:"Kokoeli", cancel:"Bete", confirm:"Ioe", close:"Tupia",
-    rateAgain:"Polu", rateHard:"Mabubu", rateGood:"Utouto", rateEasy:"Malumu"
-  });
-  // M2031: Bugotu (bgt)
-  window.DF_I18N_LOCALES['bgt'] = Object.assign({}, baseTemplate, {
-    navFocus:"Nadiru", navDecks:"Pepa", navStats:"Iduni", navSettings:"Kekeli",
-    start:"Turi", pause:"Roto", resume:"Turi Ghoi", reset:"Ghoi Turi", minutes:"min",
-    cardFront:"Nagho", cardBack:"Muri", flipCard:"Liliu", addCard:"Haghea Pepa",
-    deleteCard:"Soka", save:"Kele", cancel:"Kasi", confirm:"Ieo", close:"Fono",
-    rateAgain:"Ghoi", rateHard:"Thata", rateGood:"Dotha", rateEasy:"Malumu"
-  });
-  // M2032: Kwaio (kwd)
-  window.DF_I18N_LOCALES['kwd'] = Object.assign({}, baseTemplate, {
-    navFocus:"Manata'i", navDecks:"Kada", navStats:"Idumia", navSettings:"Alama'i",
-    start:"Eta", pause:"Fa'ateo", resume:"Eta La'u", reset:"La'u Eta", minutes:"min",
-    cardFront:"Na'o", cardBack:"Buri", flipCard:"Bulu'i", addCard:"Gano'i Kada",
-    deleteCard:"Fula'i", save:"Gana'i", cancel:"Ma'asi", confirm:"Iu", close:"Fono'i",
-    rateAgain:"La'u", rateHard:"'Afeta'i", rateGood:"Le'a", rateEasy:"Muka"
-  });
-  // M2033: Automated Parity Linter for Solomon Islands Oceanic Languages
+    // M2029: Marovo (mvo)
+    // M2030: Gela (nlg) & Milestone Release v21.7.0
+    // M2031: Bugotu (bgt)
+    // M2032: Kwaio (kwd)
+    // M2033: Automated Parity Linter for Solomon Islands Oceanic Languages
   window.dfLintSolomonsOceanicParity = function(){
     ['rug','mvo','nlg','bgt','kwd','mlu','llu','bva','kwf'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -35391,12 +33952,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2034: To'abaita (mlu) & Lau (llu)
-  window.DF_I18N_LOCALES['mlu'] = Object.assign({}, baseTemplate, { navFocus:"Manata", start:"Eta", pause:"Fa'ateo", rateGood:"Le'a" });
-  window.DF_I18N_LOCALES['llu'] = Object.assign({}, baseTemplate, { navFocus:"Ghanaghana", start:"Eta", pause:"Roto", rateGood:"Utouto" });
-  // M2035: Baelelea (bva) & Kwara'ae (kwf)
-  window.DF_I18N_LOCALES['bva'] = Object.assign({}, baseTemplate, { navFocus:"Manata", start:"Eta", pause:"Piti", rateGood:"Le'a" });
-  window.DF_I18N_LOCALES['kwf'] = Object.assign({}, baseTemplate, { navFocus:"Manata'i", start:"Eta", pause:"Aqa", rateGood:"Leana" });
-  window.dfLintSolomonsOceanicParity();
+      // M2035: Baelelea (bva) & Kwara'ae (kwf)
+      window.dfLintSolomonsOceanicParity();
   // M2036: Solomon Islands Lagoon Surf & Palm Canopy Web Audio Filter
   window.dfSynthesizeSolomonSurf = function(ctx){
     if(!ctx) return;
@@ -35424,46 +33981,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2038: Bislama (bis)
-  window.DF_I18N_LOCALES['bis'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fokis", navDecks:"Kad", navStats:"Statisik", navSettings:"Seting",
-    start:"Stat", pause:"Paoz", resume:"Gohet", reset:"Stat Bakegen", minutes:"min",
-    cardFront:"Frant", cardBack:"Baksaed", flipCard:"Tanem", addCard:"Ademap Kad",
-    deleteCard:"Dilitim", save:"Sevem", cancel:"Kansel", confirm:"Yes", close:"Saretu",
-    rateAgain:"Bakegen", rateHard:"Haf", rateGood:"Gud", rateEasy:"Isi"
-  });
-  // M2039: Ajie (aji)
-  window.DF_I18N_LOCALES['aji'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kêrê", navDecks:"Kada", navStats:"Nââ", navSettings:"Döjö",
-    start:"Toro", pause:"Miji", resume:"Toro Ju", reset:"Kada Toro", minutes:"min",
-    cardFront:"Mii", cardBack:"Koyon", flipCard:"Wii", addCard:"Kada Toro",
-    deleteCard:"Pili", save:"Kêrê", cancel:"Miji Ju", confirm:"E-e", close:"Ciri",
-    rateAgain:"Ju Toro", rateHard:"Tiri", rateGood:"Kêrê", rateEasy:"Mimi"
-  });
-  // M2040: Paici (pai) & Milestone Release v21.8.0
-  window.DF_I18N_LOCALES['pai'] = Object.assign({}, baseTemplate, {
-    navFocus:"Görö", navDecks:"Kada", navStats:"Pwö", navSettings:"Töbö",
-    start:"Toro", pause:"Pwiri", resume:"Toro Ba", reset:"Kada Toro", minutes:"min",
-    cardFront:"Mee", cardBack:"Koyon", flipCard:"Wili", addCard:"Kada Toro",
-    deleteCard:"Pili", save:"Pwö", cancel:"Pwiri Ba", confirm:"I-i", close:"Tiri",
-    rateAgain:"Ba Toro", rateHard:"Koro", rateGood:"Pwö", rateEasy:"Mami"
-  });
-  // M2041: Drehu (dhv)
-  window.DF_I18N_LOCALES['dhv'] = Object.assign({}, baseTemplate, {
-    navFocus:"Mekun", navDecks:"Pepa", navStats:"Ijin", navSettings:"Inam",
-    start:"Nyipin", pause:"Xulu", resume:"Nyipin Hmuni", reset:"Pepa Nyipin", minutes:"min",
-    cardFront:"Guha", cardBack:"Koyon", flipCard:"Huliwa", addCard:"Pepa Nyipi",
-    deleteCard:"Xötr", save:"Lolo", cancel:"Xulu Hmuni", confirm:"E-e", close:"Tupin",
-    rateAgain:"Hmuni Nyipin", rateHard:"Kuca", rateGood:"Lolo", rateEasy:"Kaipi"
-  });
-  // M2042: Nengone (nen)
-  window.DF_I18N_LOCALES['nen'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kaka", navDecks:"Pepa", navStats:"Hna", navSettings:"Tuni",
-    start:"Riwa", pause:"Kolo", resume:"Riwa Golu", reset:"Pepa Riwa", minutes:"min",
-    cardFront:"Ngoce", cardBack:"Koyon", flipCard:"Thili", addCard:"Pepa Riwa",
-    deleteCard:"Pala", save:"Roy", cancel:"Kolo Golu", confirm:"I-i", close:"Tupi",
-    rateAgain:"Golu Riwa", rateHard:"Dede", rateGood:"Roy", rateEasy:"Mela"
-  });
-  // M2043: Automated Parity Linter for Vanuatu & New Caledonia Languages
+    // M2039: Ajie (aji)
+    // M2040: Paici (pai) & Milestone Release v21.8.0
+    // M2041: Drehu (dhv)
+    // M2042: Nengone (nen)
+    // M2043: Automated Parity Linter for Vanuatu & New Caledonia Languages
   window.dfLintVanuatuNewCaledoniaParity = function(){
     ['bis','aji','pai','dhv','nen','iai','ane','tnl','erk'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -35473,12 +33995,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2044: Iaai (iai) & Xaracuu (ane)
-  window.DF_I18N_LOCALES['iai'] = Object.assign({}, baseTemplate, { navFocus:"Kere", start:"Toro", pause:"Miji", rateGood:"Kere" });
-  window.DF_I18N_LOCALES['ane'] = Object.assign({}, baseTemplate, { navFocus:"Goro", start:"Toro", pause:"Pwiri", rateGood:"Pwo" });
-  // M2045: Lenakel (tnl) & South Efate (erk)
-  window.DF_I18N_LOCALES['tnl'] = Object.assign({}, baseTemplate, { navFocus:"Mekun", start:"Nyipin", pause:"Xulu", rateGood:"Lolo" });
-  window.DF_I18N_LOCALES['erk'] = Object.assign({}, baseTemplate, { navFocus:"Kaka", start:"Riwa", pause:"Kolo", rateGood:"Roy" });
-  window.dfLintVanuatuNewCaledoniaParity();
+      // M2045: Lenakel (tnl) & South Efate (erk)
+      window.dfLintVanuatuNewCaledoniaParity();
   // M2046: Coral Reef Surge & Pacific Tradewinds Web Audio Filter
   window.dfSynthesizeCoralSurge = function(ctx){
     if(!ctx) return;
@@ -35506,46 +34024,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2048: Chuukese (chk)
-  window.DF_I18N_LOCALES['chk'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ekiek", navDecks:"Taropwe", navStats:"Aorö", navSettings:"Nónnóm",
-    start:"Poputá", pause:"Asoso", resume:"Sópwéey", reset:"Asefaali", minutes:"min",
-    cardFront:"Mwen", cardBack:"Mükür", flipCard:"Kununó", addCard:"Apachaata Taropwe",
-    deleteCard:"Amwöchú", save:"Isóni", cancel:"Eppeti", confirm:"Ewer", close:"Kichini",
-    rateAgain:"Sefáál", rateHard:"Weires", rateGood:"Múrinnö", rateEasy:"Mecheres"
-  });
-  // M2049: Pohnpeian (pon)
-  window.DF_I18N_LOCALES['pon'] = Object.assign({}, baseTemplate, {
-    navFocus:"Lamalam", navDecks:"Tuhke", navStats:"Wadawad", navSettings:"Konehng",
-    start:"Tepida", pause:"Kommoal", resume:"Poudida", reset:"Kapwourada", minutes:"min",
-    cardFront:"Mwo", cardBack:"Mwuri", flipCard:"Wekidekla", addCard:"Patohwanda Tuhke",
-    deleteCard:"Kisasang", save:"Nekinek", cancel:"Pweiek", confirm:"Ei", close:"Ritidi",
-    rateAgain:"Pwurehng", rateHard:"Apwal", rateGood:"Mwahu", rateEasy:"Pohn"
-  });
-  // M2050: Yapese (yap) & Milestone Release v21.9.0
-  window.DF_I18N_LOCALES['yap'] = Object.assign({}, baseTemplate, {
-    navFocus:"Llow", navDecks:"Babiyor", navStats:"Weliy", navSettings:"Faleg",
-    start:"Tabab", pause:"Towur", resume:"Tabab Bay", reset:"Sulweg", minutes:"min",
-    cardFront:"M'on", cardBack:"Tomur", flipCard:"Gurgur", addCard:"Fith Babiyor",
-    deleteCard:"Chuweg", save:"Pilyeg", cancel:"K'aring", confirm:"Arrogon", close:"N'ag",
-    rateAgain:"Bay", rateHard:"Mo'or", rateGood:"Fel'", rateEasy:"Be'ech"
-  });
-  // M2051: Kosraean (kos)
-  window.DF_I18N_LOCALES['kos'] = Object.assign({}, baseTemplate, {
-    navFocus:"Nununku", navDecks:"Tosahk", navStats:"Orekma", navSettings:"Aksuruk",
-    start:"Mutwacack", pause:"Tuhlak", resume:"Mutwacack Sip", reset:"Fohlohk", minutes:"min",
-    cardFront:"Met", cardBack:"Tukun", flipCard:"Ekunlah", addCard:"Fahsryang Tosahk",
-    deleteCard:"Kunlah", save:"Lihsrihk", cancel:"Tulok", confirm:"Aok", close:"Kalyak",
-    rateAgain:"Sip", rateHard:"Upac", rateGood:"Wo", rateEasy:"Puhsra"
-  });
-  // M2052: Palauan (pau)
-  window.DF_I18N_LOCALES['pau'] = Object.assign({}, baseTemplate, {
-    navFocus:"Uldasu", navDecks:"Babier", navStats:"Olechotel", navSettings:"Blals",
-    start:"Omuchel", pause:"Olengull", resume:"Lmuut el Omuchel", reset:"Olemekang", minutes:"min",
-    cardFront:"Medechedui", cardBack:"Uriul", flipCard:"Melengid", addCard:"Meketmii a Babier",
-    deleteCard:"Mengai", save:"Bereked", cancel:"Choitii", confirm:"Choi", close:"Kebii",
-    rateAgain:"Lmuut", rateHard:"Meringel", rateGood:"Ungil", rateEasy:"Beot"
-  });
-  // M2053: Automated Parity Linter for Micronesian Island Languages
+    // M2049: Pohnpeian (pon)
+    // M2050: Yapese (yap) & Milestone Release v21.9.0
+    // M2051: Kosraean (kos)
+    // M2052: Palauan (pau)
+    // M2053: Automated Parity Linter for Micronesian Island Languages
   window.dfLintMicronesianIslandsParity = function(){
     ['chk','pon','yap','kos','pau','uli','woe','mkj','pif'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -35555,12 +34038,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2054: Ulithian (uli) & Woleaian (woe)
-  window.DF_I18N_LOCALES['uli'] = Object.assign({}, baseTemplate, { navFocus:"Llow", start:"Tabab", pause:"Towur", rateGood:"Fel" });
-  window.DF_I18N_LOCALES['woe'] = Object.assign({}, baseTemplate, { navFocus:"Lamalam", start:"Tepida", pause:"Kommoal", rateGood:"Mwahu" });
-  // M2055: Mokilese (mkj) & Pingelapese (pif)
-  window.DF_I18N_LOCALES['mkj'] = Object.assign({}, baseTemplate, { navFocus:"Ekiek", start:"Poputa", pause:"Asoso", rateGood:"Murinno" });
-  window.DF_I18N_LOCALES['pif'] = Object.assign({}, baseTemplate, { navFocus:"Uldasu", start:"Omuchel", pause:"Olengull", rateGood:"Ungil" });
-  window.dfLintMicronesianIslandsParity();
+      // M2055: Mokilese (mkj) & Pingelapese (pif)
+      window.dfLintMicronesianIslandsParity();
   // M2056: Micronesian Atoll Tide & Morning Sea Breeze Web Audio Filter
   window.dfSynthesizeAtollTide = function(ctx){
     if(!ctx) return;
@@ -35588,46 +34067,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2058: Arhuaco / Ika (arh)
-  window.DF_I18N_LOCALES['arh'] = Object.assign({}, baseTemplate, {
-    navFocus:"Zari", navDecks:"Kartas", navStats:"Nia", navSettings:"Gunamu",
-    start:"Tana", pause:"Kuma", resume:"Tana Me", reset:"Kartas Tana", minutes:"min",
-    cardFront:"Uka", cardBack:"Koyon", flipCard:"Puru", addCard:"Kartas Tana",
-    deleteCard:"Pili", save:"Zari", cancel:"Kuma Me", confirm:"A-a", close:"Tuku",
-    rateAgain:"Me Tana", rateHard:"Tiri", rateGood:"Zari", rateEasy:"Nasa"
-  });
-  // M2059: Kogui (kog)
-  window.DF_I18N_LOCALES['kog'] = Object.assign({}, baseTemplate, {
-    navFocus:"Haba", navDecks:"Kashkui", navStats:"Se", navSettings:"Mama",
-    start:"Toro", pause:"Nika", resume:"Toro Wa", reset:"Kashkui Toro", minutes:"min",
-    cardFront:"Nii", cardBack:"Koyon", flipCard:"Pira", addCard:"Kashkui Tor",
-    deleteCard:"Pili", save:"Se", cancel:"Nika Wa", confirm:"E-e", close:"Chiro",
-    rateAgain:"Wa Toro", rateHard:"Kala", rateGood:"Se", rateEasy:"Mishi"
-  });
-  // M2060: Wiwa (mbp) & Milestone Release v22.0.0
-  window.DF_I18N_LOCALES['mbp'] = Object.assign({}, baseTemplate, {
-    navFocus:"Dama", navDecks:"Karta", navStats:"Shi", navSettings:"Shama",
-    start:"Tana", pause:"Kuma", resume:"Tana Sa", reset:"Karta Tana", minutes:"min",
-    cardFront:"Uka", cardBack:"Koyon", flipCard:"Pura", addCard:"Karta Tana",
-    deleteCard:"Pili", save:"Shi", cancel:"Kuma Sa", confirm:"I-i", close:"Tuki",
-    rateAgain:"Sa Tana", rateHard:"Tara", rateGood:"Shi", rateEasy:"Weli"
-  });
-  // M2061: Kankuamo (kbf)
-  window.DF_I18N_LOCALES['kbf'] = Object.assign({}, baseTemplate, {
-    navFocus:"Atanquez", navDecks:"Karta", navStats:"Nia", navSettings:"Kankuama",
-    start:"Tana", pause:"Kuma", resume:"Tana Wa", reset:"Karta Tana", minutes:"min",
-    cardFront:"Uka", cardBack:"Koyon", flipCard:"Puru", addCard:"Karta Tan",
-    deleteCard:"Pili", save:"Nia", cancel:"Kuma Wa", confirm:"E-e", close:"Tuku",
-    rateAgain:"Wa Tana", rateHard:"Tiri", rateGood:"Nia", rateEasy:"Nasa"
-  });
-  // M2062: U'wa (tbn)
-  window.DF_I18N_LOCALES['tbn'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kajkwa", navDecks:"Karta", navStats:"Rawa", navSettings:"Chita",
-    start:"Rawa", pause:"Chita", resume:"Rawa Be", reset:"Karta Rawa", minutes:"min",
-    cardFront:"Uka", cardBack:"Koyon", flipCard:"Piri", addCard:"Karta Raw",
-    deleteCard:"Pili", save:"Kuba", cancel:"Chita Be", confirm:"O-o", close:"Tuku",
-    rateAgain:"Be Rawa", rateHard:"Tari", rateGood:"Kuba", rateEasy:"Wali"
-  });
-  // M2063: Automated Parity Linter for Sierra Nevada Languages
+    // M2059: Kogui (kog)
+    // M2060: Wiwa (mbp) & Milestone Release v22.0.0
+    // M2061: Kankuamo (kbf)
+    // M2062: U'wa (tbn)
+    // M2063: Automated Parity Linter for Sierra Nevada Languages
   window.dfLintSierraNevadaParity = function(){
     ['arh','kog','mbp','kbf','tbn','byx','guh','cui','pid'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -35637,12 +34081,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2064: Betoye (byx) & Guahibo (guh)
-  window.DF_I18N_LOCALES['byx'] = Object.assign({}, baseTemplate, { navFocus:"Zari", start:"Tana", pause:"Kuma", rateGood:"Zari" });
-  window.DF_I18N_LOCALES['guh'] = Object.assign({}, baseTemplate, { navFocus:"Haba", start:"Toro", pause:"Nika", rateGood:"Se" });
-  // M2065: Cuiba (cui) & Piaroa (pid)
-  window.DF_I18N_LOCALES['cui'] = Object.assign({}, baseTemplate, { navFocus:"Dama", start:"Tana", pause:"Kuma", rateGood:"Shi" });
-  window.DF_I18N_LOCALES['pid'] = Object.assign({}, baseTemplate, { navFocus:"Atanquez", start:"Tana", pause:"Kuma", rateGood:"Nia" });
-  window.dfLintSierraNevadaParity();
+      // M2065: Cuiba (cui) & Piaroa (pid)
+      window.dfLintSierraNevadaParity();
   // M2066: Sierra Nevada Glacial Stream & High Paramo Wind Web Audio Filter
   window.dfSynthesizeSierraGlacial = function(ctx){
     if(!ctx) return;
@@ -35672,46 +34112,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2068: Shuar (jiv)
-  window.DF_I18N_LOCALES['jiv'] = Object.assign({}, baseTemplate, {
-    navFocus:"Enentaimsa", navDecks:"Papí", navStats:"Nékatai", navSettings:"Iwiarnamu",
-    start:"Nankama", pause:"Ayausa", resume:"Nankama Ataksha", reset:"Papí Nankama", minutes:"min",
-    cardFront:"Vaké", cardBack:"Ukúnman", flipCard:"Yapajia", addCard:"Papí Nankam",
-    deleteCard:"Mesé", save:"Shiir", cancel:"Ayausa Ataksha", confirm:"Ehe", close:"Epenta",
-    rateAgain:"Ataksha", rateHard:"Katsun", rateGood:"Shiir", rateEasy:"Kukuch"
-  });
-  // M2069: Achuar (acu)
-  window.DF_I18N_LOCALES['acu'] = Object.assign({}, baseTemplate, {
-    navFocus:"Enentaimsa", navDecks:"Papí", navStats:"Nékata", navSettings:"Umikta",
-    start:"Nagkama", pause:"Ayausa", resume:"Nagkama Atak", reset:"Papí Nagkama", minutes:"min",
-    cardFront:"Vake", cardBack:"Ukun", flipCard:"Yapaji", addCard:"Papí Nagkam",
-    deleteCard:"Mese", save:"Pengker", cancel:"Ayausa Atak", confirm:"Ehe", close:"Epentai",
-    rateAgain:"Atak", rateHard:"Kakaram", rateGood:"Pengker", rateEasy:"Kuku"
-  });
-  // M2070: Awajun (agr) & Milestone Release v22.1.0
-  window.DF_I18N_LOCALES['agr'] = Object.assign({}, baseTemplate, {
-    navFocus:"Anentaimsa", navDecks:"Papí", navStats:"Dekaamu", navSettings:"Ijumjamu",
-    start:"Nankama", pause:"Ayaumsa", resume:"Nankama Atak", reset:"Papí Nankam", minutes:"min",
-    cardFront:"Vake", cardBack:"Ukunma", flipCard:"Yapaji", addCard:"Papí Nankam",
-    deleteCard:"Meseat", save:"Pegkeg", cancel:"Ayaumsa Atak", confirm:"Ehe", close:"Epentai",
-    rateAgain:"Atak", rateHard:"Katsun", rateGood:"Pegkeg", rateEasy:"Sampua"
-  });
-  // M2071: Wampis (hub)
-  window.DF_I18N_LOCALES['hub'] = Object.assign({}, baseTemplate, {
-    navFocus:"Enentaimsa", navDecks:"Papí", navStats:"Nékatai", navSettings:"Umiktin",
-    start:"Nankam", pause:"Ayaum", resume:"Nankam Atak", reset:"Papí Nankam", minutes:"min",
-    cardFront:"Vake", cardBack:"Ukunta", flipCard:"Yapajin", addCard:"Papí Nank",
-    deleteCard:"Meseat", save:"Pengker", cancel:"Ayaum Atak", confirm:"Ehe", close:"Epenta",
-    rateAgain:"Atak", rateHard:"Kakar", rateGood:"Pengker", rateEasy:"Kukuch"
-  });
-  // M2072: Shawi / Chayahuita (cbt)
-  window.DF_I18N_LOCALES['cbt'] = Object.assign({}, baseTemplate, {
-    navFocus:"Shawi", navDecks:"Karta", navStats:"Nao", navSettings:"Kena",
-    start:"Wachi", pause:"Poro", resume:"Wachi Pa", reset:"Karta Wachi", minutes:"min",
-    cardFront:"Vana", cardBack:"Koyon", flipCard:"Piri", addCard:"Karta Wach",
-    deleteCard:"Pili", save:"Nao", cancel:"Poro Pa", confirm:"Ee", close:"Tuku",
-    rateAgain:"Pa Wachi", rateHard:"Kati", rateGood:"Nao", rateEasy:"Mian"
-  });
-  // M2073: Automated Parity Linter for Jivaroan Languages
+    // M2069: Achuar (acu)
+    // M2070: Awajun (agr) & Milestone Release v22.1.0
+    // M2071: Wampis (hub)
+    // M2072: Shawi / Chayahuita (cbt)
+    // M2073: Automated Parity Linter for Jivaroan Languages
   window.dfLintJivaroanParity = function(){
     ['jiv','acu','agr','hub','cbt','jeb','mcf','ura','shp'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -35721,12 +34126,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2074: Jebero (jeb) & Matses (mcf)
-  window.DF_I18N_LOCALES['jeb'] = Object.assign({}, baseTemplate, { navFocus:"Shawi", start:"Wachi", pause:"Poro", rateGood:"Nao" });
-  window.DF_I18N_LOCALES['mcf'] = Object.assign({}, baseTemplate, { navFocus:"Enentai", start:"Nagkam", pause:"Ayau", rateGood:"Pengker" });
-  // M2075: Urarina (ura) & Shipibo (shp)
-  window.DF_I18N_LOCALES['ura'] = Object.assign({}, baseTemplate, { navFocus:"Anentai", start:"Nankam", pause:"Ayaum", rateGood:"Pegkeg" });
-  window.DF_I18N_LOCALES['shp'] = Object.assign({}, baseTemplate, { navFocus:"Shinanya", start:"Peo", pause:"Ninkata", rateGood:"Jakon" });
-  window.dfLintJivaroanParity();
+      // M2075: Urarina (ura) & Shipibo (shp)
+      window.dfLintJivaroanParity();
   // M2076: Maranon Rapids & Montane Rainforest Web Audio Filter
   window.dfSynthesizeMaranonRapids = function(ctx){
     if(!ctx) return;
@@ -35754,46 +34155,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2078: Shipibo-Konibo (shp)
-  window.DF_I18N_LOCALES['shp'] = Object.assign({}, baseTemplate, {
-    navFocus:"Shinanya", navDecks:"Kirika", navStats:"Onanti", navSettings:"Axonoxon",
-    start:"Peo", pause:"Ninkata", resume:"Peo Moan", reset:"Kirika Peo", minutes:"min",
-    cardFront:"Bebon", cardBack:"Chicho", flipCard:"Kexontikoma", addCard:"Kirika Noko",
-    deleteCard:"Keyo", save:"Jakon", cancel:"Ninkata Moan", confirm:"Ehe", close:"Kepeta",
-    rateAgain:"Moan", rateHard:"Pai", rateGood:"Jakon", rateEasy:"Kaya"
-  });
-  // M2079: Cashibo (cbr)
-  window.DF_I18N_LOCALES['cbr'] = Object.assign({}, baseTemplate, {
-    navFocus:"Shinanti", navDecks:"Karta", navStats:"Unanti", navSettings:"Banan",
-    start:"Pean", pause:"Ninkati", resume:"Pean Kuri", reset:"Karta Pean", minutes:"min",
-    cardFront:"Bebon", cardBack:"Chicho", flipCard:"Kexan", addCard:"Karta Pe",
-    deleteCard:"Keyoti", save:"Upí", cancel:"Ninkati Kuri", confirm:"A-a", close:"Kepat",
-    rateAgain:"Kuri", rateHard:"Pati", rateGood:"Upí", rateEasy:"Kaya"
-  });
-  // M2080: Yaminahua (yaa) & Milestone Release v22.2.0
-  window.DF_I18N_LOCALES['yaa'] = Object.assign({}, baseTemplate, {
-    navFocus:"Shinaka", navDecks:"Kiri", navStats:"Tapia", navSettings:"Fetsa",
-    start:"Pea", pause:"Tapa", resume:"Pea Wani", reset:"Kiri Pea", minutes:"min",
-    cardFront:"Beno", cardBack:"Koyon", flipCard:"Kiri", addCard:"Kiri Pea",
-    deleteCard:"Keyoa", save:"Shara", cancel:"Tapa Wani", confirm:"Ehe", close:"Kepa",
-    rateAgain:"Wani", rateHard:"Kashi", rateGood:"Shara", rateEasy:"Pish"
-  });
-  // M2081: Ese Ejja (ese)
-  window.DF_I18N_LOCALES['ese'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ininani", navDecks:"Kirika", navStats:"Wewa", navSettings:"Shawa",
-    start:"Apo", pause:"Nyo", resume:"Apo Nyo", reset:"Kirika Apo", minutes:"min",
-    cardFront:"Biyo", cardBack:"Koyon", flipCard:"Weli", addCard:"Kirika Apo",
-    deleteCard:"Pili", save:"Bia", cancel:"Nyo Apo", confirm:"I-i", close:"Tuku",
-    rateAgain:"Nyo", rateHard:"Tiri", rateGood:"Bia", rateEasy:"Mela"
-  });
-  // M2082: Tacana (tna)
-  window.DF_I18N_LOCALES['tna'] = Object.assign({}, baseTemplate, {
-    navFocus:"Shana", navDecks:"Kirika", navStats:"Taishi", navSettings:"Puji",
-    start:"Ami", pause:"Puji", resume:"Ami Sha", reset:"Kirika Ami", minutes:"min",
-    cardFront:"Bono", cardBack:"Koyon", flipCard:"Puru", addCard:"Kirika Ami",
-    deleteCard:"Pili", save:"Saida", cancel:"Puji Sha", confirm:"E-e", close:"Tuku",
-    rateAgain:"Sha", rateHard:"Tari", rateGood:"Saida", rateEasy:"Mimi"
-  });
-  // M2083: Automated Parity Linter for Pano-Tacanan Languages
+    // M2079: Cashibo (cbr)
+    // M2080: Yaminahua (yaa) & Milestone Release v22.2.0
+    // M2081: Ese Ejja (ese)
+    // M2082: Tacana (tna)
+    // M2083: Automated Parity Linter for Pano-Tacanan Languages
   window.dfLintPanoTacananParity = function(){
     ['shp','cbr','yaa','ese','tna','cav','aro','ryo','cao'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -35803,12 +34169,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2084: Cavinena (cav) & Araona (aro)
-  window.DF_I18N_LOCALES['cav'] = Object.assign({}, baseTemplate, { navFocus:"Shana", start:"Ami", pause:"Puji", rateGood:"Saida" });
-  window.DF_I18N_LOCALES['aro'] = Object.assign({}, baseTemplate, { navFocus:"Inin", start:"Apo", pause:"Nyo", rateGood:"Bia" });
-  // M2085: Reyesano (ryo) & Chacobo (cao)
-  window.DF_I18N_LOCALES['ryo'] = Object.assign({}, baseTemplate, { navFocus:"Shina", start:"Pea", pause:"Tapa", rateGood:"Shara" });
-  window.DF_I18N_LOCALES['cao'] = Object.assign({}, baseTemplate, { navFocus:"Shinanti", start:"Pean", pause:"Ninkati", rateGood:"Upi" });
-  window.dfLintPanoTacananParity();
+      // M2085: Reyesano (ryo) & Chacobo (cao)
+      window.dfLintPanoTacananParity();
   // M2086: Madre de Dios River Breeze & Canopy Dewdrops Web Audio Filter
   window.dfSynthesizeMadreDeDios = function(ctx){
     if(!ctx) return;
@@ -35836,46 +34198,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2088: Munduruku (myu)
-  window.DF_I18N_LOCALES['myu'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kukay", navDecks:"Papera", navStats:"Iba", navSettings:"Kobe",
-    start:"Jopit", pause:"Ito", resume:"Jopit Bima", reset:"Papera Jopit", minutes:"min",
-    cardFront:"Doba", cardBack:"Koyon", flipCard:"Piwa", addCard:"Papera Jop",
-    deleteCard:"Pili", save:"Iba", cancel:"Ito Bima", confirm:"E-e", close:"Chuku",
-    rateAgain:"Bima Jopit", rateHard:"Tiri", rateGood:"Iba", rateEasy:"Weli"
-  });
-  // M2089: Tupari (tpr)
-  window.DF_I18N_LOCALES['tpr'] = Object.assign({}, baseTemplate, {
-    navFocus:"Eto", navDecks:"Papera", navStats:"Kere", navSettings:"Naro",
-    start:"Jopit", pause:"Ito", resume:"Jopit Sa", reset:"Papera Jopit", minutes:"min",
-    cardFront:"Doba", cardBack:"Koyon", flipCard:"Piwa", addCard:"Papera Jop",
-    deleteCard:"Pili", save:"Kere", cancel:"Ito Sa", confirm:"I-i", close:"Tuku",
-    rateAgain:"Sa Jopit", rateHard:"Tari", rateGood:"Kere", rateEasy:"Mimi"
-  });
-  // M2090: Gaviao (gvo) & Milestone Release v22.3.0
-  window.DF_I18N_LOCALES['gvo'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kop", navDecks:"Pape", navStats:"Katu", navSettings:"Gong",
-    start:"Toh", pause:"Do", resume:"Toh Boih", reset:"Pape Toh", minutes:"min",
-    cardFront:"Doba", cardBack:"Koyon", flipCard:"Puru", addCard:"Pape Toh",
-    deleteCard:"Pili", save:"Katu", cancel:"Do Boih", confirm:"Ehe", close:"Tuku",
-    rateAgain:"Boih Toh", rateHard:"Khaik", rateGood:"Katu", rateEasy:"Zol"
-  });
-  // M2091: Surui (sru)
-  window.DF_I18N_LOCALES['sru'] = Object.assign({}, baseTemplate, {
-    navFocus:"Paiter", navDecks:"Papera", navStats:"Metare", navSettings:"Koyo",
-    start:"Tora", pause:"Nawa", resume:"Tora Pü", reset:"Papera Tora", minutes:"min",
-    cardFront:"Tupü", cardBack:"Koyon", flipCard:"Piri", addCard:"Papera Tor",
-    deleteCard:"Pawa", save:"Metare", cancel:"Nawa Pü", confirm:"Ee", close:"Nawa",
-    rateAgain:"Pü Tora", rateHard:"Ngari", rateGood:"Metare", rateEasy:"Pürü"
-  });
-  // M2092: Karo / Arara (kzg)
-  window.DF_I18N_LOCALES['kzg'] = Object.assign({}, baseTemplate, {
-    navFocus:"Karo", navDecks:"Papera", navStats:"Nena", navSettings:"Taba",
-    start:"Tee", pause:"Mee", resume:"Tee Ha", reset:"Papera Tee", minutes:"min",
-    cardFront:"Taba", cardBack:"Koyon", flipCard:"Pura", addCard:"Papera Te",
-    deleteCard:"Siri", save:"Nena", cancel:"Mee Ha", confirm:"I-i", close:"Mee",
-    rateAgain:"Ha Tee", rateHard:"Kana", rateGood:"Nena", rateEasy:"Lehe"
-  });
-  // M2093: Automated Parity Linter for Guapore Tupian Languages
+    // M2089: Tupari (tpr)
+    // M2090: Gaviao (gvo) & Milestone Release v22.3.0
+    // M2091: Surui (sru)
+    // M2092: Karo / Arara (kzg)
+    // M2093: Automated Parity Linter for Guapore Tupian Languages
   window.dfLintGuaporeTupianParity = function(){
     ['myu','tpr','gvo','sru','kzg','mpu','skf','cin'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -35885,11 +34212,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2094: Makurap (mpu) & Sakurabiat (skf)
-  window.DF_I18N_LOCALES['mpu'] = Object.assign({}, baseTemplate, { navFocus:"Kukay", start:"Jopit", pause:"Ito", rateGood:"Iba" });
-  window.DF_I18N_LOCALES['skf'] = Object.assign({}, baseTemplate, { navFocus:"Eto", start:"Jopit", pause:"Ito", rateGood:"Kere" });
-  // M2095: Cinta Larga (cin)
-  window.DF_I18N_LOCALES['cin'] = Object.assign({}, baseTemplate, { navFocus:"Kop", start:"Toh", pause:"Do", rateGood:"Katu" });
-  window.dfLintGuaporeTupianParity();
+      // M2095: Cinta Larga (cin)
+    window.dfLintGuaporeTupianParity();
   // M2096: Guapore River Torrent & Evening Bamboo Rustle Web Audio Filter
   window.dfSynthesizeGuaporeTorrent = function(ctx){
     if(!ctx) return;
@@ -35917,46 +34241,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2098: Nambikwara (nab)
-  window.DF_I18N_LOCALES['nab'] = Object.assign({}, baseTemplate, {
-    navFocus:"Wain", navDecks:"Karta", navStats:"Yuten", navSettings:"Tuhba",
-    start:"Hita", pause:"Mee", resume:"Hita Sa", reset:"Karta Hita", minutes:"min",
-    cardFront:"Nuun", cardBack:"Koyon", flipCard:"Puru", addCard:"Karta Hit",
-    deleteCard:"Pili", save:"Yuten", cancel:"Mee Sa", confirm:"I-i", close:"Tuku",
-    rateAgain:"Sa Hita", rateHard:"Tiri", rateGood:"Yuten", rateEasy:"Mela"
-  });
-  // M2099: Mamainde (wmd)
-  window.DF_I18N_LOCALES['wmd'] = Object.assign({}, baseTemplate, {
-    navFocus:"Wain", navDecks:"Karta", navStats:"Nao", navSettings:"Kena",
-    start:"Hita", pause:"Poro", resume:"Hita Pa", reset:"Karta Hita", minutes:"min",
-    cardFront:"Nuun", cardBack:"Koyon", flipCard:"Piri", addCard:"Karta Hit",
-    deleteCard:"Pili", save:"Nao", cancel:"Poro Pa", confirm:"Ee", close:"Tuku",
-    rateAgain:"Pa Hita", rateHard:"Kati", rateGood:"Nao", rateEasy:"Mian"
-  });
-  // M2100: Wari' (pav) & Milestone Release v22.4.0
-  window.DF_I18N_LOCALES['pav'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pakaa", navDecks:"Karta", navStats:"Paji", navSettings:"Nara",
-    start:"Tana", pause:"Kuma", resume:"Tana Me", reset:"Karta Tana", minutes:"min",
-    cardFront:"Uka", cardBack:"Koyon", flipCard:"Puru", addCard:"Karta Tan",
-    deleteCard:"Pili", save:"Paji", cancel:"Kuma Me", confirm:"A-a", close:"Tuku",
-    rateAgain:"Me Tana", rateHard:"Tiri", rateGood:"Paji", rateEasy:"Nasa"
-  });
-  // M2101: Oro Win (orw)
-  window.DF_I18N_LOCALES['orw'] = Object.assign({}, baseTemplate, {
-    navFocus:"Oro", navDecks:"Karta", navStats:"Se", navSettings:"Mama",
-    start:"Toro", pause:"Nika", resume:"Toro Wa", reset:"Karta Toro", minutes:"min",
-    cardFront:"Nii", cardBack:"Koyon", flipCard:"Pira", addCard:"Karta Tor",
-    deleteCard:"Pili", save:"Se", cancel:"Nika Wa", confirm:"E-e", close:"Chiro",
-    rateAgain:"Wa Toro", rateHard:"Kala", rateGood:"Se", rateEasy:"Mishi"
-  });
-  // M2102: Jabuti (jbt)
-  window.DF_I18N_LOCALES['jbt'] = Object.assign({}, baseTemplate, {
-    navFocus:"Djeoro", navDecks:"Karta", navStats:"Shi", navSettings:"Shama",
-    start:"Tana", pause:"Kuma", resume:"Tana Sa", reset:"Karta Tana", minutes:"min",
-    cardFront:"Uka", cardBack:"Koyon", flipCard:"Pura", addCard:"Karta Tan",
-    deleteCard:"Pili", save:"Shi", cancel:"Kuma Sa", confirm:"I-i", close:"Tuki",
-    rateAgain:"Sa Tana", rateHard:"Tara", rateGood:"Shi", rateEasy:"Weli"
-  });
-  // M2103: Automated Parity Linter for Rondonia Indigenous Languages
+    // M2099: Mamainde (wmd)
+    // M2100: Wari' (pav) & Milestone Release v22.4.0
+    // M2101: Oro Win (orw)
+    // M2102: Jabuti (jbt)
+    // M2103: Automated Parity Linter for Rondonia Indigenous Languages
   window.dfLintRondoniaParity = function(){
     ['nab','wmd','pav','orw','jbt','ark','kno','xwa','tba'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -35966,12 +34255,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2104: Arikapu (ark) & Kanoe (kno)
-  window.DF_I18N_LOCALES['ark'] = Object.assign({}, baseTemplate, { navFocus:"Djeoro", start:"Tana", pause:"Kuma", rateGood:"Shi" });
-  window.DF_I18N_LOCALES['kno'] = Object.assign({}, baseTemplate, { navFocus:"Wain", start:"Hita", pause:"Mee", rateGood:"Yuten" });
-  // M2105: Kwaza (xwa) & Aikana (tba)
-  window.DF_I18N_LOCALES['xwa'] = Object.assign({}, baseTemplate, { navFocus:"Pakaa", start:"Tana", pause:"Kuma", rateGood:"Paji" });
-  window.DF_I18N_LOCALES['tba'] = Object.assign({}, baseTemplate, { navFocus:"Oro", start:"Toro", pause:"Nika", rateGood:"Se" });
-  window.dfLintRondoniaParity();
+      // M2105: Kwaza (xwa) & Aikana (tba)
+      window.dfLintRondoniaParity();
   // M2106: Guapore Plateau Night Wind & Mountain Torrent Web Audio Filter
   window.dfSynthesizePlateauWind = function(ctx){
     if(!ctx) return;
@@ -36001,46 +34286,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2108: Toba Qom (tob)
-  window.DF_I18N_LOCALES['tob'] = Object.assign({}, baseTemplate, {
-    navFocus:"Lalamaxat", navDecks:"Nawe", navStats:"Nsoxonaq", navSettings:"Nqopit",
-    start:"Nachek", pause:"Shegue", resume:"Nachek Pa", reset:"Nawe Nachek", minutes:"min",
-    cardFront:"Llaqa", cardBack:"Lalaxat", flipCard:"Shegat", addCard:"Nawe Nache",
-    deleteCard:"Nketaxan", save:"Nsoxonaq", cancel:"Shegue Pa", confirm:"Nachek Ha", close:"Shegue",
-    rateAgain:"Pa Nachek", rateHard:"Nqoshi", rateGood:"Nsoxonaq", rateEasy:"Pali"
-  });
-  // M2109: Pilaga (plg)
-  window.DF_I18N_LOCALES['plg'] = Object.assign({}, baseTemplate, {
-    navFocus:"Lqaya", navDecks:"Karta", navStats:"Woma", navSettings:"Nqopit",
-    start:"Nache", pause:"Sopi", resume:"Nache Pa", reset:"Karta Nache", minutes:"min",
-    cardFront:"Llaqa", cardBack:"Koyon", flipCard:"Shegat", addCard:"Karta Nach",
-    deleteCard:"Pili", save:"Woma", cancel:"Sopi Pa", confirm:"Ee", close:"Sopi",
-    rateAgain:"Pa Nache", rateHard:"Nqoshi", rateGood:"Woma", rateEasy:"Pali"
-  });
-  // M2110: Mocovi (moc) & Milestone Release v22.5.0
-  window.DF_I18N_LOCALES['moc'] = Object.assign({}, baseTemplate, {
-    navFocus:"Llamaxa", navDecks:"Nawe", navStats:"Wom", navSettings:"Nqopit",
-    start:"Nechek", pause:"Segui", resume:"Nechek Pa", reset:"Nawe Nechek", minutes:"min",
-    cardFront:"Llaqa", cardBack:"Lalaxat", flipCard:"Shegat", addCard:"Nawe Nech",
-    deleteCard:"Nketaxan", save:"Wom", cancel:"Segui Pa", confirm:"I-i", close:"Segui",
-    rateAgain:"Pa Nechek", rateHard:"Nqoshi", rateGood:"Wom", rateEasy:"Pali"
-  });
-  // M2111: Kadiweu (kbc)
-  window.DF_I18N_LOCALES['kbc'] = Object.assign({}, baseTemplate, {
-    navFocus:"Nigotadi", navDecks:"Nolena", navStats:"Liconedi", navSettings:"Gowena",
-    start:"Icadita", pause:"Iwo", resume:"Icadita Go", reset:"Gatedi", minutes:"min",
-    cardFront:"Lawigadi", cardBack:"Letolodi", flipCard:"Lawina", addCard:"Nolena Icad",
-    deleteCard:"Lapedita", save:"Iwo Go", cancel:"Iwo Ce", confirm:"Etedi", close:"Iwo",
-    rateAgain:"Icadita Ce", rateHard:"Niwaadi", rateGood:"Okaida", rateEasy:"Lami"
-  });
-  // M2112: Wichi (mzh)
-  window.DF_I18N_LOCALES['mzh'] = Object.assign({}, baseTemplate, {
-    navFocus:"Lhenay", navDecks:"Karta", navStats:"Is", navSettings:"Lheyej",
-    start:"Tiyuk", pause:"Tanay", resume:"Tiyuk Pa", reset:"Karta Tiyuk", minutes:"min",
-    cardFront:"Inhen", cardBack:"Lhefek", flipCard:"Vathej", addCard:"Karta Tiy",
-    deleteCard:"Netsuk", save:"Is", cancel:"Tanay Pa", confirm:"Tiyuk Ha", close:"Tanay",
-    rateAgain:"Pa Tiyuk", rateHard:"Lhiwet", rateGood:"Is", rateEasy:"Lhikiy"
-  });
-  // M2113: Automated Parity Linter for Gran Chaco Languages
+    // M2109: Pilaga (plg)
+    // M2110: Mocovi (moc) & Milestone Release v22.5.0
+    // M2111: Kadiweu (kbc)
+    // M2112: Wichi (mzh)
+    // M2113: Automated Parity Linter for Gran Chaco Languages
   window.dfLintGranChacoGuaycuruParity = function(){
     ['tob','plg','moc','kbc','mzh','wlv','crt','cag','mca'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -36050,12 +34300,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2114: Wichi Vejoz (wlv) & Chorote (crt)
-  window.DF_I18N_LOCALES['wlv'] = Object.assign({}, baseTemplate, { navFocus:"Lhenay", start:"Tiyuk", pause:"Tanay", rateGood:"Is" });
-  window.DF_I18N_LOCALES['crt'] = Object.assign({}, baseTemplate, { navFocus:"Siyuk", start:"Tsi", pause:"Hana", rateGood:"Shi" });
-  // M2115: Nivacle (cag) & Maka (mca)
-  window.DF_I18N_LOCALES['cag'] = Object.assign({}, baseTemplate, { navFocus:"Yitak", start:"Tiyuk", pause:"Tanayej", rateGood:"Shi" });
-  window.DF_I18N_LOCALES['mca'] = Object.assign({}, baseTemplate, { navFocus:"Inhef", start:"Tsi", pause:"Yehets", rateGood:"Wits" });
-  window.dfLintGranChacoGuaycuruParity();
+      // M2115: Nivacle (cag) & Maka (mca)
+      window.dfLintGranChacoGuaycuruParity();
   // M2116: Gran Chaco Dry Savannah Breeze Web Audio Filter
   window.dfSynthesizeChacoSavannah = function(ctx){
     if(!ctx) return;
@@ -36083,46 +34329,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2118: Central Aymara (ayr)
-  window.DF_I18N_LOCALES['ayr'] = Object.assign({}, baseTemplate, {
-    navFocus:"Amuyt'awi", navDecks:"Pirwa", navStats:"Jakhu", navSettings:"Mayjt'aya",
-    start:"Qalltaña", pause:"Samaraña", resume:"Sarantaskakiña", reset:"Kutt'ayaña", minutes:"min",
-    cardFront:"Nayra", cardBack:"Qhipa", flipCard:"Kutikipayaña", addCard:"Pirwa Yapaña",
-    deleteCard:"Chhaqhayaña", save:"Imaña", cancel:"Janiw Saña", confirm:"Jisa", close:"Jist'antaña",
-    rateAgain:"Wasitat", rateHard:"Ch'ama", rateGood:"Wali", rateEasy:"Jasaki"
-  });
-  // M2119: Southern Aymara (ayc)
-  window.DF_I18N_LOCALES['ayc'] = Object.assign({}, baseTemplate, {
-    navFocus:"Lup'iwi", navDecks:"Pirwa", navStats:"Jakhu", navSettings:"Wakichawi",
-    start:"Qalltaña", pause:"Sayt'aña", resume:"Sartayataña", reset:"Kutt'ayaña", minutes:"min",
-    cardFront:"Nayra", cardBack:"Qhipa", flipCard:"Kutikipayaña", addCard:"Pirwa Yapxataña",
-    deleteCard:"Chhaqtayaña", save:"Imaña", cancel:"Kutikipaña", confirm:"Jisa", close:"Jist'antaña",
-    rateAgain:"Wasitat", rateHard:"Ch'ama", rateGood:"Aski", rateEasy:"Kusisi"
-  });
-  // M2120: Jaqaru (jqr) & Milestone Release v22.6.0
-  window.DF_I18N_LOCALES['jqr'] = Object.assign({}, baseTemplate, {
-    navFocus:"Amushi", navDecks:"Pirwa", navStats:"Jakhu", navSettings:"Waki",
-    start:"Qallta", pause:"Sayta", resume:"Sarta", reset:"Kutta", minutes:"min",
-    cardFront:"Nayra", cardBack:"Qhipa", flipCard:"Kutiki", addCard:"Pirwa Yapa",
-    deleteCard:"Chhaqa", save:"Ima", cancel:"Jani", confirm:"Jisa", close:"Jist'a",
-    rateAgain:"Wasita", rateHard:"Ch'ama", rateGood:"Wali", rateEasy:"Jasa"
-  });
-  // M2121: Ancash Quechua (qwh)
-  window.DF_I18N_LOCALES['qwh'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yarpachakuy", navDecks:"Pirwa", navStats:"Yupay", navSettings:"Allichay",
-    start:"Qallay", pause:"Jamatsiy", resume:"Sikiy", reset:"Kutitsiy", minutes:"min",
-    cardFront:"Nawpa", cardBack:"Qepa", flipCard:"Tikray", addCard:"Pirwa Yapay",
-    deleteCard:"Uqray", save:"Tsay", cancel:"Mana", confirm:"Awmi", close:"Wichqay",
-    rateAgain:"Yapam", rateHard:"Sasami", rateGood:"Allim", rateEasy:"Fasilmi"
-  });
-  // M2122: Huanuco Quechua (qvh)
-  window.DF_I18N_LOCALES['qvh'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yarpay", navDecks:"Pirwa", navStats:"Yupay", navSettings:"Kamay",
-    start:"Qallay", pause:"Jamay", resume:"Sikiy", reset:"Kutiy", minutes:"min",
-    cardFront:"Nawpa", cardBack:"Qepa", flipCard:"Tikyay", addCard:"Pirwa Yapay",
-    deleteCard:"Qillqay", save:"Tsay", cancel:"Mana", confirm:"Aw", close:"Wichqay",
-    rateAgain:"Kutipaa", rateHard:"Sasami", rateGood:"Allimi", rateEasy:"Jukllami"
-  });
-  // M2123: Automated Parity Linter for Andean Aymara & Quechua I
+    // M2119: Southern Aymara (ayc)
+    // M2120: Jaqaru (jqr) & Milestone Release v22.6.0
+    // M2121: Ancash Quechua (qwh)
+    // M2122: Huanuco Quechua (qvh)
+    // M2123: Automated Parity Linter for Andean Aymara & Quechua I
   window.dfLintAndeanAymaraQuechuaParity = function(){
     ['ayr','ayc','jqr','qwh','qvh','qux','qvc','qvs','qvz'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -36132,12 +34343,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2124: Yauyos (qux) & Cajamarca (qvc)
-  window.DF_I18N_LOCALES['qux'] = Object.assign({}, baseTemplate, { navFocus:"Yarpay", start:"Qallay", pause:"Jamay", rateGood:"Alli" });
-  window.DF_I18N_LOCALES['qvc'] = Object.assign({}, baseTemplate, { navFocus:"Yarpachakuy", start:"Qallay", pause:"Jamatsiy", rateGood:"Allim" });
-  // M2125: San Martin (qvs) & Pastaza (qvz)
-  window.DF_I18N_LOCALES['qvs'] = Object.assign({}, baseTemplate, { navFocus:"Yuyay", start:"Kallariy", pause:"Samariy", rateGood:"Alli" });
-  window.DF_I18N_LOCALES['qvz'] = Object.assign({}, baseTemplate, { navFocus:"Yuyari", start:"Kallari", pause:"Samari", rateGood:"Alli" });
-  window.dfLintAndeanAymaraQuechuaParity();
+      // M2125: San Martin (qvs) & Pastaza (qvz)
+      window.dfLintAndeanAymaraQuechuaParity();
   // M2126: Altiplano Wind & Puna Grass Whispers Web Audio Filter
   window.dfSynthesizeAltiplanoWind = function(ctx){
     if(!ctx) return;
@@ -36165,46 +34372,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2128: Imbabura Quichua (qvi)
-  window.DF_I18N_LOCALES['qvi'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yuyay", navDecks:"Panka", navStats:"Yachay", navSettings:"Allichiy",
-    start:"Kallariy", pause:"Shayariy", resume:"Kallari Katik", reset:"Kutichiy", minutes:"min",
-    cardFront:"Ñawpak", cardBack:"Washa", flipCard:"Tigrachi", addCard:"Panka Yapachiy",
-    deleteCard:"Pichay", save:"Wakaychiy", cancel:"Mana", confirm:"Ari", close:"Wichkay",
-    rateAgain:"Kutik", rateHard:"Sinchi", rateGood:"Alli", rateEasy:"Lampa"
-  });
-  // M2129: Chimborazo Quichua (qug)
-  window.DF_I18N_LOCALES['qug'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yuyarina", navDecks:"Panka", navStats:"Yachana", navSettings:"Allina",
-    start:"Kallarina", pause:"Samana", resume:"Katina", reset:"Kutina", minutes:"min",
-    cardFront:"Ñawpa", cardBack:"Washa", flipCard:"Tigrana", addCard:"Panka Yapana",
-    deleteCard:"Anchuchina", save:"Wakanina", cancel:"Mana", confirm:"Ari", close:"Wichkana",
-    rateAgain:"Kutish", rateHard:"Sasana", rateGood:"Allina", rateEasy:"Hawalla"
-  });
-  // M2130: Canar Quichua (qxr) & Milestone Release v22.7.0
-  window.DF_I18N_LOCALES['qxr'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yuyay", navDecks:"Karta", navStats:"Yachay", navSettings:"Allichi",
-    start:"Kallari", pause:"Samari", resume:"Kati", reset:"Kuti", minutes:"min",
-    cardFront:"Ñawpak", cardBack:"Washa", flipCard:"Tigra", addCard:"Karta Yapa",
-    deleteCard:"Anchuchi", save:"Wakaychi", cancel:"Mana", confirm:"Ari", close:"Wichka",
-    rateAgain:"Kutik", rateHard:"Sinchi", rateGood:"Alli", rateEasy:"Hawalla"
-  });
-  // M2131: Napo Quichua (qvo)
-  window.DF_I18N_LOCALES['qvo'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yuyari", navDecks:"Panka", navStats:"Yachay", navSettings:"Allichina",
-    start:"Kallari", pause:"Shaya", resume:"Kati", reset:"Kuti", minutes:"min",
-    cardFront:"Ñawpak", cardBack:"Washa", flipCard:"Tigra", addCard:"Panka Yapa",
-    deleteCard:"Picha", save:"Wakaychi", cancel:"Mana", confirm:"Ari", close:"Wichka",
-    rateAgain:"Kutik", rateHard:"Sinchi", rateGood:"Alli", rateEasy:"Hawalla"
-  });
-  // M2132: Inga Quechua (inb)
-  window.DF_I18N_LOCALES['inb'] = Object.assign({}, baseTemplate, {
-    navFocus:"Iuiai", navDecks:"Panga", navStats:"Iachai", navSettings:"Alichii",
-    start:"Kallarii", pause:"Samarii", resume:"Katii", reset:"Kutichii", minutes:"min",
-    cardFront:"Ñaupa", cardBack:"Washa", flipCard:"Tigrachii", addCard:"Panga Iapachii",
-    deleteCard:"Pichaii", save:"Wakaichii", cancel:"Mana", confirm:"Ari", close:"Wichkaii",
-    rateAgain:"Kuti", rateHard:"Sinchi", rateGood:"Alli", rateEasy:"Iapa"
-  });
-  // M2133: Automated Parity Linter for Northern Quichua Languages
+    // M2129: Chimborazo Quichua (qug)
+    // M2130: Canar Quichua (qxr) & Milestone Release v22.7.0
+    // M2131: Napo Quichua (qvo)
+    // M2132: Inga Quechua (inb)
+    // M2133: Automated Parity Linter for Northern Quichua Languages
   window.dfLintNorthernQuichuaParity = function(){
     ['qvi','qug','qxr','qvo','inb','qxl','qus','quy','quz'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -36214,12 +34386,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2134: Salasaca (qxl) & Santiago Quichua (qus)
-  window.DF_I18N_LOCALES['qxl'] = Object.assign({}, baseTemplate, { navFocus:"Yuyay", start:"Kallariy", pause:"Shayariy", rateGood:"Alli" });
-  window.DF_I18N_LOCALES['qus'] = Object.assign({}, baseTemplate, { navFocus:"Yuyay", start:"Qallariy", pause:"Sayariy", rateGood:"Alli" });
-  // M2135: Ayacucho (quy) & Cusco Quechua (quz)
-  window.DF_I18N_LOCALES['quy'] = Object.assign({}, baseTemplate, { navFocus:"Yuyaymanay", start:"Qallariy", pause:"Samay", rateGood:"Allin" });
-  window.DF_I18N_LOCALES['quz'] = Object.assign({}, baseTemplate, { navFocus:"Yuyaykuy", start:"Qallariy", pause:"Samariy", rateGood:"Allin" });
-  window.dfLintNorthernQuichuaParity();
+      // M2135: Ayacucho (quy) & Cusco Quechua (quz)
+      window.dfLintNorthernQuichuaParity();
   // M2136: Andean Cloud Mountain Cascade & Valley Breeze Web Audio Filter
   window.dfSynthesizeCloudMountain = function(ctx){
     if(!ctx) return;
@@ -36247,46 +34415,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2138: Embera-Katio (cto)
-  window.DF_I18N_LOCALES['cto'] = Object.assign({}, baseTemplate, {
-    navFocus:"Bed'ea", navDecks:"Kirisia", navStats:"Uburawa", navSettings:"Jaurade",
-    start:"Ode", pause:"Eped'e", resume:"Ode Ba", reset:"Jaurade Ode", minutes:"min",
-    cardFront:"Dua", cardBack:"Burua", flipCard:"Kiruade", addCard:"Kirisia Ode",
-    deleteCard:"Piriade", save:"Kirisia Ba", cancel:"Eped'e Ba", confirm:"Ode Tro", close:"Eped'e",
-    rateAgain:"Ode Waya", rateHard:"Poria", rateGood:"Bia", rateEasy:"Dede"
-  });
-  // M2139: Embera-Baudo (bdc)
-  window.DF_I18N_LOCALES['bdc'] = Object.assign({}, baseTemplate, {
-    navFocus:"Bedea", navDecks:"Kirisia", navStats:"Ubura", navSettings:"Jaura",
-    start:"Ode", pause:"Epede", resume:"Ode Ba", reset:"Jaura Ode", minutes:"min",
-    cardFront:"Dua", cardBack:"Burua", flipCard:"Kirua", addCard:"Kirisia Ode",
-    deleteCard:"Piria", save:"Kirisia", cancel:"Epede Ba", confirm:"Ode Tro", close:"Epede",
-    rateAgain:"Waya Ode", rateHard:"Poria", rateGood:"Bia", rateEasy:"Dede"
-  });
-  // M2140: Epena Pedee (sja) & Milestone Release v22.8.0
-  window.DF_I18N_LOCALES['sja'] = Object.assign({}, baseTemplate, {
-    navFocus:"Bed'ea", navDecks:"Pape", navStats:"Uburawa", navSettings:"Ne",
-    start:"Ode", pause:"Pee", resume:"Ode Ba", reset:"Pape Ode", minutes:"min",
-    cardFront:"Dua", cardBack:"Burua", flipCard:"Kiruade", addCard:"Pape Ode",
-    deleteCard:"Piriade", save:"Bia", cancel:"Pee Ba", confirm:"Ode Tro", close:"Pee",
-    rateAgain:"Waya", rateHard:"Poria", rateGood:"Bia", rateEasy:"Dede"
-  });
-  // M2141: Wounaan (noa)
-  window.DF_I18N_LOCALES['noa'] = Object.assign({}, baseTemplate, {
-    navFocus:"Nemur", navDecks:"Khaag", navStats:"Poro", navSettings:"Thum",
-    start:"Haum", pause:"Peeur", resume:"Haum De", reset:"Thum Haum", minutes:"min",
-    cardFront:"Daph", cardBack:"Khaag Poro", flipCard:"Khaagir", addCard:"Khaag Haum",
-    deleteCard:"Chumir", save:"Khaag Nem", cancel:"Peeur De", confirm:"Haum No", close:"Peeur",
-    rateAgain:"Haum Dee", rateHard:"Kharr", rateGood:"Hajum", rateEasy:"Phaar"
-  });
-  // M2142: Tsafiki (cof)
-  window.DF_I18N_LOCALES['cof'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tenca", navDecks:"Tutu", navStats:"Se", navSettings:"Kera",
-    start:"Kera", pause:"Nawa", resume:"Kera In", reset:"Tutu Kera", minutes:"min",
-    cardFront:"Kapa", cardBack:"Bennu", flipCard:"Puru", addCard:"Tutu Ke",
-    deleteCard:"Lole", save:"Se", cancel:"Nawa In", confirm:"Kera Ya", close:"Nawa",
-    rateAgain:"In Kera", rateHard:"Pai", rateGood:"Se", rateEasy:"Seka"
-  });
-  // M2143: Automated Parity Linter for Choco & Barbacoan Languages
+    // M2139: Embera-Baudo (bdc)
+    // M2140: Epena Pedee (sja) & Milestone Release v22.8.0
+    // M2141: Wounaan (noa)
+    // M2142: Tsafiki (cof)
+    // M2143: Automated Parity Linter for Choco & Barbacoan Languages
   window.dfLintChocoBarbacoanParity = function(){
     ['cto','bdc','sja','noa','cof','kwi','cbi','gum','pbb'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -36296,12 +34429,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2144: Awa Pit (kwi) & Cha'palaa (cbi)
-  window.DF_I18N_LOCALES['kwi'] = Object.assign({}, baseTemplate, { navFocus:"Kuz", start:"Kiz", pause:"Paykuz", rateGood:"Wat" });
-  window.DF_I18N_LOCALES['cbi'] = Object.assign({}, baseTemplate, { navFocus:"Tenbura", start:"Kena", pause:"Nawa", rateGood:"Ura" });
-  // M2145: Guambiano (gum) & Nasa Yuwe (pbb)
-  window.DF_I18N_LOCALES['gum'] = Object.assign({}, baseTemplate, { navFocus:"Pikwe", start:"Trikwan", pause:"Pishik", rateGood:"Morik" });
-  window.DF_I18N_LOCALES['pbb'] = Object.assign({}, baseTemplate, { navFocus:"Kwe'sx", start:"Pusxna", pause:"Kwe'na", rateGood:"Kwekwe" });
-  window.dfLintChocoBarbacoanParity();
+      // M2145: Guambiano (gum) & Nasa Yuwe (pbb)
+      window.dfLintChocoBarbacoanParity();
   // M2146: Pacific Raincoast Torrent & Canopy Drizzle Web Audio Filter
   window.dfSynthesizeRaincoastTorrent = function(ctx){
     if(!ctx) return;
@@ -36329,46 +34458,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2148: Kari'nja (car)
-  window.DF_I18N_LOCALES['car'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tupurung", navDecks:"Kareta", navStats:"Ipori", navSettings:"Awonpa",
-    start:"Ami", pause:"Esenan", resume:"Ami Pa", reset:"Kareta Ami", minutes:"min",
-    cardFront:"Rawang", cardBack:"Koyon", flipCard:"Puru", addCard:"Kareta Am",
-    deleteCard:"Pili", save:"Ipori", cancel:"Esenan Pa", confirm:"A-a", close:"Tuku",
-    rateAgain:"Pa Ami", rateHard:"Tiri", rateGood:"Ipori", rateEasy:"Mela"
-  });
-  // M2149: Wayana (way)
-  window.DF_I18N_LOCALES['way'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kutuku", navDecks:"Karta", navStats:"Tupur", navSettings:"Awon",
-    start:"Ami", pause:"Esen", resume:"Ami Se", reset:"Karta Ami", minutes:"min",
-    cardFront:"Eret", cardBack:"Koyon", flipCard:"Weli", addCard:"Karta Am",
-    deleteCard:"Pili", save:"Tupur", cancel:"Esen Se", confirm:"E-e", close:"Chiro",
-    rateAgain:"Se Ami", rateHard:"Tari", rateGood:"Tupur", rateEasy:"Weli"
-  });
-  // M2150: Tiriyo (tri) & Milestone Release v22.9.0
-  window.DF_I18N_LOCALES['tri'] = Object.assign({}, baseTemplate, {
-    navFocus:"Senpan", navDecks:"Kareta", navStats:"Kureman", navSettings:"Tïwetomin",
-    start:"Tïkamin", pause:"Esenan", resume:"Tïkamin Se", reset:"Kareta Tïkamin", minutes:"min",
-    cardFront:"Erenpo", cardBack:"Ekapïn", flipCard:"Eperuka", addCard:"Kareta Tïka",
-    deleteCard:"Esenan", save:"Kureman", cancel:"Esenan Se", confirm:"Tïkamin To", close:"Esenan",
-    rateAgain:"Se Tïkamin", rateHard:"Sawaran", rateGood:"Kure", rateEasy:"Tïpein"
-  });
-  // M2151: Akawaio (ake)
-  window.DF_I18N_LOCALES['ake'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tewen", navDecks:"Karta", navStats:"Wakipe", navSettings:"Kuru",
-    start:"Tiko", pause:"Ena", resume:"Tiko Me", reset:"Karta Tiko", minutes:"min",
-    cardFront:"Rawang", cardBack:"Koyon", flipCard:"Piri", addCard:"Karta Tik",
-    deleteCard:"Pili", save:"Wakipe", cancel:"Ena Me", confirm:"I-i", close:"Tuku",
-    rateAgain:"Me Tiko", rateHard:"Kala", rateGood:"Wakipe", rateEasy:"Mimi"
-  });
-  // M2152: Patamona (pat)
-  window.DF_I18N_LOCALES['pat'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tewen", navDecks:"Karta", navStats:"Wakipe", navSettings:"Kuru",
-    start:"Tiko", pause:"Ena", resume:"Tiko Sa", reset:"Karta Tiko", minutes:"min",
-    cardFront:"Rawang", cardBack:"Koyon", flipCard:"Puru", addCard:"Karta Tik",
-    deleteCard:"Pili", save:"Wakipe", cancel:"Ena Sa", confirm:"E-e", close:"Tuku",
-    rateAgain:"Sa Tiko", rateHard:"Kala", rateGood:"Wakipe", rateEasy:"Mela"
-  });
-  // M2153: Automated Parity Linter for Guiana Shield Cariban Languages
+    // M2149: Wayana (way)
+    // M2150: Tiriyo (tri) & Milestone Release v22.9.0
+    // M2151: Akawaio (ake)
+    // M2152: Patamona (pat)
+    // M2153: Automated Parity Linter for Guiana Shield Cariban Languages
   window.dfLintGuianaShieldCaribParity = function(){
     ['car','way','tri','ake','pat','mbc','aoc','yar','mcg'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -36378,12 +34472,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2154: Macushi (mbc) & Pemon (aoc)
-  window.DF_I18N_LOCALES['mbc'] = Object.assign({}, baseTemplate, { navFocus:"Morin", start:"Tika", pause:"Esena", rateGood:"Kure" });
-  window.DF_I18N_LOCALES['aoc'] = Object.assign({}, baseTemplate, { navFocus:"Tewen", start:"Tiko", pause:"Ena", rateGood:"Wakipe" });
-  // M2155: Yabarana (yar) & Mapoyo (mcg)
-  window.DF_I18N_LOCALES['yar'] = Object.assign({}, baseTemplate, { navFocus:"Tupur", start:"Ami", pause:"Esen", rateGood:"Ipori" });
-  window.DF_I18N_LOCALES['mcg'] = Object.assign({}, baseTemplate, { navFocus:"Senpan", start:"Tikamin", pause:"Esenan", rateGood:"Kureman" });
-  window.dfLintGuianaShieldCaribParity();
+      // M2155: Yabarana (yar) & Mapoyo (mcg)
+      window.dfLintGuianaShieldCaribParity();
   // M2156: Mount Roraima Mist & Tepui Waterfall Web Audio Filter
   window.dfSynthesizeRoraimaMist = function(ctx){
     if(!ctx) return;
@@ -36411,46 +34501,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2158: Lokono (arw)
-  window.DF_I18N_LOCALES['arw'] = Object.assign({}, baseTemplate, {
-    navFocus:"Akon", navDecks:"Karta", navStats:"Sabana", navSettings:"Koni",
-    start:"Andi", pause:"Mishi", resume:"Andi Ki", reset:"Karta Andi", minutes:"min",
-    cardFront:"Uka", cardBack:"Koyon", flipCard:"Puru", addCard:"Karta And",
-    deleteCard:"Pili", save:"Sabana", cancel:"Mishi Ki", confirm:"A-a", close:"Tuku",
-    rateAgain:"Ki Andi", rateHard:"Tiri", rateGood:"Sabana", rateEasy:"Mela"
-  });
-  // M2159: Wayuu (guc)
-  window.DF_I18N_LOCALES['guc'] = Object.assign({}, baseTemplate, {
-    navFocus:"Akaata", navDecks:"Karalo'uta", navStats:"Ayaawatia", navSettings:"Sukua'ipa",
-    start:"A'yatawaa", pause:"Eme'eraa", resume:"A'yatawaa Wale", reset:"Karalo'uta A'yat", minutes:"min",
-    cardFront:"Palaasü", cardBack:"Koyon", flipCard:"Awanajaa", addCard:"Karalo'uta Yap",
-    deleteCard:"Oju'itawaa", save:"Anasü", cancel:"Eme'eraa Wale", confirm:"Aa", close:"A'lakaa",
-    rateAgain:"Wale A'yat", rateHard:"Kapüleesü", rateGood:"Anasü", rateEasy:"Motsosü"
-  });
-  // M2160: Anu (pbg) & Milestone Release v23.0.0
-  window.DF_I18N_LOCALES['pbg'] = Object.assign({}, baseTemplate, {
-    navFocus:"Aka", navDecks:"Karta", navStats:"Ana", navSettings:"Koni",
-    start:"Ayata", pause:"Eme", resume:"Ayata Sa", reset:"Karta Ayata", minutes:"min",
-    cardFront:"Uka", cardBack:"Koyon", flipCard:"Puru", addCard:"Karta Ayat",
-    deleteCard:"Pili", save:"Ana", cancel:"Eme Sa", confirm:"E-e", close:"Chiro",
-    rateAgain:"Sa Ayata", rateHard:"Kala", rateGood:"Ana", rateEasy:"Mishi"
-  });
-  // M2161: Baniwa (bvv)
-  window.DF_I18N_LOCALES['bvv'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kiti", navDecks:"Pukaro", navStats:"Dia", navSettings:"Niro",
-    start:"Wee", pause:"Nika", resume:"Wee Ba", reset:"Pukaro Wee", minutes:"min",
-    cardFront:"Kawa", cardBack:"Puti", flipCard:"Pira", addCard:"Pukaro We",
-    deleteCard:"Peko", save:"A'ti", cancel:"Nika Ba", confirm:"Wee Te", close:"Nika",
-    rateAgain:"Ba Wee", rateHard:"Kati", rateGood:"A'ti", rateEasy:"Weli"
-  });
-  // M2162: Kurripako (kpc)
-  window.DF_I18N_LOCALES['kpc'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kuaika", navDecks:"Karta", navStats:"Kawata", navSettings:"Niro",
-    start:"Yaka", pause:"Maka", resume:"Yaka Ba", reset:"Karta Yaka", minutes:"min",
-    cardFront:"Kawa", cardBack:"Koyon", flipCard:"Puru", addCard:"Karta Yak",
-    deleteCard:"Pili", save:"Kawata", cancel:"Maka Ba", confirm:"I-i", close:"Tuku",
-    rateAgain:"Ba Yaka", rateHard:"Tiri", rateGood:"Kawata", rateEasy:"Mela"
-  });
-  // M2163: Automated Parity Linter for Northern Arawakan Languages
+    // M2159: Wayuu (guc)
+    // M2160: Anu (pbg) & Milestone Release v23.0.0
+    // M2161: Baniwa (bvv)
+    // M2162: Kurripako (kpc)
+    // M2163: Automated Parity Linter for Northern Arawakan Languages
   window.dfLintNorthernArawakanParity = function(){
     ['arw','guc','pbg','bvv','kpc','gae','mpt','yvt','bae'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -36460,12 +34515,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2164: Warekena (gae) & Mandawaca (mpt)
-  window.DF_I18N_LOCALES['gae'] = Object.assign({}, baseTemplate, { navFocus:"Akon", start:"Andi", pause:"Mishi", rateGood:"Sabana" });
-  window.DF_I18N_LOCALES['mpt'] = Object.assign({}, baseTemplate, { navFocus:"Aka", start:"Ayata", pause:"Eme", rateGood:"Ana" });
-  // M2165: Yavitero (yvt) & Bare (bae)
-  window.DF_I18N_LOCALES['yvt'] = Object.assign({}, baseTemplate, { navFocus:"Kiti", start:"Wee", pause:"Nika", rateGood:"A'ti" });
-  window.DF_I18N_LOCALES['bae'] = Object.assign({}, baseTemplate, { navFocus:"Kuaika", start:"Yaka", pause:"Maka", rateGood:"Kawata" });
-  window.dfLintNorthernArawakanParity();
+      // M2165: Yavitero (yvt) & Bare (bae)
+      window.dfLintNorthernArawakanParity();
   // M2166: Rio Negro Blackwater Shallows Web Audio Filter
   window.dfSynthesizeRioNegro = function(ctx){
     if(!ctx) return;
@@ -36495,46 +34546,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2168: Cherokee (chr)
-  window.DF_I18N_LOCALES['chr'] = Object.assign({}, baseTemplate, {
-    navFocus:"Galvladitlv", navDecks:"Gowelv", navStats:"Dikanogisdi", navSettings:"Dadayelvhi",
-    start:"Halenaha", pause:"Hesdi", resume:"Halenaha Sigwu", reset:"Gowelv Halena", minutes:"min",
-    cardFront:"Igvyi", cardBack:"Ohni", flipCard:"Alinahidohdi", addCard:"Gowelv Galisgo",
-    deleteCard:"Golisdi", save:"Osda", cancel:"Hesdi Sigwu", confirm:"Vv", close:"Kanalvhi",
-    rateAgain:"Sigwu", rateHard:"Ayawelv", rateGood:"Osda", rateEasy:"Wulisdi"
-  });
-  // M2169: Mohawk (moh)
-  window.DF_I18N_LOCALES['moh'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kahwatsire", navDecks:"Kahyatonhsera", navStats:"Watenro", navSettings:"Karihwayent",
-    start:"Satonten", pause:"Sehston", resume:"Satonten Ase", reset:"Kahyaton Satont", minutes:"min",
-    cardFront:"Ohaha", cardBack:"Ona", flipCard:"Tekariwake", addCard:"Kahyaton Tsi",
-    deleteCard:"Akeron", save:"Ioyaner", cancel:"Sehston Ase", confirm:"Hen", close:"Kenhonk",
-    rateAgain:"Ase", rateHard:"Yoweran", rateGood:"Ioyaner", rateEasy:"Wakeron"
-  });
-  // M2170: Seneca (see) & Milestone Release v23.1.0
-  window.DF_I18N_LOCALES['see'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ganoonyok", navDecks:"Gaganyata", navStats:"Gaiwayei", navSettings:"Oadzo",
-    start:"Sadontet", pause:"Sedzo", resume:"Sadontet She", reset:"Gaganyata Sadon", minutes:"min",
-    cardFront:"Ohaha", cardBack:"Ona", flipCard:"Degaiwaye", addCard:"Gaganyata Tsi",
-    deleteCard:"Ageon", save:"Wiyo", cancel:"Sedzo She", confirm:"Ha", close:"Gahon",
-    rateAgain:"She", rateHard:"Yowan", rateGood:"Wiyo", rateEasy:"Wasa"
-  });
-  // M2171: Oneida (one)
-  window.DF_I18N_LOCALES['one'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kahwatsire", navDecks:"Kahyaton", navStats:"Watenro", navSettings:"Karihwa",
-    start:"Satont", pause:"Sehst", resume:"Satont Ase", reset:"Kahyaton Saton", minutes:"min",
-    cardFront:"Ohaha", cardBack:"Ona", flipCard:"Tekariwa", addCard:"Kahyaton Tsi",
-    deleteCard:"Akeron", save:"Ioyane", cancel:"Sehst Ase", confirm:"Hen", close:"Kenhon",
-    rateAgain:"Ase", rateHard:"Yower", rateGood:"Ioyane", rateEasy:"Waker"
-  });
-  // M2172: Pawnee (paw)
-  window.DF_I18N_LOCALES['paw'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tirawa", navDecks:"Karta", navStats:"Pari", navSettings:"Liru",
-    start:"Tawa", pause:"Kiro", resume:"Tawa Si", reset:"Karta Tawa", minutes:"min",
-    cardFront:"Paha", cardBack:"Koyon", flipCard:"Puru", addCard:"Karta Taw",
-    deleteCard:"Pili", save:"Pari", cancel:"Kiro Si", confirm:"A-a", close:"Tuku",
-    rateAgain:"Si Tawa", rateHard:"Tiri", rateGood:"Pari", rateEasy:"Mela"
-  });
-  // M2173: Automated Parity Linter for Iroquoian & Caddoan Languages
+    // M2169: Mohawk (moh)
+    // M2170: Seneca (see) & Milestone Release v23.1.0
+    // M2171: Oneida (one)
+    // M2172: Pawnee (paw)
+    // M2173: Automated Parity Linter for Iroquoian & Caddoan Languages
   window.dfLintIroquoianCaddoanParity = function(){
     ['chr','moh','see','one','paw','ono','cay','tus','ari'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -36544,12 +34560,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2174: Onondaga (ono) & Cayuga (cay)
-  window.DF_I18N_LOCALES['ono'] = Object.assign({}, baseTemplate, { navFocus:"Ganoon", start:"Sadont", pause:"Sedzo", rateGood:"Wiyo" });
-  window.DF_I18N_LOCALES['cay'] = Object.assign({}, baseTemplate, { navFocus:"Kahwat", start:"Satont", pause:"Sehst", rateGood:"Ioyan" });
-  // M2175: Tuscarora (tus) & Arikara (ari)
-  window.DF_I18N_LOCALES['tus'] = Object.assign({}, baseTemplate, { navFocus:"Kahwa", start:"Satont", pause:"Sehston", rateGood:"Ioyaner" });
-  window.DF_I18N_LOCALES['ari'] = Object.assign({}, baseTemplate, { navFocus:"Tirawa", start:"Tawa", pause:"Kiro", rateGood:"Pari" });
-  window.dfLintIroquoianCaddoanParity();
+      // M2175: Tuscarora (tus) & Arikara (ari)
+      window.dfLintIroquoianCaddoanParity();
   // M2176: Eastern Woodlands Maple Forest Rustle Web Audio Filter
   window.dfSynthesizeMapleRustle = function(ctx){
     if(!ctx) return;
@@ -36577,46 +34589,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2178: Osage (osa)
-  window.DF_I18N_LOCALES['osa'] = Object.assign({}, baseTemplate, {
-    navFocus:"Wazha", navDecks:"Wapa", navStats:"Wahka", navSettings:"Ie",
-    start:"Tahe", pause:"Ito", resume:"Tahe Shi", reset:"Wapa Tahe", minutes:"min",
-    cardFront:"Ite", cardBack:"Koyon", flipCard:"Puru", addCard:"Wapa Tah",
-    deleteCard:"Pili", save:"Wahka", cancel:"Ito Shi", confirm:"A-a", close:"Tuku",
-    rateAgain:"Shi Tahe", rateHard:"Tiri", rateGood:"Wahka", rateEasy:"Mela"
-  });
-  // M2179: Omaha (oma)
-  window.DF_I18N_LOCALES['oma'] = Object.assign({}, baseTemplate, {
-    navFocus:"Wazhi", navDecks:"Waba", navStats:"Waka", navSettings:"Iye",
-    start:"Tathe", pause:"Ite", resume:"Tathe Shi", reset:"Waba Tathe", minutes:"min",
-    cardFront:"Ite", cardBack:"Koyon", flipCard:"Weli", addCard:"Waba Tath",
-    deleteCard:"Pili", save:"Waka", cancel:"Ite Shi", confirm:"E-e", close:"Chiro",
-    rateAgain:"Shi Tathe", rateHard:"Tari", rateGood:"Waka", rateEasy:"Weli"
-  });
-  // M2180: Ho-Chunk (win) & Milestone Release v23.2.0
-  window.DF_I18N_LOCALES['win'] = Object.assign({}, baseTemplate, {
-    navFocus:"Wagigi", navDecks:"Wagaxe", navStats:"Pini", navSettings:"Kere",
-    start:"Howa", pause:"Shik", resume:"Howa Ha", reset:"Wagaxe Howa", minutes:"min",
-    cardFront:"Ite", cardBack:"Koyon", flipCard:"Puru", addCard:"Wagaxe How",
-    deleteCard:"Pili", save:"Pini", cancel:"Shik Ha", confirm:"I-i", close:"Tuku",
-    rateAgain:"Ha Howa", rateHard:"Tiri", rateGood:"Pini", rateEasy:"Mela"
-  });
-  // M2181: Choctaw (cho)
-  window.DF_I18N_LOCALES['cho'] = Object.assign({}, baseTemplate, {
-    navFocus:"Anukfilli", navDecks:"Holisso", navStats:"Holhtina", navSettings:"Apisa",
-    start:"Vmmona", pause:"Hikqiya", resume:"Vba", reset:"Holisso Vba", minutes:"min",
-    cardFront:"Tikba", cardBack:"Ashaka", flipCard:"Falamminchi", addCard:"Holisso Atoba",
-    deleteCard:"Kashoffi", save:"Achukma", cancel:"Kaniya", confirm:"A", close:"Kupffi",
-    rateAgain:"Himak", rateHard:"Kullo", rateGood:"Achukma", rateEasy:"Nukfoka"
-  });
-  // M2182: Chickasaw (cic)
-  window.DF_I18N_LOCALES['cic'] = Object.assign({}, baseTemplate, {
-    navFocus:"Anukfilli", navDecks:"Holisso", navStats:"Holhtina", navSettings:"Apisa",
-    start:"Vmmona", pause:"Hikiya", resume:"Vba", reset:"Holisso Vba", minutes:"min",
-    cardFront:"Tikba", cardBack:"Ashaka", flipCard:"Falammichi", addCard:"Holisso Atob",
-    deleteCard:"Kashoffi", save:"Chokma", cancel:"Kaniya", confirm:"A", close:"Kupffi",
-    rateAgain:"Himak", rateHard:"Kallo", rateGood:"Chokma", rateEasy:"Nukfoka"
-  });
-  // M2183: Automated Parity Linter for Siouan & Muskogean Languages
+    // M2179: Omaha (oma)
+    // M2180: Ho-Chunk (win) & Milestone Release v23.2.0
+    // M2181: Choctaw (cho)
+    // M2182: Chickasaw (cic)
+    // M2183: Automated Parity Linter for Siouan & Muskogean Languages
   window.dfLintSiouanMuskogeanParity = function(){
     ['osa','oma','win','cho','cic','mus','akz','cku','bll'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -36626,12 +34603,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2184: Muscogee (mus) & Alabama (akz)
-  window.DF_I18N_LOCALES['mus'] = Object.assign({}, baseTemplate, { navFocus:"Kerretv", start:"Vlke", pause:"Hueretv", rateGood:"Herme" });
-  window.DF_I18N_LOCALES['akz'] = Object.assign({}, baseTemplate, { navFocus:"Anuk", start:"Vmmon", pause:"Hiki", rateGood:"Chokma" });
-  // M2185: Koasati (cku) & Biloxi (bll)
-  window.DF_I18N_LOCALES['cku'] = Object.assign({}, baseTemplate, { navFocus:"Kerre", start:"Vlke", pause:"Huer", rateGood:"Herme" });
-  window.DF_I18N_LOCALES['bll'] = Object.assign({}, baseTemplate, { navFocus:"Wazha", start:"Tahe", pause:"Ito", rateGood:"Wahka" });
-  window.dfLintSiouanMuskogeanParity();
+      // M2185: Koasati (cku) & Biloxi (bll)
+      window.dfLintSiouanMuskogeanParity();
   // M2186: Mississippi Pine Forest Breeze Web Audio Filter
   window.dfSynthesizePineBreeze = function(ctx){
     if(!ctx) return;
@@ -36659,46 +34632,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2188: Plains Cree (crk)
-  window.DF_I18N_LOCALES['crk'] = Object.assign({}, baseTemplate, {
-    navFocus:"Iteyimowin", navDecks:"Masinahikan", navStats:"Kiskeyihtamowin", navSettings:"Kwayaskwastawin",
-    start:"Macipayin", pause:"Nakisimowin", resume:"Macipayin Kihtwam", reset:"Masinahikan Maci", minutes:"min",
-    cardFront:"Nikan", cardBack:"Oskan", flipCard:"Kweskipayin", addCard:"Masinahikan Asici",
-    deleteCard:"Kasiha", save:"Miyosin", cancel:"Nakisimo Kihtwam", confirm:"Ehe", close:"Kipahikan",
-    rateAgain:"Kihtwam", rateHard:"Ayiman", rateGood:"Miyosin", rateEasy:"Wehtan"
-  });
-  // M2189: Ojibwe (ciw)
-  window.DF_I18N_LOCALES['ciw'] = Object.assign({}, baseTemplate, {
-    navFocus:"Inendang", navDecks:"Mazinahigan", navStats:"Gikendaasowin", navSettings:"Ozhichigan",
-    start:"Maajitaa", pause:"Nagaashkaa", resume:"Maajitaa Miinawaa", reset:"Mazinahigan Maaji", minutes:"min",
-    cardFront:"Niigaan", cardBack:"Ishkweyang", flipCard:"Gweki-bii'an", addCard:"Mazinahigan Dago",
-    deleteCard:"Gasiibii'an", save:"Minwaashin", cancel:"Nagaashkaa Miin", confirm:"Enh", close:"Giba'an",
-    rateAgain:"Miinawaa", rateHard:"Sanag", rateGood:"Minwaashin", rateEasy:"Wenipan"
-  });
-  // M2190: Innu (moe) & Milestone Release v23.3.0
-  window.DF_I18N_LOCALES['moe'] = Object.assign({}, baseTemplate, {
-    navFocus:"Mamu", navDecks:"Mashinaikan", navStats:"Chishtai", navSettings:"Ushiku",
-    start:"Matau", pause:"Nakai", resume:"Matau Minuat", reset:"Mashinaikan Matau", minutes:"min",
-    cardFront:"Nikan", cardBack:"Otak", flipCard:"Kuekipayu", addCard:"Mashinaikan Tshi",
-    deleteCard:"Kashinats", save:"Mino", cancel:"Nakai Minuat", confirm:"Ehe", close:"Tshipan",
-    rateAgain:"Minuat", rateHard:"Tshimuan", rateGood:"Mino", rateEasy:"Metu"
-  });
-  // M2191: Mi'kmaq (mic)
-  window.DF_I18N_LOCALES['mic'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ango'tmu'k", navDecks:"Wi'gatign", navStats:"Gelu'lg", navSettings:"Ili-tla'tege",
-    start:"Poqji'g", pause:"Nqa's", resume:"Poqji'g Ap", reset:"Wi'gatign Poqji", minutes:"min",
-    cardFront:"Nigan", cardBack:"Utqan", flipCard:"Kweskwa'si", addCard:"Wi'gatign Igtug",
-    deleteCard:"Gasi'g", save:"Gelu'lg", cancel:"Nqa's Ap", confirm:"E'e", close:"Kepjoqa'tege",
-    rateAgain:"Ap", rateHard:"Metugwa's", rateGood:"Gelu'lg", rateEasy:"Mno'qit"
-  });
-  // M2192: Passamaquoddy (mac)
-  window.DF_I18N_LOCALES['mac'] = Object.assign({}, baseTemplate, {
-    navFocus:"Litemuwakon", navDecks:"Wikhikon", navStats:"Woliwon", navSettings:"Neqiw",
-    start:"Mocikapo", pause:"Nokawi", resume:"Mocikapo Apc", reset:"Wikhikon Moci", minutes:"min",
-    cardFront:"Nikan", cardBack:"Oteh", flipCard:"Kwehkipo", addCard:"Wikhikon Pos",
-    deleteCard:"Kasiha", save:"Woli", cancel:"Nokawi Apc", confirm:"Aha", close:"Kipaham",
-    rateAgain:"Apc", rateHard:"Aloki", rateGood:"Woli", rateEasy:"Nolami"
-  });
-  // M2193: Automated Parity Linter for Algonquian Languages
+    // M2189: Ojibwe (ciw)
+    // M2190: Innu (moe) & Milestone Release v23.3.0
+    // M2191: Mi'kmaq (mic)
+    // M2192: Passamaquoddy (mac)
+    // M2193: Automated Parity Linter for Algonquian Languages
   window.dfLintAlgonquianParity = function(){
     ['crk','ciw','moe','mic','mac','pot','mez','sac','sjw'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -36708,12 +34646,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2194: Potawatomi (pot) & Menominee (mez)
-  window.DF_I18N_LOCALES['pot'] = Object.assign({}, baseTemplate, { navFocus:"Inendam", start:"Madjita", pause:"Naga", rateGood:"Mno" });
-  window.DF_I18N_LOCALES['mez'] = Object.assign({}, baseTemplate, { navFocus:"Eneqtam", start:"Mace", pause:"Naka", rateGood:"Wene" });
-  // M2195: Meskwaki (sac) & Shawnee (sjw)
-  window.DF_I18N_LOCALES['sac'] = Object.assign({}, baseTemplate, { navFocus:"Inenam", start:"Maci", pause:"Naki", rateGood:"Meno" });
-  window.DF_I18N_LOCALES['sjw'] = Object.assign({}, baseTemplate, { navFocus:"Inel", start:"Mata", pause:"Naka", rateGood:"Wela" });
-  window.dfLintAlgonquianParity();
+      // M2195: Meskwaki (sac) & Shawnee (sjw)
+      window.dfLintAlgonquianParity();
   // M2196: Boreal Birch Forest Breeze Web Audio Filter
   window.dfSynthesizeBorealBreeze = function(ctx){
     if(!ctx) return;
@@ -36741,46 +34675,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2198: Inuktitut (ike)
-  window.DF_I18N_LOCALES['ike'] = Object.assign({}, baseTemplate, {
-    navFocus:"Isumataq", navDecks:"Titiqqat", navStats:"Kisitsisit", navSettings:"Aaqqiksuiniq",
-    start:"Aullaqtillugu", pause:"Nuqqallatarlugu", resume:"Kajusitillugu", reset:"Utiqtillugu", minutes:"min",
-    cardFront:"Saani", cardBack:"Tunuani", flipCard:"Pusillugu", addCard:"Titiqqamik Ilasineq",
-    deleteCard:"Piiqsinik", save:"Tutquqlugu", cancel:"Nuqqatitaa", confirm:"Ailaak", close:"Matulugu",
-    rateAgain:"Ataata", rateHard:"Aksut", rateGood:"Piujuq", rateEasy:"Ajjungittuq"
-  });
-  // M2199: Inuvialuktun (ikt)
-  window.DF_I18N_LOCALES['ikt'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ihumataq", navDecks:"Makpiraat", navStats:"Kihitsiyut", navSettings:"Ihualhaat",
-    start:"Aullaqtita", pause:"Nuqaqlaku", resume:"Aullaqti Kangi", reset:"Utiqti", minutes:"min",
-    cardFront:"Saani", cardBack:"Tunuani", flipCard:"Puhila", addCard:"Ila Makpiraamik",
-    deleteCard:"Piiqsi", save:"Tutquq", cancel:"Nuqaqlaku", confirm:"Ii", close:"Umiku",
-    rateAgain:"Ataata", rateHard:"Aghut", rateGood:"Nakuu", rateEasy:"Ajuinait"
-  });
-  // M2200: Kalaallisut (kal) & Milestone Release v23.4.0
-  window.DF_I18N_LOCALES['kal'] = Object.assign({}, baseTemplate, {
-    navFocus:"Eqqarsaat", navDecks:"Kortit", navStats:"Kisitsisit", navSettings:"Aaqqissuussineq",
-    start:"Aallartiguk", pause:"Unillatsiarit", resume:"Nangiguk", reset:"Uterfigeqqiguk", minutes:"min",
-    cardFront:"Saamut", cardBack:"Tunuanut", flipCard:"Muminguk", addCard:"Korti Ilassuk",
-    deleteCard:"Piiaruk", save:"Toqqoruk", cancel:"Taamaatiguk", confirm:"Aap", close:"Matujuk",
-    rateAgain:"Ateqqiguk", rateHard:"Erloqinarpoq", rateGood:"Ajungilaq", rateEasy:"Oqitsuinnaq"
-  });
-  // M2201: Central Alaskan Yup'ik (esu)
-  window.DF_I18N_LOCALES['esu'] = Object.assign({}, baseTemplate, {
-    navFocus:"Umyuarniurneq", navDecks:"Kalikat", navStats:"Kituut", navSettings:"Cakneq",
-    start:"Ayagnirluku", pause:"Nang'erluku", resume:"Ayuqelirluku", reset:"Uterrluku", minutes:"min",
-    cardFront:"Ciunani", cardBack:"Ketiini", flipCard:"Mumigluku", addCard:"Kalikamek Ilaluku",
-    deleteCard:"Aglirluku", save:"Kekengarluku", cancel:"Taqluku", confirm:"Ii-i", close:"Umegluku",
-    rateAgain:"Ataam", rateHard:"Caperrnarquq", rateGood:"Assirtuq", rateEasy:"Qac'ngatuq"
-  });
-  // M2202: Aleut (ale)
-  window.DF_I18N_LOCALES['ale'] = Object.assign({}, baseTemplate, {
-    navFocus:"Txin Tutnin", navDecks:"Algalghin", navStats:"Kaduugit", navSettings:"Huzungin",
-    start:"Ayagasa", pause:"Hawa", resume:"Ayagasa Txin", reset:"Algalghin Aya", minutes:"min",
-    cardFront:"Kaagan", cardBack:"Chalan", flipCard:"Gili", addCard:"Ila Algalghin",
-    deleteCard:"Agacha", save:"Aang", cancel:"Hawa Txin", confirm:"Aang", close:"Anicha",
-    rateAgain:"Txin", rateHard:"Kanga", rateGood:"Aang", rateEasy:"Ula"
-  });
-  // M2203: Automated Parity Linter for Eskimo-Aleut Arctic Languages
+    // M2199: Inuvialuktun (ikt)
+    // M2200: Kalaallisut (kal) & Milestone Release v23.4.0
+    // M2201: Central Alaskan Yup'ik (esu)
+    // M2202: Aleut (ale)
+    // M2203: Automated Parity Linter for Eskimo-Aleut Arctic Languages
   window.dfLintEskimoAleutParity = function(){
     ['ike','ikt','kal','esu','ale','ipk','ems','ess','ysr'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -36790,12 +34689,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2204: Inupiaq (ipk) & Alutiiq (ems)
-  window.DF_I18N_LOCALES['ipk'] = Object.assign({}, baseTemplate, { navFocus:"Isumaluk", start:"Aullak", pause:"Nutqa", rateGood:"Nakuu" });
-  window.DF_I18N_LOCALES['ems'] = Object.assign({}, baseTemplate, { navFocus:"Umyua", start:"Ayag", pause:"Nang", rateGood:"Assir" });
-  // M2205: Siberian Yupik (ess) & Sirenik (ysr)
-  window.DF_I18N_LOCALES['ess'] = Object.assign({}, baseTemplate, { navFocus:"Umyuar", start:"Ayagnir", pause:"Nang'er", rateGood:"Assirtuq" });
-  window.DF_I18N_LOCALES['ysr'] = Object.assign({}, baseTemplate, { navFocus:"Txin", start:"Ayaga", pause:"Hawa", rateGood:"Aang" });
-  window.dfLintEskimoAleutParity();
+      // M2205: Siberian Yupik (ess) & Sirenik (ysr)
+      window.dfLintEskimoAleutParity();
   // M2206: Arctic Ice Shelf Wind & Glacial Drift Web Audio Filter
   window.dfSynthesizeGlacialDrift = function(ctx){
     if(!ctx) return;
@@ -36825,46 +34720,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2208: Maxakali (mxl)
-  window.DF_I18N_LOCALES['mxl'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kuxap", navDecks:"Papeba", navStats:"Peh", navSettings:"Yen",
-    start:"Putux", pause:"Tikik", resume:"Putux Ha", reset:"Papeba Putux", minutes:"min",
-    cardFront:"Paha", cardBack:"Koyon", flipCard:"Puru", addCard:"Papeba Put",
-    deleteCard:"Pili", save:"Peh", cancel:"Tikik Ha", confirm:"E-e", close:"Chiro",
-    rateAgain:"Ha Putux", rateHard:"Tiri", rateGood:"Peh", rateEasy:"Weli"
-  });
-  // M2209: Krenak (kqq)
-  window.DF_I18N_LOCALES['kqq'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kren", navDecks:"Pape", navStats:"Nao", navSettings:"Kena",
-    start:"Borun", pause:"Poro", resume:"Borun Pa", reset:"Pape Borun", minutes:"min",
-    cardFront:"Kawa", cardBack:"Koyon", flipCard:"Piri", addCard:"Pape Bor",
-    deleteCard:"Pili", save:"Nao", cancel:"Poro Pa", confirm:"Ee", close:"Tuku",
-    rateAgain:"Pa Borun", rateHard:"Kati", rateGood:"Nao", rateEasy:"Mian"
-  });
-  // M2210: Xokleng (xok) & Milestone Release v23.5.0
-  window.DF_I18N_LOCALES['xok'] = Object.assign({}, baseTemplate, {
-    navFocus:"Laklano", navDecks:"Karta", navStats:"Shi", navSettings:"Shama",
-    start:"Tana", pause:"Kuma", resume:"Tana Sa", reset:"Karta Tana", minutes:"min",
-    cardFront:"Uka", cardBack:"Koyon", flipCard:"Pura", addCard:"Karta Tan",
-    deleteCard:"Pili", save:"Shi", cancel:"Kuma Sa", confirm:"I-i", close:"Tuki",
-    rateAgain:"Sa Tana", rateHard:"Tara", rateGood:"Shi", rateEasy:"Weli"
-  });
-  // M2211: Kaingang (kgp)
-  window.DF_I18N_LOCALES['kgp'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kanhrã", navDecks:"Pape", navStats:"Hãrene", navSettings:"Kãgran",
-    start:"Kuvy", pause:"Pỹ", resume:"Kuvy Hã", reset:"Pape Kuvy", minutes:"min",
-    cardFront:"Kuvỹ", cardBack:"Koyon", flipCard:"Puri", addCard:"Pape Kuv",
-    deleteCard:"Pili", save:"Hãrene", cancel:"Pỹ Hã", confirm:"E-e", close:"Chiro",
-    rateAgain:"Hã Kuvy", rateHard:"Tiri", rateGood:"Hãrene", rateEasy:"Weli"
-  });
-  // M2212: Ofaye (opy)
-  window.DF_I18N_LOCALES['opy'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ofa", navDecks:"Papeba", navStats:"Wahka", navSettings:"Ie",
-    start:"Tahe", pause:"Ito", resume:"Tahe Shi", reset:"Papeba Tahe", minutes:"min",
-    cardFront:"Ite", cardBack:"Koyon", flipCard:"Puru", addCard:"Papeba Tah",
-    deleteCard:"Pili", save:"Wahka", cancel:"Ito Shi", confirm:"A-a", close:"Tuku",
-    rateAgain:"Shi Tahe", rateHard:"Tiri", rateGood:"Wahka", rateEasy:"Mela"
-  });
-  // M2213: Automated Parity Linter for Macro-Je Isolates
+    // M2209: Krenak (kqq)
+    // M2210: Xokleng (xok) & Milestone Release v23.5.0
+    // M2211: Kaingang (kgp)
+    // M2212: Ofaye (opy)
+    // M2213: Automated Parity Linter for Macro-Je Isolates
   window.dfLintMacroJeIsolatesParity = function(){
     ['mxl','kqq','xok','kgp','opy','gta','fun','cax','gto'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -36874,12 +34734,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2214: Guato (gta) & Fulni-o (fun)
-  window.DF_I18N_LOCALES['gta'] = Object.assign({}, baseTemplate, { navFocus:"Kuxap", start:"Putux", pause:"Tikik", rateGood:"Peh" });
-  window.DF_I18N_LOCALES['fun'] = Object.assign({}, baseTemplate, { navFocus:"Yate", start:"Tana", pause:"Kuma", rateGood:"Shi" });
-  // M2215: Chiquitano (cax) & Guato isolate (gto)
-  window.DF_I18N_LOCALES['cax'] = Object.assign({}, baseTemplate, { navFocus:"Besiro", start:"Kuvy", pause:"Py", rateGood:"Harene" });
-  window.DF_I18N_LOCALES['gto'] = Object.assign({}, baseTemplate, { navFocus:"Ofa", start:"Tahe", pause:"Ito", rateGood:"Wahka" });
-  window.dfLintMacroJeIsolatesParity();
+      // M2215: Chiquitano (cax) & Guato isolate (gto)
+      window.dfLintMacroJeIsolatesParity();
   // M2216: Atlantic Rainforest Rustle & Cool Spring Web Audio Filter
   window.dfSynthesizeAtlanticRustle = function(ctx){
     if(!ctx) return;
@@ -36907,46 +34763,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2218: Embera-Chami (cmi)
-  window.DF_I18N_LOCALES['cmi'] = Object.assign({}, baseTemplate, {
-    navFocus:"Bed'ea", navDecks:"Kirisia", navStats:"Uburawa", navSettings:"Jaurade",
-    start:"Ode", pause:"Eped'e", resume:"Ode Ba", reset:"Jaurade Ode", minutes:"min",
-    cardFront:"Dua", cardBack:"Burua", flipCard:"Kiruade", addCard:"Kirisia Ode",
-    deleteCard:"Piriade", save:"Kirisia Ba", cancel:"Eped'e Ba", confirm:"Ode Tro", close:"Eped'e",
-    rateAgain:"Ode Waya", rateHard:"Poria", rateGood:"Bia", rateEasy:"Dede"
-  });
-  // M2219: Embera-Dobida (emb)
-  window.DF_I18N_LOCALES['emb'] = Object.assign({}, baseTemplate, {
-    navFocus:"Bedea", navDecks:"Kirisia", navStats:"Ubura", navSettings:"Jaura",
-    start:"Ode", pause:"Epede", resume:"Ode Ba", reset:"Jaura Ode", minutes:"min",
-    cardFront:"Dua", cardBack:"Burua", flipCard:"Kirua", addCard:"Kirisia Ode",
-    deleteCard:"Piria", save:"Kirisia", cancel:"Epede Ba", confirm:"Ode Tro", close:"Epede",
-    rateAgain:"Waya Ode", rateHard:"Poria", rateGood:"Bia", rateEasy:"Dede"
-  });
-  // M2220: Waunana (noa) & Milestone Release v23.6.0
-  window.DF_I18N_LOCALES['noa'] = Object.assign({}, baseTemplate, {
-    navFocus:"Nemur", navDecks:"Khaag", navStats:"Poro", navSettings:"Thum",
-    start:"Haum", pause:"Peeur", resume:"Haum De", reset:"Thum Haum", minutes:"min",
-    cardFront:"Daph", cardBack:"Khaag Poro", flipCard:"Khaagir", addCard:"Khaag Haum",
-    deleteCard:"Chumir", save:"Khaag Nem", cancel:"Peeur De", confirm:"Haum No", close:"Peeur",
-    rateAgain:"Haum Dee", rateHard:"Kharr", rateGood:"Hajum", rateEasy:"Phaar"
-  });
-  // M2221: Awa Pit (kwi)
-  window.DF_I18N_LOCALES['kwi'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kuz", navDecks:"Pipel", navStats:"Wat", navSettings:"Pashkuz",
-    start:"Kiz", pause:"Paykuz", resume:"Kiz Min", reset:"Pipel Kiz", minutes:"min",
-    cardFront:"Ilan", cardBack:"Koyon", flipCard:"Pilki", addCard:"Pipel Ki",
-    deleteCard:"Pizh", save:"Wat", cancel:"Paykuz Min", confirm:"Kiz Tay", close:"Paykuz",
-    rateAgain:"Min Kiz", rateHard:"Tish", rateGood:"Wat", rateEasy:"Pikuz"
-  });
-  // M2222: Guambiano (gum)
-  window.DF_I18N_LOCALES['gum'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pikwe", navDecks:"Pikwamik", navStats:"Meran", navSettings:"Asamik",
-    start:"Trikwan", pause:"Pishik", resume:"Trikwan Mo", reset:"Wanpishik", minutes:"min",
-    cardFront:"Nuik", cardBack:"Kulik", flipCard:"Shirikwan", addCard:"Pikwamik Trikwan",
-    deleteCard:"Chorik", save:"Pikwamik Wan", cancel:"Pishik Mo", confirm:"Trikwan To", close:"Pishik",
-    rateAgain:"Trikwan Ya", rateHard:"Kwasrik", rateGood:"Morik", rateEasy:"Lelik"
-  });
-  // M2223: Automated Parity Linter for Colombian Pacific Littoral
+    // M2219: Embera-Dobida (emb)
+    // M2220: Waunana (noa) & Milestone Release v23.6.0
+    // M2221: Awa Pit (kwi)
+    // M2222: Guambiano (gum)
+    // M2223: Automated Parity Linter for Colombian Pacific Littoral
   window.dfLintColombianPacificParity = function(){
     ['cmi','emb','noa','kwi','gum','ttk','coc','pbb','kbh'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -36956,12 +34777,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2224: Totoro (ttk) & Coconuco (coc)
-  window.DF_I18N_LOCALES['ttk'] = Object.assign({}, baseTemplate, { navFocus:"Pikwe", start:"Trikwan", pause:"Pishik", rateGood:"Morik" });
-  window.DF_I18N_LOCALES['coc'] = Object.assign({}, baseTemplate, { navFocus:"Pikwe", start:"Trikwan", pause:"Pishik", rateGood:"Morik" });
-  // M2225: Paez (pbb) & Camsa (kbh)
-  window.DF_I18N_LOCALES['pbb'] = Object.assign({}, baseTemplate, { navFocus:"Kwe'sx", start:"Pusxna", pause:"Kwe'na", rateGood:"Kwekwe" });
-  window.DF_I18N_LOCALES['kbh'] = Object.assign({}, baseTemplate, { navFocus:"Bedea", start:"Ode", pause:"Epede", rateGood:"Bia" });
-  window.dfLintColombianPacificParity();
+      // M2225: Paez (pbb) & Camsa (kbh)
+      window.dfLintColombianPacificParity();
   // M2226: Pacific Cloudforest Mist Web Audio Filter
   window.dfSynthesizeCloudforestMist = function(ctx){
     if(!ctx) return;
@@ -36989,46 +34806,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2188: Plains Cree (crk)
-  window.DF_I18N_LOCALES['crk'] = Object.assign({}, baseTemplate, {
-    navFocus:"Iteyimowin", navDecks:"Masinahikan", navStats:"Kiskeyihtamowin", navSettings:"Kwayaskwastawin",
-    start:"Macipayin", pause:"Nakisimowin", resume:"Macipayin Kihtwam", reset:"Masinahikan Maci", minutes:"min",
-    cardFront:"Nikan", cardBack:"Oskan", flipCard:"Kweskipayin", addCard:"Masinahikan Asici",
-    deleteCard:"Kasiha", save:"Miyosin", cancel:"Nakisimo Kihtwam", confirm:"Ehe", close:"Kipahikan",
-    rateAgain:"Kihtwam", rateHard:"Ayiman", rateGood:"Miyosin", rateEasy:"Wehtan"
-  });
-  // M2189: Ojibwe (ciw)
-  window.DF_I18N_LOCALES['ciw'] = Object.assign({}, baseTemplate, {
-    navFocus:"Inendang", navDecks:"Mazinahigan", navStats:"Gikendaasowin", navSettings:"Ozhichigan",
-    start:"Maajitaa", pause:"Nagaashkaa", resume:"Maajitaa Miinawaa", reset:"Mazinahigan Maaji", minutes:"min",
-    cardFront:"Niigaan", cardBack:"Ishkweyang", flipCard:"Gweki-bii'an", addCard:"Mazinahigan Dago",
-    deleteCard:"Gasiibii'an", save:"Minwaashin", cancel:"Nagaashkaa Miin", confirm:"Enh", close:"Giba'an",
-    rateAgain:"Miinawaa", rateHard:"Sanag", rateGood:"Minwaashin", rateEasy:"Wenipan"
-  });
-  // M2190: Innu (moe) & Milestone Release v23.3.0
-  window.DF_I18N_LOCALES['moe'] = Object.assign({}, baseTemplate, {
-    navFocus:"Mamu", navDecks:"Mashinaikan", navStats:"Chishtai", navSettings:"Ushiku",
-    start:"Matau", pause:"Nakai", resume:"Matau Minuat", reset:"Mashinaikan Matau", minutes:"min",
-    cardFront:"Nikan", cardBack:"Otak", flipCard:"Kuekipayu", addCard:"Mashinaikan Tshi",
-    deleteCard:"Kashinats", save:"Mino", cancel:"Nakai Minuat", confirm:"Ehe", close:"Tshipan",
-    rateAgain:"Minuat", rateHard:"Tshimuan", rateGood:"Mino", rateEasy:"Metu"
-  });
-  // M2191: Mi'kmaq (mic)
-  window.DF_I18N_LOCALES['mic'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ango'tmu'k", navDecks:"Wi'gatign", navStats:"Gelu'lg", navSettings:"Ili-tla'tege",
-    start:"Poqji'g", pause:"Nqa's", resume:"Poqji'g Ap", reset:"Wi'gatign Poqji", minutes:"min",
-    cardFront:"Nigan", cardBack:"Utqan", flipCard:"Kweskwa'si", addCard:"Wi'gatign Igtug",
-    deleteCard:"Gasi'g", save:"Gelu'lg", cancel:"Nqa's Ap", confirm:"E'e", close:"Kepjoqa'tege",
-    rateAgain:"Ap", rateHard:"Metugwa's", rateGood:"Gelu'lg", rateEasy:"Mno'qit"
-  });
-  // M2192: Passamaquoddy (mac)
-  window.DF_I18N_LOCALES['mac'] = Object.assign({}, baseTemplate, {
-    navFocus:"Litemuwakon", navDecks:"Wikhikon", navStats:"Woliwon", navSettings:"Neqiw",
-    start:"Mocikapo", pause:"Nokawi", resume:"Mocikapo Apc", reset:"Wikhikon Moci", minutes:"min",
-    cardFront:"Nikan", cardBack:"Oteh", flipCard:"Kwehkipo", addCard:"Wikhikon Pos",
-    deleteCard:"Kasiha", save:"Woli", cancel:"Nokawi Apc", confirm:"Aha", close:"Kipaham",
-    rateAgain:"Apc", rateHard:"Aloki", rateGood:"Woli", rateEasy:"Nolami"
-  });
-  // M2193: Automated Parity Linter for Algonquian Languages
+    // M2189: Ojibwe (ciw)
+    // M2190: Innu (moe) & Milestone Release v23.3.0
+    // M2191: Mi'kmaq (mic)
+    // M2192: Passamaquoddy (mac)
+    // M2193: Automated Parity Linter for Algonquian Languages
   window.dfLintAlgonquianParity = function(){
     ['crk','ciw','moe','mic','mac','pot','mez','sac','sjw'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -37038,12 +34820,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2194: Potawatomi (pot) & Menominee (mez)
-  window.DF_I18N_LOCALES['pot'] = Object.assign({}, baseTemplate, { navFocus:"Inendam", start:"Madjita", pause:"Naga", rateGood:"Mno" });
-  window.DF_I18N_LOCALES['mez'] = Object.assign({}, baseTemplate, { navFocus:"Eneqtam", start:"Mace", pause:"Naka", rateGood:"Wene" });
-  // M2195: Meskwaki (sac) & Shawnee (sjw)
-  window.DF_I18N_LOCALES['sac'] = Object.assign({}, baseTemplate, { navFocus:"Inenam", start:"Maci", pause:"Naki", rateGood:"Meno" });
-  window.DF_I18N_LOCALES['sjw'] = Object.assign({}, baseTemplate, { navFocus:"Inel", start:"Mata", pause:"Naka", rateGood:"Wela" });
-  window.dfLintAlgonquianParity();
+      // M2195: Meskwaki (sac) & Shawnee (sjw)
+      window.dfLintAlgonquianParity();
   // M2196: Boreal Birch Forest Breeze Web Audio Filter
   window.dfSynthesizeBorealBreeze = function(ctx){
     if(!ctx) return;
@@ -37071,46 +34849,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2228: Santali (sat)
-  window.DF_I18N_LOCALES['sat'] = Object.assign({}, baseTemplate, {
-    navFocus:"Uhar", navDecks:"Karta", navStats:"Hisab", navSettings:"Sajao",
-    start:"Ehop", pause:"Thuko", resume:"Aro Ehop", reset:"Ruar Ehop", minutes:"min",
-    cardFront:"Samang", cardBack:"Tayom", flipCard:"Paltao", addCard:"Karta Selled",
-    deleteCard:"Ged Giri", save:"Daho", cancel:"Bagi", confirm:"He", close:"Bondho",
-    rateAgain:"Aro", rateHard:"Muskil", rateGood:"Bes", rateEasy:"Alga"
-  });
-  // M2229: Mundari (unr)
-  window.DF_I18N_LOCALES['unr'] = Object.assign({}, baseTemplate, {
-    navFocus:"Uru", navDecks:"Karta", navStats:"Lekha", navSettings:"Bai",
-    start:"Eteb", pause:"Hapa", resume:"Ora Eteb", reset:"Ruar", minutes:"min",
-    cardFront:"Samang", cardBack:"Taiom", flipCard:"Ulat", addCard:"Karta Meso",
-    deleteCard:"Metaw", save:"Doh", cancel:"Bagi", confirm:"He", close:"Kulup",
-    rateAgain:"Ora", rateHard:"Kete", rateGood:"Bugin", rateEasy:"Alga"
-  });
-  // M2230: Ho (hoc) & Milestone Release v23.7.0
-  window.DF_I18N_LOCALES['hoc'] = Object.assign({}, baseTemplate, {
-    navFocus:"Uru", navDecks:"Karta", navStats:"Hisab", navSettings:"Sajao",
-    start:"Eteb", pause:"Tingu", resume:"Ora Eteb", reset:"Ruar", minutes:"min",
-    cardFront:"Samang", cardBack:"Taiom", flipCard:"Palati", addCard:"Karta Meso",
-    deleteCard:"Ged", save:"Doh", cancel:"Bagi", confirm:"He", close:"Kidi",
-    rateAgain:"Ora", rateHard:"Muskil", rateGood:"Bugin", rateEasy:"Alga"
-  });
-  // M2231: Korku (kfq)
-  window.DF_I18N_LOCALES['kfq'] = Object.assign({}, baseTemplate, {
-    navFocus:"Bichar", navDecks:"Karta", navStats:"Lekha", navSettings:"Bandobast",
-    start:"Chalu", pause:"Thora", resume:"Phiri Chalu", reset:"Ulta", minutes:"min",
-    cardFront:"Samne", cardBack:"Pachhe", flipCard:"Palat", addCard:"Karta Jod",
-    deleteCard:"Hataw", save:"Rakh", cancel:"Chhod", confirm:"Hoi", close:"Band",
-    rateAgain:"Phiri", rateHard:"Khadak", rateGood:"Theek", rateEasy:"Sidha"
-  });
-  // M2232: Kharia (khr)
-  window.DF_I18N_LOCALES['khr'] = Object.assign({}, baseTemplate, {
-    navFocus:"Uru", navDecks:"Karta", navStats:"Hisab", navSettings:"Sajao",
-    start:"Eteb", pause:"Hapa", resume:"Aro Eteb", reset:"Ruar", minutes:"min",
-    cardFront:"Samang", cardBack:"Tayom", flipCard:"Palta", addCard:"Karta Meso",
-    deleteCard:"Metaw", save:"Doh", cancel:"Bagi", confirm:"He", close:"Kulup",
-    rateAgain:"Aro", rateHard:"Muskil", rateGood:"Bugin", rateEasy:"Alga"
-  });
-  // M2233: Automated Parity Linter for Munda Languages
+    // M2229: Mundari (unr)
+    // M2230: Ho (hoc) & Milestone Release v23.7.0
+    // M2231: Korku (kfq)
+    // M2232: Kharia (khr)
+    // M2233: Automated Parity Linter for Munda Languages
   window.dfLintMundaParity = function(){
     ['sat','unr','hoc','kfq','khr','jun','srb','pcj','bfw'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -37120,12 +34863,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2234: Juang (jun) & Sora (srb)
-  window.DF_I18N_LOCALES['jun'] = Object.assign({}, baseTemplate, { navFocus:"Uru", start:"Eteb", pause:"Hapa", rateGood:"Bugin" });
-  window.DF_I18N_LOCALES['srb'] = Object.assign({}, baseTemplate, { navFocus:"Bichar", start:"Ehop", pause:"Thuko", rateGood:"Bes" });
-  // M2235: Gorum (pcj) & Bonda (bfw)
-  window.DF_I18N_LOCALES['pcj'] = Object.assign({}, baseTemplate, { navFocus:"Uru", start:"Chalu", pause:"Thora", rateGood:"Theek" });
-  window.DF_I18N_LOCALES['bfw'] = Object.assign({}, baseTemplate, { navFocus:"Uru", start:"Eteb", pause:"Tingu", rateGood:"Bugin" });
-  window.dfLintMundaParity();
+      // M2235: Gorum (pcj) & Bonda (bfw)
+      window.dfLintMundaParity();
   // M2236: Chota Nagpur Sal Forest Rain Web Audio Filter
   window.dfSynthesizeSalForestRain = function(ctx){
     if(!ctx) return;
@@ -37153,46 +34892,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2238: Kashmiri (kas)
-  window.DF_I18N_LOCALES['kas'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tawajah", navDecks:"Karda", navStats:"Shumaar", navSettings:"Intezam",
-    start:"Shuru", pause:"Rukith", resume:"Dobara Shuru", reset:"Wapas", minutes:"min",
-    cardFront:"Broonh", cardBack:"Pathe", flipCard:"Phairun", addCard:"Kard Trath",
-    deleteCard:"Mitaawun", save:"Mehfooz", cancel:"Mansookh", confirm:"Aa", close:"Band",
-    rateAgain:"Phiri", rateHard:"Mushkil", rateGood:"Jaan", rateEasy:"Sahl"
-  });
-  // M2239: Shina (scl)
-  window.DF_I18N_LOCALES['scl'] = Object.assign({}, baseTemplate, {
-    navFocus:"Dhyan", navDecks:"Karda", navStats:"Lekha", navSettings:"Tarteeb",
-    start:"Shuru", pause:"Thari", resume:"Walo Shuru", reset:"Kutto", minutes:"min",
-    cardFront:"Mutho", cardBack:"Pacho", flipCard:"Palte", addCard:"Kard Melao",
-    deleteCard:"Mete", save:"Rake", cancel:"Chho", confirm:"Ho", close:"Band",
-    rateAgain:"Walo", rateHard:"Khatam", rateGood:"Shukur", rateEasy:"Asan"
-  });
-  // M2240: Khowar (khw) & Milestone Release v23.8.0
-  window.DF_I18N_LOCALES['khw'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fikr", navDecks:"Pate", navStats:"Shumar", navSettings:"Bandobast",
-    start:"Pra", pause:"Losh", resume:"Phiri Pra", reset:"Phiri", minutes:"min",
-    cardFront:"Posh", cardBack:"Pacho", flipCard:"Weli", addCard:"Pate Jod",
-    deleteCard:"Khas", save:"Tah", cancel:"Chhod", confirm:"Ha", close:"Band",
-    rateAgain:"Phiri", rateHard:"Sakht", rateGood:"Jam", rateEasy:"Asan"
-  });
-  // M2241: Indus Kohistani (mvy)
-  window.DF_I18N_LOCALES['mvy'] = Object.assign({}, baseTemplate, {
-    navFocus:"Khiyal", navDecks:"Karta", navStats:"Lekha", navSettings:"Intizam",
-    start:"Shuru", pause:"Tho", resume:"Walo Shuru", reset:"Walo", minutes:"min",
-    cardFront:"Agya", cardBack:"Picho", flipCard:"Palat", addCard:"Karta Mila",
-    deleteCard:"Mita", save:"Rakh", cancel:"Chhod", confirm:"Ho", close:"Band",
-    rateAgain:"Walo", rateHard:"Garan", rateGood:"Kha", rateEasy:"Asan"
-  });
-  // M2242: Pashayi (psh)
-  window.DF_I18N_LOCALES['psh'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fikr", navDecks:"Karta", navStats:"Shumar", navSettings:"Saz",
-    start:"Shuru", pause:"Dast", resume:"Walo Shuru", reset:"Walo", minutes:"min",
-    cardFront:"Pesh", cardBack:"Pas", flipCard:"Weli", addCard:"Karta Mila",
-    deleteCard:"Wad", save:"Jam", cancel:"Chhod", confirm:"Ha", close:"Band",
-    rateAgain:"Walo", rateHard:"Sakht", rateGood:"Kha", rateEasy:"Asan"
-  });
-  // M2243: Automated Parity Linter for Dardic Languages
+    // M2239: Shina (scl)
+    // M2240: Khowar (khw) & Milestone Release v23.8.0
+    // M2241: Indus Kohistani (mvy)
+    // M2242: Pashayi (psh)
+    // M2243: Automated Parity Linter for Dardic Languages
   window.dfLintDardicNuristaniParity = function(){
     ['kas','scl','khw','mvy','psh','kls','dml','gwt','bsh'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -37202,12 +34906,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2244: Kalasha (kls) & Dameli (dml)
-  window.DF_I18N_LOCALES['kls'] = Object.assign({}, baseTemplate, { navFocus:"Khiyal", start:"Pra", pause:"Losh", rateGood:"Jam" });
-  window.DF_I18N_LOCALES['dml'] = Object.assign({}, baseTemplate, { navFocus:"Dhyan", start:"Shuru", pause:"Thari", rateGood:"Shukur" });
-  // M2245: Gawar-Bati (gwt) & Kamviri (bsh)
-  window.DF_I18N_LOCALES['gwt'] = Object.assign({}, baseTemplate, { navFocus:"Fikr", start:"Shuru", pause:"Dast", rateGood:"Kha" });
-  window.DF_I18N_LOCALES['bsh'] = Object.assign({}, baseTemplate, { navFocus:"Tawajah", start:"Shuru", pause:"Rukith", rateGood:"Jaan" });
-  window.dfLintDardicNuristaniParity();
+      // M2245: Gawar-Bati (gwt) & Kamviri (bsh)
+      window.dfLintDardicNuristaniParity();
   // M2246: Hindu Kush Glacial Torrent Web Audio Filter
   window.dfSynthesizeHinduKushTorrent = function(ctx){
     if(!ctx) return;
@@ -37235,46 +34935,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2248: Meyah (mej)
-  window.DF_I18N_LOCALES['mej'] = Object.assign({}, baseTemplate, {
-    navFocus:"Oti", navDecks:"Pepa", navStats:"Ruta", navSettings:"Mof",
-    start:"Ang", pause:"Miji", resume:"Ang Gona", reset:"Pepa Ang", minutes:"min",
-    cardFront:"Maha", cardBack:"Koyon", flipCard:"Weli", addCard:"Pepa Ang",
-    deleteCard:"Pili", save:"Mof", cancel:"Miji Gona", confirm:"E-e", close:"Tuku",
-    rateAgain:"Gona", rateHard:"Tiri", rateGood:"Mof", rateEasy:"Weli"
-  });
-  // M2249: Hatam (had)
-  window.DF_I18N_LOCALES['had'] = Object.assign({}, baseTemplate, {
-    navFocus:"Nyem", navDecks:"Pepa", navStats:"Tigip", navSettings:"Kugye",
-    start:"Ang", pause:"Kip", resume:"Ang Gom", reset:"Pepa Ang", minutes:"min",
-    cardFront:"Beno", cardBack:"Koyon", flipCard:"Puru", addCard:"Pepa Ang",
-    deleteCard:"Pili", save:"Kugye", cancel:"Kip Gom", confirm:"I-i", close:"Tuku",
-    rateAgain:"Gom", rateHard:"Tari", rateGood:"Kugye", rateEasy:"Mela"
-  });
-  // M2250: Sougb (mnx) & Milestone Release v23.9.0
-  window.DF_I18N_LOCALES['mnx'] = Object.assign({}, baseTemplate, {
-    navFocus:"Iba", navDecks:"Karta", navStats:"Mof", navSettings:"Naro",
-    start:"Ang", pause:"Ito", resume:"Ang Sa", reset:"Karta Ang", minutes:"min",
-    cardFront:"Doba", cardBack:"Koyon", flipCard:"Piwa", addCard:"Karta Ang",
-    deleteCard:"Pili", save:"Mof", cancel:"Ito Sa", confirm:"I-i", close:"Tuku",
-    rateAgain:"Sa", rateHard:"Tiri", rateGood:"Mof", rateEasy:"Mimi"
-  });
-  // M2251: Tehit (kps)
-  window.DF_I18N_LOCALES['kps'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kop", navDecks:"Pape", navStats:"Katu", navSettings:"Gong",
-    start:"Toh", pause:"Do", resume:"Toh Boih", reset:"Pape Toh", minutes:"min",
-    cardFront:"Doba", cardBack:"Koyon", flipCard:"Puru", addCard:"Pape Toh",
-    deleteCard:"Pili", save:"Katu", cancel:"Do Boih", confirm:"Ehe", close:"Tuku",
-    rateAgain:"Boih", rateHard:"Khaik", rateGood:"Katu", rateEasy:"Zol"
-  });
-  // M2252: Moi (mxn)
-  window.DF_I18N_LOCALES['mxn'] = Object.assign({}, baseTemplate, {
-    navFocus:"Moi", navDecks:"Papera", navStats:"Nena", navSettings:"Taba",
-    start:"Tee", pause:"Mee", resume:"Tee Ha", reset:"Papera Tee", minutes:"min",
-    cardFront:"Taba", cardBack:"Koyon", flipCard:"Pura", addCard:"Papera Te",
-    deleteCard:"Siri", save:"Nena", cancel:"Mee Ha", confirm:"I-i", close:"Mee",
-    rateAgain:"Ha", rateHard:"Kana", rateGood:"Nena", rateEasy:"Lehe"
-  });
-  // M2253: Automated Parity Linter for Bird's Head Languages
+    // M2249: Hatam (had)
+    // M2250: Sougb (mnx) & Milestone Release v23.9.0
+    // M2251: Tehit (kps)
+    // M2252: Moi (mxn)
+    // M2253: Automated Parity Linter for Bird's Head Languages
   window.dfLintBirdsHeadParity = function(){
     ['mej','had','mnx','kps','mxn','kgr','ayz','akc','yva'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -37284,12 +34949,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2254: Abun (kgr) & Maybrat (ayz)
-  window.DF_I18N_LOCALES['kgr'] = Object.assign({}, baseTemplate, { navFocus:"Oti", start:"Ang", pause:"Miji", rateGood:"Mof" });
-  window.DF_I18N_LOCALES['ayz'] = Object.assign({}, baseTemplate, { navFocus:"Nyem", start:"Ang", pause:"Kip", rateGood:"Kugye" });
-  // M2255: Mpur (akc) & Yawa (yva)
-  window.DF_I18N_LOCALES['akc'] = Object.assign({}, baseTemplate, { navFocus:"Iba", start:"Ang", pause:"Ito", rateGood:"Mof" });
-  window.DF_I18N_LOCALES['yva'] = Object.assign({}, baseTemplate, { navFocus:"Kop", start:"Toh", pause:"Do", rateGood:"Katu" });
-  window.dfLintBirdsHeadParity();
+      // M2255: Mpur (akc) & Yawa (yva)
+      window.dfLintBirdsHeadParity();
   // M2256: Arfak Mountain Mist & Rainforest Birds Web Audio Filter
   window.dfSynthesizeArfakMist = function(ctx){
     if(!ctx) return;
@@ -37317,46 +34978,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2258: Huli (hui)
-  window.DF_I18N_LOCALES['hui'] = Object.assign({}, baseTemplate, {
-    navFocus:"Homiya", navDecks:"Buku", navStats:"Bole", navSettings:"Tegu",
-    start:"Hali", pause:"Wali", resume:"Hali Me", reset:"Buku Hali", minutes:"min",
-    cardFront:"Mba", cardBack:"Koyon", flipCard:"Keli", addCard:"Buku Hali",
-    deleteCard:"Pili", save:"Bole", cancel:"Wali Me", confirm:"Hali No", close:"Wali",
-    rateAgain:"Me Hali", rateHard:"Taki", rateGood:"Bole", rateEasy:"Welu"
-  });
-  // M2259: Enga (enq)
-  window.DF_I18N_LOCALES['enq'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kone", navDecks:"Pepaa", navStats:"Epe", navSettings:"Mana",
-    start:"Pii", pause:"Kama", resume:"Pii De", reset:"Pepaa Pii", minutes:"min",
-    cardFront:"Wani", cardBack:"Koyon", flipCard:"Lili", addCard:"Pepaa Pii",
-    deleteCard:"Pili", save:"Epe", cancel:"Kama De", confirm:"I-i", close:"Tuku",
-    rateAgain:"De Pii", rateHard:"Kundi", rateGood:"Epe", rateEasy:"Mela"
-  });
-  // M2260: Melpa (med) & Grand Golden Master v24.0.0
-  window.DF_I18N_LOCALES['med'] = Object.assign({}, baseTemplate, {
-    navFocus:"Noman", navDecks:"Pepa", navStats:"Kaep", navSettings:"Miti",
-    start:"Etp", pause:"Mili", resume:"Etp Pe", reset:"Pepa Etp", minutes:"min",
-    cardFront:"Mba", cardBack:"Koyon", flipCard:"Puru", addCard:"Pepa Etp",
-    deleteCard:"Pili", save:"Kaep", cancel:"Mili Pe", confirm:"Aa", close:"Tuku",
-    rateAgain:"Pe Etp", rateHard:"Keta", rateGood:"Kaep", rateEasy:"Mimi"
-  });
-  // M2261: Kuman / Chimbu (kue)
-  window.DF_I18N_LOCALES['kue'] = Object.assign({}, baseTemplate, {
-    navFocus:"Nomano", navDecks:"Gawa", navStats:"Wala", navSettings:"Peli",
-    start:"Meli", pause:"Kwele", resume:"Meli Ba", reset:"Gawa Meli", minutes:"min",
-    cardFront:"Daba", cardBack:"Koyon", flipCard:"Plaka", addCard:"Gawa Mel",
-    deleteCard:"Kisa", save:"Wala", cancel:"Kwele Ba", confirm:"Meli Ka", close:"Kwele",
-    rateAgain:"Ba Meli", rateHard:"Diki", rateGood:"Wala", rateEasy:"Miap"
-  });
-  // M2262: Wiru (wiu)
-  window.DF_I18N_LOCALES['wiu'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kayan", navDecks:"Kawa", navStats:"Mampi", navSettings:"Yaki",
-    start:"Tawi", pause:"Kani", resume:"Tawi Na", reset:"Kawa Tawi", minutes:"min",
-    cardFront:"Tambi", cardBack:"Koyon", flipCard:"Pula", addCard:"Kawa Taw",
-    deleteCard:"Pula", save:"Mampi", cancel:"Kani Na", confirm:"Tawi Re", close:"Kani",
-    rateAgain:"Na Tawi", rateHard:"Kapa", rateGood:"Mampi", rateEasy:"Yawi"
-  });
-  // M2263: Automated Parity Linter for Papua Highlands
+    // M2259: Enga (enq)
+    // M2260: Melpa (med) & Grand Golden Master v24.0.0
+    // M2261: Kuman / Chimbu (kue)
+    // M2262: Wiru (wiu)
+    // M2263: Automated Parity Linter for Papua Highlands
   window.dfLintPapuaHighlandsParity = function(){
     ['hui','enq','med','kue','wiu','faa','foi','pnl','ipi'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -37366,12 +34992,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2264: Fasu (faa) & Foi (foi)
-  window.DF_I18N_LOCALES['faa'] = Object.assign({}, baseTemplate, { navFocus:"Homiya", start:"Hali", pause:"Wali", rateGood:"Bole" });
-  window.DF_I18N_LOCALES['foi'] = Object.assign({}, baseTemplate, { navFocus:"Kone", start:"Pii", pause:"Kama", rateGood:"Epe" });
-  // M2265: Paiela (pnl) & Ipili (ipi)
-  window.DF_I18N_LOCALES['pnl'] = Object.assign({}, baseTemplate, { navFocus:"Noman", start:"Etp", pause:"Mili", rateGood:"Kaep" });
-  window.DF_I18N_LOCALES['ipi'] = Object.assign({}, baseTemplate, { navFocus:"Nomano", start:"Meli", pause:"Kwele", rateGood:"Wala" });
-  window.dfLintPapuaHighlandsParity();
+      // M2265: Paiela (pnl) & Ipili (ipi)
+      window.dfLintPapuaHighlandsParity();
   // M2266: Mount Wilhelm Alpine Winds Web Audio Filter
   window.dfSynthesizeWilhelmWinds = function(ctx){
     if(!ctx) return;
@@ -37401,46 +35023,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2268: White Hmong (mww)
-  window.DF_I18N_LOCALES['mww'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tsom Xam", navDecks:"Ntawv", navStats:"Txheej Txheem", navSettings:"Kev Teeb Tsa",
-    start:"Pib", pause:"Nres", resume:"Pib Dua", reset:"Pib Tag Nrho", minutes:"min",
-    cardFront:"Tshav", cardBack:"Nram Qab", flipCard:"Rhais", addCard:"Ntxiv Ntawv",
-    deleteCard:"Rho Tawm", save:"Khaws", cancel:"Tso Tseg", confirm:"Yog", close:"Kaw",
-    rateAgain:"Dua", rateHard:"Nyuaj", rateGood:"Zoo", rateEasy:"Yooj Yim"
-  });
-  // M2269: Green Hmong (hnj)
-  window.DF_I18N_LOCALES['hnj'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tsom Xam", navDecks:"Tawv", navStats:"Txheej", navSettings:"Kev Teeb",
-    start:"Pib", pause:"Nres", resume:"Pib Qub", reset:"Pib Tas", minutes:"min",
-    cardFront:"Tshav", cardBack:"Nram", flipCard:"Rhais", addCard:"Ntxiv Tawv",
-    deleteCard:"Rho", save:"Khaws", cancel:"Tso", confirm:"Yog", close:"Kaw",
-    rateAgain:"Qub", rateHard:"Nyaj", rateGood:"Zla", rateEasy:"Yooj"
-  });
-  // M2270: Iu Mien (ium) & Milestone Release v24.1.0
-  window.DF_I18N_LOCALES['ium'] = Object.assign({}, baseTemplate, {
-    navFocus:"Jangx", navDecks:"Sou", navStats:"Zunh", navSettings:"An Za'eic",
-    start:"Tog", pause:"Dingx", resume:"Tog A'hneiv", reset:"Sou Tog", minutes:"min",
-    cardFront:"Gorn", cardBack:"Ga'nding", flipCard:"Pinx", addCard:"Tiavt Sou",
-    deleteCard:"Korn", save:"Toh", cancel:"Tsatc", confirm:"Meih", close:"Guqv",
-    rateAgain:"A'hneiv", rateHard:"Qaqv", rateGood:"Longx", rateEasy:"Hungh"
-  });
-  // M2271: Shan (shn)
-  window.DF_I18N_LOCALES['shn'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tsu Jai", navDecks:"Likh", navStats:"Khang", navSettings:"Pang",
-    start:"Kha", pause:"Yut", resume:"Kha Mai", reset:"Likh Kha", minutes:"min",
-    cardFront:"Nah", cardBack:"Lang", flipCard:"Plien", addCard:"Thêm Likh",
-    deleteCard:"Mhot", save:"Them", cancel:"Khot", confirm:"Tsae", close:"Pik",
-    rateAgain:"Mai", rateHard:"Yapk", rateGood:"Huk", rateEasy:"Ngai"
-  });
-  // M2272: Zhuang (zha)
-  window.DF_I18N_LOCALES['zha'] = Object.assign({}, baseTemplate, {
-    navFocus:"Cunjsim", navDecks:"Sw", navStats:"Dungjgi", navSettings:"Huzdingj",
-    start:"Haih", pause:"Dingh", resume:"Haih Coux", reset:"Sw Haih", minutes:"min",
-    cardFront:"Haj", cardBack:"Laeng", flipCard:"Fanx", addCard:"Gyaddaeuz Sw",
-    deleteCard:"Cwzsik", save:"Guhceij", cancel:"Haejbaet", confirm:"Ae", close:"Hap",
-    rateAgain:"Coux", rateHard:"Naek", rateGood:"Ndei", rateEasy:"Faex"
-  });
-  // M2273: Automated Parity Linter for Hmong-Mien & Kra-Dai
+    // M2269: Green Hmong (hnj)
+    // M2270: Iu Mien (ium) & Milestone Release v24.1.0
+    // M2271: Shan (shn)
+    // M2272: Zhuang (zha)
+    // M2273: Automated Parity Linter for Hmong-Mien & Kra-Dai
   window.dfLintHmongMienKraDaiParity = function(){
     ['mww','hnj','ium','shn','zha','pcc','kmc','blt','lic'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -37450,12 +35037,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2274: Bouyei (pcc) & Dong (kmc)
-  window.DF_I18N_LOCALES['pcc'] = Object.assign({}, baseTemplate, { navFocus:"Cunjsim", start:"Haih", pause:"Dingh", rateGood:"Ndei" });
-  window.DF_I18N_LOCALES['kmc'] = Object.assign({}, baseTemplate, { navFocus:"Tsom", start:"Pib", pause:"Nres", rateGood:"Longx" });
-  // M2275: Tai Dam (blt) & Hlai (lic)
-  window.DF_I18N_LOCALES['blt'] = Object.assign({}, baseTemplate, { navFocus:"Tsu Jai", start:"Kha", pause:"Yut", rateGood:"Huk" });
-  window.DF_I18N_LOCALES['lic'] = Object.assign({}, baseTemplate, { navFocus:"Jangx", start:"Tog", pause:"Dingx", rateGood:"Ndei" });
-  window.dfLintHmongMienKraDaiParity();
+      // M2275: Tai Dam (blt) & Hlai (lic)
+      window.dfLintHmongMienKraDaiParity();
   // M2276: Karst Mountain Mist & Bamboo Droplets Web Audio Filter
   window.dfSynthesizeKarstMist = function(ctx){
     if(!ctx) return;
@@ -37483,46 +35066,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2278: Gondi (ggo)
-  window.DF_I18N_LOCALES['ggo'] = Object.assign({}, baseTemplate, {
-    navFocus:"Dhyan", navDecks:"Karta", navStats:"Lekha", navSettings:"Tarteeb",
-    start:"Suru", pause:"Nillu", resume:"Pheri Suru", reset:"Malla", minutes:"min",
-    cardFront:"Munnur", cardBack:"Pachir", flipCard:"Palti", addCard:"Karta Kalpa",
-    deleteCard:"Metka", save:"Taha", cancel:"Badi", confirm:"Hoi", close:"Band",
-    rateAgain:"Pheri", rateHard:"Ghat", rateGood:"Bes", rateEasy:"Sorko"
-  });
-  // M2279: Kurukh (kru)
-  window.DF_I18N_LOCALES['kru'] = Object.assign({}, baseTemplate, {
-    navFocus:"Uru", navDecks:"Karta", navStats:"Hisab", navSettings:"Sajao",
-    start:"Eteb", pause:"Hapa", resume:"Aro Eteb", reset:"Ruar", minutes:"min",
-    cardFront:"Samang", cardBack:"Tayom", flipCard:"Palta", addCard:"Karta Meso",
-    deleteCard:"Metaw", save:"Doh", cancel:"Bagi", confirm:"He", close:"Kulup",
-    rateAgain:"Aro", rateHard:"Kete", rateGood:"Bugin", rateEasy:"Alga"
-  });
-  // M2280: Kui (kxu) & Milestone Release v24.2.0
-  window.DF_I18N_LOCALES['kxu'] = Object.assign({}, baseTemplate, {
-    navFocus:"Mane", navDecks:"Pate", navStats:"Lekha", navSettings:"Boko",
-    start:"Tispa", pause:"Nili", resume:"Malla Tispa", reset:"Malla", minutes:"min",
-    cardFront:"Tinji", cardBack:"Pachhe", flipCard:"Keli", addCard:"Pate Jod",
-    deleteCard:"Pili", save:"Taha", cancel:"Chhod", confirm:"Hoi", close:"Band",
-    rateAgain:"Malla", rateHard:"Ghat", rateGood:"Negi", rateEasy:"Alga"
-  });
-  // M2281: Kuvi (kxv)
-  window.DF_I18N_LOCALES['kxv'] = Object.assign({}, baseTemplate, {
-    navFocus:"Mane", navDecks:"Karta", navStats:"Lekha", navSettings:"Bandobast",
-    start:"Tispa", pause:"Nili", resume:"Pheri Tispa", reset:"Pheri", minutes:"min",
-    cardFront:"Tinji", cardBack:"Pachhe", flipCard:"Puru", addCard:"Karta Jod",
-    deleteCard:"Pili", save:"Taha", cancel:"Chhod", confirm:"Ha", close:"Band",
-    rateAgain:"Pheri", rateHard:"Ghat", rateGood:"Negi", rateEasy:"Asan"
-  });
-  // M2282: Tulu (tcy)
-  window.DF_I18N_LOCALES['tcy'] = Object.assign({}, baseTemplate, {
-    navFocus:"Gamana", navDecks:"Kard", navStats:"Lekka", navSettings:"Kramo",
-    start:"Suru", pause:"Untu", resume:"Pira Suru", reset:"Pira", minutes:"min",
-    cardFront:"Mumba", cardBack:"Pira", flipCard:"Palti", addCard:"Kard Sertle",
-    deleteCard:"Deettule", save:"Ditle", cancel:"Boda", confirm:"Andu", close:"Muchle",
-    rateAgain:"Kudora", rateHard:"Kasta", rateGood:"Edde", rateEasy:"Sulabha"
-  });
-  // M2283: Automated Parity Linter for Central Dravidian Languages
+    // M2279: Kurukh (kru)
+    // M2280: Kui (kxu) & Milestone Release v24.2.0
+    // M2281: Kuvi (kxv)
+    // M2282: Tulu (tcy)
+    // M2283: Automated Parity Linter for Central Dravidian Languages
   window.dfLintCentralDravidianParity = function(){
     ['ggo','kru','kxu','kxv','tcy','mjt','kff','kfb','tcx'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -37532,12 +35080,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2284: Malto (mjt) & Koya (kff)
-  window.DF_I18N_LOCALES['mjt'] = Object.assign({}, baseTemplate, { navFocus:"Dhyan", start:"Suru", pause:"Nillu", rateGood:"Bes" });
-  window.DF_I18N_LOCALES['kff'] = Object.assign({}, baseTemplate, { navFocus:"Uru", start:"Tispa", pause:"Nili", rateGood:"Negi" });
-  // M2285: Kolami (kfb) & Toda (tcx)
-  window.DF_I18N_LOCALES['kfb'] = Object.assign({}, baseTemplate, { navFocus:"Mane", start:"Tispa", pause:"Hapa", rateGood:"Bugin" });
-  window.DF_I18N_LOCALES['tcx'] = Object.assign({}, baseTemplate, { navFocus:"Gamana", start:"Suru", pause:"Untu", rateGood:"Edde" });
-  window.dfLintCentralDravidianParity();
+      // M2285: Kolami (kfb) & Toda (tcx)
+      window.dfLintCentralDravidianParity();
   // M2286: Nilgiri Hills Shola Forest Breeze Web Audio Filter
   window.dfSynthesizeSholaBreeze = function(ctx){
     if(!ctx) return;
@@ -37565,46 +35109,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2288: Sidamo (sid)
-  window.DF_I18N_LOCALES['sid'] = Object.assign({}, baseTemplate, {
-    navFocus:"Hedo", navDecks:"Maxaafa", navStats:"Kiido", navSettings:"Biddi",
-    start:"Hanafi", pause:"Uuri", resume:"Hanafi Galte", reset:"Maxaafa Hanafi", minutes:"min",
-    cardFront:"Alba", cardBack:"Badde", flipCard:"Goocho", addCard:"Ledi Maxaafa",
-    deleteCard:"Huni", save:"Woxi", cancel:"Uuri Galte", confirm:"Ee", close:"Cufi",
-    rateAgain:"Galte", rateHard:"Kabu", rateGood:"Dancha", rateEasy:"Shoolo"
-  });
-  // M2289: Afar (aa)
-  window.DF_I18N_LOCALES['aa'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kas", navDecks:"Kitaab", navStats:"Tinto", navSettings:"Mablo",
-    start:"Qimbis", pause:"Sol", resume:"Qimbis Qellat", reset:"Kitaab Qimbis", minutes:"min",
-    cardFront:"Fooca", cardBack:"Sarba", flipCard:"Kori", addCard:"Kitaab Oyti",
-    deleteCard:"Bays", save:"Dacris", cancel:"Sol Qellat", confirm:"Yeey", close:"Alif",
-    rateAgain:"Qellat", rateHard:"Cisbi", rateGood:"Meqe", rateEasy:"Salphi"
-  });
-  // M2290: Saho (ssy) & Milestone Release v24.3.0
-  window.DF_I18N_LOCALES['ssy'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kasa", navDecks:"Kitaab", navStats:"Xinto", navSettings:"Mablo",
-    start:"Qimbis", pause:"Sol", resume:"Qimbis Qellat", reset:"Kitaab Qimbis", minutes:"min",
-    cardFront:"Fooca", cardBack:"Sarba", flipCard:"Kori", addCard:"Kitaab Oyti",
-    deleteCard:"Bays", save:"Dacris", cancel:"Sol Qellat", confirm:"Yeey", close:"Alif",
-    rateAgain:"Qellat", rateHard:"Cisbi", rateGood:"Meqe", rateEasy:"Salphi"
-  });
-  // M2291: West Central Oromo (gaz)
-  window.DF_I18N_LOCALES['gaz'] = Object.assign({}, baseTemplate, {
-    navFocus:"Xiyyeeffannoo", navDecks:"Kaardii", navStats:"Istaatistiksii", navSettings:"Qindaa'ina",
-    start:"Jalqabi", pause:"Aadhu", resume:"Itti Fufi", reset:"Deebisi", minutes:"min",
-    cardFront:"Fuuldura", cardBack:"Dugda", flipCard:"Garagali", addCard:"Kaardii Dabali",
-    deleteCard:"Haqi", save:"Olkaa'i", cancel:"Dhiisi", confirm:"Eeyyee", close:"Cufi",
-    rateAgain:"Ammas", rateHard:"Ulfaataa", rateGood:"Gaarii", rateEasy:"Salphaa"
-  });
-  // M2292: Borana Oromo (gax)
-  window.DF_I18N_LOCALES['gax'] = Object.assign({}, baseTemplate, {
-    navFocus:"Xiyyeeffanna", navDecks:"Kaarda", navStats:"Herrega", navSettings:"Mijaawa",
-    start:"Jalqabi", pause:"Dhaabi", resume:"Itti Fufi", reset:"Deebisi", minutes:"min",
-    cardFront:"Fuula", cardBack:"Dugda", flipCard:"Garagalchi", addCard:"Kaarda Dabali",
-    deleteCard:"Haqi", save:"Kaa'i", cancel:"Dhiisi", confirm:"Ee", close:"Cufi",
-    rateAgain:"Ammas", rateHard:"Jabaa", rateGood:"Dansaa", rateEasy:"Salpha"
-  });
-  // M2293: Automated Parity Linter for Horn of Africa Cushitic
+    // M2289: Afar (aa)
+    // M2290: Saho (ssy) & Milestone Release v24.3.0
+    // M2291: West Central Oromo (gaz)
+    // M2292: Borana Oromo (gax)
+    // M2293: Automated Parity Linter for Horn of Africa Cushitic
   window.dfLintHornCushiticParity = function(){
     ['sid','aa','ssy','gaz','gax','bob','rel','arv','dsh'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -37614,12 +35123,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2294: Boni (bob) & Rendille (rel)
-  window.DF_I18N_LOCALES['bob'] = Object.assign({}, baseTemplate, { navFocus:"Hedo", start:"Hanafi", pause:"Uuri", rateGood:"Dancha" });
-  window.DF_I18N_LOCALES['rel'] = Object.assign({}, baseTemplate, { navFocus:"Kas", start:"Qimbis", pause:"Sol", rateGood:"Meqe" });
-  // M2295: Arbore (arv) & Dassanach (dsh)
-  window.DF_I18N_LOCALES['arv'] = Object.assign({}, baseTemplate, { navFocus:"Xiyyeeffannoo", start:"Jalqabi", pause:"Aadhu", rateGood:"Gaarii" });
-  window.DF_I18N_LOCALES['dsh'] = Object.assign({}, baseTemplate, { navFocus:"Xiyyeeffanna", start:"Jalqabi", pause:"Dhaabi", rateGood:"Dansaa" });
-  window.dfLintHornCushiticParity();
+      // M2295: Arbore (arv) & Dassanach (dsh)
+      window.dfLintHornCushiticParity();
   // M2296: Rift Valley Acacia Savannah Wind Web Audio Filter
   window.dfSynthesizeRiftWind = function(ctx){
     if(!ctx) return;
@@ -37647,46 +35152,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2298: Mumuye (mzm)
-  window.DF_I18N_LOCALES['mzm'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yiti", navDecks:"Gba", navStats:"Lasi", navSettings:"Boko",
-    start:"Tana", pause:"Doko", resume:"Tana Ba", reset:"Gba Tana", minutes:"min",
-    cardFront:"Nu", cardBack:"Koyon", flipCard:"Puru", addCard:"Gba Tana",
-    deleteCard:"Pili", save:"Lasi", cancel:"Doko Ba", confirm:"A-a", close:"Tuku",
-    rateAgain:"Ba Tana", rateHard:"Tiri", rateGood:"Lasi", rateEasy:"Weli"
-  });
-  // M2299: Samba Leko (ndi)
-  window.DF_I18N_LOCALES['ndi'] = Object.assign({}, baseTemplate, {
-    navFocus:"Doo", navDecks:"Wara", navStats:"Siam", navSettings:"Gong",
-    start:"Toh", pause:"Do", resume:"Toh Boih", reset:"Wara Toh", minutes:"min",
-    cardFront:"Anah", cardBack:"Koyon", flipCard:"Klat", addCard:"Wara Toh",
-    deleteCard:"Pleh", save:"Siam", cancel:"Do Boih", confirm:"Ehe", close:"Do",
-    rateAgain:"Boih Toh", rateHard:"Khaik", rateGood:"Siam", rateEasy:"Zol"
-  });
-  // M2300: Tupuri (tui) & Milestone Release v24.4.0
-  window.DF_I18N_LOCALES['tui'] = Object.assign({}, baseTemplate, {
-    navFocus:"Goli", navDecks:"Karta", navStats:"Peh", navSettings:"Yen",
-    start:"Toro", pause:"Miji", resume:"Toro Ju", reset:"Karta Toro", minutes:"min",
-    cardFront:"Mii", cardBack:"Koyon", flipCard:"Wii", addCard:"Karta Tor",
-    deleteCard:"Pili", save:"Peh", cancel:"Miji Ju", confirm:"E-e", close:"Ciri",
-    rateAgain:"Ju Toro", rateHard:"Tiri", rateGood:"Peh", rateEasy:"Mimi"
-  });
-  // M2301: Masa (mcn)
-  window.DF_I18N_LOCALES['mcn'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fikr", navDecks:"Pate", navStats:"Shumar", navSettings:"Bandobast",
-    start:"Pra", pause:"Losh", resume:"Phiri Pra", reset:"Pate Pra", minutes:"min",
-    cardFront:"Posh", cardBack:"Koyon", flipCard:"Weli", addCard:"Pate Jod",
-    deleteCard:"Khas", save:"Tah", cancel:"Chhod", confirm:"Ha", close:"Band",
-    rateAgain:"Phiri", rateHard:"Sakht", rateGood:"Jam", rateEasy:"Asan"
-  });
-  // M2302: Mofu-Gudur (mif)
-  window.DF_I18N_LOCALES['mif'] = Object.assign({}, baseTemplate, {
-    navFocus:"Uru", navDecks:"Karta", navStats:"Hisab", navSettings:"Sajao",
-    start:"Eteb", pause:"Hapa", resume:"Aro Eteb", reset:"Karta Eteb", minutes:"min",
-    cardFront:"Samang", cardBack:"Tayom", flipCard:"Palta", addCard:"Karta Meso",
-    deleteCard:"Metaw", save:"Doh", cancel:"Bagi", confirm:"He", close:"Kulup",
-    rateAgain:"Aro", rateHard:"Muskil", rateGood:"Bugin", rateEasy:"Alga"
-  });
-  // M2303: Automated Parity Linter for Adamawa-Chadic Languages
+    // M2299: Samba Leko (ndi)
+    // M2300: Tupuri (tui) & Milestone Release v24.4.0
+    // M2301: Masa (mcn)
+    // M2302: Mofu-Gudur (mif)
+    // M2303: Automated Parity Linter for Adamawa-Chadic Languages
   window.dfLintAdamawaChadicParity = function(){
     ['mzm','ndi','tui','mcn','mif','mua','gis','dbq','hia'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -37696,12 +35166,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2304: Mundang (mua) & Giziga (gis)
-  window.DF_I18N_LOCALES['mua'] = Object.assign({}, baseTemplate, { navFocus:"Yiti", start:"Tana", pause:"Doko", rateGood:"Lasi" });
-  window.DF_I18N_LOCALES['gis'] = Object.assign({}, baseTemplate, { navFocus:"Doo", start:"Toh", pause:"Do", rateGood:"Siam" });
-  // M2305: Daba (dbq) & Lamang (hia)
-  window.DF_I18N_LOCALES['dbq'] = Object.assign({}, baseTemplate, { navFocus:"Goli", start:"Toro", pause:"Miji", rateGood:"Peh" });
-  window.DF_I18N_LOCALES['hia'] = Object.assign({}, baseTemplate, { navFocus:"Fikr", start:"Pra", pause:"Losh", rateGood:"Jam" });
-  window.dfLintAdamawaChadicParity();
+      // M2305: Daba (dbq) & Lamang (hia)
+      window.dfLintAdamawaChadicParity();
   // M2306: Mandara Mountains Granite Echo Web Audio Filter
   window.dfSynthesizeMandaraEcho = function(ctx){
     if(!ctx) return;
@@ -37731,46 +35197,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2308: Shilluk (shk)
-  window.DF_I18N_LOCALES['shk'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pari", navDecks:"Warakak", navStats:"Kwan", navSettings:"Chen",
-    start:"Caki", pause:"Cungi", resume:"Caki Kedo", reset:"Warakak Caki", minutes:"min",
-    cardFront:"Nyimi", cardBack:"Toki", flipCard:"Loki", addCard:"Warakak Medi",
-    deleteCard:"Kethi", save:"Beri", cancel:"Cungi Kedo", confirm:"Yey", close:"Gali",
-    rateAgain:"Kedo", rateHard:"Teki", rateGood:"Beri", rateEasy:"Yoti"
-  });
-  // M2309: Anuak (anu)
-  window.DF_I18N_LOCALES['anu'] = Object.assign({}, baseTemplate, {
-    navFocus:"Para", navDecks:"Waraga", navStats:"Kwano", navSettings:"Leko",
-    start:"Caki", pause:"Cungi", resume:"Caki Dok", reset:"Waraga Caki", minutes:"min",
-    cardFront:"Nyim", cardBack:"Tok", flipCard:"Loko", addCard:"Waraga Medo",
-    deleteCard:"Ketho", save:"Bero", cancel:"Cungi Dok", confirm:"E-e", close:"Ciro",
-    rateAgain:"Dok", rateHard:"Teko", rateGood:"Bero", rateEasy:"Yoto"
-  });
-  // M2310: Acholi (ach) & Milestone Release v24.5.0
-  window.DF_I18N_LOCALES['ach'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tamo", navDecks:"Kada", navStats:"Kwan", navSettings:"Yub",
-    start:"Caku", pause:"Cung", resume:"Caku Odoco", reset:"Kada Caku", minutes:"min",
-    cardFront:"Nyim", cardBack:"Ngec", flipCard:"Loko", addCard:"Med Kada",
-    deleteCard:"Kwany", save:"Gwok", cancel:"Juki", confirm:"Eyo", close:"Lor",
-    rateAgain:"Odoco", rateHard:"Tek", rateGood:"Ber", rateEasy:"Yot"
-  });
-  // M2311: Lango (lao)
-  window.DF_I18N_LOCALES['lao'] = Object.assign({}, baseTemplate, {
-    navFocus:"Tamo", navDecks:"Waraga", navStats:"Kwan", navSettings:"Yub",
-    start:"Caku", pause:"Cung", resume:"Caku Dok", reset:"Waraga Caku", minutes:"min",
-    cardFront:"Nyim", cardBack:"Ngec", flipCard:"Loko", addCard:"Med Waraga",
-    deleteCard:"Kwany", save:"Gwon", cancel:"Juk", confirm:"Eyo", close:"Lor",
-    rateAgain:"Dok", rateHard:"Tek", rateGood:"Ber", rateEasy:"Yot"
-  });
-  // M2312: Alur (alz)
-  window.DF_I18N_LOCALES['alz'] = Object.assign({}, baseTemplate, {
-    navFocus:"Paro", navDecks:"Kada", navStats:"Kwano", navSettings:"Yiko",
-    start:"Caku", pause:"Cungo", resume:"Caku Kendo", reset:"Kada Caku", minutes:"min",
-    cardFront:"Nyim", cardBack:"Ng'ec", flipCard:"Loko", addCard:"Med Kada",
-    deleteCard:"Golo", save:"Kano", cancel:"Giko", confirm:"Eyo", close:"Tego",
-    rateAgain:"Kendo", rateHard:"Tek", rateGood:"Ber", rateEasy:"Yot"
-  });
-  // M2313: Automated Parity Linter for Western Nilotic Languages
+    // M2309: Anuak (anu)
+    // M2310: Acholi (ach) & Milestone Release v24.5.0
+    // M2311: Lango (lao)
+    // M2312: Alur (alz)
+    // M2313: Automated Parity Linter for Western Nilotic Languages
   window.dfLintWesternNiloticParity = function(){
     ['shk','anu','ach','lao','alz','muz','suq','mym','xwg'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -37780,12 +35211,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2314: Mursi (muz) & Suri (suq)
-  window.DF_I18N_LOCALES['muz'] = Object.assign({}, baseTemplate, { navFocus:"Pari", start:"Caki", pause:"Cungi", rateGood:"Beri" });
-  window.DF_I18N_LOCALES['suq'] = Object.assign({}, baseTemplate, { navFocus:"Para", start:"Caki", pause:"Cungi", rateGood:"Bero" });
-  // M2315: Me'en (mym) & Kwegu (xwg)
-  window.DF_I18N_LOCALES['mym'] = Object.assign({}, baseTemplate, { navFocus:"Tamo", start:"Caku", pause:"Cung", rateGood:"Ber" });
-  window.DF_I18N_LOCALES['xwg'] = Object.assign({}, baseTemplate, { navFocus:"Paro", start:"Caku", pause:"Cungo", rateGood:"Ber" });
-  window.dfLintWesternNiloticParity();
+      // M2315: Me'en (mym) & Kwegu (xwg)
+      window.dfLintWesternNiloticParity();
   // M2316: Sudd Marshes Water & Papyrus Whispers Web Audio Filter
   window.dfSynthesizeSuddMarshes = function(ctx){
     if(!ctx) return;
@@ -37813,46 +35240,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2318: Serer (srr)
-  window.DF_I18N_LOCALES['srr'] = Object.assign({}, baseTemplate, {
-    navFocus:"Xel", navDecks:"Kayit", navStats:"Lim", navSettings:"Ndaf",
-    start:"Deb", pause:"Taxaw", resume:"Deb Mboxa", reset:"Kayit Deb", minutes:"min",
-    cardFront:"Kan", cardBack:"Caaq", flipCard:"Weng", addCard:"Yik Kayit",
-    deleteCard:"Fat", save:"Mos", cancel:"Basi", confirm:"Iyo", close:"Ub",
-    rateAgain:"Mboxa", rateHard:"Met", rateGood:"Mos", rateEasy:"Hof"
-  });
-  // M2319: Jola-Fonyi (dyo)
-  window.DF_I18N_LOCALES['dyo'] = Object.assign({}, baseTemplate, {
-    navFocus:"Bujow", navDecks:"Karta", navStats:"Kañol", navSettings:"Kasumay",
-    start:"Sulo", pause:"Nango", resume:"Sulo Kani", reset:"Karta Sulo", minutes:"min",
-    cardFront:"Uro", cardBack:"Koyon", flipCard:"Weli", addCard:"Karta Sulo",
-    deleteCard:"Pili", save:"Kasumay", cancel:"Nango Kani", confirm:"Ey", close:"Kani",
-    rateAgain:"Kani", rateHard:"Kati", rateGood:"Kasumay", rateEasy:"Mela"
-  });
-  // M2320: Balanta (ble) & Milestone Release v24.6.0
-  window.DF_I18N_LOCALES['ble'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fikr", navDecks:"Karta", navStats:"Shumar", navSettings:"Boko",
-    start:"Pra", pause:"Losh", resume:"Phiri Pra", reset:"Karta Pra", minutes:"min",
-    cardFront:"Posh", cardBack:"Pacho", flipCard:"Weli", addCard:"Karta Jod",
-    deleteCard:"Khas", save:"Tah", cancel:"Chhod", confirm:"Ha", close:"Band",
-    rateAgain:"Phiri", rateHard:"Sakht", rateGood:"Jam", rateEasy:"Asan"
-  });
-  // M2321: Manjak (mfv)
-  window.DF_I18N_LOCALES['mfv'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kop", navDecks:"Pape", navStats:"Katu", navSettings:"Gong",
-    start:"Toh", pause:"Do", resume:"Toh Boih", reset:"Pape Toh", minutes:"min",
-    cardFront:"Doba", cardBack:"Koyon", flipCard:"Puru", addCard:"Pape Toh",
-    deleteCard:"Pili", save:"Katu", cancel:"Do Boih", confirm:"Ehe", close:"Tuku",
-    rateAgain:"Boih", rateHard:"Khaik", rateGood:"Katu", rateEasy:"Zol"
-  });
-  // M2322: Mankanya (knf)
-  window.DF_I18N_LOCALES['knf'] = Object.assign({}, baseTemplate, {
-    navFocus:"Moi", navDecks:"Papera", navStats:"Nena", navSettings:"Taba",
-    start:"Tee", pause:"Mee", resume:"Tee Ha", reset:"Papera Tee", minutes:"min",
-    cardFront:"Taba", cardBack:"Koyon", flipCard:"Pura", addCard:"Papera Te",
-    deleteCard:"Siri", save:"Nena", cancel:"Mee Ha", confirm:"I-i", close:"Mee",
-    rateAgain:"Ha", rateHard:"Kana", rateGood:"Nena", rateEasy:"Lehe"
-  });
-  // M2323: Automated Parity Linter for Atlantic Senegambian
+    // M2319: Jola-Fonyi (dyo)
+    // M2320: Balanta (ble) & Milestone Release v24.6.0
+    // M2321: Manjak (mfv)
+    // M2322: Mankanya (knf)
+    // M2323: Automated Parity Linter for Atlantic Senegambian
   window.dfLintAtlanticSenegambianParity = function(){
     ['srr','dyo','ble','mfv','knf','wo','fuc','fuf','bsc'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -37862,12 +35254,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2324: Pulaar (fuc) & Pular (fuf)
-  window.DF_I18N_LOCALES['fuc'] = Object.assign({}, baseTemplate, { navFocus:"Hakkille", start:"Fuddo", pause:"Daro", rateGood:"Moyyi" });
-  window.DF_I18N_LOCALES['fuf'] = Object.assign({}, baseTemplate, { navFocus:"Hakkille", start:"Fuddo", pause:"Daro", rateGood:"Moyyi" });
-  // M2325: Wolof (wo) & Bassari (bsc)
-  window.DF_I18N_LOCALES['wo'] = Object.assign({}, baseTemplate, { navFocus:"Xel", start:"Door", pause:"Taxaw", rateGood:"Baax" });
-  window.DF_I18N_LOCALES['bsc'] = Object.assign({}, baseTemplate, { navFocus:"Xel", start:"Deb", pause:"Taxaw", rateGood:"Mos" });
-  window.dfLintAtlanticSenegambianParity();
+      // M2325: Wolof (wo) & Bassari (bsc)
+      window.dfLintAtlanticSenegambianParity();
   // M2326: Casamance River Breeze Web Audio Filter
   window.dfSynthesizeCasamanceBreeze = function(ctx){
     if(!ctx) return;
@@ -37895,46 +35283,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2328: Yami / Tao (tao)
-  window.DF_I18N_LOCALES['tao'] = Object.assign({}, baseTemplate, {
-    navFocus:"Isei", navDecks:"Kagilingan", navStats:"Tovo", navSettings:"Kavavayan",
-    start:"Mangay", pause:"Mitwa", resume:"Mangay Pa", reset:"Kagilingan Mangay", minutes:"min",
-    cardFront:"Movahey", cardBack:"Likud", flipCard:"Pusoro", addCard:"Mangay Kagil",
-    deleteCard:"Kapsay", save:"Ipori", cancel:"Mitwa Pa", confirm:"O-o", close:"Akaw",
-    rateAgain:"Pa Mangay", rateHard:"Tiri", rateGood:"Ipori", rateEasy:"Mela"
-  });
-  // M2329: Itbayaten (ivv)
-  window.DF_I18N_LOCALES['ivv'] = Object.assign({}, baseTemplate, {
-    navFocus:"Isei", navDecks:"Karta", navStats:"Tovo", navSettings:"Kavavayan",
-    start:"Mangay", pause:"Mitwa", resume:"Mangay Pa", reset:"Karta Mangay", minutes:"min",
-    cardFront:"Movahey", cardBack:"Likud", flipCard:"Puru", addCard:"Karta Mang",
-    deleteCard:"Pili", save:"Ipori", cancel:"Mitwa Pa", confirm:"A-a", close:"Tuku",
-    rateAgain:"Pa Mangay", rateHard:"Tiri", rateGood:"Ipori", rateEasy:"Mela"
-  });
-  // M2330: Ivatan (ivt) & Milestone Release v24.7.0
-  window.DF_I18N_LOCALES['ivt'] = Object.assign({}, baseTemplate, {
-    navFocus:"Iseian", navDecks:"Karta", navStats:"Tovo", navSettings:"Vavayan",
-    start:"Mangay", pause:"Mitwa", resume:"Mangay Pa", reset:"Karta Mangay", minutes:"min",
-    cardFront:"Movahey", cardBack:"Likud", flipCard:"Puru", addCard:"Karta Mang",
-    deleteCard:"Pili", save:"Ipori", cancel:"Mitwa Pa", confirm:"A-a", close:"Tuku",
-    rateAgain:"Pa Mangay", rateHard:"Tiri", rateGood:"Ipori", rateEasy:"Mela"
-  });
-  // M2331: Amis (ami)
-  window.DF_I18N_LOCALES['ami'] = Object.assign({}, baseTemplate, {
-    navFocus:"Harateng", navDecks:"Tilid", navStats:"Kinafalah", navSettings:"Nengneng",
-    start:"Milinga'ay", pause:"Pahanhan", resume:"Matulin", reset:"Miliyaw", minutes:"min",
-    cardFront:"'Ayaw", cardBack:"Koyon", flipCard:"Puli", addCard:"Matulin Tilid",
-    deleteCard:"Liyaw", save:"Fangcal", cancel:"Pahanhan Pa", confirm:"Hay", close:"Foti'",
-    rateAgain:"Miliyaw", rateHard:"Roray", rateGood:"Fangcal", rateEasy:"Rahoday"
-  });
-  // M2332: Paiwan (pwn)
-  window.DF_I18N_LOCALES['pwn'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pakingay", navDecks:"Tjaisang", navStats:"Kisenay", navSettings:"Saluva",
-    start:"Kemasi", pause:"Milingaling", resume:"Kemasi Ang", reset:"Tjaisang Kema", minutes:"min",
-    cardFront:"Ngadan", cardBack:"Koyon", flipCard:"Palit", addCard:"Tjaisang Kema",
-    deleteCard:"Pili", save:"Bulay", cancel:"Miling Ang", confirm:"Ui", close:"Pik",
-    rateAgain:"Ang", rateHard:"Kulit", rateGood:"Bulay", rateEasy:"Kipuy"
-  });
-  // M2333: Automated Parity Linter for Formosan Languages
+    // M2329: Itbayaten (ivv)
+    // M2330: Ivatan (ivt) & Milestone Release v24.7.0
+    // M2331: Amis (ami)
+    // M2332: Paiwan (pwn)
+    // M2333: Automated Parity Linter for Formosan Languages
   window.dfLintBatanicFormosanParity = function(){
     ['tao','ivv','ivt','ami','pwn','tay','bnn','dru','pyu'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -37944,12 +35297,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2334: Atayal (tay) & Bunun (bnn)
-  window.DF_I18N_LOCALES['tay'] = Object.assign({}, baseTemplate, { navFocus:"Inlung", start:"Miling", pause:"Pahan", rateGood:"Blang" });
-  window.DF_I18N_LOCALES['bnn'] = Object.assign({}, baseTemplate, { navFocus:"Isei", start:"Mangay", pause:"Mitwa", rateGood:"Ipori" });
-  // M2335: Rukai (dru) & Puyuma (pyu)
-  window.DF_I18N_LOCALES['dru'] = Object.assign({}, baseTemplate, { navFocus:"Paking", start:"Kemasi", pause:"Miling", rateGood:"Bulay" });
-  window.DF_I18N_LOCALES['pyu'] = Object.assign({}, baseTemplate, { navFocus:"Harateng", start:"Milinga", pause:"Pahan", rateGood:"Fangcal" });
-  window.dfLintBatanicFormosanParity();
+      // M2335: Rukai (dru) & Puyuma (pyu)
+      window.dfLintBatanicFormosanParity();
   // M2336: Batanes Island Coastal Surge Web Audio Filter
   window.dfSynthesizeBatanesSurge = function(ctx){
     if(!ctx) return;
@@ -37977,46 +35326,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2338: Kalmyk (xal)
-  window.DF_I18N_LOCALES['xal'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sedkl", navDecks:"Degter", navStats:"To", navSettings:"Kevts",
-    start:"Ekllg", pause:"Zogslg", resume:"Dakhn Ekllg", reset:"Degter Ekllg", minutes:"min",
-    cardFront:"Nuurna", cardBack:"Arna", flipCard:"Ergülx", addCard:"Degter Nemx",
-    deleteCard:"Ushrulx", save:"Khadglx", cancel:"Uurgulx", confirm:"E", close:"Khaax",
-    rateAgain:"Dakhn", rateHard:"Künd", rateGood:"Sään", rateEasy:"Gemr"
-  });
-  // M2339: Buryat (bua)
-  window.DF_I18N_LOCALES['bua'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sanaankhan", navDecks:"Debter", navStats:"Too", navSettings:"Toitool",
-    start:"Ekhelkhe", pause:"Zogsookho", resume:"Dakhin Ekhelkhe", reset:"Debter Ekhel", minutes:"min",
-    cardFront:"Nuur", cardBack:"Ar", flipCard:"Ergüülkhe", addCard:"Debter Nemekhe",
-    deleteCard:"Arilgakha", save:"Khadgalakha", cancel:"Holiokho", confirm:"Tiim", close:"Khaakha",
-    rateAgain:"Dakhin", rateHard:"Khyndekhen", rateGood:"Hain", rateEasy:"Belkhen"
-  });
-  // M2340: Oirat (xwo) & Milestone Release v24.8.0
-  window.DF_I18N_LOCALES['xwo'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sedkili", navDecks:"Bichig", navStats:"Too", navSettings:"Kevts",
-    start:"Ekleku", pause:"Zogso", resume:"Dakin Ekleku", reset:"Bichig Ekle", minutes:"min",
-    cardFront:"Nuur", cardBack:"Ar", flipCard:"Ergüül", addCard:"Bichig Neme",
-    deleteCard:"Ushruul", save:"Khadgal", cancel:"Uurguul", confirm:"E", close:"Khaa",
-    rateAgain:"Dakin", rateHard:"Künde", rateGood:"Sain", rateEasy:"Geemre"
-  });
-  // M2341: Daur (dta)
-  window.DF_I18N_LOCALES['dta'] = Object.assign({}, baseTemplate, {
-    navFocus:"Bodol", navDecks:"Debter", navStats:"To", navSettings:"Kev",
-    start:"Ehel", pause:"Baits", resume:"Ehel Daki", reset:"Debter Ehel", minutes:"min",
-    cardFront:"Nuur", cardBack:"Hoit", flipCard:"Urvul", addCard:"Debter Nem",
-    deleteCard:"Garga", save:"Hadgal", cancel:"Bol", confirm:"Te", close:"Haa",
-    rateAgain:"Daki", rateHard:"Hund", rateGood:"Sain", rateEasy:"Amar"
-  });
-  // M2342: Oroqen (orh)
-  window.DF_I18N_LOCALES['orh'] = Object.assign({}, baseTemplate, {
-    navFocus:"Maran", navDecks:"Kartas", navStats:"Dukte", navSettings:"Ayalap",
-    start:"Derugi", pause:"Tolon", resume:"Derugi Wari", reset:"Kartas Derugi", minutes:"min",
-    cardFront:"Julipken", cardBack:"Koyon", flipCard:"Ugli", addCard:"Kartas Der",
-    deleteCard:"Baka", save:"Aya", cancel:"Tolon Wari", confirm:"Za", close:"Tolon",
-    rateAgain:"Wari", rateHard:"Magal", rateGood:"Aya", rateEasy:"Lugu"
-  });
-  // M2343: Automated Parity Linter for Mongolic & Tungusic
+    // M2339: Buryat (bua)
+    // M2340: Oirat (xwo) & Milestone Release v24.8.0
+    // M2341: Daur (dta)
+    // M2342: Oroqen (orh)
+    // M2343: Automated Parity Linter for Mongolic & Tungusic
   window.dfLintMongolicTungusicParity = function(){
     ['xal','bua','xwo','dta','orh','ykh','gld','evn','neg'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -38026,12 +35340,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2344: Khamnigan (ykh) & Nanai (gld)
-  window.DF_I18N_LOCALES['ykh'] = Object.assign({}, baseTemplate, { navFocus:"Sedkl", start:"Ekllg", pause:"Zogslg", rateGood:"Sään" });
-  window.DF_I18N_LOCALES['gld'] = Object.assign({}, baseTemplate, { navFocus:"Sorol", start:"Derin", pause:"Manan", rateGood:"Aya" });
-  // M2345: Evenki (evn) & Negidal (neg)
-  window.DF_I18N_LOCALES['evn'] = Object.assign({}, baseTemplate, { navFocus:"Maran", start:"Derugi", pause:"Tolon", rateGood:"Aya" });
-  window.DF_I18N_LOCALES['neg'] = Object.assign({}, baseTemplate, { navFocus:"Maran", start:"Derugi", pause:"Tolon", rateGood:"Aya" });
-  window.dfLintMongolicTungusicParity();
+      // M2345: Evenki (evn) & Negidal (neg)
+      window.dfLintMongolicTungusicParity();
   // M2346: Lake Baikal Glacial Ice Resonance Web Audio Filter
   window.dfSynthesizeBaikalIce = function(ctx){
     if(!ctx) return;
@@ -38059,46 +35369,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2348: Svan (sva)
-  window.DF_I18N_LOCALES['sva'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fikr", navDecks:"Daptar", navStats:"Lekha", navSettings:"Saz",
-    start:"Esgra", pause:"Tolon", resume:"Esgra Wari", reset:"Daptar Esgra", minutes:"min",
-    cardFront:"Jul", cardBack:"Koyon", flipCard:"Ugli", addCard:"Daptar Esg",
-    deleteCard:"Pili", save:"Khox", cancel:"Tolon Wari", confirm:"Ho", close:"Khaa",
-    rateAgain:"Wari", rateHard:"Ghat", rateGood:"Khox", rateEasy:"Alga"
-  });
-  // M2349: Mingrelian (xmf)
-  window.DF_I18N_LOCALES['xmf'] = Object.assign({}, baseTemplate, {
-    navFocus:"Gogonoba", navDecks:"Karda", navStats:"Angarishi", navSettings:"Monwyoba",
-    start:"Dachqeba", pause:"Gatereba", resume:"Dachqeba Xololo", reset:"Karda Dachq", minutes:"min",
-    cardFront:"Cina", cardBack:"Ukana", flipCard:"Gartueba", addCard:"Karda Domateba",
-    deleteCard:"Lashkua", save:"Shenaxua", cancel:"Gatereba", confirm:"Koo", close:"Jankua",
-    rateAgain:"Xololo", rateHard:"Dznelia", rateGood:"Kogi", rateEasy:"Aqvili"
-  });
-  // M2350: Laz (lzz) & Milestone Release v24.9.0
-  window.DF_I18N_LOCALES['lzz'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fikri", navDecks:"Kartasi", navStats:"Hesabi", navSettings:"Dizayni",
-    start:"Gyoctsu", pause:"Doctsu", resume:"Gyoctsu Xolo", reset:"Kartasi Gyoct", minutes:"min",
-    cardFront:"Cina", cardBack:"Ukana", flipCard:"Oktalu", addCard:"Kartasi Omxanu",
-    deleteCard:"Ocku", save:"Oskidu", cancel:"Doctsu", confirm:"Ho", close:"Oknu",
-    rateAgain:"Xolo", rateHard:"Zori", rateGood:"Vrosi", rateEasy:"Mula"
-  });
-  // M2351: Dargwa (dar)
-  window.DF_I18N_LOCALES['dar'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pikri", navDecks:"Juz", navStats:"Xisab", navSettings:"Baq'ni",
-    start:"Bexihes", pause:"Uhes", resume:"Bexihes Gaxli", reset:"Juz Bexihes", minutes:"min",
-    cardFront:"Cilxi", cardBack:"Gula", flipCard:"Шурултес", addCard:"Juz Ishes",
-    deleteCard:"Bates", save:"Bates", cancel:"Uhes Gaxli", confirm:"Gaa", close:"Kates",
-    rateAgain:"Gaxli", rateHard:"Qiyan", rateGood:"Ghaz", rateEasy:"Dugi"
-  });
-  // M2352: Tabasaran (tab)
-  window.DF_I18N_LOCALES['tab'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fikr", navDecks:"Kitab", navStats:"Hisab", navSettings:"Dizayn",
-    start:"Kebghuz", pause:"Tazhuz", resume:"Kebghuz Xana", reset:"Kitab Kebgh", minutes:"min",
-    cardFront:"Uul", cardBack:"Kylk", flipCard:"Elghyzyuz", addCard:"Kitab Ilithuz",
-    deleteCard:"Ghatyuz", save:"Dikhuz", cancel:"Tazhuz", confirm:"Au", close:"Kkaryuz",
-    rateAgain:"Xana", rateHard:"Chetyn", rateGood:"Uzhur", rateEasy:"Rehat"
-  });
-  // M2353: Automated Parity Linter for East & South Caucasian
+    // M2349: Mingrelian (xmf)
+    // M2350: Laz (lzz) & Milestone Release v24.9.0
+    // M2351: Dargwa (dar)
+    // M2352: Tabasaran (tab)
+    // M2353: Automated Parity Linter for East & South Caucasian
   window.dfLintCaucasianEastSouthParity = function(){
     ['sva','xmf','lzz','dar','tab','rut','tkr','agx','udi'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -38108,12 +35383,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2354: Rutul (rut) & Tsakhur (tkr)
-  window.DF_I18N_LOCALES['rut'] = Object.assign({}, baseTemplate, { navFocus:"Fikr", start:"Kebghuz", pause:"Tazhuz", rateGood:"Uzhur" });
-  window.DF_I18N_LOCALES['tkr'] = Object.assign({}, baseTemplate, { navFocus:"Pikri", start:"Bexihes", pause:"Uhes", rateGood:"Ghaz" });
-  // M2355: Aghul (agx) & Udi (udi)
-  window.DF_I18N_LOCALES['agx'] = Object.assign({}, baseTemplate, { navFocus:"Fikr", start:"Kebghuz", pause:"Tazhuz", rateGood:"Uzhur" });
-  window.DF_I18N_LOCALES['udi'] = Object.assign({}, baseTemplate, { navFocus:"Fikri", start:"Gyoctsu", pause:"Doctsu", rateGood:"Vrosi" });
-  window.dfLintCaucasianEastSouthParity();
+      // M2355: Aghul (agx) & Udi (udi)
+      window.dfLintCaucasianEastSouthParity();
   // M2356: Greater Caucasus Mountain Pine Wind Web Audio Filter
   window.dfSynthesizeCaucasusPine = function(ctx){
     if(!ctx) return;
@@ -38141,46 +35412,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2358: Khakas (kjh)
-  window.DF_I18N_LOCALES['kjh'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sagysh", navDecks:"Kniga", navStats:"San", navSettings:"Pabyr",
-    start:"Pastirgha", pause:"Toxtadirgha", resume:"Xada Pastir", reset:"Kniga Pastir", minutes:"min",
-    cardFront:"Alny", cardBack:"Koyon", flipCard:"Airlandir", addCard:"Kniga Xozhar",
-    deleteCard:"Choh", save:"Hadar", cancel:"Toxta", confirm:"E", close:"Jabar",
-    rateAgain:"Xada", rateHard:"Chabal", rateGood:"Chakshy", rateEasy:"Tynys"
-  });
-  // M2359: Shor (cjs)
-  window.DF_I18N_LOCALES['cjs'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sanysh", navDecks:"Pichik", navStats:"San", navSettings:"Kev",
-    start:"Pastirga", pause:"Toktirga", resume:"Tak Pastir", reset:"Pichik Past", minutes:"min",
-    cardFront:"Alty", cardBack:"Koyon", flipCard:"Ailan", addCard:"Pichik Xozh",
-    deleteCard:"Choq", save:"Qadar", cancel:"Tokta", confirm:"Ehe", close:"Qap",
-    rateAgain:"Tak", rateHard:"Qaraq", rateGood:"Jaqshy", rateEasy:"Tynys"
-  });
-  // M2360: Altai (alt) & Grand Golden Master v25.0.0
-  window.DF_I18N_LOCALES['alt'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sanysh", navDecks:"Bichik", navStats:"Too", navSettings:"Kev-temdek",
-    start:"Bashtap", pause:"Toktop", resume:"Taan Bashtap", reset:"Bichik Basht", minutes:"min",
-    cardFront:"Usti", cardBack:"Kyini", flipCard:"Eeldir", addCard:"Bichik Qozh",
-    deleteCard:"Jokto", save:"Qora", cancel:"Tokto", confirm:"E", close:"Jap",
-    rateAgain:"Taan", rateHard:"Kundu", rateGood:"Jaqshy", rateEasy:"Tynys"
-  });
-  // M2361: Chulym (clw)
-  window.DF_I18N_LOCALES['clw'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sagysh", navDecks:"Pichik", navStats:"San", navSettings:"Kev",
-    start:"Pastir", pause:"Toxta", resume:"Xada Pastir", reset:"Pichik Past", minutes:"min",
-    cardFront:"Alny", cardBack:"Koyon", flipCard:"Airland", addCard:"Pichik Xozh",
-    deleteCard:"Choh", save:"Hadar", cancel:"Toxta", confirm:"E", close:"Jabar",
-    rateAgain:"Xada", rateHard:"Chabal", rateGood:"Chakshy", rateEasy:"Tynys"
-  });
-  // M2362: Ket (ket)
-  window.DF_I18N_LOCALES['ket'] = Object.assign({}, baseTemplate, {
-    navFocus:"Keti", navDecks:"Karta", navStats:"Ruta", navSettings:"Mof",
-    start:"Ang", pause:"Miji", resume:"Ang Gona", reset:"Karta Ang", minutes:"min",
-    cardFront:"Maha", cardBack:"Koyon", flipCard:"Weli", addCard:"Karta Ang",
-    deleteCard:"Pili", save:"Mof", cancel:"Miji Gona", confirm:"E-e", close:"Tuku",
-    rateAgain:"Gona", rateHard:"Tiri", rateGood:"Mof", rateEasy:"Weli"
-  });
-  // M2363: Automated Parity Linter for Sayan Turkic & Yeniseian
+    // M2359: Shor (cjs)
+    // M2360: Altai (alt) & Grand Golden Master v25.0.0
+    // M2361: Chulym (clw)
+    // M2362: Ket (ket)
+    // M2363: Automated Parity Linter for Sayan Turkic & Yeniseian
   window.dfLintSayanYeniseianParity = function(){
     ['kjh','cjs','alt','clw','ket','kim','yug'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -38190,9 +35426,7 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2364: Tofa (kim) & Yugh (yug)
-  window.DF_I18N_LOCALES['kim'] = Object.assign({}, baseTemplate, { navFocus:"Sagysh", start:"Pastirgha", pause:"Toxtadirgha", rateGood:"Chakshy" });
-  window.DF_I18N_LOCALES['yug'] = Object.assign({}, baseTemplate, { navFocus:"Keti", start:"Ang", pause:"Miji", rateGood:"Mof" });
-  window.dfLintSayanYeniseianParity();
+      window.dfLintSayanYeniseianParity();
   // M2365: Yenisei River Rapids & Taiga Pine Whispers Web Audio Filter
   window.dfSynthesizeYeniseiRapids = function(ctx){
     if(!ctx) return;
@@ -38224,46 +35458,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2368: Samburu (saq)
-  window.DF_I18N_LOCALES['saq'] = Object.assign({}, baseTemplate, {
-    navFocus:"Inkioma", navDecks:"Warakak", navStats:"Sidai", navSettings:"Enkitoo",
-    start:"Iteru", pause:"Tashe", resume:"Iteru Kake", reset:"Warakak Iteru", minutes:"min",
-    cardFront:"Dukuya", cardBack:"Siadi", flipCard:"Welian", addCard:"Warakak Iter",
-    deleteCard:"Tung'ua", save:"Sidai", cancel:"Tashe Kake", confirm:"O-o", close:"Tashe",
-    rateAgain:"Kake Iteru", rateHard:"Golgoli", rateGood:"Sidai", rateEasy:"Noltu"
-  });
-  // M2369: Camus (toq)
-  window.DF_I18N_LOCALES['toq'] = Object.assign({}, baseTemplate, {
-    navFocus:"Inkioma", navDecks:"Warakak", navStats:"Sidai", navSettings:"Enkitoo",
-    start:"Iteru", pause:"Tashe", resume:"Iteru Kake", reset:"Warakak Iteru", minutes:"min",
-    cardFront:"Dukuya", cardBack:"Siadi", flipCard:"Welian", addCard:"Warakak Iter",
-    deleteCard:"Tung'ua", save:"Sidai", cancel:"Tashe Kake", confirm:"Ee", close:"Tashe",
-    rateAgain:"Kake Iteru", rateHard:"Golgoli", rateGood:"Sidai", rateEasy:"Noltu"
-  });
-  // M2370: Kipsigis (sgc) & Milestone Release v25.1.0
-  window.DF_I18N_LOCALES['sgc'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kayan", navDecks:"Kada", navStats:"Lekha", navSettings:"Tarteeb",
-    start:"Toi", pause:"Kany", resume:"Toi Kogeny", reset:"Kada Toi", minutes:"min",
-    cardFront:"Tain", cardBack:"Leti", flipCard:"Weli", addCard:"Kada Tes",
-    deleteCard:"Pili", save:"Kararan", cancel:"Kany Kogeny", confirm:"Ee", close:"Ker",
-    rateAgain:"Kogeny", rateHard:"Karat", rateGood:"Kararan", rateEasy:"Nyum"
-  });
-  // M2371: Nandi (niq)
-  window.DF_I18N_LOCALES['niq'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kayan", navDecks:"Kada", navStats:"Lekha", navSettings:"Tarteeb",
-    start:"Toi", pause:"Kany", resume:"Toi Kogeny", reset:"Kada Toi", minutes:"min",
-    cardFront:"Tain", cardBack:"Leti", flipCard:"Weli", addCard:"Kada Tes",
-    deleteCard:"Pili", save:"Kararan", cancel:"Kany Kogeny", confirm:"Ee", close:"Ker",
-    rateAgain:"Kogeny", rateHard:"Karat", rateGood:"Kararan", rateEasy:"Nyum"
-  });
-  // M2372: Pokot (pko)
-  window.DF_I18N_LOCALES['pko'] = Object.assign({}, baseTemplate, {
-    navFocus:"Kayan", navDecks:"Kada", navStats:"Lekha", navSettings:"Tarteeb",
-    start:"Toi", pause:"Kany", resume:"Toi Kogeny", reset:"Kada Toi", minutes:"min",
-    cardFront:"Tain", cardBack:"Leti", flipCard:"Weli", addCard:"Kada Tes",
-    deleteCard:"Pili", save:"Kararan", cancel:"Kany Kogeny", confirm:"Ee", close:"Ker",
-    rateAgain:"Kogeny", rateHard:"Karat", rateGood:"Kararan", rateEasy:"Nyum"
-  });
-  // M2373: Automated Parity Linter for Southern Nilotic Languages
+    // M2369: Camus (toq)
+    // M2370: Kipsigis (sgc) & Milestone Release v25.1.0
+    // M2371: Nandi (niq)
+    // M2372: Pokot (pko)
+    // M2373: Automated Parity Linter for Southern Nilotic Languages
   window.dfLintSouthernNiloticParity = function(){
     ['saq','toq','sgc','niq','pko','mpk','eyo','spy','tec'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -38273,12 +35472,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2374: Marakwet (mpk) & Keiyo (eyo)
-  window.DF_I18N_LOCALES['mpk'] = Object.assign({}, baseTemplate, { navFocus:"Kayan", start:"Toi", pause:"Kany", rateGood:"Kararan" });
-  window.DF_I18N_LOCALES['eyo'] = Object.assign({}, baseTemplate, { navFocus:"Kayan", start:"Toi", pause:"Kany", rateGood:"Kararan" });
-  // M2375: Sabaot (spy) & Terik (tec)
-  window.DF_I18N_LOCALES['spy'] = Object.assign({}, baseTemplate, { navFocus:"Kayan", start:"Toi", pause:"Kany", rateGood:"Kararan" });
-  window.DF_I18N_LOCALES['tec'] = Object.assign({}, baseTemplate, { navFocus:"Kayan", start:"Toi", pause:"Kany", rateGood:"Kararan" });
-  window.dfLintSouthernNiloticParity();
+      // M2375: Sabaot (spy) & Terik (tec)
+      window.dfLintSouthernNiloticParity();
   // M2376: Mount Kenya Montane Forest Mist Web Audio Filter
   window.dfSynthesizeKenyaMist = function(ctx){
     if(!ctx) return;
@@ -38306,46 +35501,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2378: Duru / Dii (dur)
-  window.DF_I18N_LOCALES['dur'] = Object.assign({}, baseTemplate, {
-    navFocus:"Yiti", navDecks:"Gba", navStats:"Lasi", navSettings:"Boko",
-    start:"Tana", pause:"Doko", resume:"Tana Ba", reset:"Gba Tana", minutes:"min",
-    cardFront:"Nu", cardBack:"Koyon", flipCard:"Puru", addCard:"Gba Tana",
-    deleteCard:"Pili", save:"Lasi", cancel:"Doko Ba", confirm:"A-a", close:"Tuku",
-    rateAgain:"Ba Tana", rateHard:"Tiri", rateGood:"Lasi", rateEasy:"Weli"
-  });
-  // M2379: Mbum (mdd)
-  window.DF_I18N_LOCALES['mdd'] = Object.assign({}, baseTemplate, {
-    navFocus:"Doo", navDecks:"Wara", navStats:"Siam", navSettings:"Gong",
-    start:"Toh", pause:"Do", resume:"Toh Boih", reset:"Wara Toh", minutes:"min",
-    cardFront:"Anah", cardBack:"Koyon", flipCard:"Klat", addCard:"Wara Toh",
-    deleteCard:"Pleh", save:"Siam", cancel:"Do Boih", confirm:"Ehe", close:"Do",
-    rateAgain:"Boih Toh", rateHard:"Khaik", rateGood:"Siam", rateEasy:"Zol"
-  });
-  // M2380: Gbaya-Bossangoa (gbp) & Milestone Release v25.2.0
-  window.DF_I18N_LOCALES['gbp'] = Object.assign({}, baseTemplate, {
-    navFocus:"Koro", navDecks:"Wara", navStats:"Zok", navSettings:"Duka",
-    start:"Tona", pause:"Doko", resume:"Tona Mbe", reset:"Wara Tona", minutes:"min",
-    cardFront:"Nu", cardBack:"Gima", flipCard:"Weli", addCard:"Wara Ton",
-    deleteCard:"Gba", save:"De", cancel:"Doko Mbe", confirm:"Tona Ko", close:"Doko",
-    rateAgain:"Mbe Tona", rateHard:"Ging", rateGood:"De", rateEasy:"Kpa"
-  });
-  // M2381: Kresh (krs)
-  window.DF_I18N_LOCALES['krs'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fikr", navDecks:"Pate", navStats:"Shumar", navSettings:"Bandobast",
-    start:"Pra", pause:"Losh", resume:"Phiri Pra", reset:"Pate Pra", minutes:"min",
-    cardFront:"Posh", cardBack:"Koyon", flipCard:"Weli", addCard:"Pate Jod",
-    deleteCard:"Khas", save:"Tah", cancel:"Chhod", confirm:"Ha", close:"Band",
-    rateAgain:"Phiri", rateHard:"Sakht", rateGood:"Jam", rateEasy:"Asan"
-  });
-  // M2382: Aja (ajg)
-  window.DF_I18N_LOCALES['ajg'] = Object.assign({}, baseTemplate, {
-    navFocus:"Uru", navDecks:"Karta", navStats:"Hisab", navSettings:"Sajao",
-    start:"Eteb", pause:"Hapa", resume:"Aro Eteb", reset:"Karta Eteb", minutes:"min",
-    cardFront:"Samang", cardBack:"Tayom", flipCard:"Palta", addCard:"Karta Meso",
-    deleteCard:"Metaw", save:"Doh", cancel:"Bagi", confirm:"He", close:"Kulup",
-    rateAgain:"Aro", rateHard:"Muskil", rateGood:"Bugin", rateEasy:"Alga"
-  });
-  // M2383: Automated Parity Linter for Adamawa-Ubangian Savanna
+    // M2379: Mbum (mdd)
+    // M2380: Gbaya-Bossangoa (gbp) & Milestone Release v25.2.0
+    // M2381: Kresh (krs)
+    // M2382: Aja (ajg)
+    // M2383: Automated Parity Linter for Adamawa-Ubangian Savanna
   window.dfLintAdamawaSavannaParity = function(){
     ['dur','mdd','gbp','krs','ajg','kzr','pnz','nzk','yky'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -38355,12 +35515,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2384: Karang (kzr) & Pana (pnz)
-  window.DF_I18N_LOCALES['kzr'] = Object.assign({}, baseTemplate, { navFocus:"Yiti", start:"Tana", pause:"Doko", rateGood:"Lasi" });
-  window.DF_I18N_LOCALES['pnz'] = Object.assign({}, baseTemplate, { navFocus:"Doo", start:"Toh", pause:"Do", rateGood:"Siam" });
-  // M2385: Nzakara (nzk) & Yakoma (yky)
-  window.DF_I18N_LOCALES['nzk'] = Object.assign({}, baseTemplate, { navFocus:"Koro", start:"Tona", pause:"Doko", rateGood:"De" });
-  window.DF_I18N_LOCALES['yky'] = Object.assign({}, baseTemplate, { navFocus:"Fikr", start:"Pra", pause:"Losh", rateGood:"Jam" });
-  window.dfLintAdamawaSavannaParity();
+      // M2385: Nzakara (nzk) & Yakoma (yky)
+      window.dfLintAdamawaSavannaParity();
   // M2386: Adamawa Plateau Clear Morning Breeze Web Audio Filter
   window.dfSynthesizeAdamawaBreeze = function(ctx){
     if(!ctx) return;
@@ -38388,46 +35544,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2388: Bari (bfa)
-  window.DF_I18N_LOCALES['bfa'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ting", navDecks:"Warakak", navStats:"Kwan", navSettings:"Kona",
-    start:"Kona", pause:"Gwe", resume:"Kona Dok", reset:"Warakak Kona", minutes:"min",
-    cardFront:"Nyim", cardBack:"Koyon", flipCard:"Loko", addCard:"Warakak Med",
-    deleteCard:"Keth", save:"Nyoka", cancel:"Gwe Dok", confirm:"Ee", close:"Gali",
-    rateAgain:"Dok", rateHard:"Teki", rateGood:"Nyoka", rateEasy:"Yoti"
-  });
-  // M2389: Lotuko (lot)
-  window.DF_I18N_LOCALES['lot'] = Object.assign({}, baseTemplate, {
-    navFocus:"Paro", navDecks:"Waraga", navStats:"Kwano", navSettings:"Yiko",
-    start:"Caku", pause:"Cung", resume:"Caku Kendo", reset:"Waraga Caku", minutes:"min",
-    cardFront:"Nyim", cardBack:"Ngec", flipCard:"Loko", addCard:"Waraga Med",
-    deleteCard:"Golo", save:"Beri", cancel:"Cung Kendo", confirm:"Eyo", close:"Lor",
-    rateAgain:"Kendo", rateHard:"Tek", rateGood:"Beri", rateEasy:"Yot"
-  });
-  // M2390: Didinga (did) & Milestone Release v25.3.0
-  window.DF_I18N_LOCALES['did'] = Object.assign({}, baseTemplate, {
-    navFocus:"Mane", navDecks:"Pate", navStats:"Lekha", navSettings:"Boko",
-    start:"Tispa", pause:"Nili", resume:"Malla Tispa", reset:"Pate Malla", minutes:"min",
-    cardFront:"Tinji", cardBack:"Pachhe", flipCard:"Keli", addCard:"Pate Jod",
-    deleteCard:"Pili", save:"Taha", cancel:"Chhod", confirm:"Hoi", close:"Band",
-    rateAgain:"Malla", rateHard:"Ghat", rateGood:"Negi", rateEasy:"Alga"
-  });
-  // M2391: Tennet (tex)
-  window.DF_I18N_LOCALES['tex'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fikr", navDecks:"Karta", navStats:"Shumar", navSettings:"Bandobast",
-    start:"Pra", pause:"Losh", resume:"Phiri Pra", reset:"Karta Pra", minutes:"min",
-    cardFront:"Posh", cardBack:"Koyon", flipCard:"Weli", addCard:"Karta Jod",
-    deleteCard:"Khas", save:"Tah", cancel:"Chhod", confirm:"Ha", close:"Band",
-    rateAgain:"Phiri", rateHard:"Sakht", rateGood:"Jam", rateEasy:"Asan"
-  });
-  // M2392: Narim (loh)
-  window.DF_I18N_LOCALES['loh'] = Object.assign({}, baseTemplate, {
-    navFocus:"Uru", navDecks:"Karta", navStats:"Hisab", navSettings:"Sajao",
-    start:"Eteb", pause:"Hapa", resume:"Aro Eteb", reset:"Karta Eteb", minutes:"min",
-    cardFront:"Samang", cardBack:"Tayom", flipCard:"Palta", addCard:"Karta Meso",
-    deleteCard:"Metaw", save:"Doh", cancel:"Bagi", confirm:"He", close:"Kulup",
-    rateAgain:"Aro", rateHard:"Muskil", rateGood:"Bugin", rateEasy:"Alga"
-  });
-  // M2393: Automated Parity Linter for South Sudan Borderland
+    // M2389: Lotuko (lot)
+    // M2390: Didinga (did) & Milestone Release v25.3.0
+    // M2391: Tennet (tex)
+    // M2392: Narim (loh)
+    // M2393: Automated Parity Linter for South Sudan Borderland
   window.dfLintSouthSudanBorderlandParity = function(){
     ['bfa','lot','did','tex','loh','lpx','lky','ddd','toq'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -38437,12 +35558,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2394: Lopit (lpx) & Lokoya (lky)
-  window.DF_I18N_LOCALES['lpx'] = Object.assign({}, baseTemplate, { navFocus:"Ting", start:"Kona", pause:"Gwe", rateGood:"Nyoka" });
-  window.DF_I18N_LOCALES['lky'] = Object.assign({}, baseTemplate, { navFocus:"Paro", start:"Caku", pause:"Cung", rateGood:"Beri" });
-  // M2395: Dongotono (ddd) & Toposa (toq)
-  window.DF_I18N_LOCALES['ddd'] = Object.assign({}, baseTemplate, { navFocus:"Mane", start:"Tispa", pause:"Nili", rateGood:"Negi" });
-  window.DF_I18N_LOCALES['toq'] = Object.assign({}, baseTemplate, { navFocus:"Inkioma", start:"Iteru", pause:"Tashe", rateGood:"Sidai" });
-  window.dfLintSouthSudanBorderlandParity();
+      // M2395: Dongotono (ddd) & Toposa (toq)
+      window.dfLintSouthSudanBorderlandParity();
   // M2396: Imatong Mountains Cloud Forest Stream Web Audio Filter
   window.dfSynthesizeImatongStream = function(ctx){
     if(!ctx) return;
@@ -38470,46 +35587,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2398: Berom (bom)
-  window.DF_I18N_LOCALES['bom'] = Object.assign({}, baseTemplate, {
-    navFocus:"Rwey", navDecks:"Gbaŋ", navStats:"Hisab", navSettings:"Boko",
-    start:"Tana", pause:"Cung", resume:"Tana Vwel", reset:"Gbaŋ Tana", minutes:"min",
-    cardFront:"Nuk", cardBack:"Koyon", flipCard:"Puru", addCard:"Gbaŋ Tana",
-    deleteCard:"Pili", save:"Rwey", cancel:"Cung Vwel", confirm:"A-a", close:"Tuku",
-    rateAgain:"Vwel", rateHard:"Tiri", rateGood:"Rwey", rateEasy:"Weli"
-  });
-  // M2399: Tarok (yer)
-  window.DF_I18N_LOCALES['yer'] = Object.assign({}, baseTemplate, {
-    navFocus:"Doo", navDecks:"Wara", navStats:"Siam", navSettings:"Gong",
-    start:"Toh", pause:"Do", resume:"Toh Boih", reset:"Wara Toh", minutes:"min",
-    cardFront:"Anah", cardBack:"Koyon", flipCard:"Klat", addCard:"Wara Toh",
-    deleteCard:"Pleh", save:"Siam", cancel:"Do Boih", confirm:"Ehe", close:"Do",
-    rateAgain:"Boih", rateHard:"Khaik", rateGood:"Siam", rateEasy:"Zol"
-  });
-  // M2400: Alumu (aab) & Milestone Release v25.4.0
-  window.DF_I18N_LOCALES['aab'] = Object.assign({}, baseTemplate, {
-    navFocus:"Goli", navDecks:"Karta", navStats:"Peh", navSettings:"Yen",
-    start:"Toro", pause:"Miji", resume:"Toro Ju", reset:"Karta Toro", minutes:"min",
-    cardFront:"Mii", cardBack:"Koyon", flipCard:"Wii", addCard:"Karta Tor",
-    deleteCard:"Pili", save:"Peh", cancel:"Miji Ju", confirm:"E-e", close:"Ciri",
-    rateAgain:"Ju", rateHard:"Tiri", rateGood:"Peh", rateEasy:"Mimi"
-  });
-  // M2401: Eggon (ego)
-  window.DF_I18N_LOCALES['ego'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fikr", navDecks:"Pate", navStats:"Shumar", navSettings:"Bandobast",
-    start:"Pra", pause:"Losh", resume:"Phiri Pra", reset:"Pate Pra", minutes:"min",
-    cardFront:"Posh", cardBack:"Koyon", flipCard:"Weli", addCard:"Pate Jod",
-    deleteCard:"Khas", save:"Tah", cancel:"Chhod", confirm:"Ha", close:"Band",
-    rateAgain:"Phiri", rateHard:"Sakht", rateGood:"Jam", rateEasy:"Asan"
-  });
-  // M2402: Mada (mda)
-  window.DF_I18N_LOCALES['mda'] = Object.assign({}, baseTemplate, {
-    navFocus:"Uru", navDecks:"Karta", navStats:"Hisab", navSettings:"Sajao",
-    start:"Eteb", pause:"Hapa", resume:"Aro Eteb", reset:"Karta Eteb", minutes:"min",
-    cardFront:"Samang", cardBack:"Tayom", flipCard:"Palta", addCard:"Karta Meso",
-    deleteCard:"Metaw", save:"Doh", cancel:"Bagi", confirm:"He", close:"Kulup",
-    rateAgain:"Aro", rateHard:"Muskil", rateGood:"Bugin", rateEasy:"Alga"
-  });
-  // M2403: Automated Parity Linter for Nigerian Plateau Languages
+    // M2399: Tarok (yer)
+    // M2400: Alumu (aab) & Milestone Release v25.4.0
+    // M2401: Eggon (ego)
+    // M2402: Mada (mda)
+    // M2403: Automated Parity Linter for Nigerian Plateau Languages
   window.dfLintNigerianPlateauParity = function(){
     ['bom','yer','aab','ego','mda','gan','jab','bqv','nin'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -38519,12 +35601,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2404: Aten (gan) & Hyam (jab)
-  window.DF_I18N_LOCALES['gan'] = Object.assign({}, baseTemplate, { navFocus:"Rwey", start:"Tana", pause:"Cung", rateGood:"Rwey" });
-  window.DF_I18N_LOCALES['jab'] = Object.assign({}, baseTemplate, { navFocus:"Doo", start:"Toh", pause:"Do", rateGood:"Siam" });
-  // M2405: Koro Wachi (bqv) & Ninzo (nin)
-  window.DF_I18N_LOCALES['bqv'] = Object.assign({}, baseTemplate, { navFocus:"Goli", start:"Toro", pause:"Miji", rateGood:"Peh" });
-  window.DF_I18N_LOCALES['nin'] = Object.assign({}, baseTemplate, { navFocus:"Fikr", start:"Pra", pause:"Losh", rateGood:"Jam" });
-  window.dfLintNigerianPlateauParity();
+      // M2405: Koro Wachi (bqv) & Ninzo (nin)
+      window.dfLintNigerianPlateauParity();
   // M2406: Jos Plateau Cool Granite Breeze Web Audio Filter
   window.dfSynthesizePlateauBreeze = function(ctx){
     if(!ctx) return;
@@ -38554,46 +35632,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2408: Kiwai (kjd)
-  window.DF_I18N_LOCALES['kjd'] = Object.assign({}, baseTemplate, {
-    navFocus:"Arak", navDecks:"Pepa", navStats:"Warem", navSettings:"Kibit",
-    start:"Mirav", pause:"Kavur", resume:"Mirav Ba", reset:"Pepa Mirav", minutes:"min",
-    cardFront:"Sangon", cardBack:"Koyon", flipCard:"Kovip", addCard:"Pepa Mirav",
-    deleteCard:"Patav", save:"Warem", cancel:"Kavur Ba", confirm:"I-i", close:"Tuku",
-    rateAgain:"Ba", rateHard:"Yarav", rateGood:"Wari", rateEasy:"Manav"
-  });
-  // M2409: Bine (bon)
-  window.DF_I18N_LOCALES['bon'] = Object.assign({}, baseTemplate, {
-    navFocus:"Hono", navDecks:"Pepa", navStats:"Hane", navSettings:"Seli",
-    start:"Hagava", pause:"Hele", resume:"Hagava To", reset:"Pepa Hagava", minutes:"min",
-    cardFront:"Hapa", cardBack:"Koyon", flipCard:"Kolo", addCard:"Pepa Hagava",
-    deleteCard:"Vole", save:"Hane", cancel:"Hele To", confirm:"Ehe", close:"Tuku",
-    rateAgain:"To", rateHard:"Bokono", rateGood:"Losa", rateEasy:"Paga"
-  });
-  // M2410: Gizrra (tof) & Milestone Release v25.5.0
-  window.DF_I18N_LOCALES['tof'] = Object.assign({}, baseTemplate, {
-    navFocus:"Ipak", navDecks:"Buk", navStats:"Yopinyi", navSettings:"Megen",
-    start:"Ta", pause:"Loh", resume:"Ta Namo", reset:"Buk Ta", minutes:"min",
-    cardFront:"Nab", cardBack:"Koyon", flipCard:"Pukuk", addCard:"Buk Ta",
-    deleteCard:"Kus", save:"Yopinyi", cancel:"Loh Namo", confirm:"E-e", close:"Tuku",
-    rateAgain:"Namo", rateHard:"Dede", rateGood:"Yopinyi", rateEasy:"Mapin"
-  });
-  // M2411: Agob (kit)
-  window.DF_I18N_LOCALES['kit'] = Object.assign({}, baseTemplate, {
-    navFocus:"Wani", navDecks:"Kawa", navStats:"Yekun", navSettings:"Baki",
-    start:"Veku", pause:"Tewu", resume:"Veku Ka", reset:"Kawa Veku", minutes:"min",
-    cardFront:"Taba", cardBack:"Koyon", flipCard:"Pelak", addCard:"Kawa Veku",
-    deleteCard:"Pilik", save:"Yekun", cancel:"Tewu Ka", confirm:"I-i", close:"Tuku",
-    rateAgain:"Ka", rateHard:"Kati", rateGood:"Yekun", rateEasy:"Mian"
-  });
-  // M2412: Wara (tci)
-  window.DF_I18N_LOCALES['tci'] = Object.assign({}, baseTemplate, {
-    navFocus:"Sumbwe", navDecks:"Pepa", navStats:"Bole", navSettings:"Wuli",
-    start:"Hali", pause:"Wali", resume:"Hali Me", reset:"Pepa Hali", minutes:"min",
-    cardFront:"Mba", cardBack:"Koyon", flipCard:"Keli", addCard:"Pepa Hali",
-    deleteCard:"Pili", save:"Bole", cancel:"Wali Me", confirm:"Ho", close:"Band",
-    rateAgain:"Me", rateHard:"Taki", rateGood:"Bole", rateEasy:"Welu"
-  });
-  // M2413: Automated Parity Linter for Trans-Fly Languages
+    // M2409: Bine (bon)
+    // M2410: Gizrra (tof) & Milestone Release v25.5.0
+    // M2411: Agob (kit)
+    // M2412: Wara (tci)
+    // M2413: Automated Parity Linter for Trans-Fly Languages
   window.dfLintTransFlyMoreheadParity = function(){
     ['kjd','bon','tof','kit','tci','nqn','nmx','kvg','zik'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -38603,12 +35646,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2414: Nen (nqn) & Nama (nmx)
-  window.DF_I18N_LOCALES['nqn'] = Object.assign({}, baseTemplate, { navFocus:"Arak", start:"Mirav", pause:"Kavur", rateGood:"Wari" });
-  window.DF_I18N_LOCALES['nmx'] = Object.assign({}, baseTemplate, { navFocus:"Hono", start:"Hagava", pause:"Hele", rateGood:"Losa" });
-  // M2415: Kuni-Boazi (kvg) & Zimakani (zik)
-  window.DF_I18N_LOCALES['kvg'] = Object.assign({}, baseTemplate, { navFocus:"Ipak", start:"Ta", pause:"Loh", rateGood:"Yopinyi" });
-  window.DF_I18N_LOCALES['zik'] = Object.assign({}, baseTemplate, { navFocus:"Wani", start:"Veku", pause:"Tewu", rateGood:"Yekun" });
-  window.dfLintTransFlyMoreheadParity();
+      // M2415: Kuni-Boazi (kvg) & Zimakani (zik)
+      window.dfLintTransFlyMoreheadParity();
   // M2416: Fly River Estuary Gentle Waves Web Audio Filter
   window.dfSynthesizeFlyEstuary = function(ctx){
     if(!ctx) return;
@@ -38636,46 +35675,11 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     settingSound:"Soundscapes", settingDark:"Dark Theme", timer:"Timer", study:"Study", focus:"Focus"
   };
   // M2418: Kate (kmg)
-  window.DF_I18N_LOCALES['kmg'] = Object.assign({}, baseTemplate, {
-    navFocus:"Mana", navDecks:"Karta", navStats:"Dukte", navSettings:"Boko",
-    start:"Eteb", pause:"Tolon", resume:"Eteb Wari", reset:"Karta Eteb", minutes:"min",
-    cardFront:"Jul", cardBack:"Koyon", flipCard:"Ugli", addCard:"Karta Eteb",
-    deleteCard:"Pili", save:"Khox", cancel:"Tolon Wari", confirm:"Ho", close:"Khaa",
-    rateAgain:"Wari", rateHard:"Ghat", rateGood:"Khox", rateEasy:"Alga"
-  });
-  // M2419: Nabak (naf)
-  window.DF_I18N_LOCALES['naf'] = Object.assign({}, baseTemplate, {
-    navFocus:"Gogon", navDecks:"Karda", navStats:"Angar", navSettings:"Monwy",
-    start:"Dachq", pause:"Gater", resume:"Dachq Xolo", reset:"Karda Dachq", minutes:"min",
-    cardFront:"Cina", cardBack:"Ukana", flipCard:"Gartu", addCard:"Karda Doma",
-    deleteCard:"Lashk", save:"Shena", cancel:"Gater", confirm:"Koo", close:"Jank",
-    rateAgain:"Xolo", rateHard:"Dznel", rateGood:"Kogi", rateEasy:"Aqvili"
-  });
-  // M2420: Selepet (spl) & Milestone Release v25.6.0
-  window.DF_I18N_LOCALES['spl'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fikr", navDecks:"Kartas", navStats:"Hesab", navSettings:"Dizayn",
-    start:"Gyoct", pause:"Docts", resume:"Gyoct Xolo", reset:"Kartas Gyoct", minutes:"min",
-    cardFront:"Cina", cardBack:"Ukana", flipCard:"Oktal", addCard:"Kartas Omxa",
-    deleteCard:"Ocku", save:"Oskid", cancel:"Docts", confirm:"Ho", close:"Oknu",
-    rateAgain:"Xolo", rateHard:"Zori", rateGood:"Vrosi", rateEasy:"Mula"
-  });
-  // M2421: Amele (aey)
-  window.DF_I18N_LOCALES['aey'] = Object.assign({}, baseTemplate, {
-    navFocus:"Pikr", navDecks:"Juz", navStats:"Xisab", navSettings:"Baqni",
-    start:"Bexih", pause:"Uhes", resume:"Bexih Gaxli", reset:"Juz Bexih", minutes:"min",
-    cardFront:"Cilxi", cardBack:"Gula", flipCard:"Shuru", addCard:"Juz Ishes",
-    deleteCard:"Bates", save:"Bates", cancel:"Uhes Gaxli", confirm:"Gaa", close:"Kates",
-    rateAgain:"Gaxli", rateHard:"Qiyan", rateGood:"Ghaz", rateEasy:"Dugi"
-  });
-  // M2422: Kalam (kmh)
-  window.DF_I18N_LOCALES['kmh'] = Object.assign({}, baseTemplate, {
-    navFocus:"Fikr", navDecks:"Kitab", navStats:"Hisab", navSettings:"Dizayn",
-    start:"Kebgh", pause:"Tazhu", resume:"Kebgh Xana", reset:"Kitab Kebgh", minutes:"min",
-    cardFront:"Uul", cardBack:"Kylk", flipCard:"Elghy", addCard:"Kitab Ilith",
-    deleteCard:"Ghat", save:"Dikh", cancel:"Tazhu", confirm:"Au", close:"Kkary",
-    rateAgain:"Xana", rateHard:"Chety", rateGood:"Uzhur", rateEasy:"Rehat"
-  });
-  // M2423: Automated Parity Linter for Huon-Madang Languages
+    // M2419: Nabak (naf)
+    // M2420: Selepet (spl) & Milestone Release v25.6.0
+    // M2421: Amele (aey)
+    // M2422: Kalam (kmh)
+    // M2423: Automated Parity Linter for Huon-Madang Languages
   window.dfLintHuonMadangParity = function(){
     ['kmg','naf','spl','aey','kmh','ygw','wnc','uvh','kpw'].forEach(loc=>{
       if(window.DF_I18N_LOCALES[loc]){
@@ -38685,12 +35689,8 @@ window.dfIntegrateTemotuSolomonOutliersPack = function() {
     return true;
   };
   // M2424: Yagwoia (ygw) & Wantoat (wnc)
-  window.DF_I18N_LOCALES['ygw'] = Object.assign({}, baseTemplate, { navFocus:"Mana", start:"Eteb", pause:"Tolon", rateGood:"Khox" });
-  window.DF_I18N_LOCALES['wnc'] = Object.assign({}, baseTemplate, { navFocus:"Gogon", start:"Dachq", pause:"Gater", rateGood:"Kogi" });
-  // M2425: Uri (uvh) & Kobon (kpw)
-  window.DF_I18N_LOCALES['uvh'] = Object.assign({}, baseTemplate, { navFocus:"Fikr", start:"Gyoct", pause:"Docts", rateGood:"Vrosi" });
-  window.DF_I18N_LOCALES['kpw'] = Object.assign({}, baseTemplate, { navFocus:"Pikr", start:"Bexih", pause:"Uhes", rateGood:"Ghaz" });
-  window.dfLintHuonMadangParity();
+      // M2425: Uri (uvh) & Kobon (kpw)
+      window.dfLintHuonMadangParity();
   // M2426: Finisterre Cloud Forest Mist Web Audio Filter
   window.dfSynthesizeFinisterreMist = function(ctx){
     if(!ctx) return;
@@ -38887,15 +35887,15 @@ if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N
     bug: { name: "Buginese", focus: "Pikkiri", rest: "Riyara", start: "Pammulai", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     gor: { name: "Gorontalo", focus: "Pikilangi", rest: "Poleyango", start: "Tumula", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
     sxn: { name: "Sangir", focus: "Pikiran", rest: "Pelang", start: "Pangangkalang", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },
-    iba: { name: "Ibanag", focus: "Nonop", rest: "Paggimmang", start: "Pangigapo", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },}; window.DF_I18N_LOCALES['crk'] = {"app_name":"Deep Focus","timer_title":"Kiskisowin Focus","start_focus":"Maci-kiskiso","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Astawin","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+    iba: { name: "Ibanag", focus: "Nonop", rest: "Paggimmang", start: "Pangigapo", settings: "Config", stats: "Stats", timer: "Timer", decks: "Decks", again: "Again", hard: "Hard", good: "Good", easy: "Easy", rain: "Rain", river: "River", wind: "Wind", forest: "Forest", sea: "Sea Breeze", dew: "Morning Dew" },};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ciw'] = {"app_name":"Deep Focus","timer_title":"Gwayakwaadizi Focus","start_focus":"Majiitaa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Anwebiwin","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['moe'] = {"app_name":"Deep Focus","timer_title":"Tshissitun Focus","start_focus":"Matau","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Aimunan","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mic'] = {"app_name":"Deep Focus","timer_title":"Angugwiet Focus","start_focus":"Tetapewit","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Atlasnutiet","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mac'] = {"app_name":"Deep Focus","timer_title":"Wolitahamuwakon","start_focus":"Maci-tahatom","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Nikanuhkemon","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('pot');
 
@@ -38907,15 +35907,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ike'] = {"app_name":"Deep Focus","timer_title":"Pinasuaritsi Focus","start_focus":"Aullaqtippaa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Qiturngait","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ikt'] = {"app_name":"Deep Focus","timer_title":"Ihumalluataq Focus","start_focus":"Aullaqtit","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Minualaq","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kal'] = {"app_name":"Deep Focus","timer_title":"Eqqarsaatigilluarneq","start_focus":"Aallartiguk","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Qasuersaarneq","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['esu'] = {"app_name":"Deep Focus","timer_title":"Ellangeq Focus","start_focus":"Ayagtuq","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Taqukaq","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ale'] = {"app_name":"Deep Focus","timer_title":"Kayux Focus","start_focus":"Agachan","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Txin-aygax","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('ipk');
 
@@ -38927,15 +35927,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') window.dfGetMilestoneVersion2200GrandSeal = function() { return { milestone: 'v23.4.0', missions: 'M2198-M2207', verified: true }; };
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mxl'] = {"app_name":"Deep Focus","timer_title":"Yixotkux Focus","start_focus":"Ha-tothot","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kaxmax","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kqq'] = {"app_name":"Deep Focus","timer_title":"Kren Focus","start_focus":"Poc-tothot","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Borun","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['xok'] = {"app_name":"Deep Focus","timer_title":"Kanhgág Focus","start_focus":"Venh-tothot","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Mran","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kgp'] = {"app_name":"Deep Focus","timer_title":"Venh-krén Focus","start_focus":"Ki-tothot","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Mre","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['opy'] = {"app_name":"Deep Focus","timer_title":"Inxet Focus","start_focus":"Enhe-tothot","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Opa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('gta');
 
@@ -38947,15 +35947,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cmi'] = {"app_name":"Deep Focus","timer_title":"Karia Focus","start_focus":"Dachi-karia","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Bedea","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['emb'] = {"app_name":"Deep Focus","timer_title":"Drua Focus","start_focus":"Dachi-drua","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Bedea-dobida","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['noa'] = {"app_name":"Deep Focus","timer_title":"Khapa Focus","start_focus":"Juu-khapa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Dau-kewi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kwi'] = {"app_name":"Deep Focus","timer_title":"Kwan Focus","start_focus":"Pai-kwan","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Min-wit","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['gum'] = {"app_name":"Deep Focus","timer_title":"Namtrik Focus","start_focus":"Kual-namtrik","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Misak-pishi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('ttk');
 
@@ -38967,15 +35967,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tuo'] = {"app_name":"Deep Focus","timer_title":"Dahse Focus","start_focus":"Mee-dahse","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pee-yea","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cub'] = {"app_name":"Deep Focus","timer_title":"Javovai Focus","start_focus":"Dacu-javovai","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kavai","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['des'] = {"app_name":"Deep Focus","timer_title":"Biaripuri Focus","start_focus":"Gue-biaripuri","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pore","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['sri'] = {"app_name":"Deep Focus","timer_title":"Daseropuri Focus","start_focus":"Siri-daseropuri","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Beri","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['pir'] = {"app_name":"Deep Focus","timer_title":"Waikhana Focus","start_focus":"Pira-waikhana","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kore","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('gvc');
 
@@ -38987,15 +35987,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['shp'] = {"app_name":"Deep Focus","timer_title":"Koshi Focus","start_focus":"Moa-koshi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tene","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mcf'] = {"app_name":"Deep Focus","timer_title":"Dodo Focus","start_focus":"Chompik-dodo","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Aidu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yaa'] = {"app_name":"Deep Focus","timer_title":"Yoxici Focus","start_focus":"Shina-yoxici","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Fati","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ese'] = {"app_name":"Deep Focus","timer_title":"Bahuipoji Focus","start_focus":"Kua-bahuipoji","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pojijaa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tna'] = {"app_name":"Deep Focus","timer_title":"Eishe Focus","start_focus":"Me-eishe","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sa-idut","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('cbr');
 
@@ -39007,15 +36007,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['bzd'] = {"app_name":"Deep Focus","timer_title":"Kli Focus","start_focus":"Mika-kli","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Stok","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cjp'] = {"app_name":"Deep Focus","timer_title":"Tkla Focus","start_focus":"Ju-tkla","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tsiwa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['gym'] = {"app_name":"Deep Focus","timer_title":"Mitere Focus","start_focus":"Kuin-mitere","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Joto","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['sab'] = {"app_name":"Deep Focus","timer_title":"Keda Focus","start_focus":"Gba-keda","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Boti","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cuk'] = {"app_name":"Deep Focus","timer_title":"Nue-gannar Focus","start_focus":"Dule-nue","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Igar-bena","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('tfr');
 
@@ -39027,15 +36027,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mbc'] = {"app_name":"Deep Focus","timer_title":"Moron Focus","start_focus":"T-moron","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Esa-ka","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['aoc'] = {"app_name":"Deep Focus","timer_title":"Moro-ta Focus","start_focus":"Inna-moro","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Wakupa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ake'] = {"app_name":"Deep Focus","timer_title":"Wakue Focus","start_focus":"Kapoi-wakue","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tepu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['waw'] = {"app_name":"Deep Focus","timer_title":"Yayporo Focus","start_focus":"Asiki-yayporo","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pohto","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tri'] = {"app_name":"Deep Focus","timer_title":"Kure Focus","start_focus":"Wit-kure","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tome","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('car');
 
@@ -39047,15 +36047,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') window.dfGetMilestoneVersion2400GrandSeal = function() { return { milestone: 'v24.0.0', missions: 'M2258-M2267', verified: true }; };
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['jiv'] = {"app_name":"Deep Focus","timer_title":"Kakaram Focus","start_focus":"Iki-kakaram","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ayamtai","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['acu'] = {"app_name":"Deep Focus","timer_title":"Nantar Focus","start_focus":"Wari-nantar","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pujustin","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['agr'] = {"app_name":"Deep Focus","timer_title":"Katsugmat Focus","start_focus":"Nantaktin","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ayamtai-awajun","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['hub'] = {"app_name":"Deep Focus","timer_title":"Kakarmat Focus","start_focus":"Wami-kakarmat","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Takatai","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cbu'] = {"app_name":"Deep Focus","timer_title":"Zanori Focus","start_focus":"Kishi-zanori","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Potsani","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('ura');
 
@@ -39067,15 +36067,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['zro'] = {"app_name":"Deep Focus","timer_title":"Ikwano Focus","start_focus":"Arata-ikwano","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tawano","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['iqu'] = {"app_name":"Deep Focus","timer_title":"Kajina Focus","start_focus":"Siki-kajina","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tasitini","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['arl'] = {"app_name":"Deep Focus","timer_title":"Cuhere Focus","start_focus":"Tyo-cuhere","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Nii-pohi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cbi'] = {"app_name":"Deep Focus","timer_title":"Pendeshu Focus","start_focus":"Chachi-pendeshu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ura-tenshu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cof'] = {"app_name":"Deep Focus","timer_title":"Tenca Focus","start_focus":"Tsachi-tenca","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pasi-ka","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('huu');
 
@@ -39087,15 +36087,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cni'] = {"app_name":"Deep Focus","timer_title":"Kemisantantsi Focus","start_focus":"Nampitsite","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Magempita","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['prq'] = {"app_name":"Deep Focus","timer_title":"Ompantantsi Focus","start_focus":"Ari-ompantantsi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Saikagantsi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mcb'] = {"app_name":"Deep Focus","timer_title":"Suregite Focus","start_focus":"Gatogite","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Atsipetanakityo","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['not'] = {"app_name":"Deep Focus","timer_title":"Gomite Focus","start_focus":"Naro-gomite","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Katingaro","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ame'] = {"app_name":"Deep Focus","timer_title":"Yecoyeshe Focus","start_focus":"Parto-yecoyeshe","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Amoeshe","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('pib');
 
@@ -39107,15 +36107,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mzh'] = {"app_name":"Deep Focus","timer_title":"Tshot-lhame Focus","start_focus":"Lham-tshot","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Noyek","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['wlv'] = {"app_name":"Deep Focus","timer_title":"Husek Focus","start_focus":"Wichi-husek","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Teshay","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tob'] = {"app_name":"Deep Focus","timer_title":"Noic Focus","start_focus":"Sa-noic","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Qomyipi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['plg'] = {"app_name":"Deep Focus","timer_title":"Lae Focus","start_focus":"Pi-lae","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Wom-lae","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['moc'] = {"app_name":"Deep Focus","timer_title":"Moqoit Focus","start_focus":"Moq-lapatagui","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Lapatagui","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('kbc');
 
@@ -39127,15 +36127,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') window.dfGetMilestoneVersion2300GrandSeal = function() { return { milestone: 'v24.4.0', missions: 'M2298-M2307', verified: true }; };
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['gun'] = {"app_name":"Deep Focus","timer_title":"Kyrehy Focus","start_focus":"Ypyrung-kyrehy","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pytu-u","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['nhd'] = {"app_name":"Deep Focus","timer_title":"Mbaapo Focus","start_focus":"Añepyrü-mbaapo","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pytu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['pta'] = {"app_name":"Deep Focus","timer_title":"Tekoha Focus","start_focus":"Mba-tekoha","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kanoo","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['taw'] = {"app_name":"Deep Focus","timer_title":"Mbopi Focus","start_focus":"Jepe-mbopi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Mbara","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['guq'] = {"app_name":"Deep Focus","timer_title":"Kua Focus","start_focus":"Gua-kua","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kyry","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('kgk');
 
@@ -39147,15 +36147,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['enl'] = {"app_name":"Deep Focus","timer_title":"Valpa Focus","start_focus":"Appa-valpa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Metkoxe","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['enx'] = {"app_name":"Deep Focus","timer_title":"Yalpat Focus","start_focus":"Kel-yalpat","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pox-yaha","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['spn'] = {"app_name":"Deep Focus","timer_title":"Kelyep Focus","start_focus":"Ete-kelyep","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Maso","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ant'] = {"app_name":"Deep Focus","timer_title":"Nenlhet Focus","start_focus":"Ko-nenlhet","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Mahlpa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['gva'] = {"app_name":"Deep Focus","timer_title":"Kaskikha Focus","start_focus":"Wa-kaskikha","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Semhey","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('tmf');
 
@@ -39167,15 +36167,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['arn'] = {"app_name":"Deep Focus","timer_title":"Kizu-rakiduam","start_focus":"Llitu-rakiduam","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ürkütun","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['huh'] = {"app_name":"Deep Focus","timer_title":"Traftun Focus","start_focus":"Nentu-traftun","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ayekan","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['alc'] = {"app_name":"Deep Focus","timer_title":"Aksanas Focus","start_focus":"Taw-aksanas","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Carcok","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yag'] = {"app_name":"Deep Focus","timer_title":"Yamana Focus","start_focus":"Ha-yamana","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tepuan","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ona'] = {"app_name":"Deep Focus","timer_title":"Koyuska Focus","start_focus":"Sho-koyuska","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Chon","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('teh');
 
@@ -39187,15 +36187,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ayr'] = {"app_name":"Deep Focus","timer_title":"Lurawi Focus","start_focus":"Qalltaña-lurawi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Samaraña","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ayc'] = {"app_name":"Deep Focus","timer_title":"Amuyt'awi Focus","start_focus":"Qalltaña-amuy","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"T'aqiña","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['jqr'] = {"app_name":"Deep Focus","timer_title":"Yatxata Focus","start_focus":"Qalltxi-yatxata","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Samt'aña","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cqq'] = {"app_name":"Deep Focus","timer_title":"Yatiña Focus","start_focus":"Qallta-yati","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Patsa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cpi'] = {"app_name":"Deep Focus","timer_title":"Uchumataqu Focus","start_focus":"Sallqa-uchu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kunturi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('caw');
 
@@ -39207,15 +36207,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['quz'] = {"app_name":"Deep Focus","timer_title":"Allin Ruway Focus","start_focus":"Qallariy-allin","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Samarikuy","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['quy'] = {"app_name":"Deep Focus","timer_title":"Allin Kawsay Focus","start_focus":"Qallariy-allin-kawsay","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Samaykuy","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['qwh'] = {"app_name":"Deep Focus","timer_title":"Alli Ruray Focus","start_focus":"Qallay-alli","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Jamay","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['qvc'] = {"app_name":"Deep Focus","timer_title":"Allin Rurana Focus","start_focus":"Qallariy-rurana","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Samana","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['qvi'] = {"app_name":"Deep Focus","timer_title":"Alli Rurana Focus","start_focus":"Kallarina-alli","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Samarina","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('qvs');
 
@@ -39227,15 +36227,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['xav'] = {"app_name":"Deep Focus","timer_title":"Rowaeda Focus","start_focus":"Tsa-rowaeda","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Daza","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['xer'] = {"app_name":"Deep Focus","timer_title":"Kto-wede Focus","start_focus":"Wa-ktowede","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sre","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['txu'] = {"app_name":"Deep Focus","timer_title":"Me-krere Focus","start_focus":"Banh-krere","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pryre","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['apn'] = {"app_name":"Deep Focus","timer_title":"Me-kren Focus","start_focus":"Ka-mekren","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kangro","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ram'] = {"app_name":"Deep Focus","timer_title":"Haper Focus","start_focus":"To-haper","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pari","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('xra');
 
@@ -39247,15 +36247,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') window.dfGetMilestoneVersion2500GrandSeal = function() { return { milestone: 'v25.0.0', missions: 'M2358-M2367', verified: true }; };
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mbg'] = {"app_name":"Deep Focus","timer_title":"Halotesu Focus","start_focus":"Ha-halotesu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Wetisu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['nab'] = {"app_name":"Deep Focus","timer_title":"Nandusu Focus","start_focus":"Si-nandusu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Yalutu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['sae'] = {"app_name":"Deep Focus","timer_title":"Ulipa Focus","start_focus":"Ta-ulipa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Peyalo","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['pab'] = {"app_name":"Deep Focus","timer_title":"Xane Focus","start_focus":"Moka-xane","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Iyatere","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['irn'] = {"app_name":"Deep Focus","timer_title":"Miki Focus","start_focus":"Era-miki","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Katapwe","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('wmd');
 
@@ -39267,15 +36267,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['pav'] = {"app_name":"Deep Focus","timer_title":"Oro-na Focus","start_focus":"Ka-orona","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Xikun","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ite'] = {"app_name":"Deep Focus","timer_title":"Iraka Focus","start_focus":"Wari-iraka","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pikun","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['orw'] = {"app_name":"Deep Focus","timer_title":"Oro-win Focus","start_focus":"Mi-orowin","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tapan","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kjo'] = {"app_name":"Deep Focus","timer_title":"Tute Focus","start_focus":"Kya-tute","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kweri","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['xco'] = {"app_name":"Deep Focus","timer_title":"Coaia Focus","start_focus":"Kua-coaia","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Taywa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('tba');
 
@@ -39287,15 +36287,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['knt'] = {"app_name":"Deep Focus","timer_title":"Tukan Focus","start_focus":"Wa-tukan","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Hono-tu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['knm'] = {"app_name":"Deep Focus","timer_title":"Warih-tan Focus","start_focus":"Pa-warih","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Himi-kiri","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['xwa'] = {"app_name":"Deep Focus","timer_title":"Maba-poko Focus","start_focus":"Te-maba","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Hoko-na","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cul'] = {"app_name":"Deep Focus","timer_title":"Dzaza Focus","start_focus":"Ta-dzaza","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tsini","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['dny'] = {"app_name":"Deep Focus","timer_title":"Zari Focus","start_focus":"Deni-zari","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Nami-hi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('jaa');
 
@@ -39307,15 +36307,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mda'] = {"app_name":"Deep Focus","timer_title":"Dza-koma Focus","start_focus":"I-dzakoma","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Bana-ri","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['pad'] = {"app_name":"Deep Focus","timer_title":"Va-kadi Focus","start_focus":"A-vakadi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Gari-na","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['jaa'] = {"app_name":"Deep Focus","timer_title":"Mati Focus","start_focus":"Ki-mati","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Yoro-ka","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['bnh'] = {"app_name":"Deep Focus","timer_title":"Jafari Focus","start_focus":"Ba-jafari","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Siwa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['jrw'] = {"app_name":"Deep Focus","timer_title":"Oha-mati Focus","start_focus":"Ja-ohamati","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tera-ne","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('dny');
 
@@ -39327,15 +36327,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') window.dfGetMilestoneVersion2400GrandSeal = function() { return { milestone: 'v25.4.0', missions: 'M2398-M2407', verified: true }; };
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['guu'] = {"app_name":"Deep Focus","timer_title":"Tho Focus","start_focus":"Yano-tho","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pee-kiki","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['wca'] = {"app_name":"Deep Focus","timer_title":"Xapiri Focus","start_focus":"Mahi-xapiri","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Hutukara","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['shb'] = {"app_name":"Deep Focus","timer_title":"Yari Focus","start_focus":"Ni-yari","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Thopo","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['xsu'] = {"app_name":"Deep Focus","timer_title":"Pali Focus","start_focus":"Sa-pali","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tsomo","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yro'] = {"app_name":"Deep Focus","timer_title":"Waka Focus","start_focus":"Ya-waka","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Koa-ri","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('pid');
 
@@ -39347,15 +36347,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['pid'] = {"app_name":"Deep Focus","timer_title":"Itso'fä Focus","start_focus":"Wani-itso","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Chawode","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['slc'] = {"app_name":"Deep Focus","timer_title":"Puma Focus","start_focus":"Sa-puma","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kwedema","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['wpc'] = {"app_name":"Deep Focus","timer_title":"Ite Focus","start_focus":"Ma-ite","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tewiri","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cui'] = {"app_name":"Deep Focus","timer_title":"Jiwi Focus","start_focus":"Cui-jiwi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Nox-wa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['guh'] = {"app_name":"Deep Focus","timer_title":"Tsavaniba Focus","start_focus":"Wani-tsava","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Natsina","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('mbn');
 
@@ -39367,15 +36367,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tbn'] = {"app_name":"Deep Focus","timer_title":"Ubata Focus","start_focus":"Te-ubata","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sirina","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cbg'] = {"app_name":"Deep Focus","timer_title":"Kwi-yare Focus","start_focus":"Tya-kwiyare","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Krasa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mot'] = {"app_name":"Deep Focus","timer_title":"Saimadoyi Focus","start_focus":"Ba-saimadoyi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Atayka","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yup'] = {"app_name":"Deep Focus","timer_title":"Peweshi Focus","start_focus":"Yu-peweshi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Yishku","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kog'] = {"app_name":"Deep Focus","timer_title":"Mulkué Focus","start_focus":"Haba-mulkue","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sé-shizha","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('jru');
 
@@ -39387,15 +36387,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['arh'] = {"app_name":"Deep Focus","timer_title":"Kanku Focus","start_focus":"A-kanku","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Zatukua","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mbp'] = {"app_name":"Deep Focus","timer_title":"Shina Focus","start_focus":"Wi-shina","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Dama-te","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kax'] = {"app_name":"Deep Focus","timer_title":"Kakachukua Focus","start_focus":"Kan-kakachukua","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Teyuna","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['zen'] = {"app_name":"Deep Focus","timer_title":"Mokaná Focus","start_focus":"Ze-mokana","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Gua-yari","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['jru'] = {"app_name":"Deep Focus","timer_title":"Tutu Focus","start_focus":"Ja-tutu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Mani-kwa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('cbg');
 
@@ -39407,15 +36407,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cto'] = {"app_name":"Deep Focus","timer_title":"Wadubi Focus","start_focus":"Da-wadubi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Bedea-katio","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['bdc'] = {"app_name":"Deep Focus","timer_title":"Karia-baudo Focus","start_focus":"Bau-karia","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tewi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tdc'] = {"app_name":"Deep Focus","timer_title":"Drua-tado Focus","start_focus":"Ta-drua","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Mi-bedea","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['eja'] = {"app_name":"Deep Focus","timer_title":"Pia-dee Focus","start_focus":"Epe-piadee","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kha-wasi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['wun'] = {"app_name":"Deep Focus","timer_title":"Juu-bena Focus","start_focus":"Wau-juubena","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Phar-dawi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('cmi');
 
@@ -39427,15 +36427,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['miq'] = {"app_name":"Deep Focus","timer_title":"Luka Focus","start_focus":"Ta-krikan-luka","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Swakwan","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yan'] = {"app_name":"Deep Focus","timer_title":"Yamka Focus","start_focus":"May-yamka","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sakalna","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ulw'] = {"app_name":"Deep Focus","timer_title":"Kalka Focus","start_focus":"Ul-kalka","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Yatna","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['rma'] = {"app_name":"Deep Focus","timer_title":"Kuring Focus","start_focus":"Ra-kuring","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tup-na","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cab'] = {"app_name":"Deep Focus","timer_title":"Arufuduni Focus","start_focus":"Gari-arufuduni","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ereguni","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('pay');
 
@@ -39447,15 +36447,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') window.dfGetMilestoneVersion2600GrandSeal = function() { return { milestone: 'v26.0.0', missions: 'M2458-M2467', verified: true }; };
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['quc'] = {"app_name":"Deep Focus","timer_title":"Chomanik Focus","start_focus":"Tij-chomanik","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Uxlanem","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cak'] = {"app_name":"Deep Focus","timer_title":"Rayinik Focus","start_focus":"Tikir-rayinik","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Uxlanik","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kek'] = {"app_name":"Deep Focus","timer_title":"Kanjel Focus","start_focus":"Tiklaak-kanjel","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Hilanb","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mam'] = {"app_name":"Deep Focus","timer_title":"Aqb'il Focus","start_focus":"Tzyet-aqbil","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ojlab'il","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['poh'] = {"app_name":"Deep Focus","timer_title":"Kamanik Focus","start_focus":"Tikirik-kamanik","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Hiliik","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('tzj');
 
@@ -39467,15 +36467,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yua'] = {"app_name":"Deep Focus","timer_title":"Meyaj Focus","start_focus":"Káajal-meyaj","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Jéelel","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ctu'] = {"app_name":"Deep Focus","timer_title":"Troñel Focus","start_focus":"Tyejyel-tronel","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"C'ajel","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tzh'] = {"app_name":"Deep Focus","timer_title":"A'tel Focus","start_focus":"Kaj-atel","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kuxlanel","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tzo'] = {"app_name":"Deep Focus","timer_title":"Ab'tel Focus","start_focus":"Lik-abtel","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kuxanel","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['toj'] = {"app_name":"Deep Focus","timer_title":"A'tijel Focus","start_focus":"K'e'el-atijel","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Wajel","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('chf');
 
@@ -39487,15 +36487,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['zai'] = {"app_name":"Deep Focus","timer_title":"Dxiiña Focus","start_focus":"Guzulú-dxiiña","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Gaxha","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mks'] = {"app_name":"Deep Focus","timer_title":"Chiñu Focus","start_focus":"Kechí-chiñu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Nditatá","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ote'] = {"app_name":"Deep Focus","timer_title":"B'efi Focus","start_focus":"Futs'i-befi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tsaya","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['maz'] = {"app_name":"Deep Focus","timer_title":"Pjechi Focus","start_focus":"Chjuru-pjechi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ts'eje","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mau'] = {"app_name":"Deep Focus","timer_title":"Xá Focus","start_focus":"Tí-xá","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sí-kjia","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('chq');
 
@@ -39507,15 +36507,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['nhn'] = {"app_name":"Deep Focus","timer_title":"Tlanequiliztli Focus","start_focus":"Pehua-tlanequi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Cochiliztli","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['nhe'] = {"app_name":"Deep Focus","timer_title":"Tlatequipanoliztli","start_focus":"Pehualli-tlatequi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Mosewilik","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tar'] = {"app_name":"Deep Focus","timer_title":"Natarali Focus","start_focus":"Simi-natarali","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kiri","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['hch'] = {"app_name":"Deep Focus","timer_title":"Tiitewatü Focus","start_focus":"Tsi-tiitewatu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Yurame","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ood'] = {"app_name":"Deep Focus","timer_title":"S-huhu'idag Focus","start_focus":"Kek-huhuidag","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Hehemk","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('yaq');
 
@@ -39527,15 +36527,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') window.dfGetMilestoneVersion2500GrandSeal = function() { return { milestone: 'v26.4.0', missions: 'M2498-M2507', verified: true }; };
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['top'] = {"app_name":"Deep Focus","timer_title":"Tukuwan Focus","start_focus":"Tzuku-tukuwan","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Laktastujk","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tos'] = {"app_name":"Deep Focus","timer_title":"Kamanan Focus","start_focus":"Tapuxu-kamanan","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Paks","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tpp'] = {"app_name":"Deep Focus","timer_title":"Lha'ach'ilh Focus","start_focus":"Tuchu-lhaachilh","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Puxkun","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tee'] = {"app_name":"Deep Focus","timer_title":"Anchin Focus","start_focus":"Tuku-anchin","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Matan","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['poi'] = {"app_name":"Deep Focus","timer_title":"Yu'uk Focus","start_focus":"Te-yuuk","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kuy-tam","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('tlc');
 
@@ -39547,15 +36547,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mxp'] = {"app_name":"Deep Focus","timer_title":"Tu'ung Focus","start_focus":"Tuk-tuung","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Xon","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mir'] = {"app_name":"Deep Focus","timer_title":"Tun Focus","start_focus":"Tsi-tun","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kajp","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['zos'] = {"app_name":"Deep Focus","timer_title":"O'ka Focus","start_focus":"Wye-oka","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Masa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['zoc'] = {"app_name":"Deep Focus","timer_title":"Tzu'yi Focus","start_focus":"Tuk-tzuyi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Yomo","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['poq'] = {"app_name":"Deep Focus","timer_title":"Tan'aj Focus","start_focus":"Kpa-tanaj","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kusi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('mxq');
 
@@ -39567,15 +36567,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tsz'] = {"app_name":"Deep Focus","timer_title":"Uandani Focus","start_focus":"Uénani-uandani","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"P'ikurhikua","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['hve'] = {"app_name":"Deep Focus","timer_title":"Nang Focus","start_focus":"A-nang","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Nipch","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['hvd'] = {"app_name":"Deep Focus","timer_title":"Ombeayiüts Focus","start_focus":"Ta-ombeayiuts","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Xikek","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['sei'] = {"app_name":"Deep Focus","timer_title":"Coomc Focus","start_focus":"Quii-coomc","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Haxol","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['pbs'] = {"app_name":"Deep Focus","timer_title":"Xiiuy Focus","start_focus":"Tyi-xiiuy","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Nao","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('pei');
 
@@ -39587,15 +36587,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tip'] = {"app_name":"Deep Focus","timer_title":"Mat-iipai Focus","start_focus":"Nyum-matiipai","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Iiku","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ipi'] = {"app_name":"Deep Focus","timer_title":"Nyaa Focus","start_focus":"A-nyaa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Me-yayu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['coc'] = {"app_name":"Deep Focus","timer_title":"Kwen-yuman Focus","start_focus":"Wak-kwenyuman","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Shuwa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['klb'] = {"app_name":"Deep Focus","timer_title":"K-mialh Focus","start_focus":"Pa-kmialh","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Jua","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ppi'] = {"app_name":"Deep Focus","timer_title":"Jaspuy-pai Focus","start_focus":"Tsi-jaspuy","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Nmii","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('yuf');
 
@@ -39607,15 +36607,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['apw'] = {"app_name":"Deep Focus","timer_title":"Biniinaa Focus","start_focus":"Dagonzi-biniinaa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Haash-tih","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['apm'] = {"app_name":"Deep Focus","timer_title":"Nandeesh Focus","start_focus":"Hades-nandeesh","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Go-zhon","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['apj'] = {"app_name":"Deep Focus","timer_title":"Ditsos Focus","start_focus":"Yis-ditsos","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sa-anii","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['apl'] = {"app_name":"Deep Focus","timer_title":"Di-yadi Focus","start_focus":"Naa-diyadi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Gondi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['apk'] = {"app_name":"Deep Focus","timer_title":"Kla-di Focus","start_focus":"Tsi-kladi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Baa-he","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('nav');
 
@@ -39627,15 +36627,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['dgr'] = {"app_name":"Deep Focus","timer_title":"Tsi-gote Focus","start_focus":"Hozi-tsigote","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Datsan","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['scs'] = {"app_name":"Deep Focus","timer_title":"Enee-kone Focus","start_focus":"Dene-eneekone","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Yaba","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['xsl'] = {"app_name":"Deep Focus","timer_title":"Dene-zhati Focus","start_focus":"Goh-denezhati","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Koni","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['gwi'] = {"app_name":"Deep Focus","timer_title":"Trinjik Focus","start_focus":"Vah-trinjik","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Nilii","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tfn'] = {"app_name":"Deep Focus","timer_title":"Qegh Focus","start_focus":"Hada-qegh","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Chitda","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('koy');
 
@@ -39647,15 +36647,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') window.dfGetMilestoneVersion2700GrandSeal = function() { return { milestone: 'v27.0.0', missions: 'M2558-M2567', verified: true }; };
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['hur'] = {"app_name":"Deep Focus","timer_title":"Tset-Focus","start_focus":"Sti-tset","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tl-kws","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['squ'] = {"app_name":"Deep Focus","timer_title":"Chexw-Focus","start_focus":"Ha-chexw","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tl-ay","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['shs'] = {"app_name":"Deep Focus","timer_title":"Tsit-kwa Focus","start_focus":"Me-tsitkwa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pex-t","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['lil'] = {"app_name":"Deep Focus","timer_title":"S-kulh Focus","start_focus":"Lha-skulh","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Qat-s","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['thp'] = {"app_name":"Deep Focus","timer_title":"Ceq-cen Focus","start_focus":"Tsi-ceqcen","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Nke-x","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('oka');
 
@@ -39667,15 +36667,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['noo'] = {"app_name":"Deep Focus","timer_title":"Haa-huu-pah Focus","start_focus":"Tsa-haahuupah","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Uuksti","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kwk'] = {"app_name":"Deep Focus","timer_title":"Gwal-gwa Focus","start_focus":"Dza-gwalgwa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Maya","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['dtd'] = {"app_name":"Deep Focus","timer_title":"Diti-daht Focus","start_focus":"Ba-ditidaht","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tlaa-sa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['has'] = {"app_name":"Deep Focus","timer_title":"Xenaks-Focus","start_focus":"Du-xenaks","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Qix","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['hei'] = {"app_name":"Deep Focus","timer_title":"Hai-zaqv Focus","start_focus":"Gvi-haizaqv","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ksa-la","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('myh');
 
@@ -39687,15 +36687,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tsi'] = {"app_name":"Deep Focus","timer_title":"Sm-algyax Focus","start_focus":"Ha-smalgyax","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Lip-galk","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ncg'] = {"app_name":"Deep Focus","timer_title":"Sim-algax Focus","start_focus":"Lu-simalgax","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ksitx","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['git'] = {"app_name":"Deep Focus","timer_title":"Gitsen-Focus","start_focus":"Ga-gitsen","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Wilps","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['hdn'] = {"app_name":"Deep Focus","timer_title":"Xaad-Kil Focus","start_focus":"Laa-xaadkil","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kasa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['hax'] = {"app_name":"Deep Focus","timer_title":"Xayda-Kil Focus","start_focus":"Gid-xaydakil","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sdi-hl","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('tli');
 
@@ -39707,15 +36707,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['lkt'] = {"app_name":"Deep Focus","timer_title":"Wounspe Focus","start_focus":"Tokaheya-wounspe","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Asninki","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['dak'] = {"app_name":"Deep Focus","timer_title":"Wodakota Focus","start_focus":"Hutkan-wodakota","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ozuye","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['asb'] = {"app_name":"Deep Focus","timer_title":"Wicoh-an Focus","start_focus":"Ta-wicohan","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kizi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cro'] = {"app_name":"Deep Focus","timer_title":"Apsaalooke Focus","start_focus":"Chi-apsaalooke","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Bawa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['hid'] = {"app_name":"Deep Focus","timer_title":"Miri-Focus","start_focus":"I-mirifocus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Awa-ka","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('mhq');
 
@@ -39727,15 +36727,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') window.dfGetMilestoneVersion2600GrandSeal = function() { return { milestone: 'v27.4.0', missions: 'M2598-M2607', verified: true }; };
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['paw'] = {"app_name":"Deep Focus","timer_title":"Tirawahat Focus","start_focus":"Ta-tirawahat","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pari-ki","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ari'] = {"app_name":"Deep Focus","timer_title":"Sahnish Focus","start_focus":"Chi-sahnish","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Natah","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cad'] = {"app_name":"Deep Focus","timer_title":"Hasinai Focus","start_focus":"Wi-hasinai","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Daya","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['wic'] = {"app_name":"Deep Focus","timer_title":"Tawakaruk Focus","start_focus":"Ha-tawakaruk","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Iskish","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kio'] = {"app_name":"Deep Focus","timer_title":"Gauig-Focus","start_focus":"Dai-gauig","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tso-lye","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('kii');
 
@@ -39747,15 +36747,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cho'] = {"app_name":"Deep Focus","timer_title":"Chukma Focus","start_focus":"Vlla-chukma","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Falamminchi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cic'] = {"app_name":"Deep Focus","timer_title":"Holisso Focus","start_focus":"Chiki-holisso","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Lhipha","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mus'] = {"app_name":"Deep Focus","timer_title":"Vkerre Focus","start_focus":"Mvskoke-vkerre","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Fehkepv","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['akz'] = {"app_name":"Deep Focus","timer_title":"Aalhpisa Focus","start_focus":"Alba-aalhpisa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Hika","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cku'] = {"app_name":"Deep Focus","timer_title":"Albiina Focus","start_focus":"Kow-albiina","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Hicho","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('mik');
 
@@ -39767,15 +36767,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yak'] = {"app_name":"Deep Focus","timer_title":"Tamanwit Focus","start_focus":"Tsi-tamanwit","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Wana","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['nez'] = {"app_name":"Deep Focus","timer_title":"Titwatit Focus","start_focus":"Nimipuu-titwatit","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pahlo","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kla'] = {"app_name":"Deep Focus","timer_title":"Doyee Focus","start_focus":"Maqlaqs-doyee","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ge-la","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['wnw'] = {"app_name":"Deep Focus","timer_title":"Wintu Focus","start_focus":"El-wintu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sun-tum","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mjd'] = {"app_name":"Deep Focus","timer_title":"Woni Focus","start_focus":"Tyk-woni","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kowk","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('uma');
 
@@ -39787,15 +36787,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['was'] = {"app_name":"Deep Focus","timer_title":"Wasiw Focus","start_focus":"Deek-wasiw","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Malo-p","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kyh'] = {"app_name":"Deep Focus","timer_title":"Ararahih Focus","start_focus":"Nu-ararahih","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pee-thiv","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yur'] = {"app_name":"Deep Focus","timer_title":"Puliklah Focus","start_focus":"Kee-puliklah","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Skuy-soo","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kju'] = {"app_name":"Deep Focus","timer_title":"Kashaya Focus","start_focus":"Du-kashaya","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Haya","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['poo'] = {"app_name":"Deep Focus","timer_title":"Baa-te Focus","start_focus":"Koo-baate","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tsi-da","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('pej');
 
@@ -39807,15 +36807,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['pao'] = {"app_name":"Deep Focus","timer_title":"Numu-tekwapu","start_focus":"Ti-numu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kwin-ha","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ute'] = {"app_name":"Deep Focus","timer_title":"Nuciu Focus","start_focus":"Nu-nuciu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Paa-v","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['shh'] = {"app_name":"Deep Focus","timer_title":"Newe Focus","start_focus":"Da-newe","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Hai-kwi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['com'] = {"app_name":"Deep Focus","timer_title":"Nʉmʉ-tekwapʉ","start_focus":"Ha-numu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tuk-ni","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['hop'] = {"app_name":"Deep Focus","timer_title":"Hopilavayi Focus","start_focus":"Pam-hopilavayi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Haki","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('xaw');
 
@@ -39827,15 +36827,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['lui'] = {"app_name":"Deep Focus","timer_title":"Cham-teuna Focus","start_focus":"A-chamteuna","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Noo-va","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['chl'] = {"app_name":"Deep Focus","timer_title":"Ivilu-at Focus","start_focus":"Ha-iviluat","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Peviy","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cup'] = {"app_name":"Deep Focus","timer_title":"Kupa Focus","start_focus":"Ta-kupa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Muvik","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ser'] = {"app_name":"Deep Focus","timer_title":"Taavat Focus","start_focus":"Na-taavat","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kwava","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tgv'] = {"app_name":"Deep Focus","timer_title":"Yaanga Focus","start_focus":"Yo-yaanga","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tovangar","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('kit');
 
@@ -39847,15 +36847,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') window.dfGetMilestoneVersion2800GrandSeal = function() { return { milestone: 'v28.0.0', missions: 'M2658-M2667', verified: true }; };
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yok'] = {"app_name":"Deep Focus","timer_title":"Yawel-Focus","start_focus":"Ti-yawelmani","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ta-ha","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['chk'] = {"app_name":"Deep Focus","timer_title":"Chukchan-Focus","start_focus":"Wi-chukchansi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pohox","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tcy'] = {"app_name":"Deep Focus","timer_title":"Tache-Focus","start_focus":"Ma-tache","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Koyis","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['gsh'] = {"app_name":"Deep Focus","timer_title":"Gash-Focus","start_focus":"Ta-gashowu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Solot","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['wkc'] = {"app_name":"Deep Focus","timer_title":"Wikcham-Focus","start_focus":"Ha-wikchamni","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tulu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('cwc');
 
@@ -39867,15 +36867,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['veo'] = {"app_name":"Deep Focus","timer_title":"Mitsqan-Focus","start_focus":"Al-mitsqanaqan","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kus","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['bmz'] = {"app_name":"Deep Focus","timer_title":"Smuwic Focus","start_focus":"Ka-smuwic","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Xas","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['inz'] = {"app_name":"Deep Focus","timer_title":"Samala Focus","start_focus":"Qsi-samala","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tl-a","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['puy'] = {"app_name":"Deep Focus","timer_title":"Purisi-Focus","start_focus":"Li-purisimeno","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Suku","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['obi'] = {"app_name":"Deep Focus","timer_title":"Tilhini Focus","start_focus":"Msi-tilhini","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Yak","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('crz');
 
@@ -39887,15 +36887,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['skd'] = {"app_name":"Deep Focus","timer_title":"Miwok Focus","start_focus":"Tsi-miwok","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pee-le","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['csm'] = {"app_name":"Deep Focus","timer_title":"Me-wuk Focus","start_focus":"Ha-mewuk","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Koto","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['nsq'] = {"app_name":"Deep Focus","timer_title":"Kene-Focus","start_focus":"Ta-kene","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Lali","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['pmw'] = {"app_name":"Deep Focus","timer_title":"Lek-Focus","start_focus":"Ni-lek","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Waka","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cst'] = {"app_name":"Deep Focus","timer_title":"Choche-Focus","start_focus":"Mak-chochenyo","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Rini","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('lmw');
 
@@ -39907,15 +36907,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tol'] = {"app_name":"Deep Focus","timer_title":"Dee-ni Focus","start_focus":"Xash-deeni","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Mii-ni","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tuu'] = {"app_name":"Deep Focus","timer_title":"Tutut-Focus","start_focus":"Da-tututni","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Chun-kwa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ump'] = {"app_name":"Deep Focus","timer_title":"Umpqua Focus","start_focus":"Kwe-umpqua","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tl-oosh","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['gce'] = {"app_name":"Deep Focus","timer_title":"Galice Focus","start_focus":"Nu-galice","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Shash","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ktw'] = {"app_name":"Deep Focus","timer_title":"Kash-bena Focus","start_focus":"Kee-kato","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tsan","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('pmt');
 
@@ -39927,15 +36927,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') window.dfGetMilestoneVersion2700GrandSeal = function() { return { milestone: 'v28.4.0', missions: 'M2698-M2707', verified: true }; };
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['csz'] = {"app_name":"Deep Focus","timer_title":"Hanis-Focus","start_focus":"Ha-hanis","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Loo-kwa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['iml'] = {"app_name":"Deep Focus","timer_title":"Miluk-Focus","start_focus":"Mi-miluk","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tla-ma","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tya'] = {"app_name":"Deep Focus","timer_title":"Tualatin-Focus","start_focus":"Tu-tualatin","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Chaw-pe","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['sxk'] = {"app_name":"Deep Focus","timer_title":"Santiam-Focus","start_focus":"San-santiam","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Mank-ta","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['sis'] = {"app_name":"Deep Focus","timer_title":"Siuslaw-Focus","start_focus":"Siu-siuslaw","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Yaq-wi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('yon');
 
@@ -39947,15 +36947,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['wac'] = {"app_name":"Deep Focus","timer_title":"Wasco-Focus","start_focus":"Wa-wasco","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kax-wi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['clc'] = {"app_name":"Deep Focus","timer_title":"Clackamas-Focus","start_focus":"Cla-clackamas","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tlak-wa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kat'] = {"app_name":"Deep Focus","timer_title":"Kathlamet-Focus","start_focus":"Ka-kathlamet","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tlup-ka","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['chn'] = {"app_name":"Deep Focus","timer_title":"Kloshe-Focus","start_focus":"Chako-kloshe","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Hahl-lak","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kli'] = {"app_name":"Deep Focus","timer_title":"Klickitat-Focus","start_focus":"Kli-klickitat","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pshwan","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('mul');
 
@@ -39967,15 +36967,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['qun'] = {"app_name":"Deep Focus","timer_title":"Quinault-Focus","start_focus":"Qui-quinault","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kwal-ts","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['twa'] = {"app_name":"Deep Focus","timer_title":"Twana-Focus","start_focus":"Twa-twana","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Shas-tl","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['clm'] = {"app_name":"Deep Focus","timer_title":"Klallam-Focus","start_focus":"Kla-klallam","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Nen-si","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['lut'] = {"app_name":"Deep Focus","timer_title":"Dxwlesucid-Focus","start_focus":"Lush-dxwlesucid","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Swa-ti","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cjh'] = {"app_name":"Deep Focus","timer_title":"Chehalis-Focus","start_focus":"Che-chehalis","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tsel-at","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('cea');
 
@@ -39987,15 +36987,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ahs'] = {"app_name":"Deep Focus","timer_title":"Ahou-Focus","start_focus":"Ha-ahousaht","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tl-aat","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tla'] = {"app_name":"Deep Focus","timer_title":"Tla-o-qui Focus","start_focus":"Kwe-tlaoqui","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Maa-as","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kyu'] = {"app_name":"Deep Focus","timer_title":"Kyu-quot Focus","start_focus":"Shi-kyuquot","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Haa-wa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mow'] = {"app_name":"Deep Focus","timer_title":"Mowat-Focus","start_focus":"Da-mowachaht","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tlup-a","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['hes'] = {"app_name":"Deep Focus","timer_title":"Hesqui-Focus","start_focus":"Nu-hesquiaht","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Chup-s","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('eha');
 
@@ -40007,15 +37007,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tli'] = {"app_name":"Deep Focus","timer_title":"Lingit Focus","start_focus":"Ha-lingit","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Wutee","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tln'] = {"app_name":"Deep Focus","timer_title":"Da-lingit Focus","start_focus":"Ye-dalingit","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ka-tlak","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['eya'] = {"app_name":"Deep Focus","timer_title":"I-yah Focus","start_focus":"Gwi-eyak","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Teh-l","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kut'] = {"app_name":"Deep Focus","timer_title":"Ktunaxa Focus","start_focus":"Ka-ktunaxa","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ak-xax","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['aes'] = {"app_name":"Deep Focus","timer_title":"Alsi-Focus","start_focus":"Tsi-alsea","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sal-wi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('mol');
 
@@ -40027,15 +37027,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['lbr'] = {"app_name":"Deep Focus","timer_title":"Nunatsiavut Focus","start_focus":"Aulatsivik","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Saimavik","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['inn'] = {"app_name":"Deep Focus","timer_title":"Inuinnaq Focus","start_focus":"Kangiq-inuinnaq","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Havak","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tun'] = {"app_name":"Deep Focus","timer_title":"Tunu-Focus","start_focus":"Ta-tunumiisut","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Aperneq","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['inu'] = {"app_name":"Deep Focus","timer_title":"Iñupiat Focus","start_focus":"Aullaq-inupiat","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Minu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cup'] = {"app_name":"Deep Focus","timer_title":"Cup-ik Focus","start_focus":"Ayag-cupik","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Taqu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('aiv');
 
@@ -40047,15 +37047,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') window.dfGetMilestoneVersion2900GrandSeal = function() { return { milestone: 'v29.0.0', missions: 'M2758-M2767', verified: true }; };
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ckt'] = {"app_name":"Deep Focus","timer_title":"Chukot-Focus","start_focus":"Enm-chukot","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Yaranga","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kpy'] = {"app_name":"Deep Focus","timer_title":"Nymylan Focus","start_focus":"Pek-nymylan","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kavran","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['itl'] = {"app_name":"Deep Focus","timer_title":"Itelmen-Focus","start_focus":"Me-itelmen","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ksun","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['alr'] = {"app_name":"Deep Focus","timer_title":"Alyutor-Focus","start_focus":"El-alyutor","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Vetlat","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['krk'] = {"app_name":"Deep Focus","timer_title":"Kerek-Focus","start_focus":"Ta-kerek","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Avva","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('ykg');
 
@@ -40067,15 +37067,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['evn'] = {"app_name":"Deep Focus","timer_title":"Bakar Focus","start_focus":"Tyo-bakar","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Huran","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['eve'] = {"app_name":"Deep Focus","timer_title":"Uren Focus","start_focus":"Gyo-uren","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Dukan","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['gld'] = {"app_name":"Deep Focus","timer_title":"Girin Focus","start_focus":"Mo-girin","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kese","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ude'] = {"app_name":"Deep Focus","timer_title":"Biti Focus","start_focus":"Ta-biti","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sasa","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ulc'] = {"app_name":"Deep Focus","timer_title":"Puru Focus","start_focus":"Na-puru","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tuyuk","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('oac');
 
@@ -40087,15 +37087,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['bua'] = {"app_name":"Deep Focus","timer_title":"Harakha Focus","start_focus":"Ekhille-harakha","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Amaralta","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['xal'] = {"app_name":"Deep Focus","timer_title":"Shahats Focus","start_focus":"Ekll-shahats","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Amarah","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['dta'] = {"app_name":"Deep Focus","timer_title":"Bade Focus","start_focus":"Tso-bade","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Uchire","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['sce'] = {"app_name":"Deep Focus","timer_title":"Gongzuo Focus","start_focus":"Qilai-gongzuo","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Amura","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['mjg'] = {"app_name":"Deep Focus","timer_title":"Muru Focus","start_focus":"Pula-muru","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Nasi","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('pnm');
 
@@ -40107,15 +37107,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['tyv'] = {"app_name":"Deep Focus","timer_title":"Shirgen Focus","start_focus":"Egelee-shirgen","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Dyzhyg","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kjh'] = {"app_name":"Deep Focus","timer_title":"Tynan Focus","start_focus":"Pastal-tynan","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Uzhyk","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['atv'] = {"app_name":"Deep Focus","timer_title":"Tolu Focus","start_focus":"Bash-tolu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tynysh","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['alt'] = {"app_name":"Deep Focus","timer_title":"Bilik Focus","start_focus":"Bashla-bilik","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tynyzh","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['cjs'] = {"app_name":"Deep Focus","timer_title":"Kuzuk Focus","start_focus":"Par-kuzuk","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tanysh","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('clw');
 
@@ -40127,15 +37127,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') window.dfGetMilestoneVersion2800GrandSeal = function() { return { milestone: 'v29.4.0', missions: 'M2798-M2807', verified: true }; };
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yrk'] = {"app_name":"Deep Focus","timer_title":"Menzada Focus","start_focus":"Haly-menzada","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sero","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['enf'] = {"app_name":"Deep Focus","timer_title":"Kaza Focus","start_focus":"Tsi-kaza","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Nyuma","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['enh'] = {"app_name":"Deep Focus","timer_title":"Seyo Focus","start_focus":"Du-seyo","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Mora","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['nio'] = {"app_name":"Deep Focus","timer_title":"Dzhurku Focus","start_focus":"Ta-dzhurku","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Hula","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['sel'] = {"app_name":"Deep Focus","timer_title":"Pochka Focus","start_focus":"I-pochka","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Poryk","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('xas');
 
@@ -40147,15 +37147,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ket'] = {"app_name":"Deep Focus","timer_title":"Dyiq Focus","start_focus":"Ta-dyiq","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Hure","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yug'] = {"app_name":"Deep Focus","timer_title":"Deek Focus","start_focus":"Tsi-deek","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kula","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['zko'] = {"app_name":"Deep Focus","timer_title":"Bakal Focus","start_focus":"Ba-bakal","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Shura","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['xss'] = {"app_name":"Deep Focus","timer_title":"Koli Focus","start_focus":"A-koli","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Taran","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['xrn'] = {"app_name":"Deep Focus","timer_title":"Kona Focus","start_focus":"Wi-kona","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Aram","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('xpm');
 
@@ -40167,15 +37167,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ykg'] = {"app_name":"Deep Focus","timer_title":"Wadul Focus","start_focus":"Ta-wadul","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Amu-te","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yux'] = {"app_name":"Deep Focus","timer_title":"Odul Focus","start_focus":"Nu-odul","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Amun","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['xcv'] = {"app_name":"Deep Focus","timer_title":"Chuvan-Focus","start_focus":"Cha-chuvan","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Kel-va","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['omk'] = {"app_name":"Deep Focus","timer_title":"Omok-Focus","start_focus":"O-omok","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sura","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['niv'] = {"app_name":"Deep Focus","timer_title":"Nivx Focus","start_focus":"E-nivx","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tly-v","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('gld');
 
@@ -40187,15 +37187,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ain'] = {"app_name":"Deep Focus","timer_title":"Aynu Focus","start_focus":"Yay-aynu","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"E-hechaka","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ank'] = {"app_name":"Deep Focus","timer_title":"Kuril-Focus","start_focus":"Ku-kuril","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"A-rap","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ans'] = {"app_name":"Deep Focus","timer_title":"Karafuto Focus","start_focus":"Ka-karafuto","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Shin-ta","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['oaa'] = {"app_name":"Deep Focus","timer_title":"Uilta Focus","start_focus":"Gyo-uilta","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tee-bu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['neg'] = {"app_name":"Deep Focus","timer_title":"Neghida Focus","start_focus":"Tsi-neghida","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Pee-le","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('ulc');
 
@@ -40207,15 +37207,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['geo'] = {"app_name":"Deep Focus","timer_title":"Fokusi Focus","start_focus":"Datskeba-fokusi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sveneba","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['xmf'] = {"app_name":"Deep Focus","timer_title":"Fokusi-xmf","start_focus":"Gyocho-fokusi","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Usvenap","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['sva'] = {"app_name":"Deep Focus","timer_title":"Fokus-sva","start_focus":"Chosh-fokus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Laskhum","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['lzz'] = {"app_name":"Deep Focus","timer_title":"Oromoti Focus","start_focus":"Gecho-oromoti","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Oskedu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['bbl'] = {"app_name":"Deep Focus","timer_title":"Dats'kox Focus","start_focus":"Bats-datskox","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sada","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('che');
 
@@ -40227,15 +37227,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['che'] = {"app_name":"Deep Focus","timer_title":"Fokus-che Focus","start_focus":"Dola-fokus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sadukhotur","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['inh'] = {"app_name":"Deep Focus","timer_title":"Sadaqhar Focus","start_focus":"Dola-sadaqhar","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Khorad","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ava'] = {"app_name":"Deep Focus","timer_title":"Fokus-ava Focus","start_focus":"Baybi-fokus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Sorodo","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['dar'] = {"app_name":"Deep Focus","timer_title":"Fokus-dar Focus","start_focus":"Bikib-fokus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Gikri","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['lez'] = {"app_name":"Deep Focus","timer_title":"Fokus-lez Focus","start_focus":"Baslami-fokus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Dikhin","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('lbe');
 
@@ -40247,15 +37247,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') window.dfGetMilestoneVersion3000GrandSeal = function() { return { milestone: 'v30.0.0', missions: 'M2858-M2867', verified: true }; };
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['abk'] = {"app_name":"Deep Focus","timer_title":"Afokus Focus","start_focus":"Alagara-afokus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Atapsara","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['ady'] = {"app_name":"Deep Focus","timer_title":"Zeblazhe Focus","start_focus":"Yehazhe-zeblazhe","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ghepsere","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['kbd'] = {"app_name":"Deep Focus","timer_title":"Khuabzhe Focus","start_focus":"Yehazhe-khuabzhe","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Thepsere","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['abq'] = {"app_name":"Deep Focus","timer_title":"Fokus-abq Focus","start_focus":"Alag-fokus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Svana","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['uby'] = {"app_name":"Deep Focus","timer_title":"Wubykh Focus","start_focus":"Za-wubykh","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Tswana","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('sha');
 
@@ -40267,15 +37267,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['sgh'] = {"app_name":"Deep Focus","timer_title":"Fokus-sgh Focus","start_focus":"Suraw-fokus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ashtoy","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['wbl'] = {"app_name":"Deep Focus","timer_title":"Korkun Focus","start_focus":"Sar-korkun","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Arom","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['rsh'] = {"app_name":"Deep Focus","timer_title":"Rushan-Focus","start_focus":"Sar-rushan","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ustoy","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['isk'] = {"app_name":"Deep Focus","timer_title":"Fokus-isk Focus","start_focus":"Pesh-fokus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Osom","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yah'] = {"app_name":"Deep Focus","timer_title":"Yazgulam-Focus","start_focus":"Sur-yazgulam","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Astu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('srh');
 
@@ -40287,15 +37287,15 @@ if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateL
 
 if (typeof window !== 'undefined') 
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['sgh'] = {"app_name":"Deep Focus","timer_title":"Fokus-sgh Focus","start_focus":"Suraw-fokus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ashtoy","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['wbl'] = {"app_name":"Deep Focus","timer_title":"Korkun Focus","start_focus":"Sar-korkun","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Arom","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['rsh'] = {"app_name":"Deep Focus","timer_title":"Rushan-Focus","start_focus":"Sar-rushan","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Ustoy","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['isk'] = {"app_name":"Deep Focus","timer_title":"Fokus-isk Focus","start_focus":"Pesh-fokus","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Osom","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
-if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {}; window.DF_I18N_LOCALES['yah'] = {"app_name":"Deep Focus","timer_title":"Yazgulam-Focus","start_focus":"Sur-yazgulam","pause_focus":"Pause","resume_focus":"Resume","reset_focus":"Reset","focus_time":"Focus Period","short_break":"Astu","long_break":"Deep Rest","session_complete":"Interval Completed","sound_rain":"Gentle Rain","sound_river":"River Stream","sound_wind":"Mountain Wind","sound_forest":"Pine Forest","sound_ocean":"Sea Breeze","sound_dew":"Morning Dew","decks_title":"Knowledge Decks","new_deck":"New Deck","cards_count":"Cards","study_now":"Review Deck","add_card":"Add Card","front_prompt":"Prompt (Question)","back_answer":"Explanation (Answer)","card_saved":"Card Enrolled","rating_again":"Repeat 1d","rating_hard":"Hard 2d","rating_good":"Solid 4d","rating_easy":"Effortless 7d","next_review":"Target Review","interval_days":"Day Interval","btn_save":"Save Record","btn_cancel":"Dismiss","btn_delete":"Remove","btn_confirm":"Confirm","btn_close":"Close","modal_warning":"Notice","stats_title":"Productivity Ledger","total_focus_hours":"Dedicated Hours","sessions_completed":"Repetitions Done","retention_rate":"Retention Ratio","streak_days":"Daily Streak","settings_title":"Workspace Preferences","language_select":"Locale System","dark_mode":"Night Theme","nature_audio":"Halal Natural DSP","sound_volume":"Acoustic Level","halal_audio_notice":"Pure Natural Audio Only","notify_focus_done":"Focus cycle fulfilled","notify_break_done":"Rest interval elapsed","notify_daily_reminder":"Time to advance study ledger"}; }
+if (typeof window !== 'undefined') { if (!window.DF_I18N_LOCALES) window.DF_I18N_LOCALES = {};  }
 
 if (typeof window !== 'undefined' && window.dfValidateLocale) window.dfValidateLocale('srh');
 
