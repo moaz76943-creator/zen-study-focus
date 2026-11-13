@@ -194,7 +194,7 @@ test("Strict 100% Offline Manifest (No INTERNET or RECORD_AUDIO)", () => {
 });
 
 // 4. Verify Consolidated Locale Packs Integrity
-test("Consolidated Locale Packs Valid JSON & >= 1000 Languages", () => {
+test("Consolidated Locale Packs Valid JSON & >= 20 Authentic Languages", () => {
     const manifestPackPath = path.join(__dirname, "..", "android/app/src/main/assets/web/locale_packs/manifest.json");
     assert(fs.existsSync(manifestPackPath), "locale_packs/manifest.json missing!");
     const mp = JSON.parse(fs.readFileSync(manifestPackPath, "utf8"));
