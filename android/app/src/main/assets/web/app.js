@@ -1,3 +1,64 @@
+/* === Deep Focus M09/M14/M19 Security Sanitizer, Schema Self-Repair & Engine Bridge === */
+(function() {
+  if (typeof window === "undefined" || window.__DF_SECURITY_AND_SCHEMA_READY__) return;
+  window.__DF_SECURITY_AND_SCHEMA_READY__ = true;
+
+  window.dfEscapeHtml = function(str) {
+    return String(str == null ? "" : str)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  };
+
+  window.dfSanitizeHtmlFragment = function(html) {
+    const raw = String(html == null ? "" : html);
+    return raw
+      .replace(/<\/?(?:script|iframe|object|embed|base|meta|link)\b[^>]*>/gi, "")
+      .replace(/\son[a-z]+\s*=\s*(?:"[^"]*"|'[^']*'|[^\s>]+)/gi, "")
+      .replace(/(href|src)\s*=\s*(["'])\s*javascript:[^"']*\2/gi, '$1=$2#$2');
+  };
+
+  window.dfSafeSetHtml = function(el, html) {
+    if (!el) return;
+    el.innerHTML = window.dfSanitizeHtmlFragment(html);
+  };
+
+  window.dfValidateAndRepairBootData = function() {
+    let repaired = 0;
+    try {
+      if (typeof cfg !== "undefined" && cfg && typeof cfg === "object") {
+        if (!Number.isFinite(Number(cfg.todayMins)) || Number(cfg.todayMins) < 0) { cfg.todayMins = 0; repaired++; }
+        if (!Number.isFinite(Number(cfg.streak)) || Number(cfg.streak) < 0) { cfg.streak = 0; repaired++; }
+        if (!Array.isArray(cfg.sessionHistory)) { cfg.sessionHistory = []; repaired++; }
+      }
+      if (typeof tasks !== "undefined" && Array.isArray(tasks)) {
+        const seenIds = new Set();
+        for (let i = tasks.length - 1; i >= 0; i--) {
+          const t = tasks[i];
+          if (!t || typeof t !== "object") { tasks.splice(i, 1); repaired++; continue; }
+          if (!t.id) { t.id = "task_" + i + "_" + Date.now(); repaired++; }
+          if (seenIds.has(t.id)) { t.id = t.id + "_" + i; repaired++; }
+          seenIds.add(t.id);
+        }
+      }
+    } catch (e) {
+      if (window.__dfRecordError) window.__dfRecordError("schemaRepair", e);
+    }
+    return { repaired };
+  };
+
+  if (typeof document !== "undefined") {
+    document.addEventListener("DOMContentLoaded", () => {
+      window.dfValidateAndRepairBootData();
+      if (!window.SpokenVocabEngine && typeof VocabAudioBankEngine !== "undefined") {
+        window.SpokenVocabEngine = VocabAudioBankEngine;
+      }
+    }, { once: true });
+  }
+})();
+
 /* === Deep Focus M06/M08 Event-Driven UI Sync & Non-Blocking Notify === */
 (function() {
   if (typeof window === "undefined" || window.__DF_UI_SYNC_BUS_READY__) return;
@@ -41355,7 +41416,7 @@ window.dfRenderVirtualList = function(containerEl, items, renderItemFn, itemHeig
   viewport.style.top = "0";
   viewport.style.left = "0";
 
-  containerEl.innerHTML = "";
+  containerEl.textContent = "";
   containerEl.appendChild(phantomScroller);
   containerEl.appendChild(viewport);
 
@@ -41365,7 +41426,7 @@ window.dfRenderVirtualList = function(containerEl, items, renderItemFn, itemHeig
     const endIndex = Math.min(items.length, startIndex + count + 5);
 
     viewport.style.transform = "translateY(" + (startIndex * height) + "px)";
-    viewport.innerHTML = "";
+    viewport.textContent = "";
     for (let i = startIndex; i < endIndex; i++) {
       const node = renderItemFn(items[i], i);
       if (node) viewport.appendChild(node);
@@ -50743,7 +50804,7 @@ window.dfRenderFlashcardRatingButtons =
     if (!container || !container.appendChild) {
       return { status: 'NO_CONTAINER' };
     }
-    container.innerHTML = '';
+    container.textContent = "";
     const ratings = [
       { score: 1, label: 'Again' },
       { score: 2, label: 'Hard' },
@@ -50892,7 +50953,7 @@ window.dfClozeParser = {
   },
   renderClozeCard: function(container, rawText) {
     if (!container) return;
-    container.innerHTML = '';
+    container.textContent = "";
     const parsed = this.parseText(rawText);
     const box = document.createElement('div');
     box.className = 'cloze-card-box';
@@ -51242,7 +51303,7 @@ window.dfMonotasking = {
   },
   renderFocusBanner: function(container) {
     if (!container || !this.activeTask) return;
-    container.innerHTML = '';
+    container.textContent = "";
     const b = document.createElement('div');
     b.className = 'monotask-banner';
     b.style.padding = '12px 16px';
@@ -51360,7 +51421,7 @@ window.dfConsistencyGrid = {
   },
   renderGrid: function(container, dayRecordsMap) {
     if (!container) return;
-    container.innerHTML = '';
+    container.textContent = "";
     const map = dayRecordsMap || {};
     const grid = document.createElement('div');
     grid.className = 'yearly-grid';
@@ -51610,7 +51671,7 @@ window.dfGetMilestoneM6807WindSeal =
 window.dfZenOrchard = {
   renderOrchard: function(container, treeList) {
     if (!container) return;
-    container.innerHTML = '';
+    container.textContent = "";
     const list = Array.isArray(treeList) ?
       treeList : [];
     const grid = document.createElement('div');
@@ -51831,7 +51892,7 @@ window.dfBreakReset = {
   ],
   renderGuidance: function(container) {
     if (!container) return;
-    container.innerHTML = '';
+    container.textContent = "";
     const box = document.createElement('div');
     box.className = 'break-guidance-box';
     box.style.padding = '12px';
@@ -52408,7 +52469,7 @@ window.dfMasteryBadges = {
   },
   renderBadgeRibbon: function(container, badges) {
     if (!container) return;
-    container.innerHTML = '';
+    container.textContent = "";
     const bList = Array.isArray(badges) ? badges : [];
     bList.forEach(function(b) {
       const sp = document.createElement('span');
@@ -53056,7 +53117,7 @@ window.dfLiveSoundUI = {
   ],
   renderSoundGrid: function(container) {
     if (!container) return;
-    container.innerHTML = '';
+    container.textContent = "";
     const grid = document.createElement('div');
     grid.className = 'sound-grid';
     grid.style.display = 'grid';
@@ -53097,7 +53158,7 @@ window.dfGetMilestoneM7367SoundSeal =
 window.dfLiveDeckGrid = {
   renderDeckDashboard: function(el, list, onStart) {
     if (!el) return;
-    el.innerHTML = '';
+    el.textContent = "";
     const arr = Array.isArray(list) ? list : [];
     const wrap = document.createElement('div');
     wrap.className = 'deck-dashboard-wrap';
@@ -83317,7 +83378,7 @@ window.SovereignSRSReviewer = (function() {
 
         if (dueCards.length === 0 || currentCardIndex >= dueCards.length) {
             frontEl.innerHTML = "<div style='text-align:center; padding: 2rem;'><h3 style='color:#4ade80;'>🎉 تم إنجاز مراجعات اليوم!</h3><p style='color:#888; margin-top:0.5rem;'>All due flashcards reviewed. Great cognitive retention!</p></div>";
-            backEl.innerHTML = "";
+            backEl.textContent = "";
             if (counterEl) counterEl.textContent = "0";
             return;
         }
@@ -83478,7 +83539,7 @@ window.SovereignSRSReviewer = (function() {
                 <h3 style="color:#4ade80; font-size: clamp(1.1rem, 3vw, 1.4rem);">🎉 تم إنجاز مراجعات اليوم!</h3>
                 <p style="color:#888; font-size: clamp(0.8rem, 2.5vw, 0.95rem); margin-top:0.5rem;">All due flashcards reviewed with active recall!</p>
             </div>`;
-            backEl.innerHTML = "";
+            backEl.textContent = "";
             if (counterEl) counterEl.textContent = "0";
             return;
         }
