@@ -99,7 +99,7 @@
 
     if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
       try {
-        navigator.vibrate(pattern);
+        ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(pattern) : false);
       } catch (e) {
         // Fallback without crashing
       }

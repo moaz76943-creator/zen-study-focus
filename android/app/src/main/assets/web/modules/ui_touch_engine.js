@@ -664,7 +664,7 @@
       if (el) {
         el.addEventListener('click', function(e) {
           e.preventDefault();
-          if (navigator.vibrate) navigator.vibrate(25);
+          if (navigator.vibrate) ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(25) : false);
           if (window.dfSetTimerPreset) {
             window.dfSetTimerPreset(preset.minutes);
           } else if (window.dfStartSession) {
@@ -683,7 +683,7 @@
     if (timerSettingsChip) {
       timerSettingsChip.addEventListener('click', function(e) {
         e.preventDefault();
-        if (navigator.vibrate) navigator.vibrate(20);
+        if (navigator.vibrate) ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(20) : false);
         if (window.StudioNavigator) {
           window.StudioNavigator.switchStudio('settings');
         } else {
@@ -698,7 +698,7 @@
     if (btnLaunchSpeedReader) {
       btnLaunchSpeedReader.addEventListener('click', function(e) {
         e.preventDefault();
-        if (navigator.vibrate) navigator.vibrate(30);
+        if (navigator.vibrate) ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(30) : false);
         if (window.StudioNavigator) {
           window.StudioNavigator.switchStudio('speed-reader');
         } else if (window.FocalStreamRSVPEngine) {
@@ -714,7 +714,7 @@
       if (btn && !btn.dataset.dfWired) {
         btn.dataset.dfWired = 'true';
         btn.addEventListener('click', function(e) {
-          if (navigator.vibrate) navigator.vibrate(15);
+          if (navigator.vibrate) ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(15) : false);
           console.log('[TactileFeedback] Button activated: #' + btnId);
           // If button specifies data-studio, switch to that studio
           const targetStudio = btn.getAttribute('data-studio');

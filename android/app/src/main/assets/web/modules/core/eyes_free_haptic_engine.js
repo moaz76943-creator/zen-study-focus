@@ -44,7 +44,7 @@
         pulse: function (pattern) {
             if (this.isSupported) {
                 try {
-                    navigator.vibrate(pattern);
+                    ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(pattern) : false);
                 } catch (e) {}
             }
         },

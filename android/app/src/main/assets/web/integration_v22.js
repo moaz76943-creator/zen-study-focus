@@ -272,7 +272,7 @@
     try {install();}
     catch (e) {
       // Display a visible non-success state: do not auto-write or migrate user data.
-      try {notify('⚠️ Advanced features unavailable: ' + e.message);} catch (_) {}
+      try {notify('⚠️ Optional bridge inactive (browser mode): ' + e.message);} catch (_) {}
     }
   }
   return Object.freeze({install,write,getSnapshot,onTab,onSessionRecorded,refreshLocale,saveCsvThroughAndroid});

@@ -233,7 +233,7 @@
       }
 
       if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate(pattern);
+        ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(pattern) : false);
       }
 
       return {

@@ -79,7 +79,7 @@
             this.updateDisplay();
             console.log("[PrecisionTimer] Session completed with absolute time precision!");
             if (typeof navigator !== "undefined" && navigator.vibrate) {
-                try { navigator.vibrate([100, 50, 100, 50, 200]); } catch (e) {}
+                try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([100, 50, 100, 50, 200]) : false); } catch (e) {}
             }
         },
 

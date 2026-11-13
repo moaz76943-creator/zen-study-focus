@@ -180,7 +180,7 @@
         btn.dataset.tactileBound = 'true';
         btn.addEventListener('click', function(e) {
           if (navigator.vibrate) {
-            navigator.vibrate(18); // Crisp 18ms tactile click pulse
+            ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(18) : false); // Crisp 18ms tactile click pulse
           }
         });
       }

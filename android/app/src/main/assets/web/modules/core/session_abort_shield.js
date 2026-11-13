@@ -99,7 +99,7 @@
                 overlay.remove();
             };
 
-            if (typeof navigator !== "undefined" && navigator.vibrate) try { navigator.vibrate([30, 40, 30]); } catch (e) {}
+            if (typeof navigator !== "undefined" && navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([30, 40, 30]) : false); } catch (e) {}
         },
 
         savePartialSession: function (elapsedSecs) {

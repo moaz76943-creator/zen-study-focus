@@ -73,7 +73,7 @@
                 this.currentPhaseIdx = (this.currentPhaseIdx + 1) % PHASES.length;
                 this.phaseStartTime = now;
                 if (typeof navigator !== "undefined" && navigator.vibrate) {
-                    try { navigator.vibrate(25); } catch (e) {}
+                    try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(25) : false); } catch (e) {}
                 }
             }
 
