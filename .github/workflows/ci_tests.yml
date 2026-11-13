@@ -1,0 +1,28 @@
+name: CI tests
+
+# One fast gate for every push / PR: all node tests must pass except the
+# legacy ones listed in tests/KNOWN_FAILING.txt (shrink that list, never grow it).
+on:
+  push:
+    branches: [main, 'integration/**', 'fix/**', 'chore/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  node-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Run regression gate
+        run: node tools/run_tests.mjs
