@@ -366,6 +366,32 @@
         lockSpans[ls].style.setProperty("opacity", "1", "important");
       }
 
+
+      // Task #835: Western digits + <input type="date" lang="en"> + 🔒 span contrast
+      var eDigits835 = /[\u0660-\u0669\u06F0-\u06F9]/g;
+      var toWest835 = function (s) {
+        return String(s).replace(eDigits835, function (c) {
+          var code = c.charCodeAt(0);
+          return String(code >= 0x06F0 ? code - 0x06F0 : code - 0x0660);
+        });
+      };
+      var w835 = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+      var n835;
+      while ((n835 = w835.nextNode())) {
+        if (n835.nodeValue && eDigits835.test(n835.nodeValue)) {
+          n835.nodeValue = toWest835(n835.nodeValue);
+        }
+      }
+      var dIn835 = document.querySelectorAll('input[type="date"]');
+      for (var di = 0; di < dIn835.length; di++) {
+        dIn835[di].setAttribute("lang", "en");
+      }
+      var lockSp835 = document.querySelectorAll('[data-i18n="ui_local_data"], [data-i18n="ui_local_data"] *');
+      for (var ls = 0; ls < lockSp835.length; ls++) {
+        lockSp835[ls].style.setProperty("color", "#0F172A", "important");
+        lockSp835[ls].style.setProperty("opacity", "1", "important");
+      }
+
       // 2. Translate all [data-i18n] elements
       var tagged = document.querySelectorAll("[data-i18n]");
       for (var j = 0; j < tagged.length; j++) {
