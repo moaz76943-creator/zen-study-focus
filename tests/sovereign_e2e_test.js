@@ -815,7 +815,7 @@ console.log('✅ PASS: Sovereign Onboarding Tour & Phase 3 Sealing Verified');
 const cp = require('child_process');
 const parityScript = path.resolve('tools/verify_locale_parity.py');
 try {
-  cp.execSync('python3 ' + parityScript, { stdio: 'pipe' });
+  cp.execFileSync('python3', [parityScript], { stdio: 'pipe' });
 } catch (err) {
   console.error('❌ FAIL: Locale Parity Audit script failed: ' + err.message);
   process.exit(1);
