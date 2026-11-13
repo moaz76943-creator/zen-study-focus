@@ -534,6 +534,9 @@
   }
   function renderStack(){
     if(!instance)return false;
+    // The Safe-DOM shield makes getElementById return a plain stub object (never null),
+    // so check for a real mounted Element; otherwise let the legacy renderer run.
+    if(!(document.getElementById('nsux-filters') instanceof Element))return false;
     refreshLocalization();
     const box=document.getElementById('notesStackBox');if(!box)return false;
     statusView();
