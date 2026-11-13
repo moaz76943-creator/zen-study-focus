@@ -78,4 +78,11 @@ assert(mainJava.includes('OnBackPressedCallback'), 'OnBackPressedCallback missin
 assert(!mainJava.includes('public void onBackPressed()'), 'Deprecated onBackPressed still present');
 assert(mainJava.includes('protected void onPause()') && mainJava.includes('onTrimMemory'), 'Lifecycle hooks missing');
 
+
+// 6. Test M33/M34/M47 audio & manifest guarantees
+const soundsMatch = appJs.match(/const\s+SOUNDS_DATA\s*=\s*\[[\s\S]*?\];/);
+assert(soundsMatch && !soundsMatch[0].includes('procedural_synth'), 'SOUNDS_DATA must not use procedural_synth');
+const manifestXml = fs.readFileSync(path.join(repoRoot, 'android/app/src/main/AndroidManifest.xml'), 'utf8');
+assert(!manifestXml.includes('screenOrientation="portrait"'), 'Portrait lock must be removed');
+
 console.log('✅ PASS: All Major #1-#5 behavioral & Android hardening regression tests passed!');

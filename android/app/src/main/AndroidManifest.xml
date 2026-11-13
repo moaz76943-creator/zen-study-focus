@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application
+ android:resizeableActivity="true"
  android:hardwareAccelerated="true"
  android:localeConfig="@xml/locales_config"
  android:label="Deep Focus"
@@ -16,7 +17,6 @@
  android:theme="@style/Theme.AppCompat.NoActionBar">
 
         <activity
- android:screenOrientation="portrait"
  android:configChanges="orientation|screenSize|keyboardHidden|screenLayout"
  android:name=".MainActivity"
  android:exported="true"
