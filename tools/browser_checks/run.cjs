@@ -43,6 +43,59 @@ async function layout(b, base) {
   }
 }
 
+async function flows(b, base) {
+  // End-to-end: create a task with a hostile title, reload, confirm it persisted and rendered as inert text;
+  // switch language, reload, confirm the choice and text direction persisted; no page errors.
+  const ctx = await b.newContext({ viewport: { width: 390, height: 800 } }); const p = await ctx.newPage(); const errs = [];
+  p.on('pageerror', (e) => errs.push(String(e.message).slice(0, 120)));
+  await p.goto(base + '/index.html'); await p.waitForTimeout(1500);
+  const evil = '<img src=x onerror="window.__pwned=1"> "q" & \'s\'';
+  await p.evaluate((t) => { document.getElementById('inpNewTask').value = t; createNewTask(); }, evil);
+  await p.waitForTimeout(300);
+  await p.reload(); await p.waitForTimeout(1500);
+  const r = await p.evaluate(() => {
+    try { switchTab('sec-tasks', document.querySelector('[onclick*="sec-tasks"]')); } catch (_) {}
+    return { pwned: !!window.__pwned, injected: !!document.querySelector('#sec-tasks img[src="x"]'),
+      found: document.body.innerText.includes('<img src=x'), saved: tasksList.some((t) => t.title.startsWith('<img')) };
+  });
+  if (r.pwned || r.injected) fail('flows: hostile task title executed/injected');
+  if (!r.saved) fail('flows: task did not survive reload');
+  if (!r.found) fail('flows: hostile title not shown as literal text');
+  await p.evaluate(() => applyLanguage('ar')); await p.waitForTimeout(300);
+  await p.reload(); await p.waitForTimeout(1500);
+  const dir = await p.evaluate(() => ({ lang: cfg.lang, dir: document.documentElement.dir }));
+  if (dir.lang !== 'ar' || dir.dir !== 'rtl') fail('flows: language/direction not restored: ' + JSON.stringify(dir));
+  if (errs.length) fail('flows: page errors: ' + errs.slice(0, 3).join(' | '));
+  await ctx.close();
+}
+
+async function offline(b, base) {
+  // The app promises 100% offline: boot it, open every section, and fail on any request that leaves localhost.
+  const ctx = await b.newContext({ viewport: { width: 390, height: 800 } }); const p = await ctx.newPage(); const out = [];
+  p.on('request', (r) => { const u = r.url(); if (!/^(http:\/\/localhost|data:|blob:|about:)/.test(u)) out.push(u.slice(0, 100)); });
+  await p.goto(base + '/index.html'); await p.waitForTimeout(1500);
+  const secs = await p.evaluate(() => [...new Set([...document.querySelectorAll('[id^="sec-"]')].map((n) => n.id))]);
+  for (const id of secs) { await p.evaluate((i) => { try { switchTab(i, document.querySelector('[onclick*="' + i + '"]')); } catch (_) {} }, id); await p.waitForTimeout(150); }
+  if (out.length) fail('offline: external requests: ' + [...new Set(out)].slice(0, 5).join(', '));
+  await ctx.close();
+}
+
+async function timerFlow(b, base) {
+  const ctx = await b.newContext({ viewport: { width: 390, height: 800 } }); const p = await ctx.newPage(); const errs = [];
+  p.on('pageerror', (e) => errs.push(String(e.message).slice(0, 120)));
+  await p.goto(base + '/index.html'); await p.waitForTimeout(1500);
+  const st = [];
+  st.push(await p.evaluate(() => timerRunning));
+  await p.evaluate(() => toggleTimerPlay()); await p.waitForTimeout(1300);
+  st.push(await p.evaluate(() => timerRunning));
+  await p.evaluate(() => toggleTimerPlay()); await p.waitForTimeout(300);
+  st.push(await p.evaluate(() => timerRunning));
+  await p.evaluate(() => { try { resetTimerNow(); } catch (_) {} });
+  if (st.join() !== 'false,true,false') fail('timer: unexpected running states ' + st.join());
+  if (errs.length) fail('timer: page errors: ' + errs.slice(0, 3).join(' | '));
+  await ctx.close();
+}
+
 async function corruption(b, base) {
   const keys = ['cfg', 'tasks', 'notes'].flatMap((k) => [`zen_fortress_${k}_v21`, `zen_fortress_${k}_v21_mirror`]);
   const bads = ['{not json', 'null', '[]', '{"payload":1,"sig":"x","ts":1}', '\u0000\u0001', 'x'.repeat(200000), '{"payload":{"__proto__":{"polluted":1}},"sig":"a","ts":1}'];
@@ -102,7 +155,7 @@ async function sounds(b, base) {
   const base = 'http://localhost:' + server.address().port;
   const b = await chromium.launch();
   const only = process.argv[2];
-  for (const [name, fn] of Object.entries({ layout, corruption, timezones, devText, sounds })) {
+  for (const [name, fn] of Object.entries({ layout, corruption, timezones, devText, sounds, flows, offline, timerFlow })) {
     if (only && only !== name) continue;
     const before = problems.length; await fn(b, base); console.log(name, problems.length === before ? 'OK' : 'FAILED');
   }
