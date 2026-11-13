@@ -5178,11 +5178,6 @@ function stopSoundTile(id) {
 }
 
 function toggleSoundTile(id) {
-  if (id === 'bell' || id === 'tibetan_bell') {
-    dfTriggerTibetanSingingBell(0.75);
-    showToast(cfg.lang === 'ar' ? '🔔 جرس تبتي' : '🔔 Tibetan Singing Bell');
-    return;
-  }
   const s = SOUNDS_DATA.find(x => x.id === id);
   if (!s) return;
   const sName = L().sounds[id] || id;
@@ -5194,7 +5189,8 @@ function toggleSoundTile(id) {
   }
   const token = (soundGeneration[id] || 0) + 1;
   soundGeneration[id] = token;
-  const audio = null /* procedural dsp enforced */;
+  if (typeof Audio !== 'function') { showToast(cfg.lang === 'ar' ? '⚠️ مشغل الصوت غير متاح' : '⚠️ Audio output unavailable'); return; }
+  const audio = new Audio();
   audio.loop = true;
   audio.volume = s.vol;
   audio.src = s.src;
