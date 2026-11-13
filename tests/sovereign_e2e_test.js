@@ -65,6 +65,7 @@ const deepAudit = require(path.resolve('android/app/src/main/assets/web/modules/
 const webRoot809 = path.resolve('android/app/src/main/assets/web');
 const html809 = fs.readFileSync(path.join(webRoot809, 'index.html'), 'utf8');
 let combinedJs809 = fs.readFileSync(path.join(webRoot809, 'app.js'), 'utf8');
+for (const studioJs of ['notes_studio.js', 'tasks_studio.js', 'goals_studio.js', 'analytics_studio.js']) { const sp = path.join(webRoot809, studioJs); if (fs.existsSync(sp)) combinedJs809 += '\n' + fs.readFileSync(sp, 'utf8'); }
 const modsDir809 = path.join(webRoot809, 'modules');
 function walkJs809(dir) {
   for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {

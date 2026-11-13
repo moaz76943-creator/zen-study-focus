@@ -95,4 +95,11 @@ assert(bloatLocales < 10, 'Unexpected DF_I18N_LOCALES bloat count: ' + bloatLoca
 assert(appJs.includes('__DF_SAFE_STORAGE_READY__'), 'dfSafeStorage missing');
 assert(!/function\s+dfSynthesizeBinauralBeats\s*\([^)]+\)\s*\{[\s\S]{30,}/.test(appJs), 'Binaural synth still active');
 
+
+// 9. Test F1 zero global function collisions between app.js and notes_studio.js
+for (const fnName of ['filterNotesByTag', 'renderNotesStack', 'openNoteModal', 'fillNoteTpl', 'saveNewNote']) {
+  const re = new RegExp('^function\\s+' + fnName + '\\b', 'm');
+  assert(!re.test(appJs), 'Shadowed collision still in app.js: ' + fnName);
+}
+
 console.log('✅ PASS: All Major #1-#5 behavioral & Android hardening regression tests passed!');
