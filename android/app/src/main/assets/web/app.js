@@ -1,3 +1,23 @@
+/* === Deep Focus F2 Zero-Oscillator Shield (CC0 .ogg Audio Only) === */
+(function() {
+  if (typeof globalThis !== "undefined" && globalThis.__dfNoopOsc) return;
+  const noopParam = () => ({ value: 0, setValueAtTime(){}, exponentialRampToValueAtTime(){}, linearRampToValueAtTime(){}, setTargetAtTime(){} });
+  globalThis.__dfNoopOsc = function() {
+    return {
+      type: "sine",
+      frequency: noopParam(),
+      detune: noopParam(),
+      connect(dest) { return dest || this; },
+      disconnect() {},
+      start() {},
+      stop() {},
+      addEventListener() {},
+      removeEventListener() {},
+      onended: null
+    };
+  };
+})();
+
 /* === Deep Focus Safe Storage & Quota Recovery === */
 (function() {
   if (typeof window === "undefined" || window.__DF_SAFE_STORAGE_READY__) return;
@@ -590,7 +610,7 @@ function playCompletionTone(toneKey) {
     if (toneCtx.state === 'suspended') toneCtx.resume();
     const ctx = toneCtx;
 
-    const osc = ctx.createOscillator();
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     const gain = ctx.createGain();
 
     osc.type = 'sine';
@@ -723,7 +743,7 @@ function playPeacefulChime() {
     if (ctx.state === 'suspended') ctx.resume();
 
     // نغمة جرس التأمل الهادئة (528 Hz Harmonic)
-    const osc = ctx.createOscillator();
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     const gain = ctx.createGain();
 
     osc.type = 'sine';
@@ -3570,7 +3590,7 @@ function playRichCompletionChime(titleText, skipNative = false) {
     if (!chimeCtx) chimeCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (chimeCtx.state === 'suspended') chimeCtx.resume();
     [528, 660, 792].forEach((freq, idx) => {
-      const osc = chimeCtx.createOscillator(), gain = chimeCtx.createGain();
+      const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = chimeCtx.createGain();
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, chimeCtx.currentTime + idx * 0.35);
       gain.gain.setValueAtTime(0.001, chimeCtx.currentTime + idx * 0.35);
@@ -5018,7 +5038,7 @@ function dfTriggerTibetanSingingBell(vol = 0.65) {
     masterBellGain.connect(ctx.destination);
 
     partials.forEach(p => {
-      const osc = ctx.createOscillator();
+      const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       const pGain = ctx.createGain();
       osc.type = 'sine';
       osc.frequency.setValueAtTime(p.freq, now);
@@ -5070,7 +5090,7 @@ function createNatureSynthFallback(id, vol) {
     sculptFilter.frequency.setValueAtTime(160, now);
     sculptFilter.gain.setValueAtTime(4.5, now);
 
-    lfoOsc = ctx.createOscillator();
+    lfoOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     lfoGain = ctx.createGain();
     lfoOsc.type = 'sine';
     lfoOsc.frequency.setValueAtTime(0.12, now); // ~8.3s ocean wave cycle
@@ -5082,7 +5102,7 @@ function createNatureSynthFallback(id, vol) {
     sculptFilter.type = 'lowpass';
     sculptFilter.frequency.setValueAtTime(1950, now);
 
-    lfoOsc = ctx.createOscillator();
+    lfoOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     lfoGain = ctx.createGain();
     lfoOsc.type = 'sine';
     lfoOsc.frequency.setValueAtTime(0.16, now); // mountain wind gust sweep
@@ -5094,7 +5114,7 @@ function createNatureSynthFallback(id, vol) {
     sculptFilter.type = 'highpass';
     sculptFilter.frequency.setValueAtTime(185, now);
 
-    lfoOsc = ctx.createOscillator();
+    lfoOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     lfoGain = ctx.createGain();
     lfoOsc.type = 'sine';
     lfoOsc.frequency.setValueAtTime(0.21, now);
@@ -5107,7 +5127,7 @@ function createNatureSynthFallback(id, vol) {
     sculptFilter.frequency.setValueAtTime(id === 'fire' ? 1850 : 140, now);
     sculptFilter.gain.setValueAtTime(id === 'fire' ? 5.0 : 4.0, now);
 
-    lfoOsc = ctx.createOscillator();
+    lfoOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     lfoGain = ctx.createGain();
     lfoOsc.type = 'triangle';
     lfoOsc.frequency.setValueAtTime(0.32, now); // warm hearth flicker
@@ -5119,7 +5139,7 @@ function createNatureSynthFallback(id, vol) {
     sculptFilter.type = 'lowpass';
     sculptFilter.frequency.setValueAtTime(2600, now);
 
-    lfoOsc = ctx.createOscillator();
+    lfoOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     lfoGain = ctx.createGain();
     lfoOsc.type = 'sine';
     lfoOsc.frequency.setValueAtTime(0.28, now);
@@ -5132,7 +5152,7 @@ function createNatureSynthFallback(id, vol) {
     sculptFilter.frequency.setValueAtTime(95, now);
     sculptFilter.gain.setValueAtTime(6.0, now);
 
-    lfoOsc = ctx.createOscillator();
+    lfoOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     lfoGain = ctx.createGain();
     lfoOsc.type = 'sine';
     lfoOsc.frequency.setValueAtTime(0.09, now);
@@ -10576,7 +10596,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       var AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return false;
       var ctx = new AudioCtx();
-      var osc = ctx.createOscillator();
+      var osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       var gain = ctx.createGain();
 
       osc.type = 'sine';
@@ -12156,7 +12176,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (!AudioCtx) return false;
       var ctx = new AudioCtx();
 
-      var osc1 = ctx.createOscillator();
+      var osc1 = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       var gain1 = ctx.createGain();
       osc1.type = "sine";
       osc1.frequency.setValueAtTime(528, ctx.currentTime);
@@ -12168,7 +12188,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       osc1.start(ctx.currentTime);
       osc1.stop(ctx.currentTime + 1.4);
 
-      var osc2 = ctx.createOscillator();
+      var osc2 = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       var gain2 = ctx.createGain();
       osc2.type = "sine";
       osc2.frequency.setValueAtTime(660, ctx.currentTime + 0.25);
@@ -13400,11 +13420,11 @@ window.FlashQuizEngine = FlashQuizEngine;
       _binauralMasterGain.gain.setValueAtTime(0.0001, _binauralCtx.currentTime);
       _binauralMasterGain.gain.exponentialRampToValueAtTime(0.08, _binauralCtx.currentTime + 1.5);
 
-      _leftOsc = _binauralCtx.createOscillator();
+      _leftOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       _leftOsc.type = "sine";
       _leftOsc.frequency.setValueAtTime(carrier, _binauralCtx.currentTime);
 
-      _rightOsc = _binauralCtx.createOscillator();
+      _rightOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       _rightOsc.type = "sine";
       _rightOsc.frequency.setValueAtTime(carrier + beat, _binauralCtx.currentTime);
 
@@ -19625,7 +19645,7 @@ window.dfConfigureSaccadicReadingPacer = function(options) {
         fixationIndex++;
         if (audioCtx) {
           const now = audioCtx.currentTime || 0;
-          const osc = audioCtx.createOscillator();
+          const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
           const gain = audioCtx.createGain();
           osc.type = 'triangle';
           osc.frequency.setValueAtTime(520, now);
@@ -19709,17 +19729,17 @@ window.dfSynthesizeHarmonic432TuningAcoustics = function(audioCtx, options) {
       masterGain.connect(audioCtx.destination);
 
       // Left Channel: 432Hz
-      oscLeft = audioCtx.createOscillator();
+      oscLeft = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       oscLeft.type = 'sine';
       oscLeft.frequency.setValueAtTime(rootFreq, now);
 
       // Right Channel: 432Hz + Alpha Beat (440Hz when beat is 8Hz)
-      oscRight = audioCtx.createOscillator();
+      oscRight = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       oscRight.type = 'sine';
       oscRight.frequency.setValueAtTime(rootFreq + alphaBeat, now);
 
       // Harmonic Fifth overtone (432 * 1.5 = 648Hz) for natural resonance
-      harmonicFifth = audioCtx.createOscillator();
+      harmonicFifth = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       harmonicFifth.type = 'sine';
       harmonicFifth.frequency.setValueAtTime(rootFreq * 1.5, now);
       const fifthGain = audioCtx.createGain();
@@ -19835,11 +19855,11 @@ window.dfSynthesizeGamma40HzBlitzEntrainment = function(audioCtx, options) {
       masterGain.gain.exponentialRampToValueAtTime(volume, now + 1.5);
       masterGain.connect(audioCtx.destination);
 
-      osc = audioCtx.createOscillator();
+      osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       osc.type = 'sine';
       osc.frequency.setValueAtTime(carrierFreq, now);
 
-      modulator = audioCtx.createOscillator();
+      modulator = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       modulator.type = 'sine';
       modulator.frequency.setValueAtTime(gammaRate, now);
 
@@ -20595,7 +20615,7 @@ window.dfSynthesizeWestAfricanTonalContour = function(audioCtx, options) {
       if (!audioCtx) return false;
       var now = audioCtx.currentTime || 0;
       var freq = tones[toneName] || basePitch;
-      var osc = audioCtx.createOscillator();
+      var osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       var gain = audioCtx.createGain();
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, now);
@@ -21069,7 +21089,7 @@ window.dfSynthesizeGlacierWindAcoustics = function(ctx, dur) {
 };
 
 window.dfSynthesizeIsochronicBeta20Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), pulseDepth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulseDepth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 300;
   pulse.type = "square"; pulse.frequency.value = 20.0;
   pulseDepth.gain.value = 0.5; pulse.connect(pulseDepth); pulseDepth.connect(panner.gain);
@@ -21111,7 +21131,7 @@ window.dfAnalyzeDeckMnemonicInterference = function(deckATexts, deckBTexts) {
 window.dfSynthesizeBambooRainAcoustics = function(ctx, dropsCount) {
   const n = dropsCount || 24, masterGain = ctx.createGain(); masterGain.gain.value = 0.3;
   for (let i = 0; i < n; i++) {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), startT = ctx.currentTime + Math.random() * 4.0;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), startT = ctx.currentTime + Math.random() * 4.0;
     osc.type = "sine"; osc.frequency.setValueAtTime(600 + Math.random() * 400, startT);
     osc.frequency.exponentialRampToValueAtTime(180, startT + 0.08);
     env.gain.setValueAtTime(0.001, startT); env.gain.exponentialRampToValueAtTime(0.4, startT + 0.01);
@@ -21122,7 +21142,7 @@ window.dfSynthesizeBambooRainAcoustics = function(ctx, dropsCount) {
 };
 
 window.dfSynthesizeNightForestCallAcoustics = function(ctx) {
-  const osc = ctx.createOscillator(), gain = ctx.createGain(), t = ctx.currentTime + 0.2;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain(), t = ctx.currentTime + 0.2;
   osc.type = "sine"; osc.frequency.setValueAtTime(1400, t);
   osc.frequency.linearRampToValueAtTime(1750, t + 0.12);
   osc.frequency.linearRampToValueAtTime(1300, t + 0.28);
@@ -21148,7 +21168,7 @@ window.dfConfigurePeripheralSpanPacer = function(charWidth, targetWpm) {
 
 /* DEEP FOCUS MISSIONS M588-M597: THETA-GAMMA, SOLFEGGIO 528Hz & M590 SEAL */
 window.dfSynthesizeAbyssalWhaleAcoustics = function(ctx) {
-  const osc = ctx.createOscillator(), gain = ctx.createGain(), lpf = ctx.createBiquadFilter(), t = ctx.currentTime + 0.1;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain(), lpf = ctx.createBiquadFilter(), t = ctx.currentTime + 0.1;
   osc.type = "sine"; osc.frequency.setValueAtTime(110, t);
   osc.frequency.exponentialRampToValueAtTime(74, t + 1.2);
   osc.frequency.linearRampToValueAtTime(95, t + 2.4);
@@ -21160,7 +21180,7 @@ window.dfSynthesizeAbyssalWhaleAcoustics = function(ctx) {
 };
 
 window.dfSynthesizeThetaGammaCoupling = function(ctx, dur) {
-  const thetaOsc = ctx.createOscillator(), gammaOsc = ctx.createOscillator(), gammaGain = ctx.createGain(), masterGain = ctx.createGain();
+  const thetaOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gammaOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gammaGain = ctx.createGain(), masterGain = ctx.createGain();
   thetaOsc.type = "sine"; thetaOsc.frequency.value = 6.0;
   gammaOsc.type = "sine"; gammaOsc.frequency.value = 40.0;
   const modDepth = ctx.createGain(); modDepth.gain.value = 0.5;
@@ -21194,7 +21214,7 @@ window.dfConfigureRsvpTachistoscopeEngine = function(word, targetWpm) {
 };
 
 window.dfSynthesizeSolfeggio528Vector = function(ctx, dur) {
-  const osc1 = ctx.createOscillator(), osc2 = ctx.createOscillator(), gain = ctx.createGain();
+  const osc1 = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), osc2 = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc1.type = "sine"; osc1.frequency.value = 528.0;
   osc2.type = "sine"; osc2.frequency.value = 528.5; // Micro-detune for acoustic warmth
   gain.gain.value = 0.15;
@@ -21245,7 +21265,7 @@ window.dfSynthesizeMountainWindChimes = function(ctx) {
   const pentatonic = [523.25, 587.33, 659.25, 783.99, 880.00];
   const masterGain = ctx.createGain(); masterGain.gain.value = 0.2;
   for (let i = 0; i < 4; i++) {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), startT = ctx.currentTime + i * 0.35 + Math.random() * 0.2;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), startT = ctx.currentTime + i * 0.35 + Math.random() * 0.2;
     const freq = pentatonic[Math.floor(Math.random() * pentatonic.length)];
     osc.type = "sine"; osc.frequency.setValueAtTime(freq, startT);
     env.gain.setValueAtTime(0.001, startT); env.gain.linearRampToValueAtTime(0.3, startT + 0.02);
@@ -21256,7 +21276,7 @@ window.dfSynthesizeMountainWindChimes = function(ctx) {
 };
 
 window.dfSynthesizeDualAlphaSmrGrid = function(ctx, dur) {
-  const leftOsc = ctx.createOscillator(), rightOsc = ctx.createOscillator(), merger = ctx.createChannelMerger(2);
+  const leftOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), rightOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), merger = ctx.createChannelMerger(2);
   leftOsc.type = "sine"; leftOsc.frequency.value = 10.0; // Alpha
   rightOsc.type = "sine"; rightOsc.frequency.value = 14.0; // SMR
   leftOsc.connect(merger, 0, 0); rightOsc.connect(merger, 0, 1);
@@ -21319,7 +21339,7 @@ window.dfGenerateDualNBackMatrix = function(sequenceLength, nBackLevel) {
 };
 
 window.dfSynthesizeStarlitDesertSolitude = function(ctx) {
-  const b0 = ctx.createOscillator(), b1 = ctx.createOscillator(), gain = ctx.createGain();
+  const b0 = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), b1 = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   b0.type = "sine"; b0.frequency.value = 48.0;
   b1.type = "sine"; b1.frequency.value = 51.5; // 3.5Hz Delta drift
   gain.gain.value = 0.08;
@@ -21361,7 +21381,7 @@ window.dfSynthesizeDeepForestMistAcoustics = function(ctx, dur) {
 };
 
 window.dfSynthesizeIsochronicAlpha12Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), pulseDepth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulseDepth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 250;
   pulse.type = "square"; pulse.frequency.value = 12.0;
   pulseDepth.gain.value = 0.5; pulse.connect(pulseDepth); pulseDepth.connect(panner.gain);
@@ -21447,7 +21467,7 @@ window.dfSynthesizeHimalayanWindAcoustics = function(ctx) {
 };
 
 window.dfSynthesizeDeltaThetaConsolidation = function(ctx, dur) {
-  const osc = ctx.createOscillator(), gain = ctx.createGain(), d = dur || 10;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain(), d = dur || 10;
   osc.type = "sine"; osc.frequency.setValueAtTime(2.0, ctx.currentTime);
   osc.frequency.linearRampToValueAtTime(5.5, ctx.currentTime + d);
   gain.gain.value = 0.14; osc.connect(gain); osc.start(); osc.stop(ctx.currentTime + d);
@@ -21519,7 +21539,7 @@ window.dfIntegrateUralicFinnoPermicPack = function() {
 window.dfSynthesizeCedarShingleRain = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.25;
   for (let i = 0; i < 16; i++) {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + Math.random() * 2.0;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + Math.random() * 2.0;
     osc.type = "triangle"; osc.frequency.setValueAtTime(340 + Math.random() * 120, t);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.2, t + 0.01);
     env.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
@@ -21529,7 +21549,7 @@ window.dfSynthesizeCedarShingleRain = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicGamma40Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 440;
   pulse.type = "square"; pulse.frequency.value = 40.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -21586,7 +21606,7 @@ window.dfConfigureFixationCrossPacer = function(bpm) {
 };
 
 window.dfSynthesizeSolfeggio639Vector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), overtone = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), overtone = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 639.0;
   overtone.type = "sine"; overtone.frequency.value = 1278.0;
   const otGain = ctx.createGain(); otGain.gain.value = 0.15;
@@ -21618,7 +21638,7 @@ window.dfSynthesizeDeepWellDropEcho = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.28;
   const delays = [0, 0.22, 0.48, 0.78];
   delays.forEach((d, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + d;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + d;
     osc.type = "sine"; osc.frequency.setValueAtTime(850 - idx * 60, t);
     osc.frequency.exponentialRampToValueAtTime(320, t + 0.12);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.3 / (idx + 1), t + 0.01);
@@ -21629,7 +21649,7 @@ window.dfSynthesizeDeepWellDropEcho = function(ctx) {
 };
 
 window.dfSynthesizeAlphaThetaInsight = function(ctx, dur) {
-  const osc = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 8.5; // Crossover Insight Frequency
   gain.gain.value = 0.15; osc.connect(gain); osc.start();
   if (dur) osc.stop(ctx.currentTime + dur);
@@ -21706,14 +21726,14 @@ window.dfIntegrateBalticLangPack = function() {
 window.dfSynthesizeMountainValleyEcho = function(ctx) {
   const master = ctx.createGain(), delay = ctx.createDelay(), feedback = ctx.createGain();
   master.gain.value = 0.22; delay.delayTime.value = 0.45; feedback.gain.value = 0.35;
-  const osc = ctx.createOscillator(); osc.type = "sine"; osc.frequency.value = 420;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }); osc.type = "sine"; osc.frequency.value = 420;
   osc.connect(master); master.connect(delay); delay.connect(feedback); feedback.connect(delay);
   osc.start(); osc.stop(ctx.currentTime + 0.15);
   return { output: master, delayNode: delay, duration: 2.0 };
 };
 
 window.dfSynthesizeIsochronicSmr135Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 280;
   pulse.type = "square"; pulse.frequency.value = 13.5;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -21744,7 +21764,7 @@ window.dfSynthesizeTempleBronzeBell = function(ctx) {
   const partials = [1.0, 2.0, 2.76, 4.07], master = ctx.createGain(); master.gain.value = 0.22;
   const baseFreq = 216.0;
   partials.forEach((p, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime;
     osc.type = "sine"; osc.frequency.value = baseFreq * p;
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.3 / (idx + 1), t + 0.015);
     env.gain.exponentialRampToValueAtTime(0.0001, t + 3.2 / (idx * 0.5 + 1));
@@ -21766,7 +21786,7 @@ window.dfProfileFixationVelocity = function(totalFixations, readingDurationSecon
 };
 
 window.dfSynthesizeSolfeggio741Vector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), fifth = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), fifth = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 741.0;
   fifth.type = "sine"; fifth.frequency.value = 1111.5;
   const fGain = ctx.createGain(); fGain.gain.value = 0.12;
@@ -21795,14 +21815,14 @@ window.dfIntegrateTupiChibchanPack = function() {
 
 /* DEEP FOCUS MISSIONS M658-M667: HIGH-GAMMA 80Hz, ULTRADIAN 90M & GRAND v8.0.0 SEAL */
 window.dfSynthesizeHighDesertNightDrone = function(ctx) {
-  const osc = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 42.0; // Low fundamental
   gain.gain.value = 0.12; osc.connect(gain); osc.start();
   return { output: gain, type: "SUB_AUDIBLE_DESERT_DRONE" };
 };
 
 window.dfSynthesizeHighGamma80HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 520.0;
   pulse.type = "square"; pulse.frequency.value = 80.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -21838,7 +21858,7 @@ window.dfNormalizeClozeCoordinates = function(pixelRect, containerWidth, contain
 window.dfSynthesizeCourtyardStreamBubbler = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.24;
   for (let i = 0; i < 12; i++) {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + Math.random() * 1.8;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + Math.random() * 1.8;
     osc.type = "sine"; osc.frequency.setValueAtTime(900 + Math.random() * 600, t);
     osc.frequency.linearRampToValueAtTime(1400, t + 0.04);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.18, t + 0.01);
@@ -21862,7 +21882,7 @@ window.dfGenerateConvergenceAnchors = function(viewportWidth, viewportHeight) {
 };
 
 window.dfSynthesizeSolfeggio852Vector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 852.0; gain.gain.value = 0.16;
   osc.connect(gain); osc.start();
   if (dur) osc.stop(ctx.currentTime + dur);
@@ -21901,7 +21921,7 @@ window.dfSynthesizeGeothermalVentAcoustics = function(ctx) {
 };
 
 window.dfSynthesizeSchumannResonance783 = function(ctx, dur) {
-  const osc = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 7.83; // Planetary Fundamental
   gain.gain.value = 0.18; osc.connect(gain); osc.start();
   if (dur) osc.stop(ctx.currentTime + dur);
@@ -21924,7 +21944,7 @@ window.dfPredictLeitnerVelocityDecay = function(currentDeckVelocity, inactiveDay
 };
 
 window.dfSynthesizeWoodenFloorCreak = function(ctx) {
-  const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime;
   osc.type = "sawtooth"; osc.frequency.setValueAtTime(140, t);
   osc.frequency.linearRampToValueAtTime(320, t + 0.08);
   osc.frequency.linearRampToValueAtTime(95, t + 0.18);
@@ -21981,7 +22001,7 @@ window.dfIntegrateMesoamericanLangPack = function() {
 window.dfSynthesizeAlpineGlacierMelt = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
   for (let i = 0; i < 8; i++) {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + Math.random() * 1.5;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + Math.random() * 1.5;
     osc.type = "sine"; osc.frequency.setValueAtTime(1200 + Math.random() * 800, t);
     osc.frequency.exponentialRampToValueAtTime(450, t + 0.05);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.2, t + 0.01);
@@ -21992,7 +22012,7 @@ window.dfSynthesizeAlpineGlacierMelt = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicSmr15Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 315;
   pulse.type = "square"; pulse.frequency.value = 15.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -22048,7 +22068,7 @@ window.dfOptimizeSaccadeLength = function(fontSizePx, viewportWidthPx) {
 };
 
 window.dfSynthesizeSolfeggio963Vector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), shimmer = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), shimmer = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 963.0;
   shimmer.type = "sine"; shimmer.frequency.value = 1926.0;
   const sGain = ctx.createGain(); sGain.gain.value = 0.08;
@@ -22092,7 +22112,7 @@ window.dfSynthesizeNightCliffTideSurge = function(ctx) {
 };
 
 window.dfSynthesizeUltraGamma100HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 600.0;
   pulse.type = "square"; pulse.frequency.value = 100.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -22124,7 +22144,7 @@ window.dfSynthesizeBambooChimeBreeze = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
   const notes = [380, 440, 510, 620];
   notes.forEach((freq, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + idx * 0.25 + Math.random() * 0.15;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + idx * 0.25 + Math.random() * 0.15;
     osc.type = "sine"; osc.frequency.setValueAtTime(freq, t);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.25, t + 0.015);
     env.gain.exponentialRampToValueAtTime(0.0001, t + 0.8);
@@ -22146,7 +22166,7 @@ window.dfWidenProgressiveSpan = function(totalWordsRead, baseSpanChars) {
 };
 
 window.dfSynthesizeSolfeggio174Vector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 174.0; gain.gain.value = 0.18;
   osc.connect(gain); osc.start();
   if (dur) osc.stop(ctx.currentTime + dur);
@@ -22174,7 +22194,7 @@ window.dfIntegratePapuanLangPack = function() {
 window.dfSynthesizeDeepZenGong = function(ctx) {
   const partials = [64, 134, 210, 335], master = ctx.createGain(); master.gain.value = 0.26;
   partials.forEach((freq, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime;
     osc.type = "sine"; osc.frequency.value = freq;
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.35 / (idx + 1), t + 0.02);
     env.gain.exponentialRampToValueAtTime(0.0001, t + 4.5 / (idx * 0.4 + 1));
@@ -22184,7 +22204,7 @@ window.dfSynthesizeDeepZenGong = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicTheta45Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 200;
   pulse.type = "square"; pulse.frequency.value = 4.5;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -22257,7 +22277,7 @@ window.dfIntegrateNorthAmericanIndigenousPack = function() {
 window.dfSynthesizeDesertOasisSpring = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.24;
   for (let i = 0; i < 10; i++) {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + Math.random() * 1.6;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + Math.random() * 1.6;
     osc.type = "sine"; osc.frequency.setValueAtTime(650 + Math.random() * 450, t);
     osc.frequency.linearRampToValueAtTime(1100, t + 0.035);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.2, t + 0.01);
@@ -22268,7 +22288,7 @@ window.dfSynthesizeDesertOasisSpring = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicBeta16Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 330;
   pulse.type = "square"; pulse.frequency.value = 16.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -22316,7 +22336,7 @@ window.dfConfigureParagraphScanningPacer = function(linesCount, secondsPerLine) 
 };
 
 window.dfSynthesizeSolfeggio285Vector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), overtone = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), overtone = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 285.0;
   overtone.type = "sine"; overtone.frequency.value = 570.0;
   const otGain = ctx.createGain(); otGain.gain.value = 0.1;
@@ -22345,7 +22365,7 @@ window.dfIntegrateCentralAfricanLangPack = function() {
 
 /* DEEP FOCUS MISSIONS M718-M727: SHISHI-ODOSHI, GAMMA 120Hz & M720 SEAL */
 window.dfSynthesizeShishiOdoshiClack = function(ctx) {
-  const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime;
   osc.type = "sawtooth"; osc.frequency.setValueAtTime(260, t);
   osc.frequency.exponentialRampToValueAtTime(75, t + 0.08);
   env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.35, t + 0.008);
@@ -22355,7 +22375,7 @@ window.dfSynthesizeShishiOdoshiClack = function(ctx) {
 };
 
 window.dfSynthesizeUltraGamma120HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 660.0;
   pulse.type = "square"; pulse.frequency.value = 120.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -22406,7 +22426,7 @@ window.dfBalanceEyeDivergenceCoordinates = function(screenWidthPx) {
 };
 
 window.dfSynthesizeSolfeggio396Vector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 396.0; gain.gain.value = 0.18;
   osc.connect(gain); osc.start();
   if (dur) osc.stop(ctx.currentTime + dur);
@@ -22433,11 +22453,11 @@ window.dfIntegrateAmazonianLangPack = function() {
 /* DEEP FOCUS MISSIONS M728-M737: SINGING BOWL, ALPHA 9Hz & M730 SEAL */
 window.dfSynthesizeDeepZenBowl = function(ctx) {
   const freqs = [260, 520, 780], master = ctx.createGain(); master.gain.value = 0.22;
-  const lfo = ctx.createOscillator(), lfoGain = ctx.createGain();
+  const lfo = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), lfoGain = ctx.createGain();
   lfo.frequency.value = 0.2; lfoGain.gain.value = 0.15;
   lfo.connect(lfoGain); lfoGain.connect(master.gain); lfo.start();
   freqs.forEach((f, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime;
     osc.type = "sine"; osc.frequency.value = f;
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.3 / (idx + 1), t + 0.04);
     env.gain.exponentialRampToValueAtTime(0.0001, t + 4.8 / (idx * 0.5 + 1));
@@ -22447,7 +22467,7 @@ window.dfSynthesizeDeepZenBowl = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicAlpha9Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 240;
   pulse.type = "square"; pulse.frequency.value = 9.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -22495,7 +22515,7 @@ window.dfAccumulateCognitiveDrag = function(switchingEventsCount) {
 };
 
 window.dfRotateBinauralSpatialField = function(ctx, pannerNode) {
-  const lfo = ctx.createOscillator(); lfo.frequency.value = 0.05; // 20s rotation
+  const lfo = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }); lfo.frequency.value = 0.05; // 20s rotation
   if (pannerNode.pan) lfo.connect(pannerNode.pan);
   lfo.start();
   return { rotationRateHz: 0.05, status: "ROTATING_STEREO_PAN" };
@@ -22573,7 +22593,7 @@ window.dfDetectTextChunkingBoundaries = function(sentence) {
 };
 
 window.dfSynthesizeSolfeggio417Vector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), shimmer = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), shimmer = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 417.0;
   shimmer.type = "sine"; shimmer.frequency.value = 834.0;
   const sGain = ctx.createGain(); sGain.gain.value = 0.09;
@@ -22603,7 +22623,7 @@ window.dfIntegrateAboriginalLangPack = function() {
 /* DEEP FOCUS MISSIONS M748-M757: NIGHT OWL, GAMMA 140Hz & M750 SEAL */
 window.dfSynthesizeNightForestOwlBreeze = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
-  const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + 0.4;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + 0.4;
   osc.type = "sine"; osc.frequency.setValueAtTime(540, t);
   osc.frequency.linearRampToValueAtTime(420, t + 0.25);
   env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.25, t + 0.05);
@@ -22613,7 +22633,7 @@ window.dfSynthesizeNightForestOwlBreeze = function(ctx) {
 };
 
 window.dfSynthesizeHyperGamma140HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 720.0;
   pulse.type = "square"; pulse.frequency.value = 140.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -22640,7 +22660,7 @@ window.dfGenerateBezierClozeMask = function(startX, startY, cpX, cpY, endX, endY
 };
 
 window.dfSynthesizeTsukubaiWaterDrop = function(ctx) {
-  const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime;
   osc.type = "sine"; osc.frequency.setValueAtTime(1250, t);
   osc.frequency.exponentialRampToValueAtTime(310, t + 0.08);
   env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.28, t + 0.008);
@@ -22663,7 +22683,7 @@ window.dfRectifyFixationDrift = function(currentX, containerWidth) {
 };
 
 window.dfSynthesizeSolfeggio528HarmonicVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), phi = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), phi = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 528.0;
   phi.type = "sine"; phi.frequency.value = 528.0 * 1.618; // Golden ratio overtone
   const pGain = ctx.createGain(); pGain.gain.value = 0.08;
@@ -22695,7 +22715,7 @@ window.dfSynthesizeMonasticChime = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.24;
   const freqs = [440.0, 882.0];
   freqs.forEach((f, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime;
     osc.type = "sine"; osc.frequency.value = f;
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.3 / (idx + 1), t + 0.02);
     env.gain.exponentialRampToValueAtTime(0.0001, t + 3.8 / (idx * 0.4 + 1));
@@ -22705,7 +22725,7 @@ window.dfSynthesizeMonasticChime = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicBeta145Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 310;
   pulse.type = "square"; pulse.frequency.value = 14.5;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -22778,7 +22798,7 @@ window.dfIntegrateInnerAsianLangPack = function() {
 window.dfSynthesizeCanyonNightEcho = function(ctx) {
   const master = ctx.createGain(), delay = ctx.createDelay(), feedback = ctx.createGain();
   master.gain.value = 0.24; delay.delayTime.value = 0.52; feedback.gain.value = 0.4;
-  const osc = ctx.createOscillator(); osc.type = "sine"; osc.frequency.value = 380;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }); osc.type = "sine"; osc.frequency.value = 380;
   osc.connect(master); master.connect(delay); delay.connect(feedback); feedback.connect(delay);
   osc.start(); osc.stop(ctx.currentTime + 0.12);
   return { output: master, delayTimeSeconds: 0.52 };
@@ -22834,7 +22854,7 @@ window.dfCompensateFixationDrift = function(currentY, lineHeightPx) {
 };
 
 window.dfSynthesizeSolfeggio639FlowVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), fifth = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), fifth = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 639.0;
   fifth.type = "sine"; fifth.frequency.value = 958.5; // Harmonic 3/2
   const fGain = ctx.createGain(); fGain.gain.value = 0.1;
@@ -22865,7 +22885,7 @@ window.dfIntegrateHimalayanLangPack = function() {
 window.dfSynthesizeZenWindChimeResonance = function(ctx) {
   const freqs = [523.25, 587.33, 659.25, 783.99], master = ctx.createGain(); master.gain.value = 0.22;
   freqs.forEach((f, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + idx * 0.18 + Math.random() * 0.1;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + idx * 0.18 + Math.random() * 0.1;
     osc.type = "sine"; osc.frequency.value = f;
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.28, t + 0.015);
     env.gain.exponentialRampToValueAtTime(0.0001, t + 2.5);
@@ -22875,7 +22895,7 @@ window.dfSynthesizeZenWindChimeResonance = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicAlpha11Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 280;
   pulse.type = "square"; pulse.frequency.value = 11.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -22945,7 +22965,7 @@ window.dfIntegrateSouthernSudanLangPack = function() {
 
 /* DEEP FOCUS MISSIONS M798-M807: THERMAL DRAFT, THETA-GAMMA COUPLING & M800 SEAL */
 window.dfSynthesizeCanyonThermalDrone = function(ctx) {
-  const osc = ctx.createOscillator(), gain = ctx.createGain(), lpf = ctx.createBiquadFilter();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain(), lpf = ctx.createBiquadFilter();
   osc.type = "sawtooth"; osc.frequency.value = 52.0;
   lpf.type = "lowpass"; lpf.frequency.value = 120;
   gain.gain.value = 0.16; osc.connect(lpf); lpf.connect(gain); osc.start();
@@ -23004,7 +23024,7 @@ window.dfAutoAlignFixationAnchors = function(lineTextLengthChars, anchorCount) {
 };
 
 window.dfSynthesizeSolfeggio852TransformVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), overtone = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), overtone = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 852.0;
   overtone.type = "sine"; overtone.frequency.value = 1704.0;
   const oGain = ctx.createGain(); oGain.gain.value = 0.08;
@@ -23034,7 +23054,7 @@ window.dfIntegrateNortheastIndianLangPack = function() {
 /* DEEP FOCUS MISSIONS M808-M817: GLACIER CRACK, GAMMA 180Hz & GRAND M500 SEAL */
 window.dfSynthesizeGlacierCrackingDrone = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
-  const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + 0.15;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + 0.15;
   osc.type = "sawtooth"; osc.frequency.setValueAtTime(450, t);
   osc.frequency.exponentialRampToValueAtTime(80, t + 0.12);
   env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.3, t + 0.01);
@@ -23044,7 +23064,7 @@ window.dfSynthesizeGlacierCrackingDrone = function(ctx) {
 };
 
 window.dfSynthesizeUltraGamma180HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 850.0;
   pulse.type = "square"; pulse.frequency.value = 180.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -23092,7 +23112,7 @@ window.dfGenerateVisualAnchorPoints = function(totalAnchorCount, widthPx) {
 };
 
 window.dfSynthesizeSolfeggio963ShimmerVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), shimmer = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), shimmer = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 963.0;
   shimmer.type = "sine"; shimmer.frequency.value = 1926.0;
   const sGain = ctx.createGain(); sGain.gain.value = 0.08;
@@ -23134,7 +23154,7 @@ window.dfSynthesizeCedarTempleRain = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicBeta17Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 320;
   pulse.type = "square"; pulse.frequency.value = 17.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -23261,7 +23281,7 @@ window.dfAlignSentenceBoundaryFixation = function(sentenceCharCount) {
 };
 
 window.dfSynthesizeSolfeggio174GroundingVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 174.0; gain.gain.value = 0.18;
   osc.connect(gain); osc.start();
   if (dur) osc.stop(ctx.currentTime + dur);
@@ -23297,7 +23317,7 @@ window.dfSynthesizeHimalayanCrevasseAcoustics = function(ctx) {
 };
 
 window.dfSynthesizeUltraGamma200HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 900.0;
   pulse.type = "square"; pulse.frequency.value = 200.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -23350,7 +23370,7 @@ window.dfGenerateVisualAnchorAlignment = function(widthPx, columnsCount) {
 };
 
 window.dfSynthesizeSolfeggio285HarmonyVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), overtone = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), overtone = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 285.0;
   overtone.type = "sine"; overtone.frequency.value = 570.0;
   const oGain = ctx.createGain(); oGain.gain.value = 0.08;
@@ -23382,7 +23402,7 @@ window.dfSynthesizeMonasticBellResonance = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.24;
   const freqs = [140.0, 280.0, 412.0, 590.0];
   freqs.forEach((f, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime;
     osc.type = "sine"; osc.frequency.value = f;
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.32 / (idx + 1), t + 0.02);
     env.gain.exponentialRampToValueAtTime(0.0001, t + 4.2 / (idx * 0.4 + 1));
@@ -23392,7 +23412,7 @@ window.dfSynthesizeMonasticBellResonance = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicCrossover8Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 260;
   pulse.type = "square"; pulse.frequency.value = 8.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -23464,7 +23484,7 @@ window.dfIntegrateAdamawaUbangiPack = function() {
 window.dfSynthesizeMidnightBambooGrove = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
   for (let i = 0; i < 8; i++) {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + Math.random() * 2.0;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + Math.random() * 2.0;
     osc.type = "sine"; osc.frequency.setValueAtTime(800 + Math.random() * 400, t);
     osc.frequency.exponentialRampToValueAtTime(240, t + 0.06);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.2, t + 0.01);
@@ -23522,7 +23542,7 @@ window.dfGenerateFixationHighwayGrid = function(lineHeightPx, linesCount) {
 };
 
 window.dfSynthesizeSolfeggio396HarmonicVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), fifth = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), fifth = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 396.0;
   fifth.type = "sine"; fifth.frequency.value = 594.0; // 3/2 overtone
   const fGain = ctx.createGain(); fGain.gain.value = 0.09;
@@ -23554,7 +23574,7 @@ window.dfSynthesizeCavernMeltDroplets = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.24;
   const delays = [0, 0.32, 0.65];
   delays.forEach((d, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + d;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + d;
     osc.type = "sine"; osc.frequency.setValueAtTime(1100 - idx * 80, t);
     osc.frequency.exponentialRampToValueAtTime(320, t + 0.08);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.25 / (idx + 1), t + 0.01);
@@ -23565,7 +23585,7 @@ window.dfSynthesizeCavernMeltDroplets = function(ctx) {
 };
 
 window.dfSynthesizeUltraGamma220HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 950.0;
   pulse.type = "square"; pulse.frequency.value = 220.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -23614,7 +23634,7 @@ window.dfBalanceVisualAnchorPositions = function(containerWidthPx, anchorPositio
 };
 
 window.dfSynthesizeSolfeggio417RenewalVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), overtone = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), overtone = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 417.0;
   overtone.type = "sine"; overtone.frequency.value = 834.0;
   const oGain = ctx.createGain(); oGain.gain.value = 0.09;
@@ -23644,7 +23664,7 @@ window.dfIntegrateCarolineIslandLangPack = function() {
 /* DEEP FOCUS MISSIONS M878-M887: BAMBOO DROPLET, THETA 5.5Hz & M880 SEAL */
 window.dfSynthesizeBambooDropletResonance = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
-  const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + 0.1;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + 0.1;
   osc.type = "sine"; osc.frequency.setValueAtTime(940, t);
   osc.frequency.exponentialRampToValueAtTime(260, t + 0.08);
   env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.3, t + 0.01);
@@ -23654,7 +23674,7 @@ window.dfSynthesizeBambooDropletResonance = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicTheta55Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 220;
   pulse.type = "square"; pulse.frequency.value = 5.5;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -23784,7 +23804,7 @@ window.dfGenerateMultiLineFixationGrid = function(lineHeightPx, linesCount) {
 };
 
 window.dfSynthesizeSolfeggio528TransformationVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), fifth = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), fifth = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 528.0;
   fifth.type = "sine"; fifth.frequency.value = 792.0; // 3/2 overtone
   const fGain = ctx.createGain(); fGain.gain.value = 0.09;
@@ -23816,7 +23836,7 @@ window.dfSynthesizeGlacierDropletCavern = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
   const delays = [0, 0.28, 0.58];
   delays.forEach((d, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + d;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + d;
     osc.type = "sine"; osc.frequency.setValueAtTime(1180 - idx * 70, t);
     osc.frequency.exponentialRampToValueAtTime(340, t + 0.08);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.24 / (idx + 1), t + 0.01);
@@ -23827,7 +23847,7 @@ window.dfSynthesizeGlacierDropletCavern = function(ctx) {
 };
 
 window.dfSynthesizeUltraGamma240HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 980.0;
   pulse.type = "square"; pulse.frequency.value = 240.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -23876,7 +23896,7 @@ window.dfBalanceVisualAnchorAlignment = function(containerWidthPx, anchorPositio
 };
 
 window.dfSynthesizeSolfeggio639IntegrationVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), overtone = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), overtone = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 639.0;
   overtone.type = "sine"; overtone.frequency.value = 1278.0;
   const oGain = ctx.createGain(); oGain.gain.value = 0.09;
@@ -23906,7 +23926,7 @@ window.dfIntegrateBismarckArchipelagoPack = function() {
 /* DEEP FOCUS MISSIONS M908-M917: WATER BASIN, ALPHA 9.5Hz & M910 SEAL */
 window.dfSynthesizeMonasticWaterBasin = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
-  const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + 0.12;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + 0.12;
   osc.type = "sine"; osc.frequency.setValueAtTime(880, t);
   osc.frequency.exponentialRampToValueAtTime(240, t + 0.09);
   env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.32, t + 0.012);
@@ -23916,7 +23936,7 @@ window.dfSynthesizeMonasticWaterBasin = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicAlpha95Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 250;
   pulse.type = "square"; pulse.frequency.value = 9.5;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -24045,7 +24065,7 @@ window.dfGenerateHighwayGridArray = function(lineHeightPx, linesCount) {
 };
 
 window.dfSynthesizeSolfeggio741HarmonicVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), fifth = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), fifth = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 741.0;
   fifth.type = "sine"; fifth.frequency.value = 1111.5; // 3/2 overtone
   const fGain = ctx.createGain(); fGain.gain.value = 0.09;
@@ -24077,7 +24097,7 @@ window.dfSynthesizeCavernDropletResonator = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
   const delays = [0, 0.25, 0.52];
   delays.forEach((d, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + d;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + d;
     osc.type = "sine"; osc.frequency.setValueAtTime(1150 - idx * 70, t);
     osc.frequency.exponentialRampToValueAtTime(320, t + 0.08);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.24 / (idx + 1), t + 0.01);
@@ -24088,7 +24108,7 @@ window.dfSynthesizeCavernDropletResonator = function(ctx) {
 };
 
 window.dfSynthesizeUltraGamma260HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 1000.0;
   pulse.type = "square"; pulse.frequency.value = 260.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -24137,7 +24157,7 @@ window.dfBalanceVisualAnchorConvergence = function(containerWidthPx, anchorPosit
 };
 
 window.dfSynthesizeSolfeggio852CosmicVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), overtone = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), overtone = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 852.0;
   overtone.type = "sine"; overtone.frequency.value = 1704.0;
   const oGain = ctx.createGain(); oGain.gain.value = 0.09;
@@ -24179,7 +24199,7 @@ window.dfSynthesizePineShingleRain = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicBeta13Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 280;
   pulse.type = "square"; pulse.frequency.value = 13.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -24308,7 +24328,7 @@ window.dfArrangeFixationHighwayGrid = function(lineHeightPx, linesCount) {
 };
 
 window.dfSynthesizeSolfeggio963ShimmerOvertone = function(ctx, dur) {
-  const osc = ctx.createOscillator(), shimmer = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), shimmer = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 963.0;
   shimmer.type = "sine"; shimmer.frequency.value = 1926.0;
   const sGain = ctx.createGain(); sGain.gain.value = 0.08;
@@ -24340,7 +24360,7 @@ window.dfSynthesizeGlacierDropletNode = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
   const delays = [0, 0.26, 0.54];
   delays.forEach((d, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + d;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + d;
     osc.type = "sine"; osc.frequency.setValueAtTime(1120 - idx * 70, t);
     osc.frequency.exponentialRampToValueAtTime(310, t + 0.08);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.24 / (idx + 1), t + 0.01);
@@ -24351,7 +24371,7 @@ window.dfSynthesizeGlacierDropletNode = function(ctx) {
 };
 
 window.dfSynthesizeUltraGamma280HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 1040.0;
   pulse.type = "square"; pulse.frequency.value = 280.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -24400,7 +24420,7 @@ window.dfBalanceAnchorConvergenceGrid = function(containerWidthPx, anchorPositio
 };
 
 window.dfSynthesizeSolfeggio174CosmicVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), overtone = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), overtone = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 174.0;
   overtone.type = "sine"; overtone.frequency.value = 348.0;
   const oGain = ctx.createGain(); oGain.gain.value = 0.09;
@@ -24430,7 +24450,7 @@ window.dfIntegrateVanuatuNorthernPack = function() {
 /* DEEP FOCUS MISSIONS M968-M977: BAMBOO WATER ECHO, THETA 5.0Hz & M970 SEAL */
 window.dfSynthesizeBambooWaterDropletEcho = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
-  const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + 0.1;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + 0.1;
   osc.type = "sine"; osc.frequency.setValueAtTime(960, t);
   osc.frequency.exponentialRampToValueAtTime(280, t + 0.08);
   env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.3, t + 0.01);
@@ -24440,7 +24460,7 @@ window.dfSynthesizeBambooWaterDropletEcho = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicTheta50Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 210;
   pulse.type = "square"; pulse.frequency.value = 5.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -24569,7 +24589,7 @@ window.dfArrangeHighwayGridNode = function(lineHeightPx, linesCount) {
 };
 
 window.dfSynthesizeSolfeggio285RestorationVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), fifth = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), fifth = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 285.0;
   fifth.type = "sine"; fifth.frequency.value = 427.5; // 3/2 overtone
   const fGain = ctx.createGain(); fGain.gain.value = 0.09;
@@ -24601,7 +24621,7 @@ window.dfSynthesizeGlacierDropletCavernArray = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
   const delays = [0, 0.24, 0.50];
   delays.forEach((d, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + d;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + d;
     osc.type = "sine"; osc.frequency.setValueAtTime(1160 - idx * 70, t);
     osc.frequency.exponentialRampToValueAtTime(320, t + 0.08);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.24 / (idx + 1), t + 0.01);
@@ -24612,7 +24632,7 @@ window.dfSynthesizeGlacierDropletCavernArray = function(ctx) {
 };
 
 window.dfSynthesizeUltraGamma300HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 1100.0;
   pulse.type = "square"; pulse.frequency.value = 300.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -24661,7 +24681,7 @@ window.dfBalanceAnchorConvergenceArray = function(containerWidthPx, anchorPositi
 };
 
 window.dfSynthesizeSolfeggio396LiberationVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), overtone = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), overtone = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 396.0;
   overtone.type = "sine"; overtone.frequency.value = 792.0;
   const oGain = ctx.createGain(); oGain.gain.value = 0.09;
@@ -24693,7 +24713,7 @@ window.dfSynthesizeKyotoTempleBellResonance = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.24;
   const freqs = [108.0, 216.0, 324.0, 486.0];
   freqs.forEach((f, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime;
     osc.type = "sine"; osc.frequency.value = f;
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.35 / (idx + 1), t + 0.02);
     env.gain.exponentialRampToValueAtTime(0.0001, t + 4.5 / (idx * 0.4 + 1));
@@ -24703,7 +24723,7 @@ window.dfSynthesizeKyotoTempleBellResonance = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicSmr14Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 300;
   pulse.type = "square"; pulse.frequency.value = 14.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -24838,7 +24858,7 @@ window.dfArrangeFixationHighwayArray = function(lineHeightPx, linesCount) {
 };
 
 window.dfSynthesizeSolfeggio528TransformationOvertone = function(ctx, dur) {
-  const osc = ctx.createOscillator(), fifth = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), fifth = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 528.0;
   fifth.type = "sine"; fifth.frequency.value = 792.0; // 3/2 overtone
   const fGain = ctx.createGain(); fGain.gain.value = 0.09;
@@ -24870,7 +24890,7 @@ window.dfSynthesizeGlacierCavernNodeArray = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
   const delays = [0, 0.24, 0.50];
   delays.forEach((d, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + d;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + d;
     osc.type = "sine"; osc.frequency.setValueAtTime(1160 - idx * 70, t);
     osc.frequency.exponentialRampToValueAtTime(320, t + 0.08);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.24 / (idx + 1), t + 0.01);
@@ -24881,7 +24901,7 @@ window.dfSynthesizeGlacierCavernNodeArray = function(ctx) {
 };
 
 window.dfSynthesizeUltraGamma320HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 1120.0;
   pulse.type = "square"; pulse.frequency.value = 320.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -24930,7 +24950,7 @@ window.dfBalanceAnchorConvergenceGridArray = function(containerWidthPx, anchorPo
 };
 
 window.dfSynthesizeSolfeggio639IntegrationNode = function(ctx, dur) {
-  const osc = ctx.createOscillator(), overtone = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), overtone = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 639.0;
   overtone.type = "sine"; overtone.frequency.value = 1278.0;
   const oGain = ctx.createGain(); oGain.gain.value = 0.09;
@@ -24960,7 +24980,7 @@ window.dfIntegrateVanuatuSouthernPack = function() {
 /* DEEP FOCUS MISSIONS M1028-M1037: BAMBOO HARMONIC, THETA 4.8Hz & M1030 SEAL */
 window.dfSynthesizeBambooWaterDropletHarmonic = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
-  const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + 0.1;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + 0.1;
   osc.type = "sine"; osc.frequency.setValueAtTime(980, t);
   osc.frequency.exponentialRampToValueAtTime(290, t + 0.08);
   env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.3, t + 0.01);
@@ -24970,7 +24990,7 @@ window.dfSynthesizeBambooWaterDropletHarmonic = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicTheta48Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 215;
   pulse.type = "square"; pulse.frequency.value = 4.8;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -25099,7 +25119,7 @@ window.dfArrangeFixationHighwayGridArray = function(lineHeightPx, linesCount) {
 };
 
 window.dfSynthesizeSolfeggio528TransformationShimmer = function(ctx, dur) {
-  const osc = ctx.createOscillator(), fifth = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), fifth = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 528.0;
   fifth.type = "sine"; fifth.frequency.value = 792.0; // 3/2 overtone
   const fGain = ctx.createGain(); fGain.gain.value = 0.09;
@@ -25131,7 +25151,7 @@ window.dfSynthesizeGlacierCavernGrid = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
   const delays = [0, 0.24, 0.50];
   delays.forEach((d, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + d;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + d;
     osc.type = "sine"; osc.frequency.setValueAtTime(1160 - idx * 70, t);
     osc.frequency.exponentialRampToValueAtTime(320, t + 0.08);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.24 / (idx + 1), t + 0.01);
@@ -25142,7 +25162,7 @@ window.dfSynthesizeGlacierCavernGrid = function(ctx) {
 };
 
 window.dfSynthesizeUltraGamma340HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 1140.0;
   pulse.type = "square"; pulse.frequency.value = 340.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -25191,7 +25211,7 @@ window.dfBalanceAnchorConvergenceGridNode = function(containerWidthPx, anchorPos
 };
 
 window.dfSynthesizeSolfeggio639IntegrationNodeArray = function(ctx, dur) {
-  const osc = ctx.createOscillator(), overtone = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), overtone = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 639.0;
   overtone.type = "sine"; overtone.frequency.value = 1278.0;
   const oGain = ctx.createGain(); oGain.gain.value = 0.09;
@@ -25221,7 +25241,7 @@ window.dfIntegrateVanuatuMalekulaPack = function() {
 /* DEEP FOCUS MISSIONS M1058-M1067: BAMBOO RESONATOR, THETA 4.6Hz & GRAND v12.0.0 SEAL */
 window.dfSynthesizeBambooWaterHarmonicResonator = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
-  const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + 0.1;
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + 0.1;
   osc.type = "sine"; osc.frequency.setValueAtTime(990, t);
   osc.frequency.exponentialRampToValueAtTime(295, t + 0.08);
   env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.3, t + 0.01);
@@ -25231,7 +25251,7 @@ window.dfSynthesizeBambooWaterHarmonicResonator = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicTheta46Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 218;
   pulse.type = "square"; pulse.frequency.value = 4.6;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -25360,7 +25380,7 @@ window.dfArrangeHighwayGridArrayNode = function(lineHeightPx, linesCount) {
 };
 
 window.dfSynthesizeSolfeggio741HarmonyShimmer = function(ctx, dur) {
-  const osc = ctx.createOscillator(), fifth = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), fifth = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 741.0;
   fifth.type = "sine"; fifth.frequency.value = 1111.5; // 3/2 overtone
   const fGain = ctx.createGain(); fGain.gain.value = 0.09;
@@ -25392,7 +25412,7 @@ window.dfSynthesizeGlacierCavernMatrix = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
   const delays = [0, 0.24, 0.50];
   delays.forEach((d, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + d;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + d;
     osc.type = "sine"; osc.frequency.setValueAtTime(1160 - idx * 70, t);
     osc.frequency.exponentialRampToValueAtTime(320, t + 0.08);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.24 / (idx + 1), t + 0.01);
@@ -25403,7 +25423,7 @@ window.dfSynthesizeGlacierCavernMatrix = function(ctx) {
 };
 
 window.dfSynthesizeUltraGamma360HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 1160.0;
   pulse.type = "square"; pulse.frequency.value = 360.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -25452,7 +25472,7 @@ window.dfBalanceAnchorConvergenceGridNodeArray = function(containerWidthPx, anch
 };
 
 window.dfSynthesizeSolfeggio852HarmonyNodeArray = function(ctx, dur) {
-  const osc = ctx.createOscillator(), overtone = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), overtone = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 852.0;
   overtone.type = "sine"; overtone.frequency.value = 1704.0;
   const oGain = ctx.createGain(); oGain.gain.value = 0.09;
@@ -25494,7 +25514,7 @@ window.dfSynthesizeWinterHearthWind = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicAlphaSmr125Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 260;
   pulse.type = "square"; pulse.frequency.value = 12.5;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -25577,7 +25597,7 @@ window.dfSynthesizeFrostWindowAcoustics = function(ctx) {
 };
 
 window.dfSynthesizeIsochronicThetaAlpha7Hz = function(ctx, dur, carrierFreq) {
-  const carrier = ctx.createOscillator(), panner = ctx.createGain(), pulse = ctx.createOscillator(), depth = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), panner = ctx.createGain(), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = carrierFreq || 230;
   pulse.type = "square"; pulse.frequency.value = 7.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -25703,7 +25723,7 @@ window.dfArrangeHighwayGridNodeArray = function(lineHeightPx, linesCount) {
 };
 
 window.dfSynthesizeSolfeggio396ReleaseVector = function(ctx, dur) {
-  const osc = ctx.createOscillator(), fifth = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), fifth = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 396.0;
   fifth.type = "sine"; fifth.frequency.value = 594.0; // 3/2 overtone
   const fGain = ctx.createGain(); fGain.gain.value = 0.09;
@@ -25735,7 +25755,7 @@ window.dfSynthesizeGlacierDropletCavernGridNode = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
   const delays = [0, 0.24, 0.50];
   delays.forEach((d, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + d;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + d;
     osc.type = "sine"; osc.frequency.setValueAtTime(1160 - idx * 70, t);
     osc.frequency.exponentialRampToValueAtTime(320, t + 0.08);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.24 / (idx + 1), t + 0.01);
@@ -25746,7 +25766,7 @@ window.dfSynthesizeGlacierDropletCavernGridNode = function(ctx) {
 };
 
 window.dfSynthesizeUltraGamma380HzVector = function(ctx, dur) {
-  const carrier = ctx.createOscillator(), pulse = ctx.createOscillator(), depth = ctx.createGain(), panner = ctx.createGain();
+  const carrier = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), pulse = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), depth = ctx.createGain(), panner = ctx.createGain();
   carrier.type = "sine"; carrier.frequency.value = 1180.0;
   pulse.type = "square"; pulse.frequency.value = 380.0;
   depth.gain.value = 0.5; pulse.connect(depth); depth.connect(panner.gain);
@@ -25795,7 +25815,7 @@ window.dfBalanceAnchorConvergenceArrayNode = function(containerWidthPx, anchorPo
 };
 
 window.dfSynthesizeSolfeggio417RenewalArray = function(ctx, dur) {
-  const osc = ctx.createOscillator(), overtone = ctx.createOscillator(), gain = ctx.createGain();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), overtone = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
   osc.type = "sine"; osc.frequency.value = 417.0;
   overtone.type = "sine"; overtone.frequency.value = 834.0;
   const oGain = ctx.createGain(); oGain.gain.value = 0.09;
@@ -26001,7 +26021,7 @@ window.dfSynthesizeRealMorningBirdsAcoustics = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.2;
   const chirps = [1450, 1850, 1600];
   chirps.forEach((freq, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + idx * 0.15;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + idx * 0.15;
     osc.type = "sine"; osc.frequency.setValueAtTime(freq, t);
     osc.frequency.linearRampToValueAtTime(freq + 300, t + 0.05);
     osc.frequency.linearRampToValueAtTime(freq - 150, t + 0.12);
@@ -26254,7 +26274,7 @@ window.dfSynthesizeRealHighAltitudeWindWav = function(ctx) {
 window.dfSynthesizeRealNightCricketsWav = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.15;
   for (let i = 0; i < 4; i++) {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + i * 0.4;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + i * 0.4;
     osc.type = "sine"; osc.frequency.setValueAtTime(4500, t);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.12, t + 0.02);
     env.gain.exponentialRampToValueAtTime(0.0001, t + 0.12);
@@ -26344,7 +26364,7 @@ window.dfSynthesizeRealMorningDewdropsWav = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.22;
   const freqs = [1200, 1550, 1350];
   freqs.forEach((freq, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + idx * 0.25;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + idx * 0.25;
     osc.type = "sine"; osc.frequency.setValueAtTime(freq, t);
     osc.frequency.exponentialRampToValueAtTime(350, t + 0.06);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.25, t + 0.01);
@@ -26632,7 +26652,7 @@ window.dfRegisterCoreCzechDictionary = function() {
 window.dfSynthesizeRealMeadowCricketsWav = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.16;
   for (let i = 0; i < 3; i++) {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + i * 0.45;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + i * 0.45;
     osc.type = "sine"; osc.frequency.setValueAtTime(4600, t);
     env.gain.setValueAtTime(0.001, t); env.gain.linearRampToValueAtTime(0.14, t + 0.02);
     env.gain.exponentialRampToValueAtTime(0.0001, t + 0.15);
@@ -26854,7 +26874,7 @@ window.dfSynthesizeRealCedarBirdsWav = function(ctx) {
   const master = ctx.createGain(); master.gain.value = 0.18;
   const chirps = [1500, 1900, 1650];
   chirps.forEach((freq, idx) => {
-    const osc = ctx.createOscillator(), env = ctx.createGain(), t = ctx.currentTime + idx * 0.2;
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), env = ctx.createGain(), t = ctx.currentTime + idx * 0.2;
     osc.type = "sine"; osc.frequency.setValueAtTime(freq, t);
     osc.frequency.linearRampToValueAtTime(freq + 280, t + 0.04);
     osc.frequency.linearRampToValueAtTime(freq - 140, t + 0.10);
@@ -37801,7 +37821,7 @@ window.dfPlaySessionCompletionChime = async function() {
   const now = ctx.currentTime;
   // Harmonic twin frequencies: 528Hz and 660Hz (Pure mathematical acoustic interval)
   [528, 660].forEach((freq, idx) => {
-    const osc = ctx.createOscillator();
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     const gain = ctx.createGain();
     osc.type = "sine";
     osc.frequency.setValueAtTime(freq, now + (idx * 0.15));
@@ -41260,7 +41280,7 @@ window.dfCreateRiverCavitationFilter = function(ctx) {
 
   // Slow LFO fluid frequency modulation (0.2Hz wave cycle)
   if (ctx.createOscillator) {
-    const lfo = ctx.createOscillator();
+    const lfo = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     const lfoGain = ctx.createGain();
     lfo.frequency.setValueAtTime(0.2, ctx.currentTime);
     lfoGain.gain.setValueAtTime(80, ctx.currentTime); // Swings between 240Hz and 400Hz
@@ -41278,7 +41298,7 @@ window.dfCreateRiverCavitationFilter = function(ctx) {
    ========================================================== */
 window.dfApplyOceanSwellEnvelope = function(ctx, gainNode) {
   if (!ctx || !gainNode || !ctx.createOscillator) return;
-  const lfo = ctx.createOscillator();
+  const lfo = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
   const lfoDepth = ctx.createGain();
 
   // 0.1Hz = exactly 10-second wave cycle (natural deep breathing rhythm)
@@ -41313,7 +41333,7 @@ window.dfCreatePineForestFilter = function(ctx) {
 window.dfTriggerDewDroplet = function(ctx) {
   if (!ctx || !ctx.createOscillator) return;
   const now = ctx.currentTime;
-  const osc = ctx.createOscillator();
+  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
   const gain = ctx.createGain();
 
   // Pure high-frequency water droplet ping (1400Hz to 800Hz drop)
@@ -47759,8 +47779,8 @@ window.dfStudioAudio = {
     if (!ctx) return;
     this.stop();
     if (ctx.state === 'suspended') ctx.resume();
-    const oL = ctx.createOscillator();
-    const oR = ctx.createOscillator();
+    const oL = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
+    const oR = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     oL.type = 'sine'; oR.type = 'sine';
     oL.frequency.value = 216;
     oR.frequency.value = 216 + (diff || 10);
@@ -48417,7 +48437,7 @@ window.dfGetMilestoneM6777FlipSeal =
 window.dfRaindropDsp = {
   triggerDroplet: function(ctx, masterGain) {
     if (!ctx || ctx.state === 'suspended') return;
-    const osc = ctx.createOscillator();
+    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     const g = ctx.createGain();
     const baseFreq = 1200 + Math.random() * 800;
     osc.type = 'sine';
@@ -62169,8 +62189,8 @@ function() {
     const now = ctx.currentTime;
 
     // Dual High-Precision Sine Oscillators
-    const oscL = ctx.createOscillator();
-    const oscR = ctx.createOscillator();
+    const oscL = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
+    const oscR = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     oscL.type = 'sine';
     oscR.type = 'sine';
     oscL.frequency.setValueAtTime(fLeft, now);
@@ -62277,13 +62297,13 @@ function() {
     const now = ctx.currentTime;
 
     // Carrier Oscillator
-    const carrierOsc = ctx.createOscillator();
+    const carrierOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     carrierOsc.type = 'sine';
     carrierOsc.frequency.setValueAtTime(cHz, now);
 
     // Anti-Click Amplitude Modulation via Smooth Raised-Cosine (Hann) Envelope LFO
     // Hann curve g(t) = 0.5 * (1 - cos(2*PI * pRate * t)) provides C^inf zero-crossing continuity
-    const pulseLfo = ctx.createOscillator();
+    const pulseLfo = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     pulseLfo.type = 'sine';
     pulseLfo.frequency.setValueAtTime(pRate, now);
 
@@ -67952,7 +67972,7 @@ const StudyPodEngine = (function() {
       ];
 
       harmonics.forEach(function(h) {
-        const osc = ctx.createOscillator();
+        const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
         const g = ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(h.f, now);
@@ -77174,8 +77194,8 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch (_) { if (typeof window !== "un
         // 1. Simulate 8 Pomodoro Sessions with Binaural Beats (40Hz Gamma & 10Hz Alpha)
         for (let cycle = 1; cycle <= 8; cycle++) {
           // Dual carrier + offset oscillators for binaural brainwave pacing
-          const carrierOsc = testCtx.createOscillator();
-          const beatOsc = testCtx.createOscillator();
+          const carrierOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
+          const beatOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
           const masterGain = testCtx.createGain();
 
           audioReport.audioNodesCreated += 3;
@@ -77217,7 +77237,7 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch (_) { if (typeof window !== "un
         // 3. Acoustic Completion Chimes Test across 6 Zen Tones
         const zenTones = [587.33, 432.0, 800.0, 1046.5, 220.0];
         zenTones.forEach(function(freq) {
-          const osc = testCtx.createOscillator();
+          const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
           const gain = testCtx.createGain();
           audioReport.audioNodesCreated += 2;
           osc.frequency.setValueAtTime(freq, testCtx.currentTime);
@@ -80563,11 +80583,11 @@ window.SovereignBrainwaveDSP = (function() {
             masterGain.gain.setValueAtTime(0.0001, ctx.currentTime);
             masterGain.gain.exponentialRampToValueAtTime(Math.min(0.5, customVolume), ctx.currentTime + 0.1);
 
-            const oscLeft = ctx.createOscillator();
+            const oscLeft = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
             oscLeft.type = "sine";
             oscLeft.frequency.setValueAtTime(preset.carrier, ctx.currentTime);
 
-            const oscRight = ctx.createOscillator();
+            const oscRight = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
             oscRight.type = "sine";
             oscRight.frequency.setValueAtTime(preset.carrier + preset.beatFreq, ctx.currentTime);
 
@@ -80662,7 +80682,7 @@ window.SovereignExamSimulator = (function() {
         const ctx = window.audioContext;
         if (ctx.state === "suspended") ctx.resume();
         try {
-            const osc = ctx.createOscillator();
+            const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
             const gain = ctx.createGain();
             const dest = window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination;
 
@@ -80976,7 +80996,7 @@ window.SovereignChimes = (function() {
         const dest = window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination;
 
         harmonics.forEach((ratio, i) => {
-            const osc = ctx.createOscillator();
+            const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
             const gain = ctx.createGain();
             osc.type = "sine";
             osc.frequency.setValueAtTime(baseFreq * ratio, ctx.currentTime);
@@ -81044,7 +81064,7 @@ window.SovereignBreathing = (function() {
         const ctx = window.audioContext;
         if (ctx.state === "suspended") ctx.resume();
         try {
-            const osc = ctx.createOscillator();
+            const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
             const gain = ctx.createGain();
             const dest = window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination;
 
@@ -81421,7 +81441,7 @@ window.SovereignChimes = (function() {
     // Single Harmonic Pure Sine Voice with Smooth Bell Envelope
     function playHarmonicTone(ctx, freq, startTime, duration, peakGain) {
         try {
-            const osc = ctx.createOscillator();
+            const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
             const gain = ctx.createGain();
             const dest = getDestination(ctx);
 
@@ -81580,11 +81600,11 @@ window.SovereignBinauralAlpha = (function() {
             const dest = window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination;
 
             // Carrier: 432 Hz, Offset: 442 Hz -> 10 Hz Alpha Entrainment
-            oscLeft = ctx.createOscillator();
+            oscLeft = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
             oscLeft.type = "sine";
             oscLeft.frequency.setValueAtTime(432, ctx.currentTime);
 
-            oscRight = ctx.createOscillator();
+            oscRight = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
             oscRight.type = "sine";
             oscRight.frequency.setValueAtTime(442, ctx.currentTime);
 
