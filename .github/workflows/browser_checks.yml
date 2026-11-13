@@ -1,0 +1,32 @@
+name: Browser checks
+
+# Real Chromium checks that unit tests cannot cover: layout at 320px/large fonts in en/ar/de,
+# boot with corrupted storage, local-day in other time zones, developer wording in the UI, sound tiles.
+on:
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'android/app/src/main/assets/web/**'
+      - 'tools/browser_checks/**'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: browser-checks-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-save playwright@1.49.1
+      - run: npx playwright install --with-deps chromium
+      - run: node tools/browser_checks/run.cjs

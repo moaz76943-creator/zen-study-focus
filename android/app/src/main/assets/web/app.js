@@ -55202,7 +55202,7 @@ function() {
     mainCol.style.cssText = 'background:#f8fafc;border:1px solid #cbd5e1;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px;';
     const mainLabel = document.createElement('label');
     mainLabel.style.cssText = 'font-size:12px;font-weight:700;color:#0f172a;';
-    mainLabel.textContent = 'Zone 2: Main Structured Notes (Supports [[Concept]] Bi-Directional Links)';
+    mainLabel.textContent = 'Zone 2: Main notes (link ideas with [[Concept]])';
     const mainArea = document.createElement('textarea');
     mainArea.id = 'dfTriZoneMainInput';
     mainArea.setAttribute('data-trizone-maskable', 'true');
@@ -55246,7 +55246,7 @@ function() {
     bidirBox.style.cssText = 'background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;padding:10px;display:flex;flex-direction:column;gap:6px;';
     const bidirHeader = document.createElement('div');
     bidirHeader.style.cssText = 'font-size:12px;font-weight:700;color:#0f172a;';
-    bidirHeader.textContent = 'Bi-Directional Linked Flashcard Concepts (Note ↔ Flashcards)';
+    bidirHeader.textContent = 'Linked flashcard concepts (note ↔ flashcards)';
     const bidirPills = document.createElement('div');
     bidirPills.id = 'dfBidirConceptPills';
     bidirPills.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;';
@@ -56547,7 +56547,7 @@ function() {
     guideHdr.style.cssText = 'display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;';
     const guideTitle = document.createElement('div');
     guideTitle.style.cssText = 'font-size:13px;font-weight:800;color:#0f172a;';
-    guideTitle.textContent = 'Visual Guide & Span Expander Ruler (Anti-Regression Line Spotlight)';
+    guideTitle.textContent = 'Reading guide & line spotlight';
 
     const guideBtns = document.createElement('div');
     guideBtns.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;';
@@ -56650,7 +56650,7 @@ function() {
     kpiGrid.appendChild(makeKpiTile('Target Speed', 'dfKpiRawWpm', '#0f172a'));
     kpiGrid.appendChild(makeKpiTile('Net Effective', 'dfKpiNetWpm', '#2563eb'));
     kpiGrid.appendChild(makeKpiTile('Comprehension', 'dfKpiCompPct', '#059669'));
-    kpiGrid.appendChild(makeKpiTile('Regressions', 'dfKpiRegressions', '#475569'));
+    kpiGrid.appendChild(makeKpiTile('Re-reads', 'dfKpiRegressions', '#475569'));
 
     const chartHost = document.createElement('div');
     chartHost.id = 'dfWpmHistoryChartHost';
@@ -69331,7 +69331,7 @@ window.dfRenderMasterPillar8StudioDom = function(containerId) {
 
       const introTitle = document.createElement('div');
       introTitle.style.cssText = 'font-size:13px;font-weight:900;color:#0f172a;';
-      introTitle.textContent = 'Join or Host a Sovereign LAN Study Pod';
+      introTitle.textContent = 'Join or host a local study pod';
 
       const introDesc = document.createElement('div');
       introDesc.style.cssText = 'font-size:11px;color:#475569;line-height:1.45;';
