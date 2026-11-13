@@ -46,6 +46,20 @@ public class MainActivity extends AppCompatActivity {
     private int rendererDeaths = 0;
     private long rendererWindowStart = 0L;
     private String backupAwaitingSave = null;
+    // Native text-to-speech for Flashcards (created lazily on the first ttsInit call).
+    private NativeTts nativeTts = null;
+
+    private synchronized NativeTts tts() {
+        if (nativeTts == null) {
+            nativeTts = new NativeTts(this, json -> {
+                final String script = "window.dfTtsEvent && window.dfTtsEvent(" + json + ");";
+                runOnUiThread(() -> {
+                    if (webView != null && !isDestroyed()) webView.evaluateJavascript(script, null);
+                });
+            });
+        }
+        return nativeTts;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -218,6 +232,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public class ZenNativeBridge {
+        // ---- Flashcards text-to-speech (device engine only; every call returns a JSON string) ----
+        @JavascriptInterface public String ttsInit(String enginePackage) { return tts().init(enginePackage); }
+        @JavascriptInterface public String ttsCapabilities() { return tts().capabilities(); }
+        @JavascriptInterface public String ttsGetEngines() { return tts().getEngines(); }
+        @JavascriptInterface public String ttsGetLanguages() { return tts().getLanguages(); }
+        @JavascriptInterface public String ttsLanguageStatus(String languageTag) { return tts().languageStatus(languageTag); }
+        @JavascriptInterface public String ttsGetVoices(String languageTag) { return tts().getVoices(languageTag); }
+        @JavascriptInterface public String ttsSpeak(String text, String optionsJson) { return tts().speak(text, optionsJson); }
+        @JavascriptInterface public String ttsStop() { return tts().stop(); }
+        @JavascriptInterface public String ttsShutdown() { return tts().shutdown(); }
+
         // @JavascriptInterface executes on WebView's bridge thread, off the UI thread.
         // Acknowledgement requires a private AtomicFile with explicit FD sync.
         @JavascriptInterface
@@ -619,6 +644,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onPause() {
+        if (nativeTts != null) nativeTts.stop(); // never keep speaking after the app leaves the foreground
         if (webView != null) {
             webView.onPause();
             webView.pauseTimers();
@@ -645,6 +671,7 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        if (nativeTts != null) { nativeTts.shutdown(); nativeTts = null; }
         if (appDialogs != null) appDialogs.cancelPending();
         WebView old = webView;
         webView = null;

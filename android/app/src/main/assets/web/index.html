@@ -1712,6 +1712,7 @@ body {
     direction: ltr !important;
   }
 </style>
+  <link rel="stylesheet" href="modules/flashcards/flashcards.css">
 </head>
 <body>
 
@@ -2040,6 +2041,7 @@ body {
           <div class="notes-studio-stats"><div><strong id="nsTotal">0</strong><span id="nsTotalLabel" data-i18n="nsTotalLabel">My notes</span></div><div><strong id="nsPinned">0</strong><span id="nsPinnedLabel" data-i18n="nsPinnedLabel">Pinned</span></div></div>
           <button type="button" id="nsNewButton" class="ns-new" onclick="openNoteModal()" data-i18n="nsNewButton">＋ New note</button>
         </section>
+        <button type="button" class="fc-btn primary" id="flashcardsEntry" data-fc-open="1" aria-label="Flashcards"><span id="flashcardsEntryLabel">Flashcards</span></button>
         <div class="ns-section-title"><strong id="nsTemplatesTitle" data-i18n="nsTemplatesTitle">Ready-to-use templates</strong><span id="nsTemplatesHint" data-i18n="nsTemplatesHint">Tap to start</span></div>
         <div id="nsTemplates" class="ns-templates" aria-label="Note templates"></div>
         <div class="ns-toolbar">
@@ -2177,6 +2179,8 @@ body {
         </div>
         <div id="df22AnalyticsHost" aria-label="History-backed analytics"></div>
       </main>
+
+      <main class="screen-section" id="sec-flashcards" aria-label="Flashcards"></main>
 
     </div>
 
@@ -2416,6 +2420,9 @@ body {
   <script src="preflight_v22.js"></script>
   <script src="analytics_core_v21.js"></script>
   <script src="modules/flashcards/fsrs.js"></script>
+  <script src="modules/flashcards/flashcards_core.js"></script>
+  <script src="modules/flashcards/flashcards_tts.js"></script>
+  <script src="modules/flashcards/flashcards_ui.js"></script>
   <script src="modules/native/widget_sync.js"></script>
     <script src="modules/analytics/cognitive_profiler.js"></script>
     <script src="modules/security/vault_backup.js"></script>

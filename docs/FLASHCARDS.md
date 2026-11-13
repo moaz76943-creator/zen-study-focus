@@ -1,0 +1,54 @@
+# Flashcards — architecture, status and limits
+
+Section `#sec-flashcards` (Arabic: البطاقات التعليمية), opened from the Notes screen. No new permission, no network API.
+
+## Discovery result (what existed before)
+- `df_flashcards_v1`: **not a production key.** Nothing wrote to it; it was only read by `vault_backup.js` / `widget_sync.js` and written on vault restore. No Flashcards UI existed.
+- `df_cards_v1` / `df_vocab_bank`: only backup mirrors, plus cards the Tri-Zone note engine auto-derives from a sample note (ids `fc_...`). These are **not** migrated.
+- `modules/flashcards/fsrs.js` (FSRS-4.5 formulas, default weights) was reused. No optimizer.
+- Native bridge is `ZenNative` (Java, WebView). There was no TTS code.
+
+## Storage (one system, no second database)
+| Key | Content |
+|---|---|
+| `df_fc_meta_v1` | decks, preferences, sessions, daily counters, active session, migration flags |
+| `df_fc_cards_v1_<n>` | cards in chunks of 500 (only changed chunks are rewritten) |
+| `df_fc_quarantine_*` | raw copy of an unreadable chunk (never deleted silently) |
+Legacy keys (`df_flashcards_v1`, `df_vocab_bank_v1`, `df_vocab_flashcards_v21`, and non-sample items of `df_cards_v1`/`df_vocab_bank`) are read once for a non-destructive migration into a deck named "Imported"; they are never modified or removed. The six v21 keys are untouched.
+Capacity is the WebView localStorage quota (about 5 MB); writes that do not fit fail with `STORAGE_FULL` and roll back.
+
+## Scheduling
+FSRS-4.5 formulas (default weights) for review cards plus fixed learning steps of 1 and 10 minutes. States: new, learning, review, relearning, suspended. Hard < Good < Easy intervals are enforced. Editing text never touches scheduling fields; a substantial change (>= 50 % edit distance) flags the card and makes it due again, with a visible reason. Submissions are idempotent (`submissionId`), so resuming a session cannot double-count.
+
+## Backup
+ZEN21 backups now carry `flashcardsV2` (decks, cards, review log, preferences, per-language speech preferences, daily counters). Restore validates every field (ids, deck references, enums, bounds) before writing, then writes with verification and rolls back on failure. `vault_backup.js` is a separate, older encrypted export and does not include flashcardsV2. A checksum is not authentication; ZEN21 integrity is detection of accidental damage only.
+
+## Text-to-speech
+`NativeTts.java` wraps the device engine (init, engines, languages, language status, voices, speak, stop, shutdown). Rules enforced: no cloud API; a missing language is reported and never replaced by another; `offlineOnly` refuses network voices; rate/pitch bounded to 0.5–2.0; Android has **no gender API**, so gender is `male`/`female` only when the engine puts that exact token in the voice features, otherwise `unknown`; pitch is independent and never presented as changing gender; Android TTS cannot pause/resume, so the UI offers stop and replay only. Speech stops on tab change, app pause and destroy.
+Repetitions 1–9: JS starts the next utterance only after the native `done` event; failed or cancelled attempts are not counted.
+
+## Honest status
+| Area | Status |
+|---|---|
+| Core data, CRUD, decks, duplicate detection, undo | IMPLEMENTED AND VERIFIED (22 unit tests, real-browser flow) |
+| FSRS scheduling, queue, session resume, analytics | IMPLEMENTED AND VERIFIED (unit tests; algorithm not compared against a reference FSRS library) |
+| Search incl. Arabic diacritics | IMPLEMENTED AND VERIFIED |
+| CSV/TSV/JSON import (preview, transactional), CSV export | IMPLEMENTED AND VERIFIED (Anki packages NOT supported) |
+| ZEN21 backup/restore of flashcards | IMPLEMENTED AND VERIFIED (round trip in browser) |
+| Study modes classic/reverse/both/listening/pronunciation/writing/quick/random/custom | IMPLEMENTED BUT NOT FULLY VERIFIED (only classic exercised end to end in browser) |
+| Native TTS bridge (Java) | IMPLEMENTED BUT NOT VERIFIED — Java is compiled only by CI; never run on an emulator or device |
+| JS speech controller | IMPLEMENTED AND VERIFIED against a fake bridge (logic only) |
+| Male voice preference | PARTIALLY IMPLEMENTED — only voices the engine labels male can be preferred; many devices label none |
+| Offline voices | BLOCKED BY PLATFORM — depends on installed voice data; reported per voice |
+| Emulator tests of native TTS | NOT IMPLEMENTED — needs an emulator image with a TTS engine and UIAutomator driving Settings > voices; not attempted |
+| Translations | PARTIAL — English and Arabic only; other languages show English until reviewed translations are provided |
+| 50,000 cards | BLOCKED BY STORAGE — localStorage quota is far below 50k cards; 10k small cards fit; measured in Node only |
+| Quick edit during study, undo | Quick edit IMPLEMENTED; undo works for edit/delete/move (last 20, in memory only) |
+| Pronunciation CSV export file name | LIMITATION — reuses the analytics CSV save dialog; falls back to clipboard |
+| Virtual deck "Custom filters by tags/difficulty" | IMPLEMENTED in Custom session; no saved filters |
+
+## Performance (Node, in-memory storage, not a phone)
+10,000 cards: import ~60 ms, search ~7 ms, queue + stats ~8 ms. Real phone numbers are unmeasured.
+
+## Needs a real device
+Which voices/engines exist, whether a language needs data download, offline behaviour, audio quality, rate/pitch audibility, behaviour when the user changes the system TTS engine (the app re-initialises on request but this is untested).
