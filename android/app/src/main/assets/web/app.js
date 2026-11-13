@@ -4943,18 +4943,18 @@ function saveQuickDump(toTasks) {
    7. 12 PURE NATURE SOUNDS WITH PHOTOS & VOLUME SLIDERS
    ======================================================== */
 const SOUNDS_DATA = [
-  { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: "procedural_synth", url: "procedural_synth" },
-  { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: "procedural_synth", url: "procedural_synth" },
-  { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.75, src: "procedural_synth", url: "procedural_synth" },
-  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: "procedural_synth", url: "procedural_synth" },
-  { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: "procedural_synth", url: "procedural_synth" },
-  { id: 'leaves', cat: 'forest', cls: 'sbg-leaves', vol: 0.6, src: "procedural_synth", url: "procedural_synth" },
-  { id: 'waterfall', cat: 'water', cls: 'sbg-waterfall', vol: 0.65, src: "procedural_synth", url: "procedural_synth" },
-  { id: 'night', cat: 'forest', cls: 'sbg-night', vol: 0.55, src: "procedural_synth", url: "procedural_synth" },
-  { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.6, src: "procedural_synth", url: "procedural_synth" },
-  { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: "procedural_synth", url: "procedural_synth" },
-  { id: 'winrain', cat: 'water', cls: 'sbg-winrain', vol: 0.65, src: "procedural_synth", url: "procedural_synth" },
-  { id: 'earth', cat: 'warm', cls: 'sbg-earth', vol: 0.5, src: "procedural_synth", url: "procedural_synth" }
+  { id: 'ocean', cat: 'water', cls: 'sbg-ocean', vol: 0.7, src: "audio/flowing_water.ogg", url: "audio/flowing_water.ogg" },
+  { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: "audio/rain_window.ogg", url: "audio/rain_window.ogg" },
+  { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.75, src: "audio/wind_breeze.ogg", url: "audio/wind_breeze.ogg" },
+  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: "audio/forest_birds.ogg", url: "audio/forest_birds.ogg" },
+  { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: "audio/flowing_water.ogg", url: "audio/flowing_water.ogg" },
+  { id: 'leaves', cat: 'forest', cls: 'sbg-leaves', vol: 0.6, src: "audio/wind_breeze.ogg", url: "audio/wind_breeze.ogg" },
+  { id: 'waterfall', cat: 'water', cls: 'sbg-waterfall', vol: 0.65, src: "audio/flowing_water.ogg", url: "audio/flowing_water.ogg" },
+  { id: 'night', cat: 'forest', cls: 'sbg-night', vol: 0.55, src: "audio/forest_birds.ogg", url: "audio/forest_birds.ogg" },
+  { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.6, src: "audio/rain_thunder.ogg", url: "audio/rain_thunder.ogg" },
+  { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: "audio/wind_breeze.ogg", url: "audio/wind_breeze.ogg" },
+  { id: 'winrain', cat: 'water', cls: 'sbg-winrain', vol: 0.65, src: "audio/rain_window.ogg", url: "audio/rain_window.ogg" },
+  { id: 'earth', cat: 'warm', cls: 'sbg-earth', vol: 0.5, src: "audio/flowing_water.ogg", url: "audio/flowing_water.ogg" }
 ];
 
 let soundCat = 'all';
@@ -13204,60 +13204,9 @@ window.FlashQuizEngine = FlashQuizEngine;
     return state;
   }
 
-  function dfSynthesizeSingleChime(ctx, freq, delaySec, gainVal) {
-    try {
-      var startTime = ctx.currentTime + delaySec;
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
+  function dfSynthesizeSingleChime() { return false; }
 
-      osc.type = "sine";
-      osc.frequency.setValueAtTime(freq, startTime);
-
-      gain.gain.setValueAtTime(0.0001, startTime);
-      gain.gain.exponentialRampToValueAtTime(gainVal, startTime + 0.03);
-      gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 2.2);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start(startTime);
-      osc.stop(startTime + 2.25);
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
-
-  function dfSynthesizeTibetanWindChimes() {
-    try {
-      if (typeof window === "undefined") return false;
-      var AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return false;
-      var ctx = new AudioCtx();
-
-      var strikes = [
-        { freq: 528, delay: 0.0, gain: 0.12 },
-        { freq: 660, delay: 0.18, gain: 0.10 },
-        { freq: 792, delay: 0.42, gain: 0.08 },
-        { freq: 528, delay: 0.75, gain: 0.09 }
-      ];
-
-      for (var i = 0; i < strikes.length; i++) {
-        var s = strikes[i];
-        dfSynthesizeSingleChime(ctx, s.freq, s.delay, s.gain);
-      }
-
-      try {
-        if (typeof window.dfVocabHapticPulse === "function") {
-          window.dfVocabHapticPulse(15);
-        }
-      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-
-      return true;
-    } catch (_) {
-      return false;
-    }
-  }
+  function dfSynthesizeTibetanWindChimes() { return false; }
 
   function dfStartWindChimesScheduler() {
     dfStopWindChimesScheduler();
