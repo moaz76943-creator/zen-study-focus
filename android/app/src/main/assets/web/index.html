@@ -1627,6 +1627,25 @@ body {
     z-index: 45 !important;
   }
 </style>
+<!-- TASK #825: Xiaomi 17T Pro 120Hz Scroll & Form Input Contrast -->
+<style id="task-825-amoled-inputs">
+  html, body, main, .tab-panel, .modal-content {
+    overscroll-behavior-y: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+  input, select, textarea {
+    color: #0F172A !important;
+    background-color: #FFFFFF !important;
+    border-color: #CBD5E1 !important;
+  }
+  body.dark-mode input, body.dark input,
+  body.dark-mode select, body.dark select,
+  body.dark-mode textarea, body.dark textarea {
+    color: #F8FAFC !important;
+    background-color: #1E293B !important;
+    border-color: #475569 !important;
+  }
+</style>
 </head>
 <body>
 
@@ -2443,5 +2462,6 @@ body {
 
     <script src="modules/sovereign_core_registry.js"></script>
   <script src="modules/sovereign_audio_suite.js"></script>
+  <script src="modules/ui/sovereign_backup_hardening_825.js"></script>
 </body>
 </html>

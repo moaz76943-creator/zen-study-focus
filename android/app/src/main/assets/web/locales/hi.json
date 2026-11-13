@@ -126,5 +126,7 @@
   "ui_sound_tab_all": "सभी",
   "ui_sound_tab_water_rain": "जल और वर्षा 🌧️",
   "ui_sound_tab_forest_wind": "वन और हवा 🌲",
-  "ui_sound_tab_earth_thunder": "आकाश और गड़गड़ाहट ⚡"
+  "ui_sound_tab_earth_thunder": "आकाश और गड़गड़ाहट ⚡",
+  "ui_copy_json": "बैकअप कॉपी करें",
+  "ui_backup_copied": "बैकअप क्लिपबोर्ड पर कॉपी हुआ"
 }

@@ -126,5 +126,7 @@
   "ui_sound_tab_all": "All",
   "ui_sound_tab_water_rain": "Water & Rain 🌧️",
   "ui_sound_tab_forest_wind": "Forest & Wind 🌲",
-  "ui_sound_tab_earth_thunder": "Sky & Thunder ⚡"
+  "ui_sound_tab_earth_thunder": "Sky & Thunder ⚡",
+  "ui_copy_json": "Copy Backup JSON",
+  "ui_backup_copied": "Backup data copied to clipboard"
 }
