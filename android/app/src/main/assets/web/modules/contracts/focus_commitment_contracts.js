@@ -90,7 +90,7 @@
     // M8478: dfDraftPersonalFocusCommitment
     dfDraftPersonalFocusCommitment(weeklyHoursTarget = 20, subject = 'Comprehensive STEM Mastery') {
       const targetHours = Math.max(1, parseInt(weeklyHoursTarget, 10) || 20);
-      const cleanSubject = String(subject || 'General Studies').replace(/<[^>]*>/g, '').trim();
+      const cleanSubject = String(subject || 'General Studies').replace(/[<>]/g, '').trim();
       const contractId = 'contract_' + Date.now().toString(36);
       const startDate = new Date();
       const endDate = new Date(startDate.getTime() + (7 * 24 * 60 * 60 * 1000));

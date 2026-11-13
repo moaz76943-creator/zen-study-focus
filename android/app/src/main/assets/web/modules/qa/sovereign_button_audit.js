@@ -14,7 +14,7 @@
     while ((match = btnRegex.exec(html)) !== null) {
       totalButtons++;
       var attrs = match[1] || "";
-      var inner = (match[2] || "").replace(/<[^>]+>/g, "").trim();
+      var inner = (function (t) { var p; do { p = t; t = t.replace(/<[^<>]*>/g, ""); } while (t !== p); return t; })(match[2] || "").trim();
 
       var hasOnclick = /\bonclick\s*=\s*["'][^"']+["']/i.test(attrs);
       var idMatch = /\bid\s*=\s*["']([^"']+)["']/i.exec(attrs);

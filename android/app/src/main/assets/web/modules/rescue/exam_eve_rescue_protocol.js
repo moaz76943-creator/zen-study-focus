@@ -55,7 +55,7 @@
 
     // M8498: dfActivateExamEveFocusProtocol
     dfActivateExamEveFocusProtocol(examSubject, examDateIso = null) {
-      const subject = String(examSubject || 'Comprehensive Exam').replace(/<[^>]*>/g, '').trim();
+      const subject = String(examSubject || 'Comprehensive Exam').replace(/[<>]/g, '').trim();
       const now = new Date();
       const examTime = examDateIso ? new Date(examDateIso).getTime() : (now.getTime() + (24 * 60 * 60 * 1000));
 

@@ -145,7 +145,7 @@
       const newTree = {
         treeId: 'tree_' + Date.now().toString(36),
         species: treeData.species || 'cedar',
-        subject: String(treeData.subject || 'General Studies').replace(/<[^>]*>/g, '').trim(),
+        subject: String(treeData.subject || 'General Studies').replace(/[<>]/g, '').trim(),
         durationMinutes: parseInt(treeData.durationMinutes, 10) || 25,
         flashcardsReviewed: parseInt(treeData.flashcardsReviewed, 10) || 0,
         plantedAtIso: new Date().toISOString(),
