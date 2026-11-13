@@ -31,7 +31,7 @@ function classifySourceLabels(keys,english,read){
 function report(){
   const app=read('app.js'),cut=app.indexOf('let todayISO =');
   if(cut<0)throw Error('LANGUAGE_CATALOG_BOUNDARY_CHANGED');
-  const c={console,document:{addEventListener(){}}};c.window=c;
+  const c={console,document:{addEventListener(){}},addEventListener(){},removeEventListener(){}};c.window=c;
   vm.createContext(c);
   vm.runInContext(read('locale_rows.js'),c,{filename:'locale_rows.js'});
   vm.runInContext(read('locale_extras.js'),c,{filename:'locale_extras.js'});
