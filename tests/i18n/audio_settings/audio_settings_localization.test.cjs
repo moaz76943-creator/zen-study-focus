@@ -65,7 +65,7 @@ test('studio translation preserves playback, slider values, app state and Wester
    assert.ok(studio.tiles[0].slider['aria-label'].includes(bridge.soundName(locale,'ocean')));
    assert.ok(studio.tiles[2].play.attributes['aria-label'].includes(bridge.translate(locale,'control.pause')));
  }
- assert.equal(studio.filters[0].textContent,'All (12)');
+ assert.equal(studio.filters[0].textContent,'All (5)');
  assert.equal(JSON.stringify(config),before);
  assert.equal(JSON.stringify(CATALOG),catalogBefore);
  assert.equal(playCount+saveCount,0);

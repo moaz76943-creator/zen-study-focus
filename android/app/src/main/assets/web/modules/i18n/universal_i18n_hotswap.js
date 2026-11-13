@@ -132,6 +132,7 @@
     "stop": "ui_stop",
     "⏹ stop": "ui_stop",
     "all (12)": "ui_all_sounds",
+    "all (5)": "ui_all_sounds",
     "all (6)": "ui_all_sounds",
     "water & rain": "soundRain",
     "forest & wind": "soundForest",
