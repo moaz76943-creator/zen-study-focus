@@ -523,10 +523,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function triggerHaptic(type) {
   if (!navigator.vibrate) return;
   try {
-    if (type === 'click') navigator.vibrate(10);
-    else if (type === 'step') navigator.vibrate(16);
-    else if (type === 'start') navigator.vibrate(28);
-    else if (type === 'complete') navigator.vibrate([35, 60, 35, 60, 80]);
+    if (type === 'click') ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(10) : false);
+    else if (type === 'step') ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(16) : false);
+    else if (type === 'start') ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(28) : false);
+    else if (type === 'complete') ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([35, 60, 35, 60, 80]) : false);
   } catch(e) {}
 }
 
@@ -3396,7 +3396,7 @@ function playRichCompletionChime(titleText, skipNative = false) {
       osc.stop(chimeCtx.currentTime + idx * 0.35 + 1.6);
     });
   } catch (e) {}
-  if (navigator.vibrate) try { navigator.vibrate([300, 150, 300, 150, 500]); } catch (e) {}
+  if (navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([300, 150, 300, 150, 500]) : false); } catch (e) {}
 }
 
 function testCompletionSoundChime() {
@@ -3645,7 +3645,7 @@ function switchTab(secId, btn) {
 
 let toastTimer = null;
 function showToast(msg) {
-  if (navigator.vibrate) try { navigator.vibrate(12); } catch(e){}
+  if (navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(12) : false); } catch(e){}
   const t = document.getElementById('appToast');
   document.getElementById('toastText').textContent = toWest(msg);
   t.classList.add('show');
@@ -8607,13 +8607,13 @@ window.FlashQuizEngine = FlashQuizEngine;
     if (typeof navigator === 'undefined' || typeof navigator.vibrate !== 'function') return false;
     try {
       if (type === 'easy') {
-        navigator.vibrate(20);
+        ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(20) : false);
       } else if (type === 'hard') {
-        navigator.vibrate([35, 40, 35]);
+        ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([35, 40, 35]) : false);
       } else if (type === 'flip') {
-        navigator.vibrate(15);
+        ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(15) : false);
       } else {
-        navigator.vibrate(15);
+        ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(15) : false);
       }
       return true;
     } catch(e) {
@@ -41859,7 +41859,7 @@ window.dfDebounceAction = function(actionCallback, debounceCooldownMs) {
 
   // Gentle tactile confirmation on supported devices
   if (typeof navigator !== "undefined" && navigator.vibrate) {
-    try { navigator.vibrate(15); } catch (e) {}
+    try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(15) : false); } catch (e) {}
   }
 
   if (typeof actionCallback === "function") {
@@ -41906,7 +41906,7 @@ window.dfPlaySessionCompletionChime = async function() {
 
   // Gentle double vibration on completion
   if (typeof navigator !== "undefined" && navigator.vibrate) {
-    try { navigator.vibrate([150, 80, 150]); } catch (e) {}
+    try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([150, 80, 150]) : false); } catch (e) {}
   }
   console.log("[DEEP FOCUS] Harmonic completion chime sounded gently.");
 };
@@ -46356,7 +46356,7 @@ window.dfTriggerLRAHaptic = function(patternType) {
   if (typeof navigator !== "undefined" && navigator.vibrate) {
     const pattern = window.DF_HAPTIC_PATTERNS[patternType] || [12];
     try {
-      navigator.vibrate(pattern);
+      ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(pattern) : false);
     } catch (e) {}
   }
 };
@@ -64369,7 +64369,7 @@ function() {
       if (typeof window.triggerHaptic === 'function') {
         window.triggerHaptic(ok ? 'complete' : 'alert');
       } else if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate(ok ? 20 : 50);
+        ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(ok ? 20 : 50) : false);
       }
     } catch (_) {}
     return {
@@ -85161,7 +85161,7 @@ window.SovereignBreathing = (function() {
     // Trigger subtle haptic pulse if available
     function triggerHaptic() {
         if (typeof navigator !== "undefined" && navigator.vibrate) {
-            try { navigator.vibrate(35); } catch(e) {}
+            try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(35) : false); } catch(e) {}
         }
     }
 

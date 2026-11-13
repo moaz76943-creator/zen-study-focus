@@ -66,7 +66,7 @@
             URL.revokeObjectURL(url);
 
             console.log("[OfflineDataVault] Backup exported successfully without network transmission.");
-            if (typeof navigator !== "undefined" && navigator.vibrate) try { navigator.vibrate(30); } catch (e) {}
+            if (typeof navigator !== "undefined" && navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(30) : false); } catch (e) {}
         },
 
         importBackupJSON: function (jsonString) {
@@ -85,7 +85,7 @@
                 });
 
                 console.log("[OfflineDataVault] Data restored successfully!");
-                if (typeof navigator !== "undefined" && navigator.vibrate) try { navigator.vibrate([40, 30, 40]); } catch (e) {}
+                if (typeof navigator !== "undefined" && navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([40, 30, 40]) : false); } catch (e) {}
                 return true;
             } catch (err) {
                 console.error("[OfflineDataVault] Import validation failed:", err);

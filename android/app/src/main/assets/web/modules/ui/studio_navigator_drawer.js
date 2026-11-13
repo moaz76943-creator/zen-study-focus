@@ -147,7 +147,7 @@
             overlay.style.display = "block";
             setTimeout(() => { overlay.style.opacity = "1"; }, 10);
             this.isOpen = true;
-            if (typeof navigator !== "undefined" && navigator.vibrate) try { navigator.vibrate(20); } catch (e) {}
+            if (typeof navigator !== "undefined" && navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(20) : false); } catch (e) {}
         },
 
         closeDrawer: function () {
@@ -161,7 +161,7 @@
         launchStudio: function (studioId) {
             console.log("[StudioNavigator] Launching studio:", studioId);
             this.closeDrawer();
-            if (typeof navigator !== "undefined" && navigator.vibrate) try { navigator.vibrate(25); } catch (e) {}
+            if (typeof navigator !== "undefined" && navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(25) : false); } catch (e) {}
             
             // Trigger specific studio modal or view if present
             const targetModal = document.getElementById(studioId + "StudioModal") || document.getElementById(studioId + "Modal");

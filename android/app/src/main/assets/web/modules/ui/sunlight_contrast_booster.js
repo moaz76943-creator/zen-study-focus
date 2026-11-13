@@ -43,7 +43,7 @@
             try {
                 localStorage.setItem(STORAGE_KEY_SUNLIGHT, String(this.isBoosted));
             } catch (e) {}
-            if (typeof navigator !== "undefined" && navigator.vibrate) try { navigator.vibrate(20); } catch (e) {}
+            if (typeof navigator !== "undefined" && navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(20) : false); } catch (e) {}
             return this.isBoosted;
         },
 

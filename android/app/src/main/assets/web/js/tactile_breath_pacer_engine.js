@@ -292,7 +292,7 @@
     if (typeof navigator !== 'undefined' && typeof navigator.vibrate === 'function') {
       try {
         if (Array.isArray(patternArr) && patternArr.length > 0) {
-          navigator.vibrate(patternArr);
+          ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(patternArr) : false);
           return true;
         }
       } catch (e) {

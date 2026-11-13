@@ -1674,6 +1674,18 @@ body {
     padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
   }
 </style>
+<script id="task-830-vibrate-guard">
+(function () {
+  if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function" && !navigator.__ZEN_VIBRATE_GUARDED__) {
+    var origVibrate = navigator.vibrate.bind(navigator);
+    navigator.vibrate = function (pattern) {
+      if (navigator.userActivation && !navigator.userActivation.hasBeenActive) return false;
+      try { return origVibrate(pattern); } catch (_) { return false; }
+    };
+    navigator.__ZEN_VIBRATE_GUARDED__ = true;
+  }
+})();
+</script>
 </head>
 <body>
 

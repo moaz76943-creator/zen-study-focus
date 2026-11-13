@@ -87,7 +87,7 @@
             document.getElementById("zenReAnchorClose").onclick = () => banner.remove();
             setTimeout(() => { if (banner && banner.parentNode) banner.remove(); }, 6000);
 
-            if (typeof navigator !== "undefined" && navigator.vibrate) try { navigator.vibrate(30); } catch (e) {}
+            if (typeof navigator !== "undefined" && navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(30) : false); } catch (e) {}
         },
 
         recordDistractionEvent: function (duration) {

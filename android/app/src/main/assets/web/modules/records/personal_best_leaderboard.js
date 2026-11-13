@@ -240,7 +240,7 @@
 
       this.records.awardedBadges.push(badge);
       if (typeof navigator !== 'undefined' && navigator.vibrate) {
-        navigator.vibrate([40, 60, 40]);
+        ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([40, 60, 40]) : false);
       }
       return badge;
     }
