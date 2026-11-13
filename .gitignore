@@ -4,4 +4,6 @@ generate_store.mjs
 *.keystore
 
 # Allow release keystore
-!android/app/zenfocus2026.jks
+*.jks
+keystore.properties
+.git-credentials
