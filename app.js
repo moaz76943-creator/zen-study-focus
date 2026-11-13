@@ -1,1 +1,0 @@
-android/app/src/main/assets/web/app.js
