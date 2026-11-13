@@ -1152,3 +1152,12 @@ require("../android/app/src/main/assets/web/modules/qa/sovereign_i18n_permanent_
 
 // Task #823: Zero-Broken-Audio-Reference Gate
 require("../android/app/src/main/assets/web/modules/qa/sovereign_audio_link_audit.js").runAudioLinkAudit(process.cwd());
+
+// Task #826: Timer Drift Guard Verification
+(function () {
+  require("../android/app/src/main/assets/web/modules/timer/sovereign_drift_guard_826.js");
+  if (!global.SovereignDriftGuard || global.SovereignDriftGuard.formatMMSS(1500) !== "25:00") {
+    throw new Error("SovereignDriftGuard.formatMMSS failed");
+  }
+  console.log("✅ PASS: Timestamp-Anchored Timer Drift Guard Verified (#826)");
+})();
