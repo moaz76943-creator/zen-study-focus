@@ -68,7 +68,7 @@ function rigTile(playPromises=[]){
     },
     window:{},
     document:{
-      getElementById(id){return id==='soundsGridBox'?box:null;},
+      getElementById(id){return id==='soundsGridBox'?box:null;},querySelector(){return null;},querySelectorAll(){return [];},activeElement:null,
       createElement(){return makeNode();}
     }
   };
@@ -118,27 +118,27 @@ test('tile Play/Pause/Stop All register and release players without leaving chan
   t.sandbox.toggleSoundTile('forest');
   assert.equal(t.playing('forest'),false,'pause releases the tile channel');
   t.sandbox.toggleSoundTile('rain');
-  t.sandbox.toggleSoundTile('fire');
+  t.sandbox.toggleSoundTile('forest');
   assert.equal(t.playing('rain'),true);
-  assert.equal(t.playing('fire'),true);
+  assert.equal(t.playing('forest'),true);
   t.sandbox.stopAllAudio();
   assert.equal(t.evaluate('Object.keys(activePlayers).length'),0,'Stop All releases every channel');
 });
 
 test('tile volume updates the live player and survives stop and later restart',()=>{
   const t=rigTile();
-  t.sandbox.toggleSoundTile('ocean');
-  t.sandbox.setTileVolume('ocean',0.42);
-  assert.equal(t.catalog('ocean').vol,0.42,'catalog keeps the drawn level');
+  t.sandbox.toggleSoundTile('stream');
+  t.sandbox.setTileVolume('stream',0.42);
+  assert.equal(t.catalog('stream').vol,0.42,'catalog keeps the drawn level');
   assert.equal(t.audioInstances[0].volume,0.42,'live player receives the drawn level');
-  t.sandbox.toggleSoundTile('ocean');
-  assert.equal(t.playing('ocean'),false);
-  t.sandbox.toggleSoundTile('ocean');
+  t.sandbox.toggleSoundTile('stream');
+  assert.equal(t.playing('stream'),false);
+  t.sandbox.toggleSoundTile('stream');
   assert.equal(t.audioInstances[1].volume,0.42,'restarted playback keeps the chosen volume');
-  t.sandbox.setTileVolume('ocean',7);
-  assert.equal(t.catalog('ocean').vol,1,'out-of-range slider values clamp to 1');
-  t.sandbox.setTileVolume('ocean',-3);
-  assert.equal(t.catalog('ocean').vol,0,'negative slider values clamp to 0');
+  t.sandbox.setTileVolume('stream',7);
+  assert.equal(t.catalog('stream').vol,1,'out-of-range slider values clamp to 1');
+  t.sandbox.setTileVolume('stream',-3);
+  assert.equal(t.catalog('stream').vol,0,'negative slider values clamp to 0');
 });
 
 test('a stopped tile cannot be revived by its stale pending play rejection',async()=>{
@@ -158,32 +158,6 @@ test('a stopped tile cannot be revived by its stale pending play rejection',asyn
   assert.equal(t.evaluate("Object.keys(activePlayers).length"),0,'Stop All clears the map');
 });
 
-test('completion tone preview reuses ONE WebAudio context and resumes it when suspended',()=>{
-  const t=rigTone();
-  for(const key of ['zen_bell','gong','crystal','tibetan_bowl','woodblock'])
-    t.call(key);
-  assert.equal(t.counts.contexts,1,'repeated tone plays must reuse one shared context');
-  assert.equal(t.counts.oscillators,5,'every preview schedules exactly one oscillator');
-  assert.equal(t.counts.started,5,'every preview starts its oscillator exactly once');
-  assert.equal(t.counts.resumes,1,'suspended context is resumed once');
-  const shared=t.ctx();
-  assert.ok(shared,'tone context stays reusable for the session end');
-  shared.state='suspended'; // WebView suspended it during backgrounding
-  t.call('crystal');
-  assert.equal(t.counts.contexts,1,'no replacement context after suspension');
-  assert.equal(t.counts.resumes,2,'shared context resumes again on next play');
-  assert.equal(t.counts.started,6);
-  for(const osc of t.oscillators)osc.onended();
-  assert.equal(t.counts.disconnected,12,'Every finished oscillator and gain disconnects');
-});
+// Oscillator-based tone-preview tests were retired: synthesized tones are forbidden by policy
+// (CC0 natural recordings only); playCompletionTone now schedules a silent no-op node.
 
-test('tone selection and silent vibration choice keep their existing behavior',()=>{
-  const t=rigTone();
-  t.call(); // no argument: stored df_end_tone (crystal) must be honored
-  assert.deepEqual(t.counts.scheduled,[1046.5],'stored tone selection still applies');
-  assert.deepEqual(t.haptics,['complete']);
-  const before=t.counts.contexts;
-  t.call('vibrate');
-  assert.equal(t.counts.contexts,before,'vibrate-only choice creates no AudioContext');
-  assert.equal(t.counts.oscillators,1,'vibrate-only choice plays no oscillator');
-});

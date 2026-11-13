@@ -1,0 +1,12 @@
+{
+  "_comment": "Counts may only go DOWN. When you reduce one, lower it here in the same commit. Never raise a number.",
+  "innerHTMLAssignments": 44,
+  "insertAdjacentHTML": 13,
+  "inlineOnclickInIndexHtml": 120,
+  "documentWrite": 1,
+  "evalOrNewFunction": 0,
+  "consoleLog": 205,
+  "appJsMaxBytes": 3800000,
+  "webAssetsMaxBytes": 16000000,
+  "singleFileMaxBytes": 3800000
+}

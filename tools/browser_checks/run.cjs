@@ -1,0 +1,111 @@
+'use strict';
+// Real-browser checks (Chromium via Playwright). Run: npx playwright install chromium && node tools/browser_checks/run.cjs
+// Covers: layout overflow (320/360px, large font, en/ar/de), corrupted storage boot, local-day in other
+// time zones, developer wording in the UI, sound tiles. Exit code 1 on any problem.
+const http = require('node:http');
+const fs = require('node:fs');
+const path = require('node:path');
+const { chromium } = require('playwright');
+const web = path.resolve(__dirname, '../../android/app/src/main/assets/web');
+const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.svg': 'image/svg+xml', '.png': 'image/png', '.jpg': 'image/jpeg', '.ogg': 'audio/ogg', '.wav': 'audio/wav' };
+const server = http.createServer((req, res) => {
+  const p = path.join(web, decodeURIComponent(req.url.split('?')[0]).replace(/^\/+/, '') || 'index.html');
+  if (!p.startsWith(web) || !fs.existsSync(p) || fs.statSync(p).isDirectory()) { res.writeHead(404); return res.end(); }
+  res.writeHead(200, { 'Content-Type': mime[path.extname(p)] || 'application/octet-stream' }); fs.createReadStream(p).pipe(res);
+});
+const problems = [];
+const fail = (m) => { problems.push(m); console.log('FAIL', m); };
+
+async function layout(b, base) {
+  for (const lang of ['en', 'ar', 'de']) for (const w of [320, 360]) for (const scale of [1, 1.5]) {
+    const ctx = await b.newContext({ viewport: { width: w, height: 640 } }); const p = await ctx.newPage();
+    await p.goto(base + '/index.html'); await p.waitForTimeout(1500);
+    await p.evaluate(([l, s]) => { try { applyLanguage(l); } catch (_) {} document.documentElement.style.fontSize = (16 * s) + 'px'; }, [lang, scale]);
+    const secs = await p.evaluate(() => [...new Set([...document.querySelectorAll('[id^="sec-"]')].map((n) => n.id))]);
+    for (const sec of secs) {
+      const bad = await p.evaluate((id) => {
+        try { switchTab(id, document.querySelector('[onclick*="' + id + '"]')); } catch (_) {}
+        const cur = document.getElementById(id); if (!cur || getComputedStyle(cur).display === 'none') return [];
+        const vw = document.documentElement.clientWidth; const out = [];
+        cur.querySelectorAll('*').forEach((el) => {
+          const r = el.getBoundingClientRect(); if (!r.width || !r.height) return;
+          const st = getComputedStyle(el); if (st.position === 'fixed' || st.visibility === 'hidden' || st.display === 'none') return;
+          if (r.right > vw + 1 || r.left < -1) {
+            let a = el, clipped = false; while (a && a !== cur) { const o = getComputedStyle(a).overflowX; if (o === 'auto' || o === 'scroll' || o === 'hidden') { clipped = true; break; } a = a.parentElement; }
+            if (!clipped) out.push((el.id ? '#' + el.id : el.tagName.toLowerCase()) + ' ' + Math.round(r.left) + '..' + Math.round(r.right));
+          }
+        });
+        return out.slice(0, 3);
+      }, sec);
+      if (bad.length) fail(`layout ${lang} ${w}px x${scale} ${sec}: ${bad.join(', ')}`);
+    }
+    await ctx.close();
+  }
+}
+
+async function corruption(b, base) {
+  const keys = ['cfg', 'tasks', 'notes'].flatMap((k) => [`zen_fortress_${k}_v21`, `zen_fortress_${k}_v21_mirror`]);
+  const bads = ['{not json', 'null', '[]', '{"payload":1,"sig":"x","ts":1}', '\u0000\u0001', 'x'.repeat(200000), '{"payload":{"__proto__":{"polluted":1}},"sig":"a","ts":1}'];
+  for (const key of keys) for (const bad of bads) {
+    const ctx = await b.newContext(); const p = await ctx.newPage(); const errs = [];
+    p.on('pageerror', (e) => errs.push(e.message.slice(0, 80)));
+    await p.addInitScript(([k, v]) => { try { if (!sessionStorage.getItem('__seed')) { localStorage.setItem(k, v); sessionStorage.setItem('__seed', '1'); } } catch (_) {} }, [key, bad]);
+    await p.goto(base + '/index.html'); await p.waitForTimeout(1200);
+    const r = await p.evaluate(() => ({ ui: document.body.innerText.length > 100, polluted: ({}).polluted === 1 }));
+    if (errs.length || !r.ui || r.polluted) fail(`corrupt ${key} <- ${JSON.stringify(bad.slice(0, 16))}: errs=${errs[0] || ''} ui=${r.ui} polluted=${r.polluted}`);
+    await ctx.close();
+  }
+}
+
+async function timezones(b, base) {
+  for (const [tz, want] of [['Asia/Amman', '2026-11-14'], ['America/Los_Angeles', '2026-11-13'], ['Pacific/Kiritimati', '2026-11-14']]) {
+    const ctx = await b.newContext({ timezoneId: tz }); const p = await ctx.newPage();
+    await p.addInitScript(() => { const T = Date.parse('2026-11-13T23:30:00Z'); const RD = Date; class FD extends RD { constructor(...a) { if (a.length === 0) super(T); else super(...a); } static now() { return T; } } window.Date = FD; });
+    await p.goto(base + '/index.html'); await p.waitForTimeout(1200);
+    const got = await p.evaluate(() => localDateISO());
+    if (got !== want) fail(`timezone ${tz}: local day ${got}, expected ${want}`);
+    await ctx.close();
+  }
+}
+
+async function devText(b, base) {
+  const ctx = await b.newContext({ viewport: { width: 390, height: 800 } }); const p = await ctx.newPage();
+  await p.goto(base + '/index.html'); await p.waitForTimeout(1800);
+  const hits = await p.evaluate(() => {
+    const re = /audit|dogfood|pillar|\bM\d{3,}\b|\d+\/100|\bQA\b|\bdebug\b|TODO|lorem|flawless|fail-closed|zero-trust|sovereign|fortress/i; const out = [];
+    document.querySelectorAll('[id^="sec-"]').forEach((cur) => {
+      try { switchTab(cur.id, document.querySelector('[onclick*="' + cur.id + '"]')); } catch (_) {}
+      const w = document.createTreeWalker(cur, NodeFilter.SHOW_TEXT);
+      while (w.nextNode()) { const n = w.currentNode; const t = n.nodeValue.trim(); if (!t || !re.test(t)) continue; const el = n.parentElement; if (getComputedStyle(el).display === 'none' || !el.getBoundingClientRect().width) continue; out.push(cur.id + ': ' + t.slice(0, 60)); }
+    });
+    return out;
+  });
+  hits.forEach((h) => fail('developer wording visible: ' + h));
+  await ctx.close();
+}
+
+async function sounds(b, base) {
+  const ctx = await b.newContext(); const p = await ctx.newPage(); const reqs = [];
+  p.on('request', (r) => { if (/\.ogg/.test(r.url())) reqs.push(path.basename(r.url())); });
+  await p.goto(base + '/index.html'); await p.waitForTimeout(1500);
+  const ids = await p.evaluate(() => { renderSoundsStudio(); return [...document.querySelectorAll('[data-sound-toggle]')].map((n) => n.getAttribute('data-sound-toggle')); });
+  if (ids.length < 5) fail('sound tiles: ' + ids.length);
+  for (const id of ids) { await p.evaluate((i) => toggleSoundTile(i), id); await p.waitForTimeout(150); await p.evaluate((i) => toggleSoundTile(i), id); }
+  const missing = await p.evaluate(() => SOUNDS_DATA.filter((s) => !s.src).map((s) => s.id));
+  if (missing.length) fail('sound without src: ' + missing);
+  if (new Set(reqs).size < ids.length) fail('sound files fetched: ' + [...new Set(reqs)] + ' for ' + ids);
+  await ctx.close();
+}
+
+(async () => {
+  await new Promise((r) => server.listen(0, r));
+  const base = 'http://localhost:' + server.address().port;
+  const b = await chromium.launch();
+  const only = process.argv[2];
+  for (const [name, fn] of Object.entries({ layout, corruption, timezones, devText, sounds })) {
+    if (only && only !== name) continue;
+    const before = problems.length; await fn(b, base); console.log(name, problems.length === before ? 'OK' : 'FAILED');
+  }
+  await b.close(); server.close();
+  process.exit(problems.length ? 1 : 0);
+})();

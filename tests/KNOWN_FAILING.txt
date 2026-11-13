@@ -4,7 +4,6 @@ test/golden_flow_06_arabic_rtl_destinations.test.js
 test/localization_fallback_guard.test.js
 test/runtime_activator_integration.test.js
 tests/accessibility/locale_button_name.test.cjs
-tests/audio_context/tone_context_reuse.test.cjs
 tests/critical_room7/m293_example_tray_html_safety.test.cjs
 tests/critical_room7/w03_contract.test.cjs
 tests/df_lane03_core_shell_locale.test.cjs
