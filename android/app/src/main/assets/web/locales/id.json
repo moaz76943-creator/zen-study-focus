@@ -122,5 +122,9 @@
   "ui_view_all": "Lihat semua ↗",
   "ui_start_training": "Mulai latihan",
   "ui_pure_nature_ready": "Suara Alam Siap",
-  "ui_sort_label": "Urutkan"
+  "ui_sort_label": "Urutkan",
+  "ui_sound_tab_all": "Semua",
+  "ui_sound_tab_water_rain": "Air & Hujan 🌧️",
+  "ui_sound_tab_forest_wind": "Hutan & Angin 🌲",
+  "ui_sound_tab_earth_thunder": "Langit & Guntur ⚡"
 }

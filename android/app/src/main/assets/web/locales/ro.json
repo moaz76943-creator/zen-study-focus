@@ -122,5 +122,9 @@
   "ui_view_all": "Vezi toate ↗",
   "ui_start_training": "Începe antrenamentul",
   "ui_pure_nature_ready": "Sunete naturale pregătite",
-  "ui_sort_label": "Sortare"
+  "ui_sort_label": "Sortare",
+  "ui_sound_tab_all": "Toate",
+  "ui_sound_tab_water_rain": "Apă și ploaie 🌧️",
+  "ui_sound_tab_forest_wind": "Pădure și vânt 🌲",
+  "ui_sound_tab_earth_thunder": "Cer și tunet ⚡"
 }

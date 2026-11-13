@@ -122,5 +122,9 @@
   "ui_view_all": "Zobacz wszystko ↗",
   "ui_start_training": "Rozpocznij trening",
   "ui_pure_nature_ready": "Dźwięki natury gotowe",
-  "ui_sort_label": "Sortuj"
+  "ui_sort_label": "Sortuj",
+  "ui_sound_tab_all": "Wszystkie",
+  "ui_sound_tab_water_rain": "Woda i deszcz 🌧️",
+  "ui_sound_tab_forest_wind": "Las i wiatr 🌲",
+  "ui_sound_tab_earth_thunder": "Niebo i grzmot ⚡"
 }

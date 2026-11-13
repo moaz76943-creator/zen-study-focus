@@ -122,5 +122,9 @@
   "ui_view_all": "Xem tất cả ↗",
   "ui_start_training": "Bắt đầu tập luyện",
   "ui_pure_nature_ready": "Âm thanh tự nhiên sẵn sàng",
-  "ui_sort_label": "Sắp xếp"
+  "ui_sort_label": "Sắp xếp",
+  "ui_sound_tab_all": "Tất cả",
+  "ui_sound_tab_water_rain": "Nước và mưa 🌧️",
+  "ui_sound_tab_forest_wind": "Rừng và gió 🌲",
+  "ui_sound_tab_earth_thunder": "Bầu trời và sấm sét ⚡"
 }

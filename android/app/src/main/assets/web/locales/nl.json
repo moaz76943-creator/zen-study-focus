@@ -122,5 +122,9 @@
   "ui_view_all": "Alles bekijken ↗",
   "ui_start_training": "Training starten",
   "ui_pure_nature_ready": "Natuurgeluiden gereed",
-  "ui_sort_label": "Sorteren"
+  "ui_sort_label": "Sorteren",
+  "ui_sound_tab_all": "Alles",
+  "ui_sound_tab_water_rain": "Water en regen 🌧️",
+  "ui_sound_tab_forest_wind": "Bos en wind 🌲",
+  "ui_sound_tab_earth_thunder": "Hemel en donder ⚡"
 }

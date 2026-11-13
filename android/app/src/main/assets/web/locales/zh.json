@@ -122,5 +122,9 @@
   "ui_view_all": "查看全部 ↗",
   "ui_start_training": "开始训练",
   "ui_pure_nature_ready": "纯自然环境音就绪",
-  "ui_sort_label": "排序"
+  "ui_sort_label": "排序",
+  "ui_sound_tab_all": "全部",
+  "ui_sound_tab_water_rain": "流水与雨声 🌧️",
+  "ui_sound_tab_forest_wind": "森林与清风 🌲",
+  "ui_sound_tab_earth_thunder": "长空与雷鸣 ⚡"
 }

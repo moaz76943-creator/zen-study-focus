@@ -122,5 +122,9 @@
   "ui_view_all": "सभी देखें ↗",
   "ui_start_training": "प्रशिक्षण शुरू करें",
   "ui_pure_nature_ready": "प्राकृतिक ध्वनि तैयार",
-  "ui_sort_label": "क्रमबद्ध करें"
+  "ui_sort_label": "क्रमबद्ध करें",
+  "ui_sound_tab_all": "सभी",
+  "ui_sound_tab_water_rain": "जल और वर्षा 🌧️",
+  "ui_sound_tab_forest_wind": "वन और हवा 🌲",
+  "ui_sound_tab_earth_thunder": "आकाश और गड़गड़ाहट ⚡"
 }

@@ -19,6 +19,8 @@
   var EXCLUDED_CODES = new Set(["he", "iw", "syc", "ber", "zgh"]);
   var LOADED_LOCALES = {};
   var PHRASE_TO_KEY = {
+    "sky & thunder ⚡": "ui_sound_tab_earth_thunder",
+    "sky & thunder": "ui_sound_tab_earth_thunder",
     "الترتيب": "ui_sort_label",
     "sort": "ui_sort_label",
     "your progress": "ui_your_progress",

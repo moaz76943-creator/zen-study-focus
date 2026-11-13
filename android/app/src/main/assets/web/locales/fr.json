@@ -122,5 +122,9 @@
   "ui_view_all": "Voir tout ↗",
   "ui_start_training": "Commencer l'entraînement",
   "ui_pure_nature_ready": "Sons naturels prêts",
-  "ui_sort_label": "Trier"
+  "ui_sort_label": "Trier",
+  "ui_sound_tab_all": "Tous",
+  "ui_sound_tab_water_rain": "Eau & Pluie 🌧️",
+  "ui_sound_tab_forest_wind": "Forêt & Vent 🌲",
+  "ui_sound_tab_earth_thunder": "Ciel & Tonnerre ⚡"
 }

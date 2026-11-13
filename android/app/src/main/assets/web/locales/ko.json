@@ -122,5 +122,9 @@
   "ui_view_all": "전체 보기 ↗",
   "ui_start_training": "훈련 시작",
   "ui_pure_nature_ready": "자연의 소리 준비 완료",
-  "ui_sort_label": "정렬"
+  "ui_sort_label": "정렬",
+  "ui_sound_tab_all": "전체",
+  "ui_sound_tab_water_rain": "물과 비 🌧️",
+  "ui_sound_tab_forest_wind": "숲과 바람 🌲",
+  "ui_sound_tab_earth_thunder": "하늘과 천둥 ⚡"
 }
