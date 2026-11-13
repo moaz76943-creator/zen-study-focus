@@ -110,4 +110,8 @@ for (const rel of ['modules/audio/spatial_acoustic_studio.js', 'modules/core/web
   assert(!/\.createOscillator\s*\(/.test(modSrc), rel + ' still calls createOscillator()');
 }
 
+
+// 11. Test F3 MutationObserver 120Hz coalescing shield
+assert(appJs.includes('__DF_MUTATION_SHIELD__'), 'MutationObserver coalescing shield missing');
+
 console.log('✅ PASS: All Major #1-#5 behavioral & Android hardening regression tests passed!');
