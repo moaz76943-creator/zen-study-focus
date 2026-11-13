@@ -72,7 +72,7 @@ test('CodeQL-driven fixes: spelling card has no inline JS and escapes card text;
   assert.match(fn, /var meaning = esc\(/);
   assert.match(app, /dfGenerateEncryptedVaultBackup was removed/);
   assert.ok(!/AES-GCM-256-CLIENT/.test(app), 'XOR must not be labelled AES-GCM');
-  assert.match(app, /Repeat until stable/);
+  assert.match(app, /DOM-based allowlist sanitizer/);
   const latex = fs.readFileSync(path.join(web, 'modules/sovereign_academic_exporter.js'), 'utf8');
   const ex = require(path.join(web, 'modules/sovereign_academic_exporter.js'));
   assert.equal(ex._latexEscape('a\\b{c}'), 'a\\textbackslash{}b\\{c\\}');
