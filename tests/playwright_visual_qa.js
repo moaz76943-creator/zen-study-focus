@@ -1,4 +1,113 @@
 
+// Task #831: 360° Exhaustive Interactive, Per-Tab, Dark Mode & Persistence Audit
+async function run360ExhaustiveSuite(page) {
+  console.log("🔍 [360° QA]: Starting Per-Tab, Timer Tick, Audio, Persistence & Dark Mode Audit...");
+  const allIssues = [];
+
+  // 1. Audit every bottom-nav tab in Light Mode (EN)
+  const navCount = await page.locator('nav button, .bottom-nav button, #bottomNav button').count();
+  for (let i = 0; i < navCount; i++) {
+    const btn = page.locator('nav button, .bottom-nav button, #bottomNav button').nth(i);
+    if (await btn.isVisible()) {
+      await btn.click({ force: true }).catch(() => {});
+      await page.waitForTimeout(350);
+      if (typeof runDeepDomAudit === "function") {
+        const tabIssues = await runDeepDomAudit(page, `Light-Tab-${i}`, 'en');
+        allIssues.push(...tabIssues);
+      }
+    }
+  }
+
+  // 2. Return to Timer tab & verify real countdown tick (25:00 -> 24:58)
+  if (navCount > 0) {
+    await page.locator('nav button, .bottom-nav button, #bottomNav button').first().click({ force: true }).catch(() => {});
+    await page.waitForTimeout(250);
+  }
+  const timerEl = page.locator('#timerDisplay, .timer-display, [data-timer-display]').first();
+  if (await timerEl.count() > 0 && await timerEl.isVisible()) {
+    const before = (await timerEl.innerText()).trim();
+    const playBtn = page.locator('#startBtn, #playBtn, button[data-action*="start"], button[aria-label*="Start"], button[aria-label*="Play"]').first();
+    if (await playBtn.count() > 0 && await playBtn.isVisible()) {
+      await playBtn.click({ force: true }).catch(() => {});
+      await page.waitForTimeout(2100);
+      const after = (await timerEl.innerText()).trim();
+      if (before === after) {
+        allIssues.push(`[TIMER_STUCK] Timer did not tick after 2.1s (stayed at "${before}")`);
+      } else {
+        console.log(`✅ PASS: Real Timer Countdown Verified (${before} -> ${after})`);
+      }
+      // Pause/stop cleanly
+      await playBtn.click({ force: true }).catch(() => {});
+    }
+  }
+
+  // 3. Verify Audio Play & Stop (no hanging playback after Stop)
+  const stopBtn = page.locator('button:has-text("Stop"), [data-action*="stop"]').first();
+  if (await stopBtn.count() > 0) {
+    await stopBtn.click({ force: true }).catch(() => {});
+    const playingCount = await page.evaluate(() => {
+      return Array.from(document.querySelectorAll('audio')).filter(a => !a.paused).length;
+    });
+    if (playingCount > 0) {
+      allIssues.push(`[AUDIO_STOP_FAIL] ${playingCount} <audio> tracks still playing after Stop`);
+    } else {
+      console.log("✅ PASS: Audio Stop cleanly halted all <audio> tracks");
+    }
+  }
+
+  // 4. Verify AMOLED Dark Mode Contrast & Layout across viewport
+  await page.evaluate(() => {
+    document.body.classList.add('dark-mode', 'dark');
+  });
+  await page.waitForTimeout(300);
+  if (typeof runDeepDomAudit === "function") {
+    const darkIssues = await runDeepDomAudit(page, 'AMOLED-DarkMode', 'en');
+    allIssues.push(...darkIssues);
+  }
+  await page.evaluate(() => {
+    document.body.classList.remove('dark-mode', 'dark');
+  });
+
+  // 5. Verify RTL Arabic Western-Digits Enforcement (zero Eastern digits ٠١٢٣٤٥٦٧٨٩)
+  await page.evaluate(async () => {
+    if (window.UniversalI18nHotSwap) {
+      await (window.UniversalI18nHotSwap.setLanguage ? window.UniversalI18nHotSwap.setLanguage('ar') : window.UniversalI18nHotSwap.applyLanguage('ar'));
+    }
+  });
+  await page.waitForTimeout(400);
+  const easternLeak = await page.evaluate(() => {
+    const m = (document.body.innerText || '').match(/[\u0660-\u0669\u06F0-\u06F9]+/);
+    return m ? m[0] : null;
+  });
+  if (easternLeak) {
+    allIssues.push(`[EASTERN_DIGITS_LEAK] Found non-Western digits in Arabic UI: ${easternLeak}`);
+  } else {
+    console.log("✅ PASS: Arabic RTL Western-Digits Enforcement Verified");
+  }
+
+  // Restore EN cleanly
+  await page.evaluate(async () => {
+    if (window.UniversalI18nHotSwap) {
+      await (window.UniversalI18nHotSwap.setLanguage ? window.UniversalI18nHotSwap.setLanguage('en') : window.UniversalI18nHotSwap.applyLanguage('en'));
+    }
+  });
+
+  const critical = allIssues.filter(i =>
+    i.startsWith('[LANG_LEAK_AR_IN_EN]') ||
+    i.startsWith('[EASTERN_DIGITS_LEAK]') ||
+    i.startsWith('[AUDIO_STOP_FAIL]') ||
+    i.startsWith('[HORIZONTAL_OVERFLOW]')
+  );
+  if (allIssues.length > 0) {
+    console.warn("⚠️ [360° QA Findings]:\n  - " + allIssues.join("\n  - "));
+  }
+  if (critical.length > 0) {
+    throw new Error("360° QA Critical Failures:\n" + critical.join("\n"));
+  }
+  console.log("🎉 [360° QA]: Exhaustive Interactive, Dark Mode & RTL/LTR Audit Completed!");
+}
+
+
 // Task #821: Deep Automated DOM, Overlap, Contrast & Language-Leak Scanner
 async function runDeepDomAudit(page, contextLabel, activeLang) {
   const report = await page.evaluate((lang) => {
