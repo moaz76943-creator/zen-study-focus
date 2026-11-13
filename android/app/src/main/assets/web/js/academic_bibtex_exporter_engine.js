@@ -52,16 +52,16 @@
     }
     if (typeof num === 'string') {
       return num
-        .replace(/[0۰]/g, '0')
-        .replace(/[1۱]/g, '1')
-        .replace(/[2۲]/g, '2')
-        .replace(/[3۳]/g, '3')
-        .replace(/[4۴]/g, '4')
-        .replace(/[5۵]/g, '5')
-        .replace(/[6۶]/g, '6')
-        .replace(/[7۷]/g, '7')
-        .replace(/[8۸]/g, '8')
-        .replace(/[9۹]/g, '9');
+        .replace(/[0\u0660\u06F0]/g, '0')
+        .replace(/[1\u0661\u06F1]/g, '1')
+        .replace(/[2\u0662\u06F2]/g, '2')
+        .replace(/[3\u0663\u06F3]/g, '3')
+        .replace(/[4\u0664\u06F4]/g, '4')
+        .replace(/[5\u0665\u06F5]/g, '5')
+        .replace(/[6\u0666\u06F6]/g, '6')
+        .replace(/[7\u0667\u06F7]/g, '7')
+        .replace(/[8\u0668\u06F8]/g, '8')
+        .replace(/[9\u0669\u06F9]/g, '9');
     }
     return '0';
   }

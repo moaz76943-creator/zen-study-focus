@@ -15,6 +15,11 @@
 }(typeof self !== "undefined" ? self : this, function () {
   "use strict";
 
+  // Setting an attribute to the value it already has still queues a MutationObserver record.
+  function setAttrIfChanged(el, name, value) {
+    if (el.getAttribute(name) !== value) el.setAttribute(name, value);
+  }
+
   var STORAGE_KEY_LANG = "zen_selected_language_v1";
   var EXCLUDED_CODES = new Set(["he", "iw", "syc", "ber", "zgh"]);
   var LOADED_LOCALES = {};
@@ -160,8 +165,8 @@
   function toWesternDigits(str) {
     if (typeof str !== "string") return str;
     return str
-      .replace(/[٠-٩]/g, function (d) { return String("٠١٢٣٤٥٦٧٨٩".indexOf(d)); })
-      .replace(/[۰-۹]/g, function (d) { return String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)); });
+      .replace(/[\u0660-\u0669]/g, function (d) { return String("٠١٢٣٤٥٦٧٨٩".indexOf(d)); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String("۰۱۲۳۴۵۶۷۸۹".indexOf(d)); });
   }
 
   var UniversalI18nHotSwap = {
@@ -172,7 +177,11 @@
       if (typeof document === "undefined") return;
       var saved = null;
       try { saved = localStorage.getItem(STORAGE_KEY_LANG); } catch (e) {}
-      var initial = (saved && this.isLanguageAllowed(saved)) ? saved : "ar";
+      // The app's own language (cfg.lang -> window.DF_CURRENT_LOCALE) is the single source of
+      // truth; this engine used to default to Arabic and overwrite an English/French UI.
+      var appLang = (typeof window !== "undefined" && window.DF_CURRENT_LOCALE) || null;
+      var initial = (appLang && this.isLanguageAllowed(appLang)) ? appLang
+        : ((saved && this.isLanguageAllowed(saved)) ? saved : "ar");
       this.applyLanguage(initial);
     },
 
@@ -216,6 +225,13 @@
 
     _xhrLoad: function (cleanCode, callback) {
       var self = this;
+      var inline = typeof window !== "undefined" && window.__DF_LOCALE_BUNDLE;
+      if (inline && inline.files && inline.files[cleanCode]) {
+        LOADED_LOCALES[cleanCode] = inline.files[cleanCode];
+        self.activeDictionary = inline.files[cleanCode];
+        if (callback) callback(inline.files[cleanCode]);
+        return;
+      }
       if (typeof XMLHttpRequest === "undefined") return;
       var xhr = new XMLHttpRequest();
       xhr.open("GET", "locales/" + cleanCode + ".json", true);
@@ -282,6 +298,9 @@
         var elA = attrTargets[a];
         ["placeholder", "title", "aria-label"].forEach(function (attrName) {
           if (!elA.hasAttribute(attrName)) return;
+          // The global search pill gets its dedicated shieldPlaceholder below; handling it in both
+          // places made the two steps overwrite each other on every sweep.
+          if (attrName === "placeholder" && elA.id === "inpSearchNotes" && dict.shieldPlaceholder) return;
           var origAttr = "data-orig-" + attrName;
           if (!elA.hasAttribute(origAttr)) {
             elA.setAttribute(origAttr, elA.getAttribute(attrName) || "");
@@ -290,9 +309,9 @@
           var lookup = origVal.toLowerCase().replace(/\.\.\.$/, "").trim();
           var key = PHRASE_TO_KEY[origVal.toLowerCase()] || PHRASE_TO_KEY[lookup];
           if (key && dict[key]) {
-            elA.setAttribute(attrName, dict[key]);
+            setAttrIfChanged(elA, attrName, dict[key]);
           } else if (lang === "en" && origVal) {
-            elA.setAttribute(attrName, origVal);
+            setAttrIfChanged(elA, attrName, origVal);
           }
         });
       }
@@ -315,12 +334,17 @@
         if (sn.children.length === 0 && sn.textContent) {
           var st = sn.textContent.trim();
           var stl = st.toLowerCase();
+          var statNext = null;
           if (stl.indexOf("verified sessions / 7 days") !== -1 && dict.ui_verified_7d) {
-            sn.textContent = st.replace(/verified sessions \/ 7 days/i, dict.ui_verified_7d);
+            statNext = st.replace(/verified sessions \/ 7 days/i, dict.ui_verified_7d);
           } else if (stl.indexOf("recorded minutes / 7 days") !== -1 && dict.ui_recorded_7d) {
-            sn.textContent = st.replace(/recorded minutes \/ 7 days/i, dict.ui_recorded_7d);
+            statNext = st.replace(/recorded minutes \/ 7 days/i, dict.ui_recorded_7d);
           }
-          sn.textContent = sn.textContent.replace(/[٠-٩]/g, function (d) { return String("٠١٢٣٤٥٦٧٨٩".indexOf(d)); });
+          if (statNext !== null && statNext !== sn.textContent) sn.textContent = statNext;
+          // Idempotent: only touch the DOM when a digit really changes. Rewriting identical text
+          // replaced the text node on every sweep and kept all MutationObservers spinning (~8 Hz).
+          var westernText = sn.textContent.replace(/[\u0660-\u0669]/g, function (d) { return String("٠١٢٣٤٥٦٧٨٩".indexOf(d)); });
+          if (westernText !== sn.textContent) sn.textContent = westernText;
         }
       }
 
@@ -341,11 +365,13 @@
       // Task #834: Force Western digits in native <input type="date"> even on Arabic Android OS
       var dInputs = document.querySelectorAll('input[type="date"]');
       for (var di = 0; di < dInputs.length; di++) {
-        dInputs[di].setAttribute("lang", "en");
+        setAttrIfChanged(dInputs[di], "lang", "en-GB");
       }
 
 
       // Task #833: Force Western digits (0123456789) on all visible text & inputs + 🔒 span color
+      // .test() on a /g regex keeps lastIndex between calls and silently skips every other node.
+      var hasEastern = /[\u0660-\u0669\u06F0-\u06F9]/;
       var eDigits = /[\u0660-\u0669\u06F0-\u06F9]/g;
       var toWest = function (s) {
         return String(s).replace(eDigits, function (c) {
@@ -356,7 +382,7 @@
       var w833 = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
       var n833;
       while ((n833 = w833.nextNode())) {
-        if (n833.nodeValue && eDigits.test(n833.nodeValue)) {
+        if (n833.nodeValue && hasEastern.test(n833.nodeValue)) {
           n833.nodeValue = toWest(n833.nodeValue);
         }
       }
@@ -378,13 +404,13 @@
       var w835 = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
       var n835;
       while ((n835 = w835.nextNode())) {
-        if (n835.nodeValue && eDigits835.test(n835.nodeValue)) {
+        if (n835.nodeValue && hasEastern.test(n835.nodeValue)) {
           n835.nodeValue = toWest835(n835.nodeValue);
         }
       }
       var dIn835 = document.querySelectorAll('input[type="date"]');
       for (var di = 0; di < dIn835.length; di++) {
-        dIn835[di].setAttribute("lang", "en");
+        setAttrIfChanged(dIn835[di], "lang", "en-GB");
       }
       var lockSp835 = document.querySelectorAll('[data-i18n="ui_local_data"], [data-i18n="ui_local_data"] *');
       for (var ls = 0; ls < lockSp835.length; ls++) {
@@ -397,11 +423,13 @@
       for (var j = 0; j < tagged.length; j++) {
         var node = tagged[j];
         var key = node.getAttribute("data-i18n");
+        // A container with child elements (icon/title/duration) must not be flattened to text.
+        if (node.children && node.children.length > 0 && node.tagName !== "INPUT" && node.tagName !== "TEXTAREA") continue;
         if (key && dict[key]) {
           var val = toWesternDigits(dict[key]);
           if (node.tagName === "INPUT" || node.tagName === "TEXTAREA") {
-            node.placeholder = val;
-          } else {
+            if (node.placeholder !== val) node.placeholder = val;
+          } else if (node.textContent !== val) {
             node.textContent = val;
           }
         }
@@ -412,8 +440,11 @@
       for (var k = 0; k < inputs.length; k++) {
         var inp = inputs[k];
         var ph = (inp.getAttribute("placeholder") || "").trim().toLowerCase();
-        if (ph.indexOf("search") !== -1 || ph.indexOf("add study") !== -1 || ph.indexOf("note") !== -1) {
-          if (dict.shieldPlaceholder) inp.setAttribute("placeholder", toWesternDigits(dict.shieldPlaceholder));
+        // shieldPlaceholder is the text of the global search pill only. Applying it to every input whose
+        // placeholder merely contains "note"/"search"/"add study" overwrote note titles, the task
+        // creator, the Feynman box and the language search, then step 3 reverted them (ping-pong).
+        if (inp.id === "inpSearchNotes" && (ph.indexOf("search") !== -1 || ph.indexOf("note") !== -1)) {
+          if (dict.shieldPlaceholder) setAttrIfChanged(inp, "placeholder", toWesternDigits(dict.shieldPlaceholder));
         }
       }
 
@@ -431,9 +462,10 @@
             if (mIdx !== -1 && typeof Intl !== "undefined" && Intl.DateTimeFormat) {
               try {
                 var dtf = new Intl.DateTimeFormat(lang + "-u-nu-latn", { month: "long", year: "numeric" });
-                mel.textContent = toWesternDigits(dtf.format(new Date(yr, mIdx, 1)));
-                mel.setAttribute("data-cal-year", String(yr));
-                mel.setAttribute("data-cal-month", String(mIdx));
+                var monthFirst = toWesternDigits(dtf.format(new Date(yr, mIdx, 1)));
+                if (mel.textContent !== monthFirst) mel.textContent = monthFirst;
+                setAttrIfChanged(mel, "data-cal-year", String(yr));
+                setAttrIfChanged(mel, "data-cal-month", String(mIdx));
               } catch (e) {}
             }
           } else if (mel.hasAttribute("data-cal-year") && mel.hasAttribute("data-cal-month")) {
@@ -442,7 +474,8 @@
             if (typeof Intl !== "undefined" && Intl.DateTimeFormat) {
               try {
                 var dtf2 = new Intl.DateTimeFormat(lang + "-u-nu-latn", { month: "long", year: "numeric" });
-                mel.textContent = toWesternDigits(dtf2.format(new Date(cy, cm, 1)));
+                var monthText = toWesternDigits(dtf2.format(new Date(cy, cm, 1)));
+                if (mel.textContent !== monthText) mel.textContent = monthText;
               } catch (e) {}
             }
           }
@@ -469,7 +502,7 @@
       var dateInputs = document.querySelectorAll("input, select, option");
       for (var dIdx = 0; dIdx < dateInputs.length; dIdx++) {
         var di = dateInputs[dIdx];
-        di.setAttribute("lang", "en-GB");
+        setAttrIfChanged(di, "lang", "en-GB");
         if (di.value && /[٠-٩۰-۹]/.test(di.value)) {
           di.value = toWesternDigits(di.value);
         }

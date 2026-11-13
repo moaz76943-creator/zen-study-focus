@@ -88,7 +88,7 @@
    const box=el('article','df-task'),head=el('header');box.setAttribute('aria-label',l.task+': '+t.title);append(head,el('div','df-title',t.title),el('span','df-status',l[C.statusOf(t)]));box.appendChild(head);
    if(t.description)box.appendChild(el('p','df-muted',t.description));
    const meta=el('div','df-meta'),actual=C.actualFocusMinutes(state,t.id);
-   const ascii=v=>String(v).replace(/[0-9۰-۹०-९]/g,d=>String(d.charCodeAt(0)-(d<='9'?1632:d<='۹'?1776:2406)));
+   const ascii=v=>String(v).replace(/[\u0660-\u0669\u06F0-\u06F9\u0966-\u096F\u09E6-\u09EF]/g,d=>{const c=d.charCodeAt(0);return String(c-(c>=0x09E6?0x09E6:c>=0x0966?0x0966:c>=0x06F0?0x06F0:0x0660));});
    append(meta,el('span','',`📅 ${ascii(t.dueAssigned===false?'—':t.date||'—')}${t.dueAssigned!==false&&t.dueTime?' '+ascii(t.dueTime):''}`),el('span','',l[t.catKey]||t.catKey),el('span','',l[t.priority]||''),el('span','',`${l.estimated}: ${t.estimateMin||0} · ${l.actual}: ${actual}`));
    if(C.isOverdue(t,currentDay()))meta.appendChild(el('strong','df-overdue',l.overdue));
    box.appendChild(meta);

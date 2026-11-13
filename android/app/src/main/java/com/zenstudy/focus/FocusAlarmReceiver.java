@@ -58,7 +58,11 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
         String fallback = NativeLocaleStrings.get(context, R.string.native_focus_session);
         if (text == null) return fallback;
         String clean = text.replaceAll("[\\p{Cntrl}]", " ").trim();
-        return clean.isEmpty() ? fallback : clean.substring(0, Math.min(clean.length(), 100));
+        if (clean.isEmpty()) return fallback;
+        int end = Math.min(clean.length(), 100);
+        // Never cut a surrogate pair (emoji) in half.
+        if (end < clean.length() && Character.isHighSurrogate(clean.charAt(end - 1))) end--;
+        return clean.substring(0, end);
     }
 
     private static PendingIntent pending(Context context, long token) {
@@ -225,7 +229,9 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
                 NativeLocaleStrings.get(context, R.string.native_focus_session));
         long now = System.currentTimeMillis();
         String action = intent.getAction();
-        if (Intent.ACTION_BOOT_COMPLETED.equals(action)) {
+        if (Intent.ACTION_BOOT_COMPLETED.equals(action)
+                || Intent.ACTION_MY_PACKAGE_REPLACED.equals(action)) {
+            // Alarms are wiped by reboot and by an app update: re-arm from the stored deadline.
             if (deadline > now) {
                 scheduleSystemAlarm(context, token, deadline);
                 showActive(context, deadline, title);

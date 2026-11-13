@@ -19,10 +19,17 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.RenderProcessGoneDetail;
+import android.webkit.WebResourceResponse;
+import android.os.SystemClock;
+import android.view.ViewGroup;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
@@ -33,7 +40,11 @@ public class MainActivity extends AppCompatActivity {
     private String analyticsAwaitingRequest = null;
     private static final int REQUEST_BACKUP_IMPORT = 7412;
     private static final int MAX_BACKUP_IMPORT_BYTES = 8 * 1024 * 1024;
+    private static final int MAX_SHARE_TEXT_CHARS = 200 * 1000;
     private boolean backupImportPickerOpen = false;
+    // Renderer-death loop guard: recreate() is only safe if the crash is not immediate and repeating.
+    private int rendererDeaths = 0;
+    private long rendererWindowStart = 0L;
     private String backupAwaitingSave = null;
 
     @Override
@@ -49,6 +60,14 @@ public class MainActivity extends AppCompatActivity {
 
         webView = new WebView(this);
         setContentView(webView);
+        // targetSdk 35+ enforces edge-to-edge: keep web content clear of system bars,
+        // display cutouts and the on-screen keyboard.
+        ViewCompat.setOnApplyWindowInsetsListener(webView, (v, windowInsets) -> {
+            Insets bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()
+                    | WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.ime());
+            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return WindowInsetsCompat.CONSUMED;
+        });
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
@@ -65,6 +84,38 @@ public class MainActivity extends AppCompatActivity {
 
         webView.addJavascriptInterface(new ZenNativeBridge(), "ZenNative");
         webView.setWebViewClient(new WebViewClient() {
+            // If the WebView renderer is killed (memory pressure), returning false would
+            // crash the whole app. Recreate the activity instead; durable data is on disk.
+            @Override
+            @android.annotation.TargetApi(26)
+            public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+                final long now = SystemClock.elapsedRealtime();
+                if (now - rendererWindowStart > 30000L) { rendererWindowStart = now; rendererDeaths = 0; }
+                rendererDeaths++;
+                final boolean giveUp = rendererDeaths > 3;
+                runOnUiThread(() -> {
+                    if (isFinishing() || isDestroyed()) return;
+                    // A renderer that keeps dying right after restart would loop forever.
+                    if (giveUp) finish(); else recreate();
+                });
+                return true;
+            }
+
+            // Defence in depth for the "100% offline" promise: never fetch network sub-resources.
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                Uri target = request == null ? null : request.getUrl();
+                String scheme = target == null ? null : target.getScheme();
+                if ("http".equalsIgnoreCase(scheme) || "https".equalsIgnoreCase(scheme)
+                        || "ftp".equalsIgnoreCase(scheme) || "ws".equalsIgnoreCase(scheme)
+                        || "wss".equalsIgnoreCase(scheme)) {
+                    return new WebResourceResponse("text/plain", "UTF-8", 403, "Blocked offline",
+                            new java.util.HashMap<String, String>(),
+                            new java.io.ByteArrayInputStream(new byte[0]));
+                }
+                return null;
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
@@ -399,24 +450,41 @@ public class MainActivity extends AppCompatActivity {
 
         @JavascriptInterface
         public void shareAppInvite(String statsSummary) {
-            Intent share = new Intent(Intent.ACTION_SEND);
-            share.setType("text/plain");
-            share.putExtra(Intent.EXTRA_SUBJECT, NativeLocaleStrings.get(MainActivity.this, R.string.native_share_subject));
-            share.putExtra(Intent.EXTRA_TEXT, statsSummary);
-            startActivity(Intent.createChooser(share, NativeLocaleStrings.get(MainActivity.this, R.string.native_share_chooser)));
+            final String text = statsSummary == null ? "" : statsSummary;
+            runOnUiThread(() -> {
+                try {
+                    Intent share = new Intent(Intent.ACTION_SEND);
+                    share.setType("text/plain");
+                    share.putExtra(Intent.EXTRA_SUBJECT, NativeLocaleStrings.get(MainActivity.this, R.string.native_share_subject));
+                    share.putExtra(Intent.EXTRA_TEXT, text.length() > MAX_SHARE_TEXT_CHARS ? text.substring(0, MAX_SHARE_TEXT_CHARS) : text);
+                    startActivity(Intent.createChooser(share, NativeLocaleStrings.get(MainActivity.this, R.string.native_share_chooser)));
+                } catch (Exception ignored) { /* no share target or oversized transaction */ }
+            });
         }
 
         @JavascriptInterface
         public void syncBackupToGoogleEmailOrDrive(String encryptedBackupPayload) {
-            Intent send = new Intent(Intent.ACTION_SEND);
-            send.setType("text/plain");
-            send.putExtra(Intent.EXTRA_SUBJECT, NativeLocaleStrings.format(MainActivity.this, R.string.native_backup_share_subject,
-                    new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date())));
-            send.putExtra(Intent.EXTRA_TEXT,
-                NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_privacy_warning) +
-                NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_copy_heading) + encryptedBackupPayload
-            );
-            startActivity(Intent.createChooser(send, NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_share_chooser)));
+            final String payload = encryptedBackupPayload == null ? "" : encryptedBackupPayload;
+            // A truncated backup would be silently corrupt, and an oversized Intent extra throws
+            // TransactionTooLargeException. Refuse instead; file export handles large backups.
+            if (payload.length() > MAX_SHARE_TEXT_CHARS) {
+                runOnUiThread(() -> Toast.makeText(MainActivity.this,
+                    NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_save_failed), Toast.LENGTH_SHORT).show());
+                return;
+            }
+            runOnUiThread(() -> {
+                try {
+                    Intent send = new Intent(Intent.ACTION_SEND);
+                    send.setType("text/plain");
+                    send.putExtra(Intent.EXTRA_SUBJECT, NativeLocaleStrings.format(MainActivity.this, R.string.native_backup_share_subject,
+                            new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date())));
+                    send.putExtra(Intent.EXTRA_TEXT,
+                        NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_privacy_warning) +
+                        NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_copy_heading) + payload
+                    );
+                    startActivity(Intent.createChooser(send, NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_share_chooser)));
+                } catch (Exception ignored) { /* no share target or oversized transaction */ }
+            });
         }
     }
 
@@ -471,35 +539,39 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == REQUEST_BACKUP_IMPORT) {
             backupImportPickerOpen = false;
             if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null) return;
-            try (java.io.InputStream source =
-                    getContentResolver().openInputStream(data.getData())) {
-                if (source == null) throw new java.io.IOException("No selected document");
-                java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
-                byte[] chunk = new byte[8192];
-                int total = 0, count;
-                while ((count = source.read(chunk)) != -1) {
-                    total += count;
-                    if (total > MAX_BACKUP_IMPORT_BYTES)
-                        throw new java.io.IOException("Backup exceeds size limit");
-                    bytes.write(chunk, 0, count);
+            final Uri source = data.getData();
+            // Reading a user-picked document (up to 8 MB, possibly from a cloud provider)
+            // on the UI thread risks an ANR; do the IO off-thread and post the result back.
+            new Thread(() -> {
+                try (java.io.InputStream in = getContentResolver().openInputStream(source)) {
+                    if (in == null) throw new java.io.IOException("No selected document");
+                    java.io.ByteArrayOutputStream bytes = new java.io.ByteArrayOutputStream();
+                    byte[] chunk = new byte[8192];
+                    int total = 0, count;
+                    while ((count = in.read(chunk)) != -1) {
+                        total += count;
+                        if (total > MAX_BACKUP_IMPORT_BYTES)
+                            throw new java.io.IOException("Backup exceeds size limit");
+                        bytes.write(chunk, 0, count);
+                    }
+                    final String backupCode = new String(bytes.toByteArray(), StandardCharsets.UTF_8);
+                    if (backupCode.trim().isEmpty()) throw new java.io.IOException("Empty backup");
+                    // Native only transports user-picked text. Existing v21 code owns
+                    // checksum/schema verification, explicit consent and atomic commit.
+                    final String script = "if(typeof verifyAndRestoreBackupCode==='function')"
+                            + "verifyAndRestoreBackupCode("
+                            + org.json.JSONObject.quote(backupCode) + ");";
+                    runOnUiThread(() -> {
+                        if (webView != null && !isDestroyed()) webView.evaluateJavascript(script, null);
+                    });
+                } catch (Exception error) {
+                    runOnUiThread(() -> {
+                        if (!isDestroyed()) Toast.makeText(MainActivity.this,
+                                NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_import_failed),
+                                Toast.LENGTH_LONG).show();
+                    });
                 }
-                final String backupCode =
-                        new String(bytes.toByteArray(), StandardCharsets.UTF_8);
-                if (backupCode.trim().isEmpty()) throw new java.io.IOException("Empty backup");
-                if (webView == null || isDestroyed()) return;
-                // Native only transports user-picked text. Existing v21 code owns
-                // checksum/schema verification, explicit consent and atomic commit.
-                final String script = "if(typeof verifyAndRestoreBackupCode==='function')"
-                        + "verifyAndRestoreBackupCode("
-                        + org.json.JSONObject.quote(backupCode) + ");";
-                webView.post(() -> {
-                    if (webView != null && !isDestroyed())
-                        webView.evaluateJavascript(script, null);
-                });
-            } catch (Exception error) {
-                Toast.makeText(this, NativeLocaleStrings.get(this, R.string.native_backup_import_failed),
-                        Toast.LENGTH_LONG).show();
-            }
+            }, "df-backup-import").start();
             return;
         }
         if (requestCode != REQUEST_BACKUP_EXPORT) return;
@@ -507,16 +579,26 @@ public class MainActivity extends AppCompatActivity {
         backupAwaitingSave = null;
         if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null
                 || payload == null) return;
-        try (OutputStream output = getContentResolver().openOutputStream(data.getData(), "w")) {
-            if (output == null) throw new java.io.IOException("Cannot open target document");
-            output.write(payload.getBytes(StandardCharsets.UTF_8));
-            output.flush();
-            Toast.makeText(this, NativeLocaleStrings.get(this, R.string.native_backup_exported),
-                    Toast.LENGTH_LONG).show();
-        } catch (Exception error) {
-            Toast.makeText(this, NativeLocaleStrings.get(this, R.string.native_backup_save_failed),
-                    Toast.LENGTH_LONG).show();
-        }
+        final Uri exportTarget = data.getData();
+        final byte[] exportBytes = payload.getBytes(StandardCharsets.UTF_8);
+        new Thread(() -> {
+            boolean saved;
+            // "wt" truncates: plain "w" may leave the tail of a longer previous file behind,
+            // producing a corrupt backup that fails its checksum on restore.
+            try (OutputStream output = getContentResolver().openOutputStream(exportTarget, "wt")) {
+                if (output == null) throw new java.io.IOException("Cannot open target document");
+                output.write(exportBytes);
+                output.flush();
+                saved = true;
+            } catch (Exception error) { saved = false; }
+            final boolean ok = saved;
+            runOnUiThread(() -> {
+                if (isDestroyed()) return;
+                Toast.makeText(MainActivity.this, NativeLocaleStrings.get(MainActivity.this,
+                        ok ? R.string.native_backup_exported : R.string.native_backup_save_failed),
+                        Toast.LENGTH_LONG).show();
+            });
+        }, "df-backup-export").start();
     }
 
     @Override
@@ -558,10 +640,13 @@ public class MainActivity extends AppCompatActivity {
     protected void onDestroy() {
         if (appDialogs != null) appDialogs.cancelPending();
         WebView old = webView;
-    webView = null;
-    if (old != null) {
-        old.destroy();
-    }
-    super.onDestroy();
+        webView = null;
+        if (old != null) {
+            old.removeJavascriptInterface("ZenNative");
+            old.stopLoading();
+            if (old.getParent() instanceof ViewGroup) ((ViewGroup) old.getParent()).removeView(old);
+            old.destroy();
+        }
+        super.onDestroy();
     }
 }

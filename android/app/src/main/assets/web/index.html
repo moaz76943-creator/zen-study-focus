@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr" id="htmlRoot">
 <head>
-  <script src="modules/qa/sovereign_runtime_shield_828.js"></script>
+  <script src="modules/core/storage_write_guard.js"></script>
+    <script src="modules/qa/sovereign_runtime_shield_828.js"></script>
   <script src="modules/sovereign_startup_booster.js"></script>
   <script src="modules/sovereign_insets_calibrator.js"></script>
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' data: blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none';">
     <link rel="stylesheet" href="touch_restorer.css">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
@@ -2395,6 +2396,9 @@ body {
   <script src="js/df99_multiscreen_i18n.js"></script>
   <script src="quick_training.js"></script>
   <!-- Localization sources must be ready before app.js applies the persisted language. -->
+  <script src="locale_packs/locale_bundle.js"></script>
+  <script src="locale_rows.js"></script>
+  <script src="locale_extras.js"></script>
   <script src="locale_premium_v22.js"></script>
   <script src="js/df99_reviewed_packs.js"></script>
   <script src="localization_20_recovery.js"></script>
@@ -2428,7 +2432,6 @@ body {
     <script src="modules/performance/battery_thermal_guard.js"></script>
     <script src="modules/core/eyes_free_haptic_engine.js"></script>
     <script src="modules/core/session_abort_shield.js"></script>
-    <script src="modules/core/safe_dom_proxy_shield.js"></script>
     <script src="modules/core/local_study_scheduler.js"></script>
     <script src="modules/core/unhandled_error_shield.js"></script>
     <script src="modules/ergonomics/four_button_density_enforcer.js"></script>
@@ -2499,14 +2502,14 @@ body {
 <div id="dfMounts" style="display:none"><div id="dfVaultMount"></div><div id="dfStreakMount"></div><div id="dfBreakPacingMount"></div><div id="dfSpeedReaderMount"></div><div id="dfPillar3StemMountHidden"></div><div id="dfPillar4WhiteboardMountHidden"></div><div id="dfPillar7FeynmanMountHidden"></div><div id="dfPillar9BotanicalHeatmapMountHidden"></div><div id="dfPillar10HighPerfMountHidden"></div></div>
     <!-- CALM PROGRESSIVE DISCLOSURE TOOLS DRAWER (TASK #734) -->
     <div id="sovereignCalmToolsDrawer" style="width: 100%; max-width: clamp(300px, 92vw, 520px); margin: 0.75rem auto; background: #070707; border: 1px solid #1a1a1a; border-radius: 14px; overflow: hidden; box-sizing: border-box;">
-        <button onclick="window.SovereignCalmUI && window.SovereignCalmUI.toggleDrawer()" aria-label="فتح أو إغلاق أدوات الاستوديو والصيانة" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: transparent; border: none; color: #ededed; font-size: 0.82rem; font-weight: 700; cursor: pointer;">
-            <span>⚙️ أدوات الاستوديو والصيانة المتقدمة</span>
+        <button id="sovereignCalmToolsToggle" onclick="window.SovereignCalmUI && window.SovereignCalmUI.toggleDrawer()" aria-label="Open or close studio and maintenance tools" style="width: 100%; display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; background: transparent; border: none; color: #ededed; font-size: 0.82rem; font-weight: 700; cursor: pointer;">
+            <span id="sovereignCalmToolsLabel">⚙️ Advanced studio &amp; maintenance tools</span>
             <span id="sovereignCalmToolsArrow" style="color: #4ade80; font-size: 0.75rem;">▼</span>
         </button>
         <div id="sovereignCalmToolsBody" style="display: none; flex-direction: column; gap: 6px; padding: 0 1rem 1rem 1rem; border-top: 1px solid #141414;">
 
-            <button id="toggleTwilightBtn" onclick="window.SovereignEyeComfort && window.SovereignEyeComfort.toggle()" aria-label="تفعيل أو إيقاف وضع السكينة الليلي لحماية العين" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 14px; background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.25); color: #ededed; border-radius: 999px; font-size: 0.72rem; cursor: pointer; margin: 4px auto; width: fit-content;">
-                🌙 وضع السكينة الليلي (Eye Comfort)
+            <button id="toggleTwilightBtn" onclick="window.SovereignEyeComfort && window.SovereignEyeComfort.toggle()" aria-label="Toggle night calm mode to protect your eyes" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 14px; background: rgba(74,222,128,0.06); border: 1px solid rgba(74,222,128,0.25); color: #ededed; border-radius: 999px; font-size: 0.72rem; cursor: pointer; margin: 4px auto; width: fit-content;">
+                🌙 Night calm mode (Eye Comfort)
             </button>
 
         </div>

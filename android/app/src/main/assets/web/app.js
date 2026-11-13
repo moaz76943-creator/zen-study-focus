@@ -278,11 +278,6 @@ if (typeof UnhandledErrorShield !== "undefined") {
 }
 
 
-// [Task #680] Safe DOM Proxy Shield Initialization
-if (typeof SafeDOMProxyShield !== "undefined") {
-    SafeDOMProxyShield.init();
-}
-
 window.df_i18n_locales = window.df_i18n_locales || { en: {} };
 
 /* ========================================================
@@ -2497,11 +2492,11 @@ const DF_EXTRA_UI_TRANSLATIONS = {
     taskCompleteContinueLater: '⏳ المتابعة لاحقاً',
     focusEndChimeTitle: 'نغمة انتهاء الجلسة',
     zeroMusicBadge: 'بدون موسيقى',
-    toneZenBell: 'قطرة ماء الهادئ 🎐',
-    toneTibetanBowl: 'وعاء الرنين العميق 🧘',
-    toneWoodblock: 'إيقاع خشبي نقي 🪵',
-    toneCrystalBell: 'جرس كريستالي صافي 🔔',
-    toneTempleGong: 'جرس عميق واضح ⛩️',
+    toneZenBell: 'قطرة ماء 🎐',
+    toneTibetanBowl: 'خرير الماء 🧘',
+    toneWoodblock: 'نقر المطر 🪵',
+    toneCrystalBell: 'حفيف الرياح 🔔',
+    toneTempleGong: 'رعد بعيد ⛩️',
     toneVibrateOnly: 'اهتزاز فقط 📳',
     toneDescGentle: 'لطيف',
     toneDescDeep: 'عميق',
@@ -3286,6 +3281,9 @@ function applyLanguage(code) {
   document.querySelectorAll('[data-i18n]').forEach(el => {
     // Never replace an editable value or arbitrary user-generated content.
     if (el.isContentEditable || /^(INPUT|TEXTAREA)$/i.test(el.tagName || '')) return;
+    // Replacing textContent on a container would wipe its icon/title/duration children;
+    // such containers localise through their own labelled child elements.
+    if (el.children.length > 0) return;
     const k = el.getAttribute('data-i18n');
     const value = dfGetLocalizedText(k, meta.code, el.textContent);
     if (value && value !== k && el.textContent !== value) el.textContent = toWest(value);
@@ -3313,18 +3311,41 @@ function applyLanguage(code) {
 
   renderAnalyticsBars();
 
-  syncHeaderMetrics();
-  updateTimerDisplay();
-  renderTasksList();
-  renderCalendar();
-  renderNotesStack();
-  renderSoundsStudio();
-  updateSyllabusCalc();
+  // One failing renderer must never abort the rest of the language switch
+  // (modal close, quick-training text and premium locale layer run after these).
+  // Thunks: renderNotesStack/renderSoundsStudio live in scripts loaded after app.js,
+  // so at first boot they do not exist yet (a ReferenceError here used to abort the
+  // whole app.js boot sequence). A late re-apply on window load covers those screens.
+  [() => syncHeaderMetrics(), () => updateTimerDisplay(), () => renderTasksList(),
+   () => renderCalendar(), () => renderNotesStack(), () => renderSoundsStudio(),
+   () => updateSyllabusCalc()].forEach(step => {
+    try { step(); } catch (error) {
+      if (!(error instanceof ReferenceError)) console.error('applyLanguage step failed:', error);
+    }
+  });
   closeModal('langModal');
   if (typeof quickL10n === 'function') quickL10n();
   // Premium labels may also be created by re-rendered screens; refresh last.
   if (window.DF22Locale?.apply) window.DF22Locale.apply(document, baseCode);
   if (window.DF22Integration?.refreshLocale) window.DF22Integration.refreshLocale();
+  // Chrome created outside the dictionaries (studio pill, tools drawer) follows the UI language.
+  try {
+    const arUi = baseCode === 'ar';
+    const setText = (id, ar, en) => { const n = document.getElementById(id); if (n) n.textContent = arUi ? ar : en; };
+    const setAria = (id, ar, en) => { const n = document.getElementById(id); if (n) n.setAttribute('aria-label', arUi ? ar : en); };
+    setText('zenStudioTriggerLabel', '✨ الاستوديوهات', '✨ Studios');
+    setAria('zenStudioTriggerPill', 'فتح لوحة الاستوديوهات والأدوات', 'Open studios and tools panel');
+    setText('sovereignCalmToolsLabel', '⚙️ أدوات الاستوديو والصيانة المتقدمة', '⚙️ Advanced studio & maintenance tools');
+    setAria('sovereignCalmToolsToggle', 'فتح أو إغلاق أدوات الاستوديو والصيانة', 'Open or close studio and maintenance tools');
+    setText('toggleTwilightBtn', '🌙 وضع السكينة الليلي (Eye Comfort)', '🌙 Night calm mode (Eye Comfort)');
+    setAria('toggleTwilightBtn', 'تفعيل أو إيقاف وضع السكينة الليلي لحماية العين', 'Toggle night calm mode to protect your eyes');
+  } catch (_) { /* cosmetic */ }
+  // Keep the secondary hot-swap engine on the same language so its DOM sweeps never
+  // overwrite the language the user picked.
+  try {
+    const hot = window.UniversalI18nHotSwap;
+    if (hot && typeof hot.applyLanguage === 'function' && hot.currentLang !== baseCode) hot.applyLanguage(baseCode);
+  } catch (_) { /* optional engine */ }
   try {
     if (window.ZenNative && typeof window.ZenNative.setNativeLocale === 'function')
       window.ZenNative.setNativeLocale(meta.code);
@@ -5671,9 +5692,11 @@ function applyPristineUIElevations() {
 
   // 3. قسر الأرقام الغربية على حقول تواريخ التحليلات
   document.querySelectorAll('input[type="date"]').forEach(inp => {
-    inp.setAttribute('lang', 'en-US');
-    inp.style.direction = 'ltr';
-    inp.style.fontVariantNumeric = 'lining-nums';
+    // en-GB: the same value the i18n hot-swap uses. Two different values made both engines
+    // rewrite the attribute on every sweep (an endless mutation ping-pong).
+    if (inp.getAttribute('lang') !== 'en-GB') inp.setAttribute('lang', 'en-GB');
+    if (inp.style.direction !== 'ltr') inp.style.direction = 'ltr';
+    if (inp.style.fontVariantNumeric !== 'lining-nums') inp.style.fontVariantNumeric = 'lining-nums';
   });
 }
 
@@ -7184,6 +7207,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   function buildCsvText(items) {
@@ -7466,6 +7491,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   function shuffleArray(arr) {
@@ -7677,6 +7704,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfGetVocabMasteryStats = function() {
@@ -7766,6 +7795,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfMarkAllReviewAsMastered = function() {
@@ -8078,6 +8109,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfGetVocabCountsByFilter = function() {
@@ -8142,6 +8175,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfCleanDuplicateVocabWords = function() {
@@ -8309,6 +8344,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   var currentStreak = 0;
@@ -8434,6 +8471,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfCreateVocabBackupSnapshot = function() {
@@ -8679,6 +8718,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfUpdateQuizProgressBar = function(currentIdx, totalCount) {
@@ -9115,6 +9156,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   window.dfShowQuizSessionSummary = function(stats) {
@@ -10194,6 +10237,8 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function toWesternDigits(str) {
     return String(str == null ? '' : str)
+      .replace(/[\u0660-\u0669]/g, function (d) { return String(d.charCodeAt(0) - 0x0660); })
+      .replace(/[\u06F0-\u06F9]/g, function (d) { return String(d.charCodeAt(0) - 0x06F0); });
   }
 
   var quizStartTime = 0;
@@ -50354,9 +50399,9 @@ window.dfTimeBoxMount = {
       row.style.padding = '6px 0';
       row.style.borderBottom = '1px solid #27272a';
       row.innerHTML = '<span style="color:#a1a1aa">' +
-        (b.slot || '09:00') + '</span> ' +
+        escapeHtmlText(b.slot || '09:00') + '</span> ' +
         '<strong style="color:#f4f4f5">' +
-        (b.subject || 'Focus') + '</strong>';
+        escapeHtmlText(b.subject || 'Focus') + '</strong>';
       wrap.appendChild(row);
     });
   }
@@ -67732,7 +67777,7 @@ function() {
           jInfo.suggestions.forEach(function(sug) {
             const row = document.createElement('div');
             row.style.cssText = 'font-size:11px;color:#334155;display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;background:#fee2e2;border:1px solid #fecaca;';
-            row.innerHTML = '<strong style="color:#b91c1c;">' + sug.word + '</strong> ➔ <span style="color:#15803d;font-weight:700;">' + sug.simpleAlt + '</span>';
+            row.innerHTML = '<strong style="color:#b91c1c;">' + escapeHtmlText(sug.word) + '</strong> ➔ <span style="color:#15803d;font-weight:700;">' + escapeHtmlText(sug.simpleAlt) + '</span>';
             listCard.appendChild(row);
           });
           resBox.appendChild(listCard);
@@ -77951,10 +77996,10 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch (_) { if (typeof window !== "un
           val = mirrorVal;
           storage.setItem(key, val);
         } else {
-          // Initialize clean sovereign default
-          val = key.includes('cfg') ? JSON.stringify({ version: 21, streak: 0, lang: 'en', sound: 'rain', focusMin: 25 }) :
-                key.includes('tasks') ? JSON.stringify([]) : JSON.stringify([]);
-          storage.setItem(key, val);
+          // Never invent data in a v21 key: every family must be a signed
+          // {payload,sig,ts} packet. A raw '[]' made the native receipt reject
+          // the first save of a fresh install. An absent family stays null.
+          val = null;
         }
       }
       packets[key] = val;
@@ -79451,10 +79496,9 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch (_) { if (typeof window !== "un
     return { rendered: true, report: report };
   }
 
-  // Run automatically on initialization
-  try {
-    dfRunMultiStudioDogfoodSuite();
-  } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+  // The dogfood suite is a QA simulation that creates sample notes, cards, mind-map and LAN
+  // pod data. It must NEVER run automatically against a real user's data; it stays available
+  // only through the explicit global dfRunMultiStudioDogfoodSuite() below.
 
   // =========================================================================
   // 4. GLOBAL EXPORTS
@@ -80332,8 +80376,8 @@ window.SovereignSRSReviewer = (function() {
         }
 
         const card = dueCards[currentCardIndex];
-        frontEl.innerHTML = `<div style="font-size: 1.1rem; line-height: 1.6; color: #fff;">${card.front}</div><div style="font-size: 0.8rem; color: #666; margin-top: 1rem;">انقر لقلب البطاقة | Tap to Flip</div>`;
-        backEl.innerHTML = `<div style="font-size: 1.05rem; line-height: 1.6; color: #4ade80;">${card.back}</div>`;
+        frontEl.innerHTML = `<div style="font-size: 1.1rem; line-height: 1.6; color: #fff;">${escapeHtmlText(card.front)}</div><div style="font-size: 0.8rem; color: #666; margin-top: 1rem;">انقر لقلب البطاقة | Tap to Flip</div>`;
+        backEl.innerHTML = `<div style="font-size: 1.05rem; line-height: 1.6; color: #4ade80;">${escapeHtmlText(card.back)}</div>`;
         if (counterEl) counterEl.textContent = dueCards.length - currentCardIndex;
     }
 
@@ -80494,14 +80538,14 @@ window.SovereignSRSReviewer = (function() {
 
         const card = dueCards[currentCardIndex];
         frontEl.innerHTML = `
-            <div style="font-size: clamp(1rem, 2.8vw, 1.25rem); line-height: 1.6; color: #fff; width: 100%; text-align: center;">${card.front}</div>
+            <div style="font-size: clamp(1rem, 2.8vw, 1.25rem); line-height: 1.6; color: #fff; width: 100%; text-align: center;">${escapeHtmlText(card.front)}</div>
             <div style="display:flex; justify-content:space-between; align-items:center; width: 100%; margin-top: 1rem;">
                 <button type="button" class="btn" onclick="event.stopPropagation(); window.SovereignSRSReviewer.speak(window.SovereignSRSReviewer.getCurrentFront())" style="background: rgba(74,222,128,0.1); border: 1px solid rgba(74,222,128,0.3); color: #4ade80; border-radius: 6px; padding: 6px 12px; font-size: 0.85rem;" title="Listen">🔊 نطق</button>
                 <span style="font-size: 0.75rem; color: #666;">انقر لقلب البطاقة | Tap to Flip</span>
             </div>`;
 
         backEl.innerHTML = `
-            <div style="font-size: clamp(0.95rem, 2.5vw, 1.15rem); line-height: 1.6; color: #4ade80; width: 100%; text-align: center;">${card.back}</div>
+            <div style="font-size: clamp(0.95rem, 2.5vw, 1.15rem); line-height: 1.6; color: #4ade80; width: 100%; text-align: center;">${escapeHtmlText(card.back)}</div>
             <div style="display:flex; justify-content:flex-end; width: 100%; margin-top: 0.8rem;">
                 <button type="button" class="btn" onclick="event.stopPropagation(); window.SovereignSRSReviewer.speak(window.SovereignSRSReviewer.getCurrentBack())" style="background: rgba(56,189,248,0.1); border: 1px solid rgba(56,189,248,0.3); color: #38bdf8; border-radius: 6px; padding: 6px 12px; font-size: 0.85rem;" title="Listen Answer">🔊 نطق الإجابة</button>
             </div>`;
@@ -82440,8 +82484,17 @@ window.SovereignLocaleResolver = (function() {
         return null;
     }
 
+    // Inlined copy of the JSON (locale_packs/locale_bundle.js): the Android WebView refuses
+    // fetch()/XHR of file:// assets, so the network-style loaders below only work on desktop.
+    function bundled() { return (typeof window !== "undefined" && window.__DF_LOCALE_BUNDLE) || null; }
+
     async function loadPack(packName) {
         if (packCache[packName]) return packCache[packName];
+        const inline = bundled();
+        if (inline && inline.packs && inline.packs[packName]) {
+            packCache[packName] = inline.packs[packName];
+            return packCache[packName];
+        }
         const resp = await fetch("locale_packs/" + packName);
         if (!resp.ok) throw new Error("Pack not found: " + packName);
         const data = await resp.json();
@@ -82466,6 +82519,8 @@ window.SovereignLocaleResolver = (function() {
         }
 
         // 3. Legacy individual file fallback
+        const inlineFiles = bundled();
+        if (inlineFiles && inlineFiles.files && inlineFiles.files[langCode]) return inlineFiles.files[langCode];
         const resp = await fetch("locales/" + langCode + ".json");
         return resp.ok ? await resp.json() : null;
     }
@@ -82776,7 +82831,10 @@ window.SovereignEyeComfort = (function() {
         }
         const btn = document.getElementById("toggleTwilightBtn");
         if (btn) {
-            btn.textContent = isTwilightActive ? "🌙 إيقاف وضع السكينة الليلي" : "🌙 وضع السكينة الليلي (Eye Comfort)";
+            const arUi = (document.documentElement.lang || "").toLowerCase().indexOf("ar") === 0;
+            btn.textContent = isTwilightActive
+                ? (arUi ? "🌙 إيقاف وضع السكينة الليلي" : "🌙 Turn off night calm mode")
+                : (arUi ? "🌙 وضع السكينة الليلي (Eye Comfort)" : "🌙 Night calm mode (Eye Comfort)");
         }
     }
 
