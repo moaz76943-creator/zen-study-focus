@@ -85,4 +85,9 @@ assert(soundsMatch && !soundsMatch[0].includes('procedural_synth'), 'SOUNDS_DATA
 const manifestXml = fs.readFileSync(path.join(repoRoot, 'android/app/src/main/AndroidManifest.xml'), 'utf8');
 assert(!manifestXml.includes('screenOrientation="portrait"'), 'Portrait lock must be removed');
 
+
+// 7. Test M29 zero 1000-locale bloat regression
+const bloatLocales = (appJs.match(/window\.DF_I18N_LOCALES\[['"][a-zA-Z0-9_-]+['"]\]\s*=/g) || []).length;
+assert(bloatLocales < 10, 'Unexpected DF_I18N_LOCALES bloat count: ' + bloatLocales);
+
 console.log('✅ PASS: All Major #1-#5 behavioral & Android hardening regression tests passed!');
