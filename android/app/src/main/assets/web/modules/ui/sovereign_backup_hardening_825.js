@@ -71,7 +71,7 @@
       var url = URL.createObjectURL(blob);
       var a = document.createElement("a");
       a.href = url;
-      a.download = "deep-focus-backup-" + new Date().toISOString().slice(0, 10) + ".json";
+      a.download = "deep-focus-backup-" + (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date()) + ".json";
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

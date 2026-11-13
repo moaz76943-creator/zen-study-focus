@@ -20,7 +20,7 @@
         subtitle: String(data.subtitle || 'Sovereign Study Achievement'),
         statValue: String(data.statValue || '100%'),
         statLabel: String(data.statLabel || 'Focus Completed'),
-        date: String(data.date || new Date().toISOString().slice(0, 10)),
+        date: String(data.date || (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date())),
         theme: String(data.theme || 'amoled'),
         width: 1080,
         height: 1080

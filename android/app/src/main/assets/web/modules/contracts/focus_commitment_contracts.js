@@ -143,7 +143,7 @@
       }
 
       this.streakFreezeShields.available--;
-      const todayKey = new Date().toISOString().slice(0, 10);
+      const todayKey = (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date());
       
       if (this.activeContract) {
         this.activeContract.dailyLogs[todayKey] = {
@@ -167,7 +167,7 @@
       if (!this.activeContract) return { met: false, error: 'No contract' };
       
       const targetDate = dateIso ? new Date(dateIso) : new Date();
-      const dateKey = targetDate.toISOString().slice(0, 10);
+      const dateKey = (function(v){if(typeof v==='string'&&/^\d{4}-\d{2}-\d{2}$/.test(v))return v;var d=new Date(v);return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(dateIso ? dateIso : targetDate);
       const minutes = parseInt(sessionMinutes, 10) || 0;
 
       if (!this.activeContract.dailyLogs[dateKey]) {
