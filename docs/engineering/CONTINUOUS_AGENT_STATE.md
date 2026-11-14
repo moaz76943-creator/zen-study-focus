@@ -32,7 +32,8 @@ Remaining, in registry order: az uz kk ka hy ne si my km lo mn af sq eu ca gl is
 | 2026-11-14 | 22c5cbd | packs az uz kk ka | #607 | MERGE_BLOCKED: size budget (see Next step). Still open. |
 | 2026-11-14 | 22c5cbd | locale guard synced to 101-code catalog; lane11 test fixed (10/10) | #608 | merged 41dea72 (verified locally: run_tests no new failures) |
 | 2026-11-14 | 41dea72 | lane03 harness repaired (9 tests: 8 pass); fix: English baseline no longer masks a Quick Training translation reached through alias keys (`navTrainingText` → `trainingTitle`) | #609 | merged 1e2e13b |
-| 2026-11-14 | 1e2e13b | 2 stale test harnesses repaired (note digit integrity, streak badge); KNOWN_FAILING 17 → 15; run_tests 478 pass, no new failures | (this PR) | see PR |
+| 2026-11-14 | 1e2e13b | 2 stale test harnesses repaired (note digit integrity, streak badge); KNOWN_FAILING 17 → 15; run_tests 478 pass, no new failures | #610 | merged 17faf63 (Gitleaks/CodeQL red on base too; Codex P2 → follow-up below) |
+| 2026-11-14 | 17faf63 | Codex P2 from #610: new `tests/i18n/notes_ui_authored_digit_integrity.test.cjs` saves through `saveNewNote()` → installed `DeepFocusNotesEditorUI` → `draftToSave()` → controller → Notes Core (fake DOM); mutation in `draftToSave()` caught | (this PR) | see PR |
 
 ## Next step
 **BLOCKER (since 2026-11-14 07:41 UTC, no owner reply yet):** with az/uz/kk/ka the web assets are 16,104,404 bytes, over `tests/ratchets.json` `webAssetsMaxBytes` 16,000,000 (`tests/guardrails.test.cjs` "size budgets hold"). The 46 packs still to come need about 1.9 MB more. Do not raise the ratchet without the owner. Options sent: (a) re-encode `audio/wind_breeze.ogg` (3.47 MB, 225 kbps) to about 112 kbps, saving about 1.7 MB; (b) a higher budget; (c) another cut. PR #607 stays open. No new packs until decided.
