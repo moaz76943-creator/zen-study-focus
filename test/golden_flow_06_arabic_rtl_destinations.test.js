@@ -17,7 +17,10 @@ console.log("==========================================================");
 const persistentStore = {};
 const mockStorage = {
     getItem: (k) => persistentStore[k] || null,
-    setItem: (k, v) => { persistentStore[k] = v; }
+    setItem: (k, v) => { persistentStore[k] = v; },
+    // The locale guard refuses to write the v21 key without an acknowledged atomic adapter (the app's
+    // saveFortressData). Model that adapter: it persists and returns true only once the write is stored.
+    saveFortressData: (k, v) => { persistentStore[k] = JSON.stringify(v); return persistentStore[k] !== undefined; }
 };
 
 let currentConfig = {
