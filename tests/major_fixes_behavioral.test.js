@@ -130,4 +130,33 @@ for (const forbidden of ['he', 'iw', 'syc', 'ber', 'zgh', 'kab', 'yi']) {
 assert.strictEqual(sandbox.dfGetLanguageDirection('ar'), 'rtl');
 assert.strictEqual(sandbox.dfGetLanguageDirection('de'), 'ltr');
 
+
+// 13. Java brace balance check across all Android Java sources (prevents MainActivity.java:569 error)
+function verifyJavaBraceBalance(src, fileLabel) {
+  let depth = 0, inStr = false, inChr = false, inSL = false, inML = false, esc = false;
+  let openedClass = false, classCloseIdx = -1;
+  for (let i = 0; i < src.length; i++) {
+    const ch = src[i], nxt = src[i + 1] || '';
+    if (inSL) { if (ch === '\n') inSL = false; continue; }
+    if (inML) { if (ch === '*' && nxt === '/') { inML = false; i++; } continue; }
+    if (inStr) { if (esc) esc = false; else if (ch === '\\') esc = true; else if (ch === '"') inStr = false; continue; }
+    if (inChr) { if (esc) esc = false; else if (ch === '\\') esc = true; else if (ch === "'") inChr = false; continue; }
+    if (ch === '/' && nxt === '/') { inSL = true; i++; continue; }
+    if (ch === '/' && nxt === '*') { inML = true; i++; continue; }
+    if (ch === '"') { inStr = true; continue; }
+    if (ch === "'") { inChr = true; continue; }
+    if (ch === '{') { depth++; openedClass = true; }
+    else if (ch === '}') {
+      assert(depth > 0, 'Extra closing brace outside class in ' + fileLabel + ' at index ' + i);
+      depth--;
+      if (openedClass && depth === 0 && classCloseIdx === -1) classCloseIdx = i;
+    }
+  }
+  assert.strictEqual(depth, 0, 'Unclosed brace in ' + fileLabel + ' (depth=' + depth + ')');
+  assert(classCloseIdx !== -1, 'No top-level class body found in ' + fileLabel);
+  const trailing = src.slice(classCloseIdx + 1).trim();
+  assert.strictEqual(trailing, '', 'Stray code after top-level class closing brace in ' + fileLabel + ': ' + trailing);
+}
+verifyJavaBraceBalance(mainJava, 'MainActivity.java');
+
 console.log('✅ PASS: All Major #1-#5 behavioral & Android hardening regression tests passed!');
