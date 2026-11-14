@@ -82975,3 +82975,27 @@ window.SovereignEyeComfort = (function() {
     }
 })();
 
+
+
+/* === DF-009: Multilingual Word Segmentation (Intl.Segmenter for CJK/Thai + Whitespace Fallback) === */
+(function() {
+  if (typeof window === "undefined") return;
+  window.dfTokenizePassageWords = function(text, lang) {
+    const clean = String(text || "").trim();
+    if (!clean) return [];
+    if (typeof Intl !== "undefined" && typeof Intl.Segmenter === "function") {
+      try {
+        const seg = new Intl.Segmenter(lang || undefined, { granularity: "word" });
+        const words = [];
+        for (const item of seg.segment(clean)) {
+          if (item.isWordLike) words.push(item.segment);
+        }
+        if (words.length > 0) return words;
+      } catch (_) {}
+    }
+    return clean.split(/\s+/).filter(Boolean);
+  };
+  if (typeof window.tokenizePassageWords === "function") {
+    window.tokenizePassageWords = window.dfTokenizePassageWords;
+  }
+})();

@@ -2,7 +2,7 @@
 
 **Effective Date:** November 11, 2026  
 **Application Name:** DEEP FOCUS — Sovereign Offline Android Study OS  
-**Package Identifier:** `com.moaz76943.zenfocus`  
+**Package Identifier:** `com.deepfocus.study`  
 **Developer Contact:** `moaz76943-creator` (GitHub Repository)  
 
 ---
@@ -39,3 +39,6 @@ Because DEEP FOCUS does not collect, transmit, or store any personal information
 Any updates to this policy will be committed directly to our open-source repository at `https://github.com/moaz76943-creator/zen-study-focus`.
 
 **Official Live Verification URL:** `https://moaz76943-creator.github.io/zen-study-focus/`
+
+
+> Note: Files you explicitly export via Android Storage Access Framework (SAF) to external folders remain under your control and are not deleted automatically on app uninstall.
