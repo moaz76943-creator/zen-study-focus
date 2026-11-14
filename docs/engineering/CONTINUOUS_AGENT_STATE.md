@@ -18,7 +18,7 @@ Done (631/631 strings): ar es zh hi fr de ru pt ja id tr ko vi it bn ur fa pl nl
 Remaining, in registry order: az uz kk ka hy ne si my km lo mn af sq eu ca gl is ga mk mt cy be ky tg tk ps ku so ha yo ig zu xh sn st tn rw mg ny eo la gd co fy haw hmn sm su jv om.
 
 ## Known pre-existing test failures (fail on the base branch too, not caused by pack work)
-- `tests/df_lane03_core_shell_locale.test.cjs`: tests 3, 4, 5, 8 (numbering as of 2026-11-14 run 2; same failures on base)
+- `tests/df_lane03_core_shell_locale.test.cjs`: only test 4 still fails (harness repaired in branch `ccr-618eb454-s60jxw`). Test 4 expects a reviewed DF99 shell pack to beat the legacy DICT; `dfGetLocalizedText` checks DICT first. Changing that order changes visible text in many languages, so it waits for a product decision.
 - `tests/global_i18n_engine.test.js`
 - `tests/i18n/*`: "new note preserves exactly entered title and body numerals in v21 record"
 
@@ -28,10 +28,15 @@ Remaining, in registry order: az uz kk ka hy ne si my km lo mn af sq eu ca gl is
 | 2026-11-14 | a06e5af | packs sw, fil + this state file | #603 | merged db11002 (CI: Gitleaks, CodeQL, lane11 regression fail on base too — repo-wide, not required) |
 | 2026-11-14 | db11002 | pack ms | #604 | merged 2971971 |
 | 2026-11-14 | 2971971 | packs ta te mr gu (4 parallel translation subagents) | #605 | merged b9fdcae |
-| 2026-11-14 | b9fdcae | packs kn ml pa am (catalog test 5/5; lane03 4 fail + lane11 3 fail identical on base) | (this PR) | see PR |
+| 2026-11-14 | b9fdcae | packs kn ml pa am (catalog test 5/5; lane03 4 fail + lane11 3 fail identical on base) | #606 | merged 22c5cbd |
+| 2026-11-14 | 22c5cbd | packs az uz kk ka | #607 | MERGE_BLOCKED: size budget (see Next step). Still open. |
+| 2026-11-14 | 22c5cbd | locale guard synced to 101-code catalog; lane11 test fixed (10/10) | #608 | merged 41dea72 (verified locally: run_tests no new failures) |
+| 2026-11-14 | 41dea72 | lane03 harness repaired (9 tests: 8 pass); fix: English baseline no longer masks a Quick Training translation reached through alias keys (`navTrainingText` → `trainingTitle`) | (this PR) | see PR |
 
 ## Next step
-Next batch of packs: az uz kk ka (then hy ne si my …). Branch pattern `i18n-packs-<n>` (last used: 11).
+**BLOCKER (since 2026-11-14 07:41 UTC, no owner reply yet):** with az/uz/kk/ka the web assets are 16,104,404 bytes, over `tests/ratchets.json` `webAssetsMaxBytes` 16,000,000 (`tests/guardrails.test.cjs` "size budgets hold"). The 46 packs still to come need about 1.9 MB more. Do not raise the ratchet without the owner. Options sent: (a) re-encode `audio/wind_breeze.ogg` (3.47 MB, 225 kbps) to about 112 kbps, saving about 1.7 MB; (b) a higher budget; (c) another cut. PR #607 stays open. No new packs until decided.
+While blocked: hardening work (lane03 test 4 needs a decision too; other KNOWN_FAILING files in `tests/KNOWN_FAILING.txt`).
+After unblock: merge #607, then packs hy ne si my (then km lo mn af …). Branch pattern `i18n-packs-<n>` (last used: 12).
 Efficient method: dump numbered source list, then one subagent per language writes `index\ttranslation` TSV; spot-check alignment at several indices before building.
 
 ## Pre-existing failing CI gates (not required by branch protection; PR state "unstable", not "blocked")
