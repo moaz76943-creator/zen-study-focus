@@ -20,6 +20,8 @@ condition = "AND"
 regexTarget = "secret"
 regexes = ['''^zen_fortress_(?:cfg|tasks|notes)_v21(?:_mirror)?$''']
 paths = [
+  '''^tests/integration_quality/verified_legacy_save\.test\.cjs$''',
+  '''^tests/termux_room5/counter_log_workout_set\.test\.cjs$''',
   '''^tests/critical_room7/w05_contract\.test\.cjs$''',
   '''^tests/focus_workflows/test_focus_workflows\.cjs$''',
   '''^tests/focus_workflows/track09_chromium\.cjs$''',
@@ -63,3 +65,47 @@ condition = "AND"
 regexTarget = "secret"
 regexes = ['''^ZEN_FORTRESS_V19_99481$''']
 paths = ['''^android/app/src/main/assets/web/index\.html$''']
+
+
+[[rules.allowlists]]
+description = "Reviewed focus commitment localStorage identifiers"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^df_focus_contracts_v1$''', '''^df_contracts_ledger_v1$''']
+paths = ['''^android/app/src/main/assets/web/modules/contracts/focus_commitment_contracts\.js$''']
+
+[[rules.allowlists]]
+description = "Reviewed fractal garden localStorage identifier"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^df_botanical_garden_vault_v1$''']
+paths = ['''^android/app/src/main/assets/web/modules/garden/fractal_botanical_engine\.js$''']
+
+[[rules.allowlists]]
+description = "Reviewed interactive sanctuary localStorage identifier"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^df_botanical_sanctuary_v1$''']
+paths = ['''^android/app/src/main/assets/web/modules/garden/interactive_sanctuary_canvas\.js$''']
+
+[[rules.allowlists]]
+description = "Reviewed integrity guard localStorage identifier"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^zen_crypto_signatures_v1$''']
+paths = ['''^android/app/src/main/assets/web/modules/security/tamper_proof_integrity_guard\.js$''']
+
+[[rules.allowlists]]
+description = "Reviewed application localStorage namespace identifiers"
+condition = "AND"
+regexTarget = "secret"
+regexes = [
+  '''^df_subject_pacing_balance_v21$''',
+  '''^df_daily_velocity_meter_v21$''',
+  '''^df_stem_calc_tape_v1$''',
+  '''^zen_syllabus_cfg_v1$''',
+  '''^df_botanical_garden_v1$''',
+  '''^df_milestone_badges_v1$''',
+  '''^df_fortress_integrity_ledger_v1$'''
+]
+paths = ['''^android/app/src/main/assets/web/app\.js$''']

@@ -25,6 +25,13 @@ STORAGE_IDENTIFIERS = frozenset({
     "zen_fortress_cfg_v21", "zen_fortress_tasks_v21", "zen_fortress_notes_v21",
     "zen_fortress_cfg_v21_mirror", "zen_fortress_tasks_v21_mirror",
     "zen_fortress_notes_v21_mirror",
+    "df_focus_contracts_v1", "df_contracts_ledger_v1",
+    "df_botanical_garden_vault_v1", "df_botanical_sanctuary_v1",
+    "zen_crypto_signatures_v1",
+    "df_subject_pacing_balance_v21", "df_daily_velocity_meter_v21",
+    "df_stem_calc_tape_v1", "zen_syllabus_cfg_v1",
+    "df_botanical_garden_v1", "df_milestone_badges_v1",
+    "df_fortress_integrity_ledger_v1",
 })
 PUBLIC_SALT_SOURCE_PATHS = (
     "android/app/src/main/assets/web/app.js",

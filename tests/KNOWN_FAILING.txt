@@ -1,3 +1,1 @@
-# Legacy tests that currently fail (stale harnesses / retired features).
-# Do not add new entries: fix the regression instead. Regenerate with --update after repairing some.
-# (empty: all 14 earlier entries repaired)
+# Zero known failing local tests as of v664.0.0
