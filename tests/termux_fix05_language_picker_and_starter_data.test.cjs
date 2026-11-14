@@ -8,7 +8,23 @@ const app = fs.readFileSync(path.resolve(__dirname,'../android/app/src/main/asse
 const begin=app.indexOf('function renderLanguageList() {');
 const end=app.indexOf('/* ========================================================\n   3. CLOUD BACKUP', begin);
 assert.ok(begin>0 && end>begin,'language UI function signatures changed');
-const source=app.slice(begin,end);
+// applyLanguage() relies on shared locale helpers defined elsewhere in app.js. Use the REAL implementations
+// (exclusion policy, RTL set, digit conversion) so the fallback-to-English behaviour under test is the shipped one.
+function topLevel(marker){
+  const i=app.indexOf(marker);assert.ok(i>=0,marker+' missing');
+  let depth=0,k=app.indexOf('{',i);
+  for(;k<app.length;k++){if(app[k]==='{')depth++;else if(app[k]==='}'&&--depth===0)break;}
+  return app.slice(i,k+1);
+}
+const constLine=(name)=>{const i=app.indexOf('const '+name);assert.ok(i>=0,name+' missing');return app.slice(i,app.indexOf('\n',i));};
+const constSet=(name)=>{const i=app.indexOf('const '+name);assert.ok(i>=0,name+' missing');return app.slice(i,app.indexOf(']);',i)+3);};
+const helpers=[
+  constSet('DF_EXCLUDED_LOCALE_CODES'),constLine('DF_EXCLUDED_SCRIPT_RE'),constSet('DF_RTL_BASE_CODES'),
+  topLevel('function dfIsExcludedLocale('),topLevel('function dfIsRtlLocale('),
+  'function dfSyncInfiniteLocaleRegistry(){}',          // registry loading is covered by the catalog tests
+  'function dfGetLocalizedText(k,l,fb){return fb;}'      // dictionary lookup is not under test here
+].join('\n');
+const source=helpers+'\n'+app.slice(begin,end);
 
 function fakeElement(tag='div') {
   const element={tagName:tag.toUpperCase(),children:[],attrs:{},textContent:'',value:'',type:'',className:'',style:{},

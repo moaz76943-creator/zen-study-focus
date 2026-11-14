@@ -1,16 +1,3 @@
 # Legacy tests that currently fail (stale harnesses / retired features).
 # Do not add new entries: fix the regression instead. Regenerate with --update after repairing some.
-test/golden_flow_06_arabic_rtl_destinations.test.js
-test/localization_fallback_guard.test.js
-test/runtime_activator_integration.test.js
-tests/accessibility/locale_button_name.test.cjs
-tests/critical_room7/w03_contract.test.cjs
-tests/df_lane03_core_shell_locale.test.cjs
-tests/global_i18n_engine.test.js
-tests/i18n/tasks/tasks_studio_i18n.test.cjs
-tests/runtime_activator/studio_runtime_user_text.test.cjs
-tests/termux_fix01_consent_kickstart_digits.test.cjs
-tests/termux_fix02_locale_ui.test.cjs
-tests/termux_fix05_language_picker_and_starter_data.test.cjs
-tests/termux_fix27_tasks_notes_10_languages.test.cjs
-tests/termux_fix30_bulk_tasks_goals_analytics.test.cjs
+# (empty: all 14 earlier entries repaired)
