@@ -11,6 +11,10 @@
   "ctx": "sec-calendar#sec-calendar",
   "kind": "text"
  },
+ "+{0} Set ✓": {
+  "ctx": "device-ux#2026-11-15 button: add one training set, {0} is a number",
+  "kind": "text"
+ },
  "+{0} Word ⏭": {
   "ctx": "sec-notes#dfPillar2SpeedReaderMount",
   "kind": "text"
@@ -63,6 +67,14 @@
   "ctx": "sec-analytics#df22AnalyticsHost | analytics:activity",
   "kind": "text,analytics"
  },
+ "Adaptive Exam Pacing Engine & Syllabus Roadmap": {
+  "ctx": "device-ux#2026-11-15 heading: exam pacing tool that spreads syllabus study over days",
+  "kind": "text"
+ },
+ "Add Exercise": {
+  "ctx": "device-ux#2026-11-15 button: add a workout exercise",
+  "kind": "text"
+ },
  "Add Q&A": {
   "ctx": "modal:noteModal#nsux-recall",
   "kind": "text"
@@ -94,6 +106,10 @@
  "All cards": {
   "ctx": "flashcards:allCards",
   "kind": "flashcards"
+ },
+ "All notes": {
+  "ctx": "device-ux#2026-11-15 notes filter: show every note",
+  "kind": "text"
  },
  "Almost — check the spelling": {
   "ctx": "flashcards:almost",
@@ -145,6 +161,10 @@
  },
  "Binaural acoustics & gamma brainwaves": {
   "ctx": "modal:dfZenStudySuiteModal#btnLaunchSpatialAudioStudio",
+  "kind": "text"
+ },
+ "Bio-Frequency Tone": {
+  "ctx": "device-ux#2026-11-15 name of a generated binaural/bio-frequency tone in the sound mixer",
   "kind": "text"
  },
  "Blank-sheet active recall & simplification": {
@@ -387,8 +407,16 @@
   "ctx": "analytics:daily",
   "kind": "analytics"
  },
+ "Daily Card Reviews": {
+  "ctx": "device-ux#2026-11-15 label: flashcards to review per day",
+  "kind": "text"
+ },
  "Daily Goals": {
   "ctx": "sec-timer#goalsEditButton",
+  "kind": "text"
+ },
+ "Daily Study Quota": {
+  "ctx": "device-ux#2026-11-15 label: minutes of study required per day",
   "kind": "text"
  },
  "Daily activity goals": {
@@ -531,6 +559,10 @@
   "ctx": "sec-timer#dfPillar8TabContainer",
   "kind": "placeholder"
  },
+ "Exam: {0}": {
+  "ctx": "device-ux#2026-11-15 label: exam date, {0} is a date",
+  "kind": "text"
+ },
  "Example": {
   "ctx": "flashcards:example",
   "kind": "flashcards"
@@ -651,6 +683,10 @@
   "ctx": "sec-sounds#sec-sounds",
   "kind": "text"
  },
+ "Forest Birds": {
+  "ctx": "device-ux#2026-11-15 sound tile name: a recording of birds singing in a forest",
+  "kind": "text"
+ },
  "Formula Preset:": {
   "ctx": "sec-notes#dfStemContentPane",
   "kind": "text"
@@ -682,6 +718,22 @@
  "Good": {
   "ctx": "flashcards:good",
   "kind": "flashcards"
+ },
+ "Grid: Blank": {
+  "ctx": "device-ux#2026-11-15 notes canvas background option: blank page",
+  "kind": "text"
+ },
+ "Grid: Dots": {
+  "ctx": "device-ux#2026-11-15 notes canvas background option: dot grid",
+  "kind": "text"
+ },
+ "Grid: Quad": {
+  "ctx": "device-ux#2026-11-15 notes canvas background option: square grid",
+  "kind": "text"
+ },
+ "Grid: Ruled": {
+  "ctx": "device-ux#2026-11-15 notes canvas background option: ruled lines",
+  "kind": "text"
  },
  "Grouping adjacent words into semantic chunks expands peripheral vision span and suppresses subvocalization at speeds between {0} and {1} words per minute.": {
   "ctx": "sec-notes#closeout-2026-11-15 speed-reading tutorial sentence 4 (separate words with spaces; keep {0} and {1})",
@@ -847,6 +899,10 @@
   "ctx": "sec-notes#dfPillar1StudioMount",
   "kind": "text"
  },
+ "Mark as Completed": {
+  "ctx": "device-ux#2026-11-15 button: mark a topic done",
+  "kind": "text"
+ },
  "Mark complete": {
   "ctx": "modal:noteModal#nsux-tools",
   "kind": "text"
@@ -926,6 +982,14 @@
  "Multiple choice": {
   "ctx": "flashcards:modeChoice",
   "kind": "flashcards"
+ },
+ "Mute": {
+  "ctx": "device-ux#2026-11-15 button: silence this sound track",
+  "kind": "text"
+ },
+ "Muted": {
+  "ctx": "device-ux#2026-11-15 button state: this track is silenced",
+  "kind": "text"
  },
  "My cards": {
   "ctx": "flashcards:defaultDeckName",
@@ -1095,6 +1159,10 @@
   "ctx": "modal:cloudBackupModal#inpRestorePayload",
   "kind": "placeholder"
  },
+ "Pause: {0}": {
+  "ctx": "device-ux#2026-11-15 screen-reader label of a pause/stop button; {0} is a sound name",
+  "kind": "aria-label"
+ },
  "Period": {
   "ctx": "sec-analytics#df22AnalyticsHost | analytics:period",
   "kind": "text,analytics"
@@ -1165,6 +1233,10 @@
  },
  "Play: Soft Forest Rain": {
   "ctx": "sec-sounds#soundsGridBox",
+  "kind": "aria-label"
+ },
+ "Play: {0}": {
+  "ctx": "device-ux#2026-11-15 screen-reader label of a play button; {0} is a sound name",
   "kind": "aria-label"
  },
  "Please enter a {0}-digit PIN or paste a QR Ticket.": {
@@ -1307,6 +1379,10 @@
   "ctx": "sec-sounds#completionAlertPickerHost",
   "kind": "text"
  },
+ "Rain on Window": {
+  "ctx": "device-ux#2026-11-15 sound tile name: a recording of rain falling against a window",
+  "kind": "text"
+ },
  "Random practice": {
   "ctx": "flashcards:modeRandom",
   "kind": "flashcards"
@@ -1426,6 +1502,10 @@
  "Rest seconds": {
   "ctx": "sec-timer#qtRest",
   "kind": "aria-label"
+ },
+ "Rest {0}s": {
+  "ctx": "device-ux#2026-11-15 label: rest period in seconds between sets",
+  "kind": "text"
  },
  "Restore": {
   "ctx": "flashcards:restore",
@@ -1787,6 +1867,10 @@
   "ctx": "flashcards:suspend",
   "kind": "flashcards"
  },
+ "Syllabus Complete": {
+  "ctx": "device-ux#2026-11-15 progress label: syllabus finished percent",
+  "kind": "text"
+ },
  "Sync Cues & [[WikiLinks]] → Flashcards": {
   "ctx": "sec-notes#dfPillar1StudioMount",
   "kind": "text"
@@ -1817,6 +1901,10 @@
  },
  "Target Speed": {
   "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "Target Syllabus:": {
+  "ctx": "device-ux#2026-11-15 label before the chosen syllabus name",
   "kind": "text"
  },
  "Target language": {
@@ -1883,6 +1971,10 @@
   "ctx": "sec-timer#homeWeekStrip",
   "kind": "aria-label"
  },
+ "Tier {0} (★★★)": {
+  "ctx": "device-ux#2026-11-15 priority tier; keep the stars",
+  "kind": "text"
+ },
  "Time by activity": {
   "ctx": "analytics:activitySplit",
   "kind": "analytics"
@@ -1943,6 +2035,10 @@
   "ctx": "flashcards:sideBack",
   "kind": "flashcards"
  },
+ "Trash": {
+  "ctx": "device-ux#2026-11-15 notes filter: deleted notes",
+  "kind": "text"
+ },
  "Tri-Zone Cornell Notes and Vector Mind-Map Studio": {
   "ctx": "sec-notes#dfPillar1StudioMount",
   "kind": "aria-label"
@@ -1978,6 +2074,10 @@
  "Unique cards today": {
   "ctx": "flashcards:uniqueToday",
   "kind": "flashcards"
+ },
+ "Unit {0}": {
+  "ctx": "device-ux#2026-11-15 course unit number",
+  "kind": "text"
  },
  "Upcoming": {
   "ctx": "sec-tasks#df22TasksHost",
@@ -2019,6 +2119,10 @@
   "ctx": "sec-sounds#soundsGridBox",
   "kind": "aria-label"
  },
+ "Volume for {0}": {
+  "ctx": "device-ux#2026-11-15 screen-reader label of a volume slider; {0} is a sound name",
+  "kind": "aria-label"
+ },
  "Warm-up {0}m": {
   "ctx": "sec-notes#closeout-2026-11-15 sample workout list line; m = minutes",
   "kind": "text"
@@ -2054,6 +2158,10 @@
  "Weekly review — Review wins and unfinished work": {
   "ctx": "sec-notes#nsTemplates",
   "kind": "aria-label"
+ },
+ "Weight: {0}%": {
+  "ctx": "device-ux#2026-11-15 exam weight of a unit in percent",
+  "kind": "text"
  },
  "When your eyes fixate slightly left of the center of a word, the fovea decodes the entire lexical unit simultaneously without horizontal scanning.": {
   "ctx": "sec-notes#closeout-2026-11-15 speed-reading tutorial sentence 2 (separate words with spaces)",
@@ -2251,12 +2359,28 @@
   "ctx": "sec-notes#dfKpiRegressions",
   "kind": "text"
  },
+ "{0} Days to Exam": {
+  "ctx": "device-ux#2026-11-15 countdown to the exam",
+  "kind": "text"
+ },
  "{0} Sets Compound Exercises": {
   "ctx": "sec-notes#closeout-2026-11-15 sample workout list line",
   "kind": "text"
  },
  "{0} WPM": {
   "ctx": "sec-notes#dfRsvpLiveWpmBadge",
+  "kind": "text"
+ },
+ "{0} cards": {
+  "ctx": "device-ux#2026-11-15 number of flashcards",
+  "kind": "text"
+ },
+ "{0} days left": {
+  "ctx": "device-ux#2026-11-15 days remaining",
+  "kind": "text"
+ },
+ "{0} min": {
+  "ctx": "device-ux#2026-11-15 duration in minutes",
   "kind": "text"
  },
  "{0} words": {
@@ -2273,6 +2397,14 @@
  },
  "{0}Hz AMOLED": {
   "ctx": "sec-analytics#btnLaunchHighPerfEngine",
+  "kind": "text"
+ },
+ "{0}h Pre-Exam Buffer": {
+  "ctx": "device-ux#2026-11-15 label: reserved hours before the exam; {0} is a number",
+  "kind": "text"
+ },
+ "{0}h Review Buffer": {
+  "ctx": "device-ux#2026-11-15 label: reserved final review hours before the exam",
   "kind": "text"
  },
  "{0}° FRONT": {
@@ -2359,6 +2491,10 @@
   "ctx": "modal:cloudBackupModal#cloudBackupModal",
   "kind": "text"
  },
+ "⚖️ Load-Balancer & Velocity": {
+  "ctx": "device-ux#2026-11-15 tab: daily load and study speed",
+  "kind": "text"
+ },
  "⚙ Customize": {
   "ctx": "sec-timer#timerSettingsChip",
   "kind": "text"
@@ -2398,6 +2534,10 @@
  "⚠️ Paste backup code first": {
   "ctx": "toast",
   "kind": "toast"
+ },
+ "⚡ Rebalance": {
+  "ctx": "device-ux#2026-11-15 button: redistribute the daily study load",
+  "kind": "text"
  },
  "✏️ Pen": {
   "ctx": "sec-notes#dfPillar4ContentPane",
@@ -2475,6 +2615,10 @@
   "ctx": "toast",
   "kind": "toast"
  },
+ "✦ Dynamic Load-Balancer": {
+  "ctx": "device-ux#2026-11-15 small heading: study load balancer feature",
+  "kind": "text"
+ },
  "✦ Focus space": {
   "ctx": "sec-timer#focusHeroCard",
   "kind": "text"
@@ -2539,6 +2683,10 @@
   "ctx": "modal:dfZenStudySuiteModal#btnLaunchBotanicalGardenTimer",
   "kind": "text"
  },
+ "🎓 {0}% Exam Ready (In)": {
+  "ctx": "device-ux#2026-11-15 badge: percent of exam preparation done",
+  "kind": "text"
+ },
  "🎚️ Multi-Track Mixer": {
   "ctx": "sec-sounds#dfPillar5SpatialMount",
   "kind": "text"
@@ -2557,6 +2705,10 @@
  },
  "🎨 Vector Whiteboard": {
   "ctx": "sec-notes#dfPillar4WhiteboardMount",
+  "kind": "text"
+ },
+ "🎯 GPA & Exam Targeter": {
+  "ctx": "device-ux#2026-11-15 tab: grade and exam target planner",
   "kind": "text"
  },
  "🎯 Target:": {
@@ -2617,6 +2769,10 @@
  },
  "📝 Blank-Sheet Brain-Dump": {
   "ctx": "sec-notes#dfFeynmanStudioCard",
+  "kind": "text"
+ },
+ "📝 Hierarchy & Outline": {
+  "ctx": "device-ux#2026-11-15 tab: syllabus structure outline",
   "kind": "text"
  },
  "📤 Copied to Clipboard!": {
@@ -2687,6 +2843,10 @@
   "ctx": "sec-timer#dfPillar8TabContainer",
   "kind": "text"
  },
+ "🔥 High-Yield": {
+  "ctx": "device-ux#2026-11-15 badge: topic with high exam value",
+  "kind": "text"
+ },
  "🔥 {0}d Depth Streak": {
   "ctx": "sec-notes#dfFeynmanStudioCard",
   "kind": "text"
@@ -2699,12 +2859,24 @@
   "ctx": "sec-notes#dfPillar4ContentPane",
   "kind": "text"
  },
+ "🗺️ Roadmap Trail": {
+  "ctx": "device-ux#2026-11-15 tab: roadmap of units to study",
+  "kind": "text"
+ },
+ "🗺️ Syllabus": {
+  "ctx": "device-ux#2026-11-15 tab/button: course syllabus",
+  "kind": "text"
+ },
  "🚀 Host New Pod (Generate PIN)": {
   "ctx": "sec-timer#dfPillar8TabContainer",
   "kind": "text"
  },
  "🚨 Exam-Eve Rescue": {
   "ctx": "sec-timer#dfPillar8StudioCard",
+  "kind": "text"
+ },
+ "🛡️ Burnout Sentinel": {
+  "ctx": "device-ux#2026-11-15 tab: warns about study overload",
   "kind": "text"
  },
  "🛡️ Smart Error-Bank": {

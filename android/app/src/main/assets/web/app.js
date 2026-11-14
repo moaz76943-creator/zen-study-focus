@@ -5382,6 +5382,19 @@ const SOUNDS_DATA = [
   { id: 'thunder', cat: 'warm', cls: 'sbg-thunder', vol: 0.6, src: "audio/rain_thunder.ogg", url: "audio/rain_thunder.ogg" }
 ];
 
+// Visible tile names must describe the bundled recording (audio/LICENSES.json): the "forest" tile plays a bird
+// recording and the "rain" tile plays rain against a window, so legacy names ("Pine Breeze", "Soft Forest Rain")
+// are replaced in every language by catalog keys. Missing translations fall back to English, never to a wrong name.
+const SOUND_NAME_EN = { rain: 'Rain on Window', forest: 'Forest Birds' };
+const SOUND_LEGACY_EN = { stream: 'Mountain Stream', wind: 'Highland Wind', thunder: 'Distant Thunder' };
+function dfSoundName(id) {
+  const en = SOUND_NAME_EN[id];
+  if (en) return dfCatalogKeyText(en, null, en);
+  const legacy = (L().sounds && L().sounds[id]) || id;
+  // A language that has its own legacy name keeps it; otherwise use the shared catalog instead of English.
+  const base = SOUND_LEGACY_EN[id];
+  return base && legacy === base ? dfCatalogKeyText(base, null, base) : legacy;
+}
 let soundCat = 'all';
 const activePlayers = {};
 // A stale media error or delayed play promise may never restart a stopped tile.
@@ -5469,7 +5482,7 @@ function stopSoundTile(id) {
 function toggleSoundTile(id) {
   const s = SOUNDS_DATA.find(x => x.id === id);
   if (!s) return;
-  const sName = L().sounds[id] || id;
+  const sName = dfSoundName(id);
   if (activePlayers[id]) {
     stopSoundTile(id);
     showToast(`⏹ ${sName}`);
@@ -5530,9 +5543,15 @@ function setTileVolume(id, val) {
 }
 
 function playPresetRelaxMix() {
+  // Rain on a window under soft wind. The bird recording is only played when the user starts its own tile.
   stopAllAudio();
   toggleSoundTile('rain');
-  toggleSoundTile('forest');
+  toggleSoundTile('wind');
+}
+if (typeof document !== 'undefined') {
+  document.addEventListener('df-ui-catalog-applied', () => {
+    try { if (document.getElementById('soundsGridBox')) renderSoundsStudio(); } catch (_) {}
+  });
 }
 function stopAllAudio() {
   SOUNDS_DATA.forEach(s => stopSoundTile(s.id));
@@ -5556,7 +5575,7 @@ function renderSoundsStudio() {
   for (const s of SOUNDS_DATA) {
     if (soundCat !== 'all' && s.cat !== soundCat) continue;
     const isOn = !!activePlayers[s.id];
-    const sName = d.sounds[s.id] || s.id;
+    const sName = dfSoundName(s.id);
     const tile = document.createElement('div');
     tile.className = `sound-Rich-tile ${s.cls} ${isOn ? 'playing' : ''}`;
 
@@ -5632,6 +5651,24 @@ function renderSoundsStudio() {
     category: soundCat,
     legacy: { locale: cfg.lang, sounds: d.sounds }
   });
+  // The locale bridge names tiles from its own 5-language table; re-apply the recording-accurate names.
+  if (box.querySelector('.sound-Rich-tile')) {
+    const tiles = [...box.querySelectorAll('.sound-Rich-tile')];
+    const shown = SOUNDS_DATA.filter(x => soundCat === 'all' || x.cat === soundCat);
+    tiles.forEach((tile, i) => {
+      const item = shown[i];
+      if (!item || !SOUND_NAME_EN[item.id]) return;
+      const nameEl = tile.querySelector('.stile-name');
+      const fresh = toWest(dfSoundName(item.id));
+      const old = nameEl ? nameEl.textContent : '';
+      if (!nameEl || !old || old === fresh) return;
+      nameEl.textContent = fresh;
+      [tile, tile.querySelector('.stile-play-btn'), tile.querySelector('input.stile-vol')].forEach(el => {
+        const label = el && el.getAttribute('aria-label');
+        if (label && label.indexOf(old) !== -1) el.setAttribute('aria-label', label.split(old).join(fresh));
+      });
+    });
+  }
   if (focusedSound) {
     const control = [...box.querySelectorAll('[data-sound-toggle]')]
       .find(node => node.getAttribute('data-sound-toggle') === focusedSound);
@@ -63150,15 +63187,14 @@ function() {
 
       const sourceSel = document.createElement('select');
       sourceSel.style.cssText = 'padding:5px 10px;border-radius:8px;border:1px solid #cbd5e1;background:#ffffff;font-size:12px;font-weight:700;color:#0f172a;';
+      // Only recordings that really ship (audio/LICENSES.json) are listed, named for what they play.
       const soundOptions = [
-        { id: 'wind', name: '🍃 Mountain Wind' },
-        { id: 'rain', name: '🌧️ Gentle Rain' },
-        { id: 'ocean', name: '🌊 Ocean Surf' },
-        { id: 'fire', name: '🔥 Warm Fireplace' },
-        { id: 'stream', name: '💧 Forest Stream' },
-        { id: 'waterfall', name: '🌊 Waterfall Mist' },
-        { id: 'night', name: '🦗 Night Ambiance' },
-        { id: 'bio_beat', name: '🧠 Bio-Frequency Tone' }
+        { id: 'wind', name: '🍃 ' + dfSoundName('wind') },
+        { id: 'rain', name: '🌧️ ' + dfSoundName('rain') },
+        { id: 'stream', name: '💧 ' + dfSoundName('stream') },
+        { id: 'forest', name: '🐦 ' + dfSoundName('forest') },
+        { id: 'thunder', name: '⛈️ ' + dfSoundName('thunder') },
+        { id: 'bio_beat', name: '🧠 ' + dfCatalogKeyText('Bio-Frequency Tone', null, 'Bio-Frequency Tone') }
       ];
       soundOptions.forEach(function(o) {
         const opt = document.createElement('option');
@@ -63692,13 +63728,14 @@ function() {
       box.appendChild(desc);
 
       // Track Rows
+      // One row per bundled recording (same ids as the Nature tiles) so every row controls a real sound.
       const trackList = [
-        { id: 'ocean', name: '🌊 Ocean Surf', defVol: 70, defAz: 45 },
-        { id: 'rain', name: '🌧️ Gentle Rain', defVol: 65, defAz: 0 },
-        { id: 'wind', name: '🍃 Mountain Wind', defVol: 55, defAz: 315 },
-        { id: 'fire', name: '🔥 Hearth Fireplace', defVol: 75, defAz: 135 },
-        { id: 'stream', name: '💧 Forest Stream', defVol: 60, defAz: 225 },
-        { id: 'bio_beat', name: '🧠 Bio-Frequency Tone', defVol: 65, defAz: 0 }
+        { id: 'rain', name: '🌧️ ' + dfSoundName('rain'), defVol: 65, defAz: 0 },
+        { id: 'stream', name: '💧 ' + dfSoundName('stream'), defVol: 70, defAz: 225 },
+        { id: 'forest', name: '🐦 ' + dfSoundName('forest'), defVol: 65, defAz: 90 },
+        { id: 'wind', name: '🍃 ' + dfSoundName('wind'), defVol: 55, defAz: 315 },
+        { id: 'thunder', name: '⛈️ ' + dfSoundName('thunder'), defVol: 60, defAz: 180 },
+        { id: 'bio_beat', name: '🧠 ' + dfCatalogKeyText('Bio-Frequency Tone', null, 'Bio-Frequency Tone'), defVol: 65, defAz: 0 }
       ];
 
       const mixerCard = document.createElement('div');
@@ -63760,6 +63797,10 @@ function() {
           muteBtn.textContent = isMuted ? 'Muted' : 'Mute';
           if (spatialSourcesMap[tr.id] && spatialSourcesMap[tr.id].gain) {
             spatialSourcesMap[tr.id].gain.gain.setValueAtTime(isMuted ? 0.0001 : 0.75, spatialAudioCtx.currentTime);
+          }
+          // The recordings play through the Nature tiles, so Mute must act on the tile's own player.
+          if (tr.id !== 'bio_beat' && activePlayers[tr.id]) {
+            activePlayers[tr.id].setVol(isMuted ? 0 : (vSlider.value / 100));
           }
         };
 

@@ -8,6 +8,8 @@
 (function (global) {
   "use strict";
 
+  // Only recordings whose name matches the bundled file (audio/LICENSES.json). Unknown keys are NOT
+  // redirected to another recording ("night", "brown", "pink" used to play wind/rain/water files).
   var SOUND_FILES = {
     rain: "audio/rain_window.ogg",
     thunder: "audio/rain_thunder.ogg",
@@ -15,12 +17,9 @@
     birds: "audio/forest_birds.ogg",
     water: "audio/flowing_water.ogg",
     stream: "audio/flowing_water.ogg",
-    night: "audio/wind_breeze.ogg",
     wind: "audio/wind_breeze.ogg",
     cue: "audio/water_drop.ogg",
-    bell: "audio/water_drop.ogg",
-    brown: "audio/rain_window.ogg",
-    pink: "audio/flowing_water.ogg"
+    bell: "audio/water_drop.ogg"
   };
 
   if (!global.__ZEN_AUDIO_SINGLETON__) {
@@ -105,14 +104,15 @@
       if (typeof vol === "number") this.setVolume(vol);
       stopAllGlobal();
       var key = String(type || "rain").toLowerCase();
-      var src = SOUND_FILES[key] || SOUND_FILES.rain;
+      var src = Object.prototype.hasOwnProperty.call(SOUND_FILES, key) ? SOUND_FILES[key] : null;
+      if (!src) return false;
       playSingleClean(src, true, S.volume);
       return true;
     },
     mixAmbient: function () {
       stopAllGlobal();
       playSingleClean(SOUND_FILES.rain, true, S.volume * 0.6);
-      playSingleClean(SOUND_FILES.forest, true, S.volume * 0.4);
+      playSingleClean(SOUND_FILES.wind, true, S.volume * 0.4);
       return true;
     },
     stopAmbient: function () {

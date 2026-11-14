@@ -1475,37 +1475,11 @@ body {
           var txt = (btn.textContent || '').trim().toLowerCase();
           var i18nKey = btn.getAttribute('data-i18n') || '';
 
-          if (txt.indexOf('test sound') !== -1 || txt.indexOf('preview') !== -1 || i18nKey === 'ui_test_sound' || i18nKey === 'ui_preview') {
-            btn.setAttribute('data-806-wired', '1');
-            btn.addEventListener('click', function () {
-              if (window.SovereignAudioCues) window.SovereignAudioCues.playBell();
-            });
-          } else if (txt.indexOf('water & rain') !== -1 || i18nKey === 'soundRain') {
-            btn.setAttribute('data-806-wired', '1');
-            btn.addEventListener('click', function () {
-              if (window.SovereignAudioCues) window.SovereignAudioCues.playAmbient('rain');
-            });
-          } else if (txt.indexOf('forest & wind') !== -1 || i18nKey === 'soundForest') {
-            btn.setAttribute('data-806-wired', '1');
-            btn.addEventListener('click', function () {
-              if (window.SovereignAudioCues) window.SovereignAudioCues.playAmbient('forest');
-            });
-          } else if (txt.indexOf('fire & earth') !== -1 || i18nKey === 'soundWaves') {
-            btn.setAttribute('data-806-wired', '1');
-            btn.addEventListener('click', function () {
-              if (window.SovereignAudioCues) window.SovereignAudioCues.playAmbient('water');
-            });
-          } else if (txt.indexOf('mix') !== -1 || txt.indexOf('3d spatial') !== -1 || i18nKey === 'ui_mix' || i18nKey === 'ui_3d_spatial') {
-            btn.setAttribute('data-806-wired', '1');
-            btn.addEventListener('click', function () {
-              if (window.SovereignAudioCues) window.SovereignAudioCues.mixAmbient();
-            });
-          } else if (txt.indexOf('stop') !== -1 || i18nKey === 'ui_stop') {
-            btn.setAttribute('data-806-wired', '1');
-            btn.addEventListener('click', function () {
-              if (window.SovereignAudioCues) window.SovereignAudioCues.stopAmbient();
-            });
-          } else if (txt.indexOf('manual backup') !== -1 || i18nKey === 'ui_manual_backup') {
+          // Audio buttons are NOT wired here by label text. Substring matching ("mix", "stop", "preview",
+          // "water & rain", "forest & wind") attached extra playback to unrelated controls, so filter pills,
+          // the 3D studio launcher and completion-sound previews started ambient recordings (birds) on their own.
+          // Each audio control owns its handler (app.js toggleSoundTile / playPresetRelaxMix / stopAllAudio).
+          if (txt.indexOf('manual backup') !== -1 || i18nKey === 'ui_manual_backup') {
             btn.setAttribute('data-806-wired', '1');
             btn.addEventListener('click', function () {
               if (window.SovereignDataVault && window.SovereignDataVault.exportToClipboard) {
@@ -1713,6 +1687,7 @@ body {
   }
 </style>
   <link rel="stylesheet" href="modules/flashcards/flashcards.css">
+  <link rel="stylesheet" href="styles/device_ux_fixes.css">
 </head>
 <body>
 

@@ -1,0 +1,42 @@
+/* DEEP FOCUS — real-device UX fixes (loaded last). Root causes, not new decoration:
+ * 1. styles/amoled_120hz.css paints html/body OLED black while the White Premium theme is light, so the
+ *    safe-area strip above the app and any gap below it showed as a black bar.
+ * 2. touch_restorer.css forces `html, body { padding-bottom: 16px !important }`, which overrides the 104px that
+ *    index.html reserves for the fixed bottom navigation. The last block of every page (the studio/maintenance
+ *    drawer) therefore ended underneath the nav and could not be reached or tapped.
+ * 3. The .stile-vol range inputs were 5px tall, so the touch area was 5px.
+ */
+:root { --df-nav-clear: 164px; }
+
+html:not([data-theme="dark"]):has(body:not(.dark):not(.deep-lockdown)) {
+  background-color: #fafdff !important;
+  color-scheme: light;
+}
+body:not(.dark):not(.deep-lockdown) { background-color: #fafdff; }
+
+/* Real space below the last element: bottom nav (58px + 10px offset) + gesture area + breathing room. */
+html { padding-bottom: 0 !important; }
+/* `html body` outranks the later inline `body { padding-bottom: ... !important }` rules in index.html. */
+html body { padding-bottom: calc(var(--df-nav-clear) + env(safe-area-inset-bottom, 0px)) !important; }
+
+/* The Advanced studio drawer sat in the page flow as a black block in the light theme. */
+#sovereignCalmToolsDrawer {
+  background: #ffffff !important;
+  border: 1px solid rgba(15, 23, 42, 0.12) !important;
+  box-shadow: 0 6px 18px -10px rgba(15, 23, 42, 0.18);
+}
+#sovereignCalmToolsToggle { color: #17284f !important; min-height: 48px; }
+#sovereignCalmToolsBody { border-top-color: rgba(15, 23, 42, 0.08) !important; }
+
+/* Volume sliders: a 5px element is nearly impossible to hit with a thumb. Keep the thin track, enlarge the hit area. */
+.stile-vol {
+  height: 32px !important;
+  margin-top: 2px !important;
+  background: transparent !important;
+  touch-action: pan-y;
+}
+.stile-vol::-webkit-slider-runnable-track { height: 5px; border-radius: 3px; background: rgba(255, 255, 255, 0.55); }
+.stile-vol::-webkit-slider-thumb { -webkit-appearance: none; width: 24px; height: 24px; margin-top: -9.5px; border-radius: 50%; background: #ffffff; box-shadow: 0 1px 8px #172944; }
+
+/* Text fields in the timer panel were 36px tall. */
+#sec-timer input[type="number"], #sec-timer input[type="text"], #sec-timer select { min-height: 44px; }

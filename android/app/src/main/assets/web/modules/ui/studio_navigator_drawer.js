@@ -55,12 +55,13 @@
             // left:50% shrinks the available width to half the viewport; large text then overflows the right edge.
             pill.style.width = "max-content";
             pill.style.maxWidth = "calc(100vw - 32px)";
-            pill.style.background = "rgba(18, 18, 18, 0.85)";
+            pill.style.background = "rgba(255, 255, 255, 0.94)";
             pill.style.backdropFilter = "blur(12px)";
-            pill.style.border = "1px solid rgba(255, 255, 255, 0.15)";
+            pill.style.border = "1px solid rgba(15, 23, 42, 0.16)";
             pill.style.borderRadius = "28px";
             pill.style.padding = "10px 22px";
-            pill.style.color = "#ffffff";
+            // White Premium: the global light-theme button rule forces dark ink, so the pill must be a light surface.
+            pill.style.setProperty("color", "#17284f", "important");
             pill.style.fontSize = "0.92rem";
             pill.style.fontWeight = "600";
             pill.style.cursor = "pointer";
@@ -68,7 +69,7 @@
             pill.style.display = "flex";
             pill.style.alignItems = "center";
             pill.style.gap = "8px";
-            pill.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.6)";
+            pill.style.boxShadow = "0 8px 24px -8px rgba(15, 23, 42, 0.28)";
 
             pill.innerHTML = '<span id="zenStudioTriggerLabel">' + ((document.documentElement.lang || "").toLowerCase().indexOf("ar") === 0 ? "✨ الاستوديوهات" : "✨ Studios") + '</span> <span style="opacity: 0.5; font-size: 0.75rem;">(10)</span>';
 
