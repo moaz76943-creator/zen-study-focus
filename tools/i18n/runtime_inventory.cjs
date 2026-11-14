@@ -24,7 +24,31 @@ async function collect(p) {
 }
 (async () => {
   const langs = process.argv.slice(2).length ? process.argv.slice(2) : ['en'];
-  const srv = http.createServer((q, r) => { const f = path.join(root, q.url === '/' ? 'index.html' : decodeURIComponent(q.url.split('?')[0])); fs.readFile(f, (e, d) => { if (e) { r.statusCode = 404; r.end(); } else { r.setHeader('content-type', mime[path.extname(f)] || 'application/octet-stream'); r.end(d); } }); });
+  const assetFiles = new Map();
+  function indexAssets(dir) {
+    for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+      if (entry.isSymbolicLink()) continue;
+      const full = path.join(dir, entry.name);
+      if (entry.isDirectory()) indexAssets(full);
+      else if (entry.isFile()) assetFiles.set('/' + path.relative(root, full).split(path.sep).join('/'), full);
+    }
+  }
+  indexAssets(root);
+  function resolveAsset(rawUrl) {
+    let pathname;
+    try { pathname = decodeURIComponent(String(rawUrl || '/').split('?')[0]); }
+    catch (_) { return null; }
+    if (pathname === '/') pathname = '/index.html';
+    return assetFiles.get(pathname) || null;
+  }
+  const srv = http.createServer((q, r) => {
+    const f = resolveAsset(q.url);
+    if (!f) { r.statusCode = 404; return r.end(); }
+    fs.readFile(f, (e, d) => {
+      if (e) { r.statusCode = 404; r.end(); }
+      else { r.setHeader('content-type', mime[path.extname(f)] || 'application/octet-stream'); r.end(d); }
+    });
+  });
   await new Promise((r) => srv.listen(0, r)); const base = 'http://localhost:' + srv.address().port;
   const b = await chromium.launch(); fs.mkdirSync('i18n-out', { recursive: true });
   for (const lang of langs) {
