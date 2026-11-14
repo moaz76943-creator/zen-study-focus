@@ -25,10 +25,23 @@ function walk(dir, out = []) {
 
 function run(file) {
   return new Promise((done) => {
-    const child = spawn(process.execPath, [file], { cwd: root, stdio: 'ignore' });
-    const timer = setTimeout(() => child.kill('SIGKILL'), 120000);
-    child.on('exit', (code) => { clearTimeout(timer); done(code === 0); });
-    child.on('error', () => { clearTimeout(timer); done(false); });
+    const child = spawn(process.execPath, [file], { cwd: root, stdio: ['ignore', 'pipe', 'pipe'] });
+    let stdout = '';
+    let stderr = '';
+    let timedOut = false;
+    child.stdout.setEncoding('utf8');
+    child.stderr.setEncoding('utf8');
+    child.stdout.on('data', (chunk) => { stdout += chunk; });
+    child.stderr.on('data', (chunk) => { stderr += chunk; });
+    const timer = setTimeout(() => { timedOut = true; child.kill('SIGKILL'); }, 120000);
+    child.on('exit', (code) => {
+      clearTimeout(timer);
+      done({ ok: code === 0 && !timedOut, output: [stdout, stderr].filter(Boolean).join('\n') || (timedOut ? 'Test timed out after 120 seconds.' : '') });
+    });
+    child.on('error', (error) => {
+      clearTimeout(timer);
+      done({ ok: false, output: String(error) });
+    });
   });
 }
 
@@ -48,9 +61,9 @@ async function worker() {
 }
 await Promise.all(Array.from({ length: Math.max(2, os.cpus().length) }, worker));
 
-const failing = files.filter((f) => !results.get(f));
+const failing = files.filter((f) => !results.get(f).ok);
 const newFailures = failing.filter((f) => !known.has(f));
-const nowPassing = [...known].filter((f) => results.has(f) && results.get(f));
+const nowPassing = [...known].filter((f) => results.has(f) && results.get(f).ok);
 console.log(`tests: ${files.length}  passed: ${files.length - failing.length}  failed: ${failing.length}  known-failing: ${known.size}`);
 
 if (process.argv.includes('--update')) {
@@ -64,6 +77,10 @@ if (process.argv.includes('--update')) {
 if (nowPassing.length) console.log(`fixed since baseline (remove from KNOWN_FAILING.txt):\n  ${nowPassing.join('\n  ')}`);
 if (newFailures.length) {
   console.error(`NEW FAILURES (${newFailures.length}):\n  ${newFailures.join('\n  ')}`);
+  for (const f of newFailures) {
+    const output = results.get(f).output;
+    if (output) console.error(`\\n--- ${f} output ---\\n${output}`);
+  }
   process.exit(1);
 }
 console.log('OK: no new failures');
