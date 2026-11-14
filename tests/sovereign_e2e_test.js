@@ -434,14 +434,23 @@ console.log('✅ PASS: SovereignStore Unified State Layer & Atomic Undo/Redo Ver
 // Android Java Bridge & Memory-Leak Prevention Gate
 const glob = require('fs');
 let foundMain = false;
+function readRegularFileNoFollow(filePath) {
+  const fd = fs.openSync(filePath, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
+  try {
+    if (!fs.fstatSync(fd).isFile()) throw new Error('Expected regular Java source file');
+    return fs.readFileSync(fd, 'utf8');
+  } finally {
+    fs.closeSync(fd);
+  }
+}
 function findMainActivity(dir) {
   if (!fs.existsSync(dir)) return;
-  const list = fs.readdirSync(dir);
-  for (const item of list) {
-    const full = path.join(dir, item);
-    if (fs.statSync(full).isDirectory()) findMainActivity(full);
-    else if (item === 'MainActivity.java') {
-      const jSrc = fs.readFileSync(full, 'utf8');
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isSymbolicLink()) continue;
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory()) findMainActivity(full);
+    else if (entry.isFile() && entry.name === 'MainActivity.java') {
+      const jSrc = readRegularFileNoFollow(full);
       if (jSrc.includes('@JavascriptInterface') && !jSrc.includes('WeakReference') && jSrc.includes('Activity mContext')) {
         console.error('❌ FAIL: MainActivity retains direct strong Activity reference in JavascriptInterface');
         process.exit(1);
