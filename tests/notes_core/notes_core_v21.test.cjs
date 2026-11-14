@@ -144,3 +144,10 @@ test('explicit recall pair keys must be unique',()=>{
   const notes=seed();
   assert.throws(()=>N.edit(notes,77,{}, {now:at,extension:{recallPairs:[{key:'a',question:'q',answer:'a'},{key:'a',question:'q2',answer:'a2'}]}}),/DUPLICATE_RECALL_KEY/);
 });
+
+test('createNote refuses to exceed MAX_NOTES so the collection never becomes unreadable',()=>{
+  const at=1763114400000;let notes=[];
+  for(let i=0;i<N.MAX_NOTES;i++)notes=[{id:i+1,title:'n',body:'',createdAt:at,updatedAt:at},...notes];
+  assert.throws(()=>N.createNote(notes,{id:N.MAX_NOTES+1,title:'x',body:''},{now:at}),/NOTE_LIMIT_REACHED/);
+  assert.equal(N.search(notes,{limit:1}).total,N.MAX_NOTES,'full collection stays readable');
+});
