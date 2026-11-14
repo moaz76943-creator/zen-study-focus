@@ -97,11 +97,14 @@
     return out;
   }
   function statusOf(task) {return task.status==='archived'?'archived':task.done?'completed':task.status==='doing'?'doing':'todo';}
+  // The placeholder date of a task with no assigned due date is the user's LOCAL day, not the UTC day
+  // (at 01:00 in UTC+3 the UTC day is still yesterday).
+  function localDay(iso){const d=new Date(iso);return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-');}
   function createTask(state,input,opts={}) {
     const s=stateCopy(state),fields=normalizePatch(s,input);
     if(!fields.title)fail('Title required');
     const stamp=timeStamp(opts),id=uniqueId(s,opts);
-    const task={id,isStarter:false,title:fields.title,date:fields.date||stamp.slice(0,10),catKey:fields.catKey||'study',done:false,
+    const task={id,isStarter:false,title:fields.title,date:fields.date||localDay(stamp),catKey:fields.catKey||'study',done:false,
       time:'25m',status:'todo',createdAt:stamp,updatedAt:stamp,dueAssigned:own(fields,'date'),...fields};
     s.tasksList.unshift(task);
     return {state:s,task:copy(task)};

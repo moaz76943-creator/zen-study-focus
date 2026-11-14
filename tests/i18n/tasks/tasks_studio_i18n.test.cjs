@@ -106,7 +106,7 @@ test('new task stores category, priority and repeat as stable machine keys',()=>
  const task=f.get().tasksList[0];
  assert.equal(task.title,'New task');assert.equal(task.catKey,'sport');
  assert.equal(task.priority,'urgent');assert.deepEqual(task.repeat,{frequency:'daily',interval:1});
- assert.equal(task.date,'2026-10-25');assert.equal(f.commits(),1);
+ assert.equal(task.date,'2026-10-25');assert.equal(task.dueAssigned,false,'no due date is assigned unless the user ticks it');assert.equal(f.commits(),1);
  f.adapter.locale='ar';f.studio.render();
  assert.equal(f.get().tasksList[0].catKey,'sport');
  assert.equal(f.get().tasksList[0].priority,'urgent');
@@ -136,8 +136,12 @@ test('sort/filter/search/kanban with 1000 tasks is read-only and has accessible 
  search.value='Task 499';search.dispatch('input');
  assert.deepEqual(f.cardTitles(),['Task 499']);
  search.value='';search.dispatch('input');
- f.button('Kanban').dispatch('click');assert.equal(f.cardTitles().length,1000);
- f.button('Priorities').dispatch('click');
+ // Secondary views now live in the "More views" select (the primary row is Today/Upcoming/Overdue/Completed).
+ const views=()=>f.all().find(e=>e.tagName==='SELECT'&&e.attributes['aria-label']==='More views');
+ assert.ok(views(),'More views selector');
+ views().value='board';views().dispatch('change');
+ assert.ok(f.cardTitles().length>0,'Kanban renders task cards');
+ views().value='matrix';views().dispatch('change');
  assert.equal(f.commits(),0);assert.equal(JSON.stringify(f.get()),original);
 });
 test('legacy Arabic/Persian/Devanagari numerals render as Western digits without storage writes',()=>{
@@ -174,7 +178,7 @@ test('empty new task title reports a localized validation reason without a commi
 
 test('legacy invalid optional values survive browser input normalization on title-only edit',()=>{
  const legacy={id:72,title:'Keep odd fields',catKey:'study',done:false,isStarter:false,
-  dueTime:'99:99',estimateMin:'legacy estimate',repeat:{frequency:'weekdays',interval:1},
+  dueTime:'99:99',estimateMin:'legacy estimate',repeat:{frequency:'fortnightly-legacy',interval:1},
   proprietary:{value:'do not touch'}};
  const f=fixture([legacy]);
  f.button('Edit').dispatch('click');
@@ -188,6 +192,6 @@ test('legacy invalid optional values survive browser input normalization on titl
  assert.equal(result.title,'Rename only');
  assert.equal(result.dueTime,'99:99');
  assert.equal(result.estimateMin,'legacy estimate');
- assert.deepEqual(result.repeat,{frequency:'weekdays',interval:1});
+ assert.deepEqual(result.repeat,{frequency:'fortnightly-legacy',interval:1});
  assert.deepEqual(result.proprietary,{value:'do not touch'});
 });

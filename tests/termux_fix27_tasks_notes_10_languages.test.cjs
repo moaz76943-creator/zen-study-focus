@@ -35,7 +35,7 @@ test('offline runtime resolves 552 new entries and absent keys use safe English 
   }}
   assert.equal(count,552);
   for(const lang of ['he','iw','zz'])assert.equal(t(lang,'notes','25','fallback'),'fallback');
-  assert.equal(t('vi','tasks','title','fallback'),'fallback');
+  assert.equal(t('vi','tasks','nonexistent_absent_key','fallback'),'fallback');
   assert.equal(t('id','tasks','nonexistent','fallback'),'fallback');
 });
 test('original 3099 strings are retained; no network, mutable storage or injected markup',()=>{
