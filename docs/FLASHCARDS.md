@@ -48,8 +48,8 @@ Repetitions 1–9: JS starts the next utterance only after the native `done` eve
 | JS speech controller | IMPLEMENTED AND VERIFIED against a fake bridge (logic only) |
 | Male voice preference | PARTIALLY IMPLEMENTED — only voices the engine labels male can be preferred; many devices label none |
 | Offline voices | BLOCKED BY PLATFORM — depends on installed voice data; reported per voice |
-| Emulator tests of native TTS | NOT IMPLEMENTED — needs an emulator image with a TTS engine and UIAutomator driving Settings > voices; not attempted |
-| Translations | PARTIAL — English and Arabic only; other languages show English until reviewed translations are provided |
+| Emulator tests of native TTS | IMPLEMENTED, RESULT PENDING — `tests/android_tts` instrumentation runs the shipped `NativeTts` on API 30/35 emulators via `.github/workflows/native_tts_emulator.yml`; see the workflow run for actual results. Images without an engine/voice data report SKIP lines, never PASS. Audible output and voice quality are NOT verifiable on an emulator |
+| Translations | PARTIAL — English and Arabic complete; 18 other locales have NO reviewed pack and show English. `tests/flashcards_locale_coverage.test.cjs` pins that gap list (it may only shrink) and fails on any incomplete or English-copy pack. Add a reviewed pack as `S.<code>` in flashcards_ui.js |
 | 50,000 cards | BLOCKED BY STORAGE — localStorage quota is far below 50k cards; 10k small cards fit; measured in Node only |
 | Quick edit during study, undo | Quick edit IMPLEMENTED; undo works for edit/delete/move (last 20, in memory only) |
 | Pronunciation CSV export file name | LIMITATION — reuses the analytics CSV save dialog; falls back to clipboard |
@@ -60,3 +60,10 @@ Repetitions 1–9: JS starts the next utterance only after the native `done` eve
 
 ## Needs a real device
 Which voices/engines exist, whether a language needs data download, offline behaviour, audio quality, rate/pitch audibility, behaviour when the user changes the system TTS engine (the app re-initialises on request but this is untested).
+
+## Review round (directive: final implementation review)
+- Backup restore: a flashcards write failure is reported as a partial restore (never the green success toast); existing cards are kept (browser regression test).
+- Old backups: `migrateLegacy({rescan:true})` re-imports legacy arrays without clearing flags or touching legacy keys; deduplicated (core + browser tests).
+- CSV: formula guard now covers leading whitespace/control characters and `= + - @`; plain numbers stay readable (core test).
+- Study modes: `tests/flashcards_modes.test.cjs` covers every mode's queue, session, resume, cancel, duplicate submissions, suspended/archived/empty cases. Only classic and multiple choice are driven through the real UI.
+- Not done in this round: Android WebView performance benchmarks, reviewed translations for 18 locales, a physical-device pass.
