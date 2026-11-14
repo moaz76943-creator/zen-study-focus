@@ -1,7 +1,7 @@
 /**
  * DEEP FOCUS - Axis 10: Global i18n & RTL/LTR Language Engine
  * Milestone M8558 - M8567 | Sovereign Offline Architecture
- * Maximum 16 Approved Languages, Strict Language Exclusion Barrier, Western Numerals Global Guard
+ * 100-language official catalog (pack-status gated), 16 active runtime dictionaries, Hebrew exclusion, Western numerals
  */
 
 (function (root, factory) {
@@ -21,7 +21,7 @@
   // Permanent sovereign exclusion guard (Policy Invariant)
   const FORBIDDEN_LANGUAGE_CODES = ['he', 'iw', 'syc', 'ber', 'zgh'];
 
-  // Approved runtime languages (hard ceiling: 16)
+  // Active runtime dictionaries. The official 100-language catalog and pack states live in i18n/languages.json.
   const SUPPORTED_LANGUAGES = {
     ar: { name: 'العربية', dir: 'rtl', label: 'العربية' },
     en: { name: 'English', dir: 'ltr', label: 'English' },
