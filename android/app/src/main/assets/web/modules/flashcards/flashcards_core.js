@@ -62,7 +62,7 @@
   function validLang(tag) { return tag === '' || (typeof tag === 'string' && tag.length <= 35 && LANG_RE.test(tag)); }
 
   function defaultPrefs() {
-    return { dailyGoal: 20, direction: 'forward', repeat: 1, rate: 1.0, pitch: 1.0, speakSide: 'front', offlineOnly: false, preferMale: true, engine: '', perLanguage: {} };
+    return { dailyGoal: 20, direction: 'forward', textSize: 'medium', showExamples: true, defaultMode: 'classic', defaultDeckId: '', repeat: 1, rate: 1.0, pitch: 1.0, speakSide: 'front', offlineOnly: false, preferMale: true, engine: '', perLanguage: {} };
   }
 
   function create(opts) {
@@ -168,6 +168,10 @@
       d.dailyGoal = clampInt(p.dailyGoal, 1, 1000, d.dailyGoal);
       d.direction = ['forward', 'reverse', 'both'].indexOf(p.direction) >= 0 ? p.direction : d.direction;
       d.repeat = clampInt(p.repeat, 1, 9, 1);
+      d.textSize = ['small', 'medium', 'large'].indexOf(p.textSize) >= 0 ? p.textSize : 'medium';
+      d.showExamples = p.showExamples !== false;
+      d.defaultMode = ['classic', 'reverse', 'both', 'listening', 'pronunciation', 'writing', 'choice', 'cloze', 'mixed', 'quick'].indexOf(p.defaultMode) >= 0 ? p.defaultMode : 'classic';
+      d.defaultDeckId = typeof p.defaultDeckId === 'string' ? p.defaultDeckId.slice(0, 60) : '';
       var r = Number(p.rate); d.rate = isFinite(r) ? Math.min(2, Math.max(0.5, r)) : 1;
       var pi = Number(p.pitch); d.pitch = isFinite(pi) ? Math.min(2, Math.max(0.5, pi)) : 1;
       d.speakSide = ['front', 'back'].indexOf(p.speakSide) >= 0 ? p.speakSide : 'front';
@@ -500,6 +504,7 @@
         if (o.deckId && c.deckId !== o.deckId) return;
         var d = deckById(c.deckId); if (!d || d.archivedAt) return;
         if (mode === 'favorites' && !c.favorite) return;
+        if (mode === 'mistakes' && !(c.log.length && c.log[c.log.length - 1].r === 1)) return;
         if (mode === 'difficult' && !(c.lapses >= 3 || (c.reps >= 4 && c.ok / c.reps < 0.6))) return;
         if (tagSet && !c.tags.some(function (x) { return tagSet.indexOf(norm(x)) >= 0; })) return;
         if (o.state && c.st !== o.state) return;
@@ -556,6 +561,40 @@
     }
     function abandonSession() { var s = meta.activeSession; meta.activeSession = null; var r = persist([]); if (!r.ok) meta.activeSession = s; return r.ok ? { ok: true } : r; }
 
+    // ---------- typed / choice / cloze helpers (reuse the same card data) ----------
+    // A back text may hold several meanings, one per line or separated by ';'. Any of them is a correct answer.
+    function answerVariants(text) {
+      var v = String(text || '').split(/[\n;]+/).map(function (x) { return x.trim(); }).filter(Boolean);
+      return v.length ? v : [String(text || '').trim()];
+    }
+    // exact: equal after case/diacritic normalisation; close: small spelling slip (<= 25 % edits); wrong otherwise.
+    function checkAnswer(expectedText, typed) {
+      var t = norm(typed);
+      if (!t) return { result: 'wrong', expected: answerVariants(expectedText)[0] };
+      var best = 1, variants = answerVariants(expectedText).concat(String(expectedText || '').trim() && answerVariants(expectedText).length > 1 ? [expectedText] : []);
+      for (var i = 0; i < variants.length; i++) { var e = norm(variants[i]); if (e === t) return { result: 'exact', expected: variants[i] }; var ratio = lev(e, t) / Math.max(e.length, t.length, 1); if (ratio < best) best = ratio; }
+      return { result: best <= 0.25 ? 'close' : 'wrong', expected: variants[0], distance: best };
+    }
+    function distractors(id, n, direction) {
+      var c = cardIndex[id]; if (!c) return [];
+      var key = direction === 'reverse' ? 'frontText' : 'backText', own = norm(c[key]), seen = {}, pool = [];
+      seen[own] = 1;
+      allCards().forEach(function (x) { if (x.id === id || x.deckId !== c.deckId) return; var k = norm(x[key]); if (!k || seen[k]) return; seen[k] = 1; pool.push(x[key]); });
+      for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(rng() * (i + 1)); var t = pool[i]; pool[i] = pool[j]; pool[j] = t; }
+      return pool.slice(0, n);
+    }
+    // Fill in the blank from the example sentence; null when the example does not contain the answer.
+    function makeCloze(id, direction) {
+      var c = cardIndex[id]; if (!c || !c.exampleText) return null;
+      var answers = answerVariants(direction === 'reverse' ? c.frontText : c.frontText);
+      var ex = c.exampleText, lower = ex.toLowerCase();
+      for (var i = 0; i < answers.length; i++) {
+        var a = answers[i], at = lower.indexOf(a.toLowerCase());
+        if (a && at >= 0) return { text: ex.slice(0, at) + '_____' + ex.slice(at + a.length), answer: ex.slice(at, at + a.length) };
+      }
+      return null;
+    }
+
     // ---------- search ----------
     function search(q, o) {
       o = o || {};
@@ -568,6 +607,7 @@
         if (o.due && !(c.st !== 'new' && c.due <= t)) return;
         if (o.difficult && !(c.lapses >= 3 || (c.reps >= 4 && c.ok / c.reps < 0.6))) return;
         if (o.state && c.st !== o.state) return;
+        if (o.language) { var lg = String(o.language).toLowerCase(); if (String(c.sourceLanguage).toLowerCase().indexOf(lg) !== 0 && String(c.targetLanguage).toLowerCase().indexOf(lg) !== 0) return; }
         if (terms.length) {
           var hay = norm(c.frontText + ' ' + c.backText + ' ' + c.exampleText + ' ' + c.exampleTranslation + ' ' + c.personalNotes + ' ' + c.pronunciationNotes + ' ' + c.tags.join(' ')) + ' ' + (deckNames[c.deckId] || '');
           for (var i = 0; i < terms.length; i++) if (hay.indexOf(terms[i]) < 0) return;
@@ -838,7 +878,7 @@
       createDeck: createDeck, updateDeck: updateDeck, archiveDeck: archiveDeck, restoreDeck: restoreDeck, deleteDeck: deleteDeck, duplicateDeck: duplicateDeck, listDecks: listDecks, deckStats: deckStats,
       addCard: addCard, getCard: getCard, updateCard: updateCard, moveCard: moveCard, deleteCard: deleteCard, setSuspended: setSuspended, toggleFavorite: toggleFavorite, undo: undo, findDuplicates: function (f, d) { return findDuplicates(f, d).map(function (c) { return c.id; }); },
       reviewCard: reviewCard, previewIntervals: previewIntervals, buildQueue: buildQueue, startSession: startSession, resumeSession: resumeSession, completeSession: completeSession, abandonSession: abandonSession, advanceSession: advanceSession,
-      search: search, stats: stats, usage: usage, getPrefs: getPrefs, setPrefs: setPrefs,
+      search: search, checkAnswer: checkAnswer, answerVariants: answerVariants, distractors: distractors, makeCloze: makeCloze, stats: stats, usage: usage, getPrefs: getPrefs, setPrefs: setPrefs,
       parseImport: parseImport, guessMapping: guessMapping, previewImport: previewImport, commitImport: commitImport, exportCsv: exportCsv,
       exportSnapshot: exportSnapshot, validateSnapshot: validateSnapshot, importSnapshot: importSnapshot, migrateLegacy: migrateLegacy,
       util: { norm: norm, changeRatio: changeRatio, validLang: validLang, dayKey: dayKey }

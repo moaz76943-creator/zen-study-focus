@@ -32,7 +32,7 @@
 .fc-card-text strong, .fc-card-text span { overflow-wrap: break-word; unicode-bidi: plaintext; }
 .fc-card-text span { color: var(--fc-mute); }
 .fc-face { min-height: 180px; display: flex; align-items: center; justify-content: center; padding: 24px 16px; background: #fff; border: 1px solid var(--fc-line); border-radius: 24px; box-shadow: 0 8px 24px -10px rgba(15,23,42,.12); text-align: center; max-height: 50vh; overflow: auto; }
-.fc-q { font-size: 1.6rem; font-weight: 700; overflow-wrap: break-word; max-width: 100%; unicode-bidi: plaintext; }
+.fc-q { font-size: calc(1.6rem * var(--fc-scale, 1)); font-weight: 700; overflow-wrap: break-word; max-width: 100%; unicode-bidi: plaintext; }
 .fc-a { font-size: 1.3rem; text-align: center; padding: 12px; border-top: 1px dashed var(--fc-line); overflow-wrap: break-word; unicode-bidi: plaintext; max-height: 30vh; overflow: auto; }
 .fc-rate { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 6px; }
 .fc-btn.rate { display: flex; flex-direction: column; gap: 2px; padding: 8px 4px; font-size: .85rem; }
@@ -55,3 +55,9 @@
 .fc-write { margin: 4px 0; }
 #flashcardsEntry { width: 100%; min-height: 56px; margin: 8px 0; }
 @media (prefers-reduced-motion: reduce) { .fc-toast { transition: none; } }
+
+.fc-a { font-size: calc(1.3rem * var(--fc-scale, 1)); }
+.fc-choices { display: grid; gap: 8px; }
+.fc-example { padding: 8px 0; display: grid; gap: 4px; }
+.fc-ok { color: #1a7f4b; }
+.fc-map { display: grid; gap: 6px; }
