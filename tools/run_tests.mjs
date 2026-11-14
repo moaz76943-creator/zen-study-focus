@@ -14,10 +14,11 @@ const knownFile = join(root, 'tests', 'KNOWN_FAILING.txt');
 const TEST = /\.test\.(js|cjs|mjs)$/;
 
 function walk(dir, out = []) {
-  for (const name of readdirSync(dir)) {
+  for (const ent of readdirSync(dir, { withFileTypes: true })) {
+    const name = ent.name;
     if (name === 'node_modules' || name.startsWith('.')) continue;
     const p = join(dir, name);
-    if (statSync(p).isDirectory()) walk(p, out);
+    if (ent.isDirectory()) walk(p, out);
     else if (TEST.test(name)) out.push(relative(root, p).split('\\').join('/'));
   }
   return out;
@@ -47,9 +48,9 @@ function run(file) {
 
 const files = ['test', 'tests'].filter((d) => existsSync(join(root, d)))
   .flatMap((d) => walk(join(root, d))).sort();
-const known = new Set(existsSync(knownFile)
-  ? readFileSync(knownFile, 'utf8').split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#'))
-  : []);
+let knownText = '';
+try { knownText = readFileSync(knownFile, 'utf8'); } catch (e) { if (e.code !== 'ENOENT') throw e; }
+const known = new Set(knownText.split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#')));
 
 const results = new Map();
 let next = 0;

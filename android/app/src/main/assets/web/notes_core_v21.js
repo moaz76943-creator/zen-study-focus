@@ -105,6 +105,8 @@
   function createNote(notes, note, options = {}) {
     checkRecords(notes); validateNote(note);
     if (notes.some(n => n && n.id === note.id)) throw new Error('DUPLICATE_ID');
+    // Creating past MAX_NOTES would make every later read/edit/search throw in checkRecords (lockout).
+    if (notes.length >= MAX_NOTES) throw new RangeError('NOTE_LIMIT_REACHED');
     const at = time(options.now);
     const next = {...copy(note), createdAt:note.createdAt ?? at, updatedAt:note.updatedAt ?? at};
     return [next, ...notes];

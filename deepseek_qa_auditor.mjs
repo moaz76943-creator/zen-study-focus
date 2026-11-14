@@ -17,11 +17,10 @@ const indexContent = fs.existsSync(indexPath) ? fs.readFileSync(indexPath, 'utf8
 let allJsContent = '';
 function gatherJs(dir) {
   if (!fs.existsSync(dir)) return;
-  const files = fs.readdirSync(dir);
-  for (const f of files) {
+  for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+    const f = ent.name;
     const full = path.join(dir, f);
-    const stat = fs.statSync(full);
-    if (stat.isDirectory() && f !== '.git' && f !== 'node_modules') {
+    if (ent.isDirectory() && f !== '.git' && f !== 'node_modules') {
       gatherJs(full);
     } else if (f.endsWith('.js') && !f.includes('deepseek_qa_auditor')) {
       allJsContent += fs.readFileSync(full, 'utf8') + '\n';
