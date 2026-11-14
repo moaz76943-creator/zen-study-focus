@@ -32,8 +32,8 @@ function scan(files,withConfig=true){
 test('reviewed Gitleaks config extends default rules and requires value AND exact path',()=>{
  const cfg=fs.readFileSync(CONFIG,'utf8');
  assert.match(cfg,/useDefault = true/);
- assert.equal((cfg.match(/condition = "AND"/g)||[]).length,5);
- assert.equal((cfg.match(/regexTarget = "secret"/g)||[]).length,5);
+ assert.equal((cfg.match(/condition = "AND"/g)||[]).length,10);
+ assert.equal((cfg.match(/regexTarget = "secret"/g)||[]).length,10);
  assert.doesNotMatch(cfg,/disabledRules|stopwords|commits\s*=/);
 });
 
