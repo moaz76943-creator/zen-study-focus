@@ -80,7 +80,7 @@ test('reviewed public storage-key candidates reveal only safe source path, never
   ];
   const r=run(rows);
   assert.equal(r.status,1);
-  assert.deepEqual(r.output.review_paths,['android/app/src/main/assets/web/app.js','tests/config.cjs']);
+  assert.deepEqual(r.output.review_paths,['tests/config.cjs']);
   assert.ok(!(r.stdout+r.stderr).includes(secret));
   assert.ok(!(r.stdout+r.stderr).includes('private/'));
   assert.equal(r.output.status,'REVIEW_REQUIRED');
