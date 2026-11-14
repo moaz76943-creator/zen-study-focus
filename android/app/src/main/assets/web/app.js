@@ -81501,7 +81501,8 @@ window.SovereignViewportOptimizer = (function() {
         // Enforce GPU-accelerated compositing on interactive elements
         const targets = document.querySelectorAll("button, .btn, canvas, .card");
         targets.forEach(el => {
-            el.style.transform = "translateZ(0)";
+            // Never overwrite an element's own inline transform (e.g. the centred Studios pill uses translateX(-50%)).
+            if (!el.style.transform) el.style.transform = "translateZ(0)";
             el.style.backfaceVisibility = "hidden";
         });
         console.log("⚡ [ViewportOptimizer] Applied 120Hz/144Hz zero-jank compositing layers.");
