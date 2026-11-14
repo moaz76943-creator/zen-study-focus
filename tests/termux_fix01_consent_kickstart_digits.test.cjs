@@ -22,18 +22,29 @@ test('25-minute kickstart selects real timer and respects cancellation', () => {
   assert.ok(start >= 0 && end > start, 'Expected kickstart implementation');
   function verify(allow) {
     let selected=0, started=0, removed=0;
-    const btns={};
-    const modal={style:{}, className:'', innerHTML:'', remove(){removed++;},querySelector(id){return btns[id] ||= {};}};
-    const document={createElement(){return modal;},body:{appendChild(){}}};
+    const byId={};
+    const makeEl=()=>{const el={style:{},className:'',textContent:'',id:'',attrs:{},children:[],
+      setAttribute(k,v){this.attrs[k]=v;},appendChild(c){this.children.push(c);return c;},
+      remove(){removed++;}};
+      return new Proxy(el,{set(t,k,v){t[k]=v;if(k==='id')byId[v]=t;return true;}});};
+    const document={createElement:makeEl,body:{appendChild(){}}};
     const ctx={document,window:{},timerRunning:false,
       selectHomeQuickSession(n){assert.equal(n,25);selected++;return allow;},
       toggleTimerPlay(){started++;}};
     vm.runInNewContext(app.slice(start,end) + '\nshowKickstartPrompt();',ctx);
-    assert.equal(typeof btns['#df-extend-25m'].onclick,'function');
-    btns['#df-extend-25m'].onclick();
+    const extend=byId['df-extend-25m'];
+    assert.ok(extend,'extend button is built');
+    assert.equal(extend.attrs['data-i18n'],'kickstartExtend25m');
+    assert.equal(typeof extend.onclick,'function');
+    extend.onclick();
     assert.equal(selected,1);
     assert.equal(started,allow?1:0);
     assert.equal(removed,allow?1:0);
+    // "Take a break" only dismisses; it never starts the timer.
+    const close=byId['df-kickstart-close'];
+    assert.equal(typeof close.onclick,'function');
+    const before=started;close.onclick();
+    assert.equal(started,before);
   }
   verify(true);
   verify(false);
@@ -52,10 +63,11 @@ test('Generated date digits change, user-authored note digits never change', () 
     if(selector.includes('.date-display'))result.push(display);
     return result;
   }};
-  vm.runInNewContext(runtime,{window:{},document,Audio:class{}});
+  vm.runInNewContext(runtime,{window:{requestAnimationFrame:fn=>fn()},document,Audio:class{}});
   listeners.DOMContentLoaded();
   assert.equal(note.value,'مهمة ٢٠٢٦');
   assert.equal(note.textContent,'مهمة ٢٠٢٦');
-  assert.equal(date.value,'2026-10-25');
+  // Native date inputs are normalised by the main app handler, never rewritten by the activator (it wiped fields).
+  assert.equal(date.value,'٢٠٢٦-١٠-٢٥');
   assert.equal(display.textContent,'اليوم 25');
 });

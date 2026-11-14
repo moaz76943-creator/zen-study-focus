@@ -260,8 +260,17 @@
     // M8560: dfEnforceWesternDigitsGlobalRule
     dfEnforceWesternDigitsGlobalRule(text) {
       if (typeof text !== 'string') return text;
-      const easternMap = {'0':'0','1':'1','2':'2','3':'3','4':'4','5':'5','6':'6','7':'7','8':'8','9':'9'};
-      return text.replace(/[0123456789]/g, m => easternMap[m] || m);
+      // Convert every Unicode decimal digit (Arabic-Indic, Persian, Devanagari, Bengali, Thai, fullwidth, ...)
+      // to 0-9. The previous map only matched the Western digits, so it never changed anything.
+      const ZERO_POINTS = [0x0660, 0x06f0, 0x07c0, 0x0966, 0x09e6, 0x0a66, 0x0ae6, 0x0b66, 0x0be6, 0x0c66,
+        0x0ce6, 0x0d66, 0x0de6, 0x0e50, 0x0ed0, 0x0f20, 0x1040, 0x1090, 0x17e0, 0x1810, 0xff10];
+      return text.replace(/\p{Nd}/gu, (digit) => {
+        const point = digit.codePointAt(0);
+        for (const zero of ZERO_POINTS) {
+          if (point >= zero && point < zero + 10) return String(point - zero);
+        }
+        return digit;
+      });
     }
 
     // M8561: dfHotSwapUiLanguageZeroReload

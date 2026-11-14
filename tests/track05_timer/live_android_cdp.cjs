@@ -13,7 +13,7 @@ const adb=(...args)=>{
 const cases=[];let ws,seq=0;const pending=new Map();
 function record(name,status,detail,evidence){const r={name,status,detail,evidence:evidence||null};cases.push(r);console.log(JSON.stringify(r))}
 async function connect(){
- const pid=adb('shell','pidof','com.zenstudy.focus').split(/\s/)[0];
+ const pid=adb('shell','pidof','com.deepfocus.study').split(/\s/)[0];
  if(!/^\d+$/.test(pid))throw Error('TRANSPORT: no app PID');
  adb('forward','tcp:9222','localabstract:webview_devtools_remote_'+pid);
  let pages=[],target;
@@ -43,7 +43,7 @@ async function evalJs(code){const r=await call('Runtime.evaluate',{expression:co
 async function ready(){for(let n=0;n<25;n++){if(await evalJs("document.readyState==='complete'&&typeof toggleTimerPlay==='function'"))return;await pause(500)}throw Error('TRANSPORT: app readiness timeout')}
 async function restart(){
  ws.close();try{adb('forward','--remove','tcp:9222')}catch(_){}
- adb('shell','am','force-stop','com.zenstudy.focus');adb('shell','am','start','-n','com.zenstudy.focus/.MainActivity');
+ adb('shell','am','force-stop','com.deepfocus.study');adb('shell','am','start','-n','com.deepfocus.study/com.zenstudy.focus.MainActivity');
  await pause(3500);await connect();await ready();
 }
 // Only the preinstalled disposable emulator may be cleared; never touch user data.
@@ -51,8 +51,8 @@ async function cleanQAProfile(){
  assert.equal(process.env.DF_TRACK05_DISPOSABLE,'1');
  assert.equal(adb('shell','getprop','ro.kernel.qemu'),'1');
  ws.close();try{adb('forward','--remove','tcp:9222')}catch(_){}
- assert.match(adb('shell','pm','clear','com.zenstudy.focus'),/Success/);
- adb('shell','am','start','-n','com.zenstudy.focus/.MainActivity');
+ assert.match(adb('shell','pm','clear','com.deepfocus.study'),/Success/);
+ adb('shell','am','start','-n','com.deepfocus.study/com.zenstudy.focus.MainActivity');
  await pause(3500);await connect();await ready();
 }
 async function tap(selector){

@@ -59,7 +59,7 @@ test('all 605 added translations resolve from the offline runtime',()=>{
   for(const code of ['he','iw','zz'])assert.equal(t(code,'analytics','title','fallback'),'fallback');
   assert.equal(t('fil','analytics','not_a_real_key','fallback'),'fallback');
   assert.equal(t('hi','tasks','title','fallback'),'fallback');
-  assert.equal(t('vi','tasks','title','fallback'),'fallback');
+  assert.equal(t('vi','tasks','nonexistent_absent_key','fallback'),'fallback');
 });
 test('prior 4755 strings survive without unsafe runtime or fabricated completeness',()=>{
   const total=Object.values(packs).reduce((n,s)=>n+Object.values(s).reduce((m,dict)=>m+Object.keys(dict).length,0),0);

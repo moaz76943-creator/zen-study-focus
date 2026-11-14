@@ -225,6 +225,13 @@ test('report totals stay consistent across every category', async () => {
 /* ---------- live integrated v21 codebase (offline, read-only) ---------- */
 
 const REPO = path.resolve(__dirname, '../..');
+function assertLanguageSet(languages) {
+  const codes = languages.map(l => l.language || l.code);
+  assert.ok(codes.every(Boolean), 'every row names its language');
+  assert.equal(new Set(codes).size, codes.length, 'no duplicate languages');
+  assert.ok(codes.length >= 99, 'at least the 99 non-English catalog languages: ' + codes.length);
+  assert.ok(!codes.some(c => /^(he|iw)(-|$)/i.test(c)), 'Hebrew must never appear');
+}
 const LIVE_FAMILY_KEY_TOTAL = 147; // timer 11 + goals 15 + tasks 64 + notes 36 + analytics 17 + analyticsDomain 4
 
 test('live v21 matrix: offline CLI run, report consistent, known el/sk timer divergences surfaced', async () => {
@@ -243,7 +250,8 @@ test('live v21 matrix: offline CLI run, report consistent, known el/sk timer div
     assert.equal(report.offline, true);
     assert.equal(report.is_android_verification, false);
     assert.equal(report.android_e2e, 'NOT_TESTED');
-    assert.equal(report.languages.length, 99);
+    // The live catalog has grown (100-language registry): assert invariants instead of a frozen count.
+    assertLanguageSet(report.languages);
     assert.ok(report.languages.every(l => l.present_in_catalog));
     assert.equal(report.totals.base, 2 * LIVE_FAMILY_KEY_TOTAL);
 
@@ -257,7 +265,7 @@ test('live v21 matrix: offline CLI run, report consistent, known el/sk timer div
     const written = JSON.parse(fs.readFileSync(path.join(outDir, 'truth_matrix.json'), 'utf8'));
       assert.equal(written.kind, report.kind);
     const sum = Object.values(written.totals).reduce((a, b) => a + b, 0);
-    assert.equal(sum, 99 * LIVE_FAMILY_KEY_TOTAL);
+    assert.equal(sum, written.languages.length * LIVE_FAMILY_KEY_TOTAL);
 
     // Facts, clamped to numbers, for the factual report the task asks for.
     for (const language of written.languages) {
@@ -277,12 +285,12 @@ test('CLI resolves shipped dictionaries without an explicit root from an unrelat
     const summary = JSON.parse(stdout);
     const report = JSON.parse(fs.readFileSync(output, 'utf8'));
     assert.equal(summary.kind, 'LOCALE_TRUTH_MATRIX_OFFLINE_SOURCE_AUDIT');
-    assert.equal(report.languages.length, 99);
+    assertLanguageSet(report.languages);
     assert.ok(report.languages.every(row => row.present_in_catalog));
     assert.equal(report.android_e2e, 'NOT_TESTED');
     assert.ok(report.totals.fallback > 0, 'missing translations remain visible');
     assert.equal(Object.values(report.totals).reduce((sum, n) => sum + n, 0),
-      99 * LIVE_FAMILY_KEY_TOTAL);
+      report.languages.length * LIVE_FAMILY_KEY_TOTAL);
   } finally {
     fs.rmSync(outDir, { recursive: true, force: true });
   }

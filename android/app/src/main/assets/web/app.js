@@ -3033,8 +3033,11 @@ function dfGetLocalizedText(key, langCode, fallback) {
     const lc = candidateLangs[i];
     if (dfIsExcludedLocale(lc)) continue;
 
-    // 1. Primary DICT
-    if (typeof DICT !== 'undefined' && DICT[lc] && typeof DICT[lc][key] === 'string' && DICT[lc][key].trim()) {
+    // 1. Primary DICT. A non-English entry that is identical to the English DICT text is an untranslated
+    // placeholder, not a translation: it must not mask a reviewed pack below (that is English leakage).
+    // If no later source has anything different, the same text is still returned by the baseline step.
+    if (typeof DICT !== 'undefined' && DICT[lc] && typeof DICT[lc][key] === 'string' && DICT[lc][key].trim()
+      && !(lc !== 'en' && DICT.en && DICT[lc][key] === DICT.en[key])) {
       return toWest(DICT[lc][key]);
     }
 

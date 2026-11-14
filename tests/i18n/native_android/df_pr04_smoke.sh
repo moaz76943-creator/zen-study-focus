@@ -26,7 +26,7 @@ fi
 # Retry only the install; do not mark a failed or incomplete install as PASS.
 installed=0
 for attempt in 1 2 3; do
-  if adb install --no-streaming -r "$apk" && adb shell pm path com.zenstudy.focus | grep -q '^package:'; then
+  if adb install --no-streaming -r "$apk" && adb shell pm path com.deepfocus.study | grep -q '^package:'; then
     installed=1
     break
   fi
@@ -55,18 +55,18 @@ for attempt in 1 2 3; do
   fi
 done
 test "$installed" -eq 1
-adb shell pm list packages | grep -Fx 'package:com.zenstudy.focus'
+adb shell pm list packages | grep -Fx 'package:com.deepfocus.study'
 
-adb shell am start -W -n com.zenstudy.focus/com.zenstudy.focus.MainActivity
+adb shell am start -W -n com.deepfocus.study/com.zenstudy.focus.MainActivity
 sleep 6
-adb shell pidof com.zenstudy.focus
+adb shell pidof com.deepfocus.study
 adb shell input keyevent KEYCODE_HOME
-adb shell am start -W -n com.zenstudy.focus/com.zenstudy.focus.MainActivity
-adb shell pidof com.zenstudy.focus
-adb shell am force-stop com.zenstudy.focus
-adb shell am start -W -n com.zenstudy.focus/com.zenstudy.focus.MainActivity
+adb shell am start -W -n com.deepfocus.study/com.zenstudy.focus.MainActivity
+adb shell pidof com.deepfocus.study
+adb shell am force-stop com.deepfocus.study
+adb shell am start -W -n com.deepfocus.study/com.zenstudy.focus.MainActivity
 sleep 4
-adb shell pidof com.zenstudy.focus
+adb shell pidof com.deepfocus.study
 echo 'API_RUNTIME_SMOKE=PASS'
 echo 'SAF_USER_CONSENT_DEVICE_QA=NOT_TESTED'
 echo 'NOTIFICATION_GRANT_DENY_QA=NOT_TESTED'

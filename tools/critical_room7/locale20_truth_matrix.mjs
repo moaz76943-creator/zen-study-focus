@@ -69,7 +69,13 @@ export function buildTruthMatrix(inputs) {
     usable.push(item);
   }
 
-  const languages = union(catalog, Object.keys(packs), usable.map(c => c.language));
+  // Locales the product excludes by policy (Hebrew and Hebrew-script languages, etc.; mirrors
+  // DF_EXCLUDED_LOCALE_CODES in app.js) are never part of the matrix. Their stray contribution files are
+  // reported, not counted as supported languages.
+  const EXCLUDED_BY_POLICY = new Set(['he', 'iw', 'heb', 'hbo', 'yi', 'yid', 'jrb', 'jpr', 'lad', 'syc', 'syr']);
+  const everyLanguage = union(catalog, Object.keys(packs), usable.map(c => c.language));
+  const excludedByPolicy = everyLanguage.filter(code => EXCLUDED_BY_POLICY.has(String(code).split(/[-_]/)[0]));
+  const languages = everyLanguage.filter(code => !excludedByPolicy.includes(code));
   const matrix = [];
   const conflicts = [];
   const unknownKeys = [];
@@ -121,6 +127,7 @@ export function buildTruthMatrix(inputs) {
     is_android_verification: false,
     base_languages: [...baseLanguages],
     languages: matrix,
+    excluded_by_policy: excludedByPolicy,
     totals,
     conflicts,
     unknown_keys: unknownKeys,
@@ -300,7 +307,7 @@ export function loadCatalogCodes(appJsPath) {
   const app = fs.readFileSync(appJsPath, 'utf8');
   const boundary = app.indexOf('let todayISO =');
   if (boundary < 0) throw new Error('App dictionary initialization boundary moved');
-  const ctx = { window: {}, document: { addEventListener() {} }, console };
+  const ctx = { window: { addEventListener() {} }, document: { addEventListener() {} }, console };
   vm.createContext(ctx);
   vm.runInContext(app.slice(0, boundary) + '\nthis.__catalog = LANG_CATALOG;', ctx,
     { filename: 'app.js', timeout: 5000 });
