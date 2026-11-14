@@ -48,7 +48,11 @@ console.log("✔ Test 4: 20-locale catalog verified and policy exclusions honore
 
 // Test 5: Switch Language preserves config and identifies RTL
 const cfg = { theme: "white_premium", locale: "en" };
-const mockStorage = { setItem: () => {} };
+// A raw setItem-only backend is refused on purpose: the v21 key needs the app's acknowledged atomic save.
+const rawRes = setSystemLanguage("ar", cfg, { setItem: () => {} });
+assert.strictEqual(rawRes.success, false);
+assert.strictEqual(rawRes.reason, "ATOMIC_STORAGE_REQUIRED");
+const mockStorage = { saveFortressData: () => true };
 const switchRes = setSystemLanguage("ar", cfg, mockStorage);
 assert.strictEqual(switchRes.success, true);
 assert.strictEqual(switchRes.locale, "ar");

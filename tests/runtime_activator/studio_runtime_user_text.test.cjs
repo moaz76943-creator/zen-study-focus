@@ -15,7 +15,7 @@ function boot(fields) {
       return fields.filter(f => tokens.includes(f.selector));
     },
   };
-  vm.runInNewContext(fs.readFileSync(SOURCE, 'utf8'), { document, console, Audio: class {} }, { filename: SOURCE });
+  vm.runInNewContext(fs.readFileSync(SOURCE, 'utf8'), { document, console, window: { requestAnimationFrame: (fn) => fn() }, Audio: class {} }, { filename: SOURCE });
   callbacks.DOMContentLoaded();
   return callbacks;
 }
@@ -30,12 +30,14 @@ test('preserves user-authored Arabic-Indic digits in task and note text fields',
   assert.equal(note.textContent, 'ملاحظتي ۱۲۳ و٤٥٦');
 });
 
-test('normalizes generated date UI digits to Western 0-9', () => {
+test('normalizes generated date display digits to Western 0-9 without touching native date inputs', () => {
   const date = { selector: 'input[type="date"]', value: '٢٠٢٦-١٠-٢٣', textContent: '' };
   const label = { selector: '.date-display', value: '', textContent: '۲۰۲۶/۱۰/۲۳' };
   const callbacks = boot([date, label]);
   callbacks.change();
-  assert.equal(date.value, '2026-10-23');
+  // Native date inputs are never rewritten by the activator (rewriting them wiped the field while typing);
+  // the main app handler normalises them instead (see the app.js listener tests below).
+  assert.equal(date.value, '٢٠٢٦-١٠-٢٣');
   assert.equal(label.textContent, '2026/10/23');
 });
 

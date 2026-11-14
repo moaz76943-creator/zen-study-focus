@@ -32,6 +32,8 @@
    wrapper.setAttribute('lang',code);
   }
   let state=adapter.readState(),undoStack=[],redoStack=[],view='all',editing=null,category='',query='',day='',status='',sortKey='',projectFilter='',isDestroyed=false;
+  // Honour an injected clock for created/updated stamps too (production adapters use the real clock).
+  const nowOpt=()=>typeof adapter.now==='function'?{now:new Date(adapter.now()).toISOString()}:{};
   const currentDay=()=>dateLocal(typeof adapter.now==='function'?adapter.now():new Date());
   const el=(tag,cls,text)=>{const x=doc.createElement(tag);if(cls)x.className=cls;if(text!==undefined)x.textContent=String(text);return x;};
   const btn=(caption,fn,kind='')=>{const b=el('button','df-btn '+kind,caption);b.type='button';b.addEventListener('click',fn);return b;};
@@ -196,7 +198,7 @@
      if(apply(s=>C.updateTask(s,t.id,patch,{noteIds:adapter.noteIds?.()})))submitted=true;
     }else{
      if(!hasDue.checked)delete fields.date;
-     if(apply(s=>C.createTask(s,fields,{noteIds:adapter.noteIds?.()})))submitted=true;
+     if(apply(s=>C.createTask(s,fields,{noteIds:adapter.noteIds?.(),...nowOpt()})))submitted=true;
     }
    });
    panel.appendChild(form);return panel;
@@ -224,7 +226,7 @@
     if(quickSubmitted||isDestroyed)return;
     const title=quickTitle.value.trim();
     if(!title)return;
-    if(apply(s=>C.createTask(s,{title},{noteIds:adapter.noteIds?.()})))quickSubmitted=true;
+    if(apply(s=>C.createTask(s,{title},{noteIds:adapter.noteIds?.(),...nowOpt()})))quickSubmitted=true;
    });
    if(editing!==null)content.appendChild(editor());
    else content.appendChild(quickForm);

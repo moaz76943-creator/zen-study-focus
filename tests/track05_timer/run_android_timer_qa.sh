@@ -16,13 +16,13 @@ if ! timeout --kill-after=5s 60s adb -s "$serial" install android/app/build/outp
   echo 'QA INFRA BLOCKER: APK install failed or timed out' >&2
   exit 2
 fi
-if ! timeout --kill-after=5s 30s adb -s "$serial" shell am start -n com.zenstudy.focus/.MainActivity; then
+if ! timeout --kill-after=5s 30s adb -s "$serial" shell am start -n com.deepfocus.study/com.zenstudy.focus.MainActivity; then
   echo 'QA INFRA BLOCKER: Android app launch failed or timed out' >&2
   exit 2
 fi
 launched=0
 for attempt in {1..15}; do
-  if timeout --kill-after=5s 5s adb -s "$serial" shell pidof com.zenstudy.focus >/dev/null 2>&1; then
+  if timeout --kill-after=5s 5s adb -s "$serial" shell pidof com.deepfocus.study >/dev/null 2>&1; then
     launched=1
     break
   else

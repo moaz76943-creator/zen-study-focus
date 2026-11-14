@@ -117,7 +117,7 @@ class NativeAndroidI18nTests(unittest.TestCase):
         self.assertIn("Intent.ACTION_CREATE_DOCUMENT", self.activity)
         self.assertIn("REQUEST_BACKUP_EXPORT = 7410", self.activity)
         self.assertIn('getBytes(StandardCharsets.UTF_8)', self.activity)
-        self.assertIn('openOutputStream(data.getData(), "w")', self.activity)
+        self.assertRegex(self.activity, r'openOutputStream\((data\.getData\(\)|exportTarget|target), "wt?"\)')
 
     def test_no_hebrew_resources_or_new_permissions(self):
         self.assertFalse((RES / "values-he").exists())

@@ -40,9 +40,15 @@ test('Quick training follows existing translations',()=>{
       }
     };
 
+    // The snippet runs inside applyLocale(); give it the surrounding app-scope helpers it uses.
+    // dfGetLocalizedText returns its fallback here, so the premium pack (quickTraining) must win.
     vm.runInNewContext(
-      'const meta={code:'+JSON.stringify(locale)+'};\n'+snippet,
-      {document,window:win}
+      'const meta={code:'+JSON.stringify(locale)+'};\n'+
+      'const baseCode='+JSON.stringify(locale.split(/[-_]/)[0])+';\n'+snippet,
+      {document,window:win,
+       dfGetLocalizedText:(key,code,fallback)=>fallback,
+       toWest:(value)=>value,
+       quickText:(key)=>'Quick training'}
     );
 
     assert.equal(
