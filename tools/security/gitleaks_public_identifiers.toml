@@ -12,7 +12,11 @@ description = "Public legacy checksum salt, never encryption or authentication"
 condition = "AND"
 regexTarget = "secret"
 regexes = ['''^ZEN_FORTRESS_V21_99812$''']
-paths = ['''^android/app/src/main/assets/web/(?:app\.js(?:\.bak)?|data_compat_v21\.js)$''']
+paths = [
+  '''^android/app/src/main/assets/web/(?:app\.js(?:\.bak)?|data_compat_v21\.js)$''',
+  # historical-only fixture (file no longer in tree); same public constant
+  '''^tests/crypto/compute_hash\.test\.cjs$'''
+]
 
 [[rules.allowlists]]
 description = "Immutable localStorage v21 identifiers in reviewed regression fixtures"
@@ -109,3 +113,32 @@ regexes = [
   '''^df_fortress_integrity_ledger_v1$'''
 ]
 paths = ['''^android/app/src/main/assets/web/app\.js$''']
+
+# Public localStorage key NAMES (identifiers, not credentials). Verified 2026-11-14: each value is a
+# snake_case key string used by the shipped app (or a retired one); exact value AND exact path required.
+[[rules.allowlists]]
+description = "Public v21 localStorage key name df_subject_pacing_balance_v21 (tree fixture + historical scratch scripts)"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^df_subject_pacing_balance_v21$''']
+paths = [
+  '''^tests/security_recovery/track13_private_triage\.test\.cjs$''',
+  '''^\.run_(?:bulletproof_448|bulletproof_v2_448|fix_and_push_448|indestructible_448|verify_and_apply_448)\.sh$'''
+]
+
+[[rules.allowlists]]
+description = "Public localStorage key name df_daily_velocity_meter_v21 in historical scratch script"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^df_daily_velocity_meter_v21$''']
+paths = ['''^\.run_batch_m452_m454\.sh$''']
+
+[[rules.allowlists]]
+description = "Retired public localStorage key name df_milestone_v590_m140_seal in historical script and historical app.js"
+condition = "AND"
+regexTarget = "secret"
+regexes = ['''^df_milestone_v590_m140_seal$''']
+paths = [
+  '''^\.run_batch_m449_m451\.sh$''',
+  '''^android/app/src/main/assets/web/app\.js$'''
+]
