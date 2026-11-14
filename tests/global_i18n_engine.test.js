@@ -1,7 +1,19 @@
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 const GlobalI18nEngine = require('../android/app/src/main/assets/web/modules/i18n/global_i18n_engine.js');
 
-console.log('🧪 Starting GlobalI18nEngine (Axis 10: M8558-M8567) Unit Tests...');
+console.log('🧪 Starting GlobalI18nEngine + official 100-language catalog tests...');
+
+// Test 0: Official 100-language policy (availability remains pack-status gated)
+const catalog = JSON.parse(fs.readFileSync(path.join(__dirname, '../i18n/languages.json'), 'utf8'));
+const catalogCodes = catalog.languages.map(language => language.code);
+assert.strictEqual(catalogCodes.length, 100);
+assert.strictEqual(new Set(catalogCodes).size, 100);
+assert.ok(!catalogCodes.includes('he'));
+assert.ok(!catalogCodes.includes('iw'));
+assert.match(catalog.note, /100-language/i);
+console.log('  ✓ Official 100-language catalog and Hebrew exclusion verified.');
 
 const i18n = new GlobalI18nEngine();
 
@@ -52,7 +64,6 @@ console.log('  ✓ dfSupportBilingualFlashcardDecks verified.');
 
 // Test 7: Translation Completeness 100%
 const audit = i18n.dfAuditTranslationCompleteness100();
-assert.strictEqual(audit.is100PercentComplete, true);
 assert.strictEqual(audit.auditedLanguagesCount, 16);
 assert.strictEqual(audit.is100PercentComplete, false);
 assert.ok(audit.missingKeysPerLanguage.it.length > 0);
