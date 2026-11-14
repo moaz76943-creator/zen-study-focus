@@ -3473,6 +3473,72 @@ function renderLanguageList() {
   });
 }
 
+// Raw catalog lookup for a normalized key with {n} placeholders (null-safe; English fallback when no pack/entry).
+function dfCatalogKeyText(key, vars, fallback) {
+  try {
+    const cat = window.DFUiCatalog;
+    if (!cat || cat.active() === 'en') return fallback;
+    const raw = cat.lookupKey(key);
+    if (typeof raw !== 'string' || !raw) return fallback;
+    return toWest(raw.replace(/\{(\d+)\}/g, (m, d) => (vars && vars[+d] !== undefined ? String(vars[+d]) : m)));
+  } catch (_) { return fallback; }
+}
+// Shared-catalog translation of the English starter records for languages the legacy DICT has no samples for.
+// A record is only rewritten while it still holds text this code (or the legacy table) wrote: user edits win.
+const DF_STARTER_TASK_SRC = ['Complete Chapter 1 & Core Concepts', 'HIIT Strength & Cardio Session (4 Sets)',
+  'Read 25 Pages of Reference Book', 'Finish Deep Work Project Milestone'];
+const DF_STARTER_NOTE_SRC = [
+  { t: 'Spaced Repetition System', b: ['Reviewing concepts at increasing intervals strengthens long-term memory retention.'] },
+  { t: 'Active Recall: Key Formula & Law', b: ['Hidden Answer: Performance = Focused Time × Intensity.'] },
+  { t: 'Workout & Training Log', b: ['Warm-up 5m', '4 Sets Compound Exercises', 'Cool-down stretch.'], numbered: true }
+];
+function dfCatalogStarterText(cat, text) {
+  const out = cat.translate(text);
+  return toWest(out);
+}
+function localizeStarterFromCatalog() {
+  const cat = window.DFUiCatalog;
+  if (!cat || typeof cat.translate !== 'function' || typeof cfg !== 'object' || !cfg) return;
+  const legacy = DICT[cfg.lang];
+  if (legacy && Array.isArray(legacy.sampleTasks)) return; // the legacy dictionary owns these languages
+  const english = cat.active() === 'en';
+  const packs = Object.values(DICT);
+  let changed = false;
+  tasksList.forEach(record => {
+    if (!record || record.isStarter !== true || !Number.isSafeInteger(record.id) || record.id < 1 || record.id > DF_STARTER_TASK_SRC.length) return;
+    const src = DF_STARTER_TASK_SRC[record.id - 1], index = record.id - 1;
+    const owned = record.title === src || record.title === record.starterRendered ||
+      packs.some(pack => Array.isArray(pack.sampleTasks) && typeof pack.sampleTasks[index] === 'string' && record.title === toWest(pack.sampleTasks[index]));
+    if (!owned) return;
+    const next = english ? src : dfCatalogStarterText(cat, src);
+    if (next !== record.title) { record.title = next; changed = true; }
+    if (next === src) delete record.starterRendered; else record.starterRendered = next;
+  });
+  notesList.forEach(record => {
+    if (!record || record.isStarter !== true || !Number.isSafeInteger(record.id) || record.id < 1 || record.id > DF_STARTER_NOTE_SRC.length) return;
+    const def = DF_STARTER_NOTE_SRC[record.id - 1], index = record.id - 1;
+    const srcBody = def.numbered ? def.b.map((l, i) => (i + 1) + '. ' + l).join('\n') : def.b[0];
+    const rendered = record.starterRendered;
+    const owned = (record.title === def.t && record.body === srcBody) ||
+      (rendered && record.title === rendered.t && record.body === rendered.b) ||
+      packs.some(pack => { const sample = Array.isArray(pack.sampleNotes) && pack.sampleNotes[index];
+        return sample && record.title === toWest(sample.t) && record.body === toWest(sample.b); });
+    if (!owned) return;
+    const t = english ? def.t : dfCatalogStarterText(cat, def.t);
+    const b = english ? srcBody : def.b.map((l, i) => (def.numbered ? (i + 1) + '. ' : '') + dfCatalogStarterText(cat, l)).join('\n');
+    if (t !== record.title || b !== record.body) { record.title = t; record.body = b; changed = true; }
+    if (t === def.t && b === srcBody) delete record.starterRendered; else record.starterRendered = { t: t, b: b };
+  });
+  if (changed) {
+    [() => renderTasksList(), () => renderCalendar(), () => renderNotesStack()].forEach(step => {
+      try { step(); } catch (error) { if (!(error instanceof ReferenceError)) console.error('starter re-render failed:', error); }
+    });
+  }
+}
+if (typeof window !== 'undefined' && window.addEventListener) window.addEventListener('df-ui-catalog-applied', () => {
+  try { localizeStarterFromCatalog(); } catch (error) { if (!(error instanceof ReferenceError)) console.error('localizeStarterFromCatalog failed:', error); }
+});
+
 function localizeStarterPreviews(target) {
   // IDs 1..4 and 1..3 are the stable v21 demonstration records.
   // A user-edited demonstration record is no longer replaced by translation.
@@ -3482,9 +3548,10 @@ function localizeStarterPreviews(target) {
       if (!record || record.isStarter !== true || !Number.isSafeInteger(record.id)) return;
       const index = record.id - 1;
       if (index < 0 || index >= target.sampleTasks.length) return;
-      const unchanged = packs.some(pack => Array.isArray(pack.sampleTasks) &&
+      const unchanged = (typeof record.starterRendered === 'string' && record.title === record.starterRendered) ||
+        packs.some(pack => Array.isArray(pack.sampleTasks) &&
         typeof pack.sampleTasks[index] === 'string' && record.title === toWest(pack.sampleTasks[index]));
-      if (unchanged) record.title = toWest(target.sampleTasks[index]);
+      if (unchanged) { record.title = toWest(target.sampleTasks[index]); delete record.starterRendered; }
     });
   }
   if (Array.isArray(target.sampleNotes)) {
@@ -3492,13 +3559,15 @@ function localizeStarterPreviews(target) {
       if (!record || record.isStarter !== true || !Number.isSafeInteger(record.id)) return;
       const index = record.id - 1;
       if (index < 0 || index >= target.sampleNotes.length) return;
-      const unchanged = packs.some(pack => {
+      const unchanged = (record.starterRendered && record.title === record.starterRendered.t &&
+        record.body === record.starterRendered.b) || packs.some(pack => {
         const sample = Array.isArray(pack.sampleNotes) && pack.sampleNotes[index];
         return sample && record.title === toWest(sample.t) && record.body === toWest(sample.b);
       });
       if (unchanged) {
         record.title = toWest(target.sampleNotes[index].t);
         record.body = toWest(target.sampleNotes[index].b);
+        delete record.starterRendered;
       }
     });
   }
@@ -55346,7 +55415,7 @@ function() {
           const pill = document.createElement('button');
           pill.type = 'button';
           pill.style.cssText = 'padding:4px 10px;border-radius:999px;border:1px solid #cbd5e1;background:#ffffff;color:#0f172a;font-size:11px;font-weight:600;cursor:pointer;';
-          pill.textContent = '🗂 ' + safeCleanText(card.front || card.q || 'Concept', 40) + ' ↔ Note #' + activeId;
+          pill.textContent = '🗂 ' + safeCleanText(card.front || card.q || 'Concept', 40) + ' ↔ ' + dfCatalogKeyText('Note #{0}', [activeId], 'Note #' + activeId);
           pill.onclick = (function(cObj) {
             return function() {
               mainArea.focus();
@@ -55896,19 +55965,20 @@ function() {
     const lines = splitPassageIntoLines(raw);
     const questions = [];
     for (let i = 0; i < Math.min(3, lines.length); i++) {
-      const words = lines[i].split(/\s+/).filter(function(w) { return w.replace(/[^a-zA-Z0-9\u0600-\u06FF]/g, '').length >= 4; });
+      const words = lines[i].split(/\s+/).filter(function(w) { return w.replace(/[^\p{L}\p{N}]/gu, '').length >= 4; });
       if (words.length >= 3) {
         const targetIdx = Math.floor(words.length / 2);
         const rawTarget = words[targetIdx].replace(/[.,;?!:()"]/g, '');
         const promptLine = lines[i].replace(rawTarget, '_____');
         const distractors = ['regression', 'peripheral', 'subvocal', 'retention', 'fixation']
+          .map(function(d) { return dfCatalogKeyText(d, [], d); })
           .filter(function(d) { return d.toLowerCase() !== rawTarget.toLowerCase(); })
           .slice(0, 2);
         questions.push({
           id: 'comp_q_' + (i + 1),
           prompt: promptLine,
           answer: rawTarget,
-          options: [rawTarget, distractors[0] || 'lexical', distractors[1] || 'cognitive']
+          options: [rawTarget, distractors[0] || dfCatalogKeyText('lexical', [], 'lexical'), distractors[1] || dfCatalogKeyText('cognitive', [], 'cognitive')]
         });
       }
     }
@@ -56726,7 +56796,7 @@ function() {
       const q = check.questions[0];
       const topLbl = document.createElement('div');
       topLbl.style.cssText = 'font-size:12px;font-weight:800;color:#0f172a;';
-      topLbl.textContent = 'Instant Reading Comprehension Check (Cloze Recall):';
+      topLbl.textContent = dfCatalogKeyText('Instant Reading Comprehension Check (Cloze Recall):', [], 'Instant Reading Comprehension Check (Cloze Recall):');
       compQuizBox.appendChild(topLbl);
 
       if (!q) return;
@@ -56752,8 +56822,8 @@ function() {
           window.dfPlotWpmProgressHistoryChart(undefined, 'dfWpmHistoryChartHost');
           refreshAnalyticsKpisDom();
           topLbl.textContent = isCorrect
-            ? '✓ Correct Recall! Comprehension: 100% (' + q.answer + ')'
-            : '↺ Target term was: ' + q.answer + ' (Logged 75%)';
+            ? dfCatalogKeyText('✓ Correct Recall! Comprehension: {0}% ({1})', ['100', q.answer], '✓ Correct Recall! Comprehension: 100% (' + q.answer + ')')
+            : dfCatalogKeyText('↺ Target term was: {0} (Logged {1}%)', [q.answer, '75'], '↺ Target term was: ' + q.answer + ' (Logged 75%)');
           topLbl.style.color = isCorrect ? '#059669' : '#dc2626';
         };
         optsRow.appendChild(oBtn);
@@ -56894,6 +56964,37 @@ function() {
       window.dfLogReadingSessionMetricsLocal(state.wpm, state.comprehensionPct);
       window.dfPlotWpmProgressHistoryChart(undefined, 'dfWpmHistoryChartHost');
       refreshAnalyticsKpisDom();
+    });
+
+    // The built-in tutorial passage follows the UI language until the reader replaces it with their own text.
+    function dfPassageForUiLanguage() {
+      const arUi = typeof cfg === 'object' && cfg && String(cfg.lang || '').startsWith('ar');
+      if (arUi) return DEFAULT_STUDY_PASSAGE_AR;
+      const cat = window.DFUiCatalog;
+      if (!cat || cat.active() === 'en') return DEFAULT_STUDY_PASSAGE;
+      return DEFAULT_STUDY_PASSAGE.split('\n').map(function(line) { return toWest(cat.translate(line)); }).join('\n');
+    }
+    function dfSyncDefaultPassage() {
+      const untouched = state.text === DEFAULT_STUDY_PASSAGE || state.text === DEFAULT_STUDY_PASSAGE_AR ||
+        (typeof state.defaultPassageText === 'string' && state.text === state.defaultPassageText);
+      if (!untouched) return false;
+      const next = dfPassageForUiLanguage();
+      state.defaultPassageText = next;
+      if (next === state.text) return false;
+      state.text = next; sourceInp.value = next;
+      state.wordIndex = 0; state.activeLineIndex = 0;
+      saveRsvpState(state);
+      return true;
+    }
+    function dfRenderReaderAll() {
+      renderCurrentRsvpWordAndHud();
+      renderVisualGuideLines();
+      renderSpanChunksPreview();
+      renderComprehensionCheck();
+    }
+    dfSyncDefaultPassage();
+    window.addEventListener('df-ui-catalog-applied', function() {
+      try { dfSyncDefaultPassage(); dfRenderReaderAll(); } catch (_) { /* reader not mounted */ }
     });
 
     renderCurrentRsvpWordAndHud();
