@@ -20,7 +20,7 @@ Remaining, in registry order: az uz kk ka hy ne si my km lo mn af sq eu ca gl is
 ## Known pre-existing test failures (fail on the base branch too, not caused by pack work)
 - `tests/df_lane03_core_shell_locale.test.cjs`: only test 4 still fails (harness repaired in branch `ccr-618eb454-s60jxw`). Test 4 expects a reviewed DF99 shell pack to beat the legacy DICT; `dfGetLocalizedText` checks DICT first. Changing that order changes visible text in many languages, so it waits for a product decision.
 - `tests/global_i18n_engine.test.js`
-- `tests/i18n/*`: "new note preserves exactly entered title and body numerals in v21 record"
+- Fixed 2026-11-14 (branch `ccr-618eb454-6miujj`): `tests/i18n/core_authored_digit_integrity.test.cjs` (`saveNewNote` moved to `notes_studio.js`; test now runs the real v21 controller + Notes Core and the legacy fallback) and `tests/termux_fix03_truthful_streak.test.cjs` (badge is built with DOM nodes, not innerHTML; fake DOM updated). Both mutation-checked. 15 files remain in `tests/KNOWN_FAILING.txt`.
 
 ## Checkpoint log
 | Date (UTC) | Base HEAD | Work | PR | Result |
@@ -31,11 +31,12 @@ Remaining, in registry order: az uz kk ka hy ne si my km lo mn af sq eu ca gl is
 | 2026-11-14 | b9fdcae | packs kn ml pa am (catalog test 5/5; lane03 4 fail + lane11 3 fail identical on base) | #606 | merged 22c5cbd |
 | 2026-11-14 | 22c5cbd | packs az uz kk ka | #607 | MERGE_BLOCKED: size budget (see Next step). Still open. |
 | 2026-11-14 | 22c5cbd | locale guard synced to 101-code catalog; lane11 test fixed (10/10) | #608 | merged 41dea72 (verified locally: run_tests no new failures) |
-| 2026-11-14 | 41dea72 | lane03 harness repaired (9 tests: 8 pass); fix: English baseline no longer masks a Quick Training translation reached through alias keys (`navTrainingText` → `trainingTitle`) | (this PR) | see PR |
+| 2026-11-14 | 41dea72 | lane03 harness repaired (9 tests: 8 pass); fix: English baseline no longer masks a Quick Training translation reached through alias keys (`navTrainingText` → `trainingTitle`) | #609 | merged 1e2e13b |
+| 2026-11-14 | 1e2e13b | 2 stale test harnesses repaired (note digit integrity, streak badge); KNOWN_FAILING 17 → 15; run_tests 478 pass, no new failures | (this PR) | see PR |
 
 ## Next step
 **BLOCKER (since 2026-11-14 07:41 UTC, no owner reply yet):** with az/uz/kk/ka the web assets are 16,104,404 bytes, over `tests/ratchets.json` `webAssetsMaxBytes` 16,000,000 (`tests/guardrails.test.cjs` "size budgets hold"). The 46 packs still to come need about 1.9 MB more. Do not raise the ratchet without the owner. Options sent: (a) re-encode `audio/wind_breeze.ogg` (3.47 MB, 225 kbps) to about 112 kbps, saving about 1.7 MB; (b) a higher budget; (c) another cut. PR #607 stays open. No new packs until decided.
-While blocked: hardening work (lane03 test 4 needs a decision too; other KNOWN_FAILING files in `tests/KNOWN_FAILING.txt`).
+While blocked: hardening work (lane03 test 4 needs a decision too). Next single-failure candidates: `tests/i18n/analytics/analytics_studio_i18n.test.cjs`, `tests/termux_fix02_locale_ui.test.cjs`, `tests/termux_fix27_tasks_notes_10_languages.test.cjs`, `tests/termux_fix30_bulk_tasks_goals_analytics.test.cjs`. Rule: fix the harness only when the app code is right; mutation-check every repaired test.
 After unblock: merge #607, then packs hy ne si my (then km lo mn af …). Branch pattern `i18n-packs-<n>` (last used: 12).
 Efficient method: dump numbered source list, then one subagent per language writes `index\ttranslation` TSV; spot-check alignment at several indices before building.
 

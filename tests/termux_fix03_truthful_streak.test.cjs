@@ -18,7 +18,8 @@ function habit(streak, langDays='Days') {
     addEventListener(){},
     getElementById(){return null;},
     querySelector(){return {parentElement:badgeParent};},
-    createElement(){return {className:'',innerHTML:'',id:''};}
+    // injectStreakBadge builds the badge with DOM nodes (textContent), not innerHTML.
+    createElement(){return {className:'',id:'',textContent:'',style:{},children:[],appendChild(c){this.children.push(c);return c;}};}
   };
   const ctx={
     window:{}, document, cfg:{streak},
@@ -40,9 +41,12 @@ test('streak reflects real session history summary, not a phantom or obsolete ke
 test('visible streak text uses chosen language, not permanently English',()=>{
   const h=habit(5,'Tage');
   h.engine.injectStreakBadge();
-  assert.match(h.created().innerHTML,/>5<\/span>/);
-  assert.match(h.created().innerHTML,/>Tage<\/span>/);
-  assert.doesNotMatch(h.created().innerHTML,/>Days Streak<\/span>/);
+  const badge=h.created();
+  const count=badge.children.find(c=>c.id==='df-streak-badge-count');
+  const label=badge.children.find(c=>c.id==='df-streak-label');
+  assert.equal(count.textContent,'5');
+  assert.equal(label.textContent,'Tage');
+  assert.ok(badge.children.every(c=>!/Days Streak/.test(c.textContent)));
 });
 test('badge updates immediately when completed focus sessions update cfg.streak',()=>{
   const begin=app.indexOf('function syncHeaderMetrics() {');
