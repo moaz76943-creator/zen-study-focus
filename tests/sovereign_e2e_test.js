@@ -436,10 +436,10 @@ const glob = require('fs');
 let foundMain = false;
 function findMainActivity(dir) {
   if (!fs.existsSync(dir)) return;
-  const list = fs.readdirSync(dir);
-  for (const item of list) {
+  for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+    const item = ent.name;
     const full = path.join(dir, item);
-    if (fs.statSync(full).isDirectory()) findMainActivity(full);
+    if (ent.isDirectory()) findMainActivity(full);
     else if (item === 'MainActivity.java') {
       const jSrc = fs.readFileSync(full, 'utf8');
       if (jSrc.includes('@JavascriptInterface') && !jSrc.includes('WeakReference') && jSrc.includes('Activity mContext')) {

@@ -14,10 +14,11 @@ const knownFile = join(root, 'tests', 'KNOWN_FAILING.txt');
 const TEST = /\.test\.(js|cjs|mjs)$/;
 
 function walk(dir, out = []) {
-  for (const name of readdirSync(dir)) {
+  for (const ent of readdirSync(dir, { withFileTypes: true })) {
+    const name = ent.name;
     if (name === 'node_modules' || name.startsWith('.')) continue;
     const p = join(dir, name);
-    if (statSync(p).isDirectory()) walk(p, out);
+    if (ent.isDirectory()) walk(p, out);
     else if (TEST.test(name)) out.push(relative(root, p).split('\\').join('/'));
   }
   return out;

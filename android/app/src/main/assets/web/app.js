@@ -68782,7 +68782,16 @@ window.dfDraftPersonalFocusCommitment = function(targetHours, deadlineDate, peer
   const h = Number(targetHours) || 20;
   const dl = deadlineDate ? String(deadlineDate) : (function(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);})(new Date(Date.now() + 7 * 86400000));
   const witness = String(peerWitness || 'Scholar #1 (Host)');
-  const contractId = 'contract_' + Math.random().toString(36).slice(2, 9);
+  const contractId = 'contract_' + (function () {
+    // CodeQL js/insecure-randomness: contract ids feed the study-receipt checksum, so use the CSPRNG.
+    try {
+      if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
+        return Array.from(crypto.getRandomValues(new Uint32Array(2)), function (n) { return n.toString(36); }).join('').slice(0, 9);
+      }
+    } catch (_e) { /* fall through */ }
+    window.__dfContractSeq = (window.__dfContractSeq || 0) + 1;
+    return Date.now().toString(36) + window.__dfContractSeq.toString(36);
+  })();
   return {
     contractId: contractId,
     committedHours: h,
