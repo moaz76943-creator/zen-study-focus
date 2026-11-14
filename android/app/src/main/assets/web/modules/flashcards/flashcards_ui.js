@@ -535,3 +535,25 @@
   });
   document.addEventListener('visibilitychange', function () { if (document.hidden && tts) tts.stop(); });
 })(typeof window !== 'undefined' ? window : this);
+
+/* === DF-020: Wire flashcardsEntry button to switchTab + DFFlashcardsUI.show() === */
+(function () {
+  if (typeof document === 'undefined') return;
+  function wireFlashcardsEntry() {
+    var btn = document.getElementById('flashcardsEntry');
+    if (!btn || btn.dataset.dfFcWired === '1') return;
+    btn.dataset.dfFcWired = '1';
+    btn.addEventListener('click', function () {
+      if (typeof window.switchTab === 'function') {
+        window.switchTab('sec-flashcards', document.getElementById('navNotes'));
+      } else if (window.DFFlashcardsUI && typeof window.DFFlashcardsUI.show === 'function') {
+        window.DFFlashcardsUI.show();
+      }
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', wireFlashcardsEntry);
+  } else {
+    wireFlashcardsEntry();
+  }
+})();

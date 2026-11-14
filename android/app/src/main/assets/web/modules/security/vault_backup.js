@@ -59,7 +59,23 @@
                 notes: JSON.parse(localStorage.getItem('df_trizone_notes_v1') || '[]'),
                 docs: JSON.parse(localStorage.getItem('df_reader_docs_v1') || '[]'),
                 syllabus: JSON.parse(localStorage.getItem('df_syllabus_roadmap_v1') || '{}'),
-                cognitiveHistory: JSON.parse(localStorage.getItem('df_cognitive_history_v1') || '[]')
+                cognitiveHistory: JSON.parse(localStorage.getItem('df_cognitive_history_v1') || '[]'),
+                coreFortressV21: (function () {
+                    const keys = [
+                        'zen_fortress_cfg_v21',
+                        'zen_fortress_cfg_v21_mirror',
+                        'zen_fortress_tasks_v21',
+                        'zen_fortress_tasks_v21_mirror',
+                        'zen_fortress_notes_v21',
+                        'zen_fortress_notes_v21_mirror'
+                    ];
+                    const out = {};
+                    keys.forEach(function (k) {
+                        const v = localStorage.getItem(k);
+                        if (typeof v === 'string') out[k] = v;
+                    });
+                    return out;
+                })()
             };
         }
 
