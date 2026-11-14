@@ -41,7 +41,21 @@ def executable_source_digest(root: Path) -> str:
     return digest.hexdigest()
 
 
-def approved_evidence_sink(root: Path):
+def current_review_digest(root: Path):
+    """Expose only exact SHA-256 review bindings; never expose source text or paths."""
+    try:
+        source = root / EVIDENCE_SINK[1]
+        if source.is_symlink() or not source.is_file() or source.stat().st_size > MAX_BYTES:
+            return None
+        return {
+            "sourceSha256": hashlib.sha256(source.read_bytes()).hexdigest(),
+            "executableSourceSha256": executable_source_digest(root),
+        }
+    except (OSError, ValueError, UnicodeError, subprocess.SubprocessError):
+        return None
+
+
+def approved_evidence_sink(root: Path, review_digest=None):
     """One explicit adjudication. Never infer approval or update its snapshot."""
     try:
         registry = root / 'tools/security/codeql_adjudications.json'
@@ -60,10 +74,8 @@ def approved_evidence_sink(root: Path):
         source_hash, tree_hash = entry.get('sourceSha256'), entry.get('executableSourceSha256')
         if not all(isinstance(value, str) and re.fullmatch(r'[a-f0-9]{64}', value) for value in (source_hash, tree_hash)):
             return None
-        source = root / EVIDENCE_SINK[1]
-        if source.is_symlink() or hashlib.sha256(source.read_bytes()).hexdigest() != source_hash:
-            return None
-        if executable_source_digest(root) != tree_hash:
+        current = review_digest if review_digest is not None else current_review_digest(root)
+        if not isinstance(current, dict) or current.get('sourceSha256') != source_hash or current.get('executableSourceSha256') != tree_hash:
             return None
         return {key: entry[key] for key in ('id', 'verdict', 'sourceSha256', 'executableSourceSha256')}
     except (OSError, ValueError, UnicodeError, subprocess.SubprocessError, AttributeError, TypeError):
@@ -84,7 +96,9 @@ def summarize(directory: Path, sha: str, source_root=None) -> dict:
         unclassified_reasons = {}
         unclassified_structure = {}
         evidence = []
-        adjudication = approved_evidence_sink(Path(source_root) if source_root is not None else Path(__file__).resolve().parents[2])
+        review_root = Path(source_root) if source_root is not None else Path(__file__).resolve().parents[2]
+        review_digest = current_review_digest(review_root)
+        adjudication = approved_evidence_sink(review_root, review_digest)
         adjudicable = 0
         for path in paths:
             if path.stat().st_size > MAX_BYTES:
@@ -193,7 +207,7 @@ def summarize(directory: Path, sha: str, source_root=None) -> dict:
                   adjudications=[adjudication] if false_positives else [],
                   status="PASS" if unresolved == 0 else "FAIL",
                   reason="ZERO_FINDINGS" if count == 0 else "REVIEWED_FALSE_POSITIVE" if unresolved == 0 else "CODEQL_FINDINGS",
-                  rule_counts=dict(sorted(rule_counts.items())), unclassified_reasons=dict(sorted(unclassified_reasons.items())), unclassified_structure=dict(sorted(unclassified_structure.items())), evidence=evidence)
+                  rule_counts=dict(sorted(rule_counts.items())), unclassified_reasons=dict(sorted(unclassified_reasons.items())), unclassified_structure=dict(sorted(unclassified_structure.items())), evidence=evidence, review_digest=review_digest)
     return output
 
 
