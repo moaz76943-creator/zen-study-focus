@@ -14,17 +14,26 @@ const rootDir = fs.existsSync(webDir) ? webDir : baseDir;
 const indexPath = path.join(rootDir, 'index.html');
 const indexContent = fs.existsSync(indexPath) ? fs.readFileSync(indexPath, 'utf8') : '';
 
+function readRegularFileNoFollow(filePath) {
+  const fd = fs.openSync(filePath, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
+  try {
+    if (!fs.fstatSync(fd).isFile()) throw new Error('Expected regular source file');
+    return fs.readFileSync(fd, 'utf8');
+  } finally {
+    fs.closeSync(fd);
+  }
+}
+
 let allJsContent = '';
 function gatherJs(dir) {
   if (!fs.existsSync(dir)) return;
-  const files = fs.readdirSync(dir);
-  for (const f of files) {
-    const full = path.join(dir, f);
-    const stat = fs.statSync(full);
-    if (stat.isDirectory() && f !== '.git' && f !== 'node_modules') {
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isSymbolicLink()) continue;
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory() && entry.name !== '.git' && entry.name !== 'node_modules') {
       gatherJs(full);
-    } else if (f.endsWith('.js') && !f.includes('deepseek_qa_auditor')) {
-      allJsContent += fs.readFileSync(full, 'utf8') + '\n';
+    } else if (entry.isFile() && entry.name.endsWith('.js') && !entry.name.includes('deepseek_qa_auditor')) {
+      allJsContent += readRegularFileNoFollow(full) + '\\n';
     }
   }
 }
