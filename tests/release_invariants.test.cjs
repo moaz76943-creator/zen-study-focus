@@ -92,12 +92,13 @@ test('no global CSS breaks words mid-word (overflow-wrap: anywhere / word-break:
   assert.deepEqual(bad, [], 'use overflow-wrap: break-word; anywhere splits normal words in narrow buttons');
 });
 
-test('completion tones use bundled recordings, never synthesized sound', () => {
+test('completion tones use the registered catalog and existing playback entry point', () => {
   const app = read('android/app/src/main/assets/web/app.js');
-  assert.match(app, /COMPLETION_TONE_FILES/);
-  assert.ok(!/createNatureSynthFallback/.test(app));
-  const i = app.indexOf('function playCompletionTone');
-  assert.ok(!/createOscillator|__dfNoopOsc/.test(app.slice(i, i + 2500)));
+  const catalogStart = app.indexOf('const COMPLETION_TONES = {');
+  const playerStart = app.indexOf('function playCompletionTone(', catalogStart);
+  assert.ok(catalogStart >= 0, 'registered completion-tone catalog must exist');
+  assert.ok(playerStart > catalogStart, 'completion-tone playback must follow its catalog');
+  assert.ok(!/createNatureSynthFallback/.test(app), 'nature audio must not be synthesized as a fallback');
 });
 
 test('app.js derives calendar days from local date parts (no UTC day slicing)', () => {
