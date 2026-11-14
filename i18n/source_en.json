@@ -1,0 +1,2526 @@
+{
+ "+ Add": {
+  "ctx": "sec-timer#quickTrainingDetails",
+  "kind": "text"
+ },
+ "+ Add Branch": {
+  "ctx": "sec-notes#dfPillar1StudioMount",
+  "kind": "text"
+ },
+ "+ Add Note to Date": {
+  "ctx": "sec-calendar#sec-calendar",
+  "kind": "text"
+ },
+ "+{0} Word ⏭": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "A card with the same front already exists in this deck.": {
+  "ctx": "flashcards:dupWarn",
+  "kind": "flashcards"
+ },
+ "A little progress, each day": {
+  "ctx": "sec-timer#dailyGoalsHeading",
+  "kind": "text"
+ },
+ "A tailored session for every goal": {
+  "ctx": "sec-timer#sec-timer",
+  "kind": "text"
+ },
+ "A timer session is already active; it will keep running.": {
+  "ctx": "flashcards:timerBusy",
+  "kind": "flashcards"
+ },
+ "Accuracy": {
+  "ctx": "flashcards:accuracy",
+  "kind": "flashcards"
+ },
+ "Active Break": {
+  "ctx": "sec-timer,sec-calendar#dailyGoalsRows | sec-timer#dailyGoalsRows",
+  "kind": "text,aria-label"
+ },
+ "Active Flashcard Link": {
+  "ctx": "sec-notes#dfMindMapCanvasHost",
+  "kind": "text"
+ },
+ "Active Sound Source:": {
+  "ctx": "sec-sounds#dfPillar5TabHost",
+  "kind": "text"
+ },
+ "Active recall": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "text"
+ },
+ "Active recall — Question and answer review": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "aria-label"
+ },
+ "Activity": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Add Q&A": {
+  "ctx": "modal:noteModal#nsux-recall",
+  "kind": "text"
+ },
+ "Add card": {
+  "ctx": "sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#sec-flashcards | flashcards:add",
+  "kind": "aria-label,flashcards"
+ },
+ "Add your first card": {
+  "ctx": "sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#sec-flashcards | flashcards:addFirst",
+  "kind": "text,aria-label,flashcards"
+ },
+ "Advanced tasks and calendar": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "aria-label"
+ },
+ "Again": {
+  "ctx": "flashcards:again",
+  "kind": "flashcards"
+ },
+ "All": {
+  "ctx": "sec-notes#sec-notes | flashcards:allStates",
+  "kind": "text,flashcards"
+ },
+ "All ({0})": {
+  "ctx": "sec-sounds#sec-sounds",
+  "kind": "text"
+ },
+ "All cards": {
+  "ctx": "flashcards:allCards",
+  "kind": "flashcards"
+ },
+ "Almost — check the spelling": {
+  "ctx": "flashcards:almost",
+  "kind": "flashcards"
+ },
+ "Analytics": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#navAnalytics",
+  "kind": "text"
+ },
+ "Archive": {
+  "ctx": "flashcards:archive",
+  "kind": "flashcards"
+ },
+ "Archived": {
+  "ctx": "flashcards:archived",
+  "kind": "flashcards"
+ },
+ "Auto-Layout": {
+  "ctx": "sec-notes#dfPillar1StudioMount",
+  "kind": "text"
+ },
+ "Automatic": {
+  "ctx": "flashcards:autoVoice",
+  "kind": "flashcards"
+ },
+ "Average session": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Azimuth ({0}° Horizontal Pan):": {
+  "ctx": "sec-sounds#dfPillar5TabHost",
+  "kind": "text"
+ },
+ "Back": {
+  "ctx": "flashcards:back",
+  "kind": "flashcards"
+ },
+ "Back (translation / answer)": {
+  "ctx": "flashcards:back",
+  "kind": "flashcards"
+ },
+ "Backup Export": {
+  "ctx": "sec-timer#sec-timer",
+  "kind": "text"
+ },
+ "Backup copied — save privately; NOT encrypted": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "Binaural acoustics & gamma brainwaves": {
+  "ctx": "modal:dfZenStudySuiteModal#btnLaunchSpatialAudioStudio",
+  "kind": "text"
+ },
+ "Blank-sheet active recall & simplification": {
+  "ctx": "modal:dfZenStudySuiteModal#btnLaunchFeynmanStudio",
+  "kind": "text"
+ },
+ "Blur text for active recall (Tap to reveal)": {
+  "ctx": "modal:noteModal#noteModal",
+  "kind": "text"
+ },
+ "Both directions": {
+  "ctx": "flashcards:modeBoth",
+  "kind": "flashcards"
+ },
+ "Bulleted list": {
+  "ctx": "modal:noteModal#nsux-tools",
+  "kind": "aria-label"
+ },
+ "Calendar": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#navCalendar",
+  "kind": "text"
+ },
+ "Cancel": {
+  "ctx": "modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfZenStudySuiteModal#langModal | modal:dailyGoalsModal,modal:customTimerModal,modal:noteModal#dailyGoalsModal | flashcards:cancel",
+  "kind": "aria-label,text,flashcards"
+ },
+ "Canvas View: {0}×{1} Vector • Stylus Smoothing: Catmull-Rom Bezier": {
+  "ctx": "sec-notes#dfPillar4ContentPane",
+  "kind": "text"
+ },
+ "Capture ideas from a book": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "title"
+ },
+ "Card deleted": {
+  "ctx": "flashcards:deleted",
+  "kind": "flashcards"
+ },
+ "Card text size": {
+  "ctx": "flashcards:textSize",
+  "kind": "flashcards"
+ },
+ "Card type": {
+  "ctx": "flashcards:type",
+  "kind": "flashcards"
+ },
+ "Change": {
+  "ctx": "sec-timer#df-change-task-btn",
+  "kind": "text"
+ },
+ "Chapter Template": {
+  "ctx": "sec-notes#dfPillar1StudioMount",
+  "kind": "text"
+ },
+ "Checklist": {
+  "ctx": "sec-notes#nsTemplates | modal:noteModal#nsux-tools",
+  "kind": "text,aria-label"
+ },
+ "Checklist — Track items to completion": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "aria-label"
+ },
+ "Choose a sound": {
+  "ctx": "sec-sounds#completionAlertPickerHost",
+  "kind": "text"
+ },
+ "Choose file": {
+  "ctx": "flashcards:choose",
+  "kind": "flashcards"
+ },
+ "Choose your activity": {
+  "ctx": "sec-timer#sec-timer",
+  "kind": "text"
+ },
+ "Classic": {
+  "ctx": "flashcards:modeClassic",
+  "kind": "flashcards"
+ },
+ "Clear": {
+  "ctx": "sec-notes#dfPillar4ContentPane",
+  "kind": "text"
+ },
+ "Cloud Backup": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#heroHeader",
+  "kind": "title"
+ },
+ "Column for": {
+  "ctx": "flashcards:mapColumn",
+  "kind": "flashcards"
+ },
+ "Completed": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "text"
+ },
+ "Completed tasks: {0} / {1}": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Completion Sound": {
+  "ctx": "sec-sounds#completionAlertPickerHost | sec-sounds#df-tone-picker-card",
+  "kind": "text,aria-label"
+ },
+ "Comprehension": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "Concept → Explanation": {
+  "ctx": "flashcards:tConcept",
+  "kind": "flashcards"
+ },
+ "Configured speed": {
+  "ctx": "flashcards:actualSpeed",
+  "kind": "flashcards"
+ },
+ "Connect with classmates on the same Wi-Fi or Mobile Hotspot without internet or external servers. Synchronize Pomodoro timers, Tibet singing bell chimes, and peer presence with <{0}ms clock drift.": {
+  "ctx": "sec-timer#dfPillar8TabContainer",
+  "kind": "text"
+ },
+ "Consistency": {
+  "ctx": "flashcards:consistency",
+  "kind": "flashcards"
+ },
+ "Content": {
+  "ctx": "modal:noteModal#nsBodyLabel",
+  "kind": "text"
+ },
+ "Contextual Advanced Learning Studios": {
+  "ctx": "modal:dfZenStudySuiteModal#dfZenStudySuiteModal",
+  "kind": "text"
+ },
+ "Continue last session": {
+  "ctx": "flashcards:continueSession",
+  "kind": "flashcards"
+ },
+ "Copied to clipboard": {
+  "ctx": "flashcards:copied",
+  "kind": "flashcards"
+ },
+ "Copy all notes": {
+  "ctx": "sec-notes#nsExport",
+  "kind": "aria-label"
+ },
+ "Core Concept": {
+  "ctx": "sec-notes#dfMindMapCanvasHost",
+  "kind": "text"
+ },
+ "Cornell Notes & Mind-Map Studio": {
+  "ctx": "sec-notes#dfPillar1StudioMount",
+  "kind": "text"
+ },
+ "Correct": {
+  "ctx": "flashcards:correctAnswers",
+  "kind": "flashcards"
+ },
+ "Create Cloze Card": {
+  "ctx": "sec-notes#dfStemContentPane",
+  "kind": "text"
+ },
+ "Create a card to start. Everything stays on your phone and works offline.": {
+  "ctx": "sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#sec-flashcards | flashcards:emptyText",
+  "kind": "text,flashcards"
+ },
+ "Create a deck first.": {
+  "ctx": "flashcards:noDecks",
+  "kind": "flashcards"
+ },
+ "Cues: {0} | Density Ratio: {1} | WikiLinks: {2}": {
+  "ctx": "sec-notes#dfTriZoneMetrics",
+  "kind": "text"
+ },
+ "Current streak": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Custom front → back": {
+  "ctx": "flashcards:tCustom",
+  "kind": "flashcards"
+ },
+ "Custom session": {
+  "ctx": "flashcards:modeCustom",
+  "kind": "flashcards"
+ },
+ "Custom work-and-rest intervals": {
+  "ctx": "sec-timer#quickTrainingDetails",
+  "kind": "text"
+ },
+ "Custom ⚡": {
+  "ctx": "sec-timer,modal:customTimerModal#modeCustomBtn",
+  "kind": "text"
+ },
+ "Daily Goals": {
+  "ctx": "sec-timer#goalsEditButton",
+  "kind": "text"
+ },
+ "Daily activity goals": {
+  "ctx": "modal:dailyGoalsModal#goalsModalHeading",
+  "kind": "text"
+ },
+ "Daily distribution": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Daily goal": {
+  "ctx": "flashcards:dailyGoal",
+  "kind": "flashcards"
+ },
+ "Daily journal": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "text"
+ },
+ "Daily journal — Reflect on your day": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "aria-label"
+ },
+ "Date": {
+  "ctx": "modal:noteModal#nsDateLabel",
+  "kind": "text"
+ },
+ "Decision log": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "text"
+ },
+ "Decision log — Record options and reasoning": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "aria-label"
+ },
+ "Decisions and follow-up actions": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "title"
+ },
+ "Deck": {
+  "ctx": "flashcards:deck",
+  "kind": "flashcards"
+ },
+ "Deck name": {
+  "ctx": "flashcards:deckName",
+  "kind": "flashcards"
+ },
+ "Deep Study": {
+  "ctx": "sec-timer,sec-calendar#dailyGoalsRows | sec-timer#dailyGoalsRows",
+  "kind": "text,aria-label"
+ },
+ "Deep Work": {
+  "ctx": "sec-timer#domBtn-work | sec-timer#dailyGoalsRows",
+  "kind": "text,aria-label"
+ },
+ "Deep work {0}/{1}": {
+  "ctx": "sec-timer#quickTrainingDetails",
+  "kind": "text"
+ },
+ "Default deck": {
+  "ctx": "flashcards:defaultDeck",
+  "kind": "flashcards"
+ },
+ "Default study mode": {
+  "ctx": "flashcards:defaultMode",
+  "kind": "flashcards"
+ },
+ "Defaults": {
+  "ctx": "modal:timerSettingsModal#tsetReset",
+  "kind": "text"
+ },
+ "Delete": {
+  "ctx": "flashcards:del",
+  "kind": "flashcards"
+ },
+ "Delete this card? You can undo right after.": {
+  "ctx": "flashcards:confirmDelete",
+  "kind": "flashcards"
+ },
+ "Description": {
+  "ctx": "flashcards:deckDesc",
+  "kind": "flashcards"
+ },
+ "Desk Clock": {
+  "ctx": "sec-timer#sec-timer",
+  "kind": "text"
+ },
+ "Detailed progress": {
+  "ctx": "flashcards:details",
+  "kind": "flashcards"
+ },
+ "Different from the stored answer": {
+  "ctx": "flashcards:different",
+  "kind": "flashcards"
+ },
+ "Difficult cards": {
+  "ctx": "flashcards:difficult",
+  "kind": "flashcards"
+ },
+ "Discard": {
+  "ctx": "modal:noteModal#nsDraftDiscard",
+  "kind": "text"
+ },
+ "Distance (HRTF Rolloff):": {
+  "ctx": "sec-sounds#dfPillar5TabHost",
+  "kind": "text"
+ },
+ "Distant Thunder": {
+  "ctx": "sec-sounds#completionAlertPickerHost | sec-sounds#soundsGridBox",
+  "kind": "text,aria-label"
+ },
+ "Due for review": {
+  "ctx": "flashcards:dueDeck",
+  "kind": "flashcards"
+ },
+ "Due today": {
+  "ctx": "flashcards:due",
+  "kind": "flashcards"
+ },
+ "Duplicate": {
+  "ctx": "flashcards:duplicate",
+  "kind": "flashcards"
+ },
+ "Duplicates": {
+  "ctx": "flashcards:duplicates",
+  "kind": "flashcards"
+ },
+ "Easy": {
+  "ctx": "flashcards:easy",
+  "kind": "flashcards"
+ },
+ "Edit": {
+  "ctx": "flashcards:edit",
+  "kind": "flashcards"
+ },
+ "End session": {
+  "ctx": "flashcards:end",
+  "kind": "flashcards"
+ },
+ "Enter {0}-Digit PIN (e.g. {1})...": {
+  "ctx": "sec-timer#dfPillar8TabContainer",
+  "kind": "placeholder"
+ },
+ "Example": {
+  "ctx": "flashcards:example",
+  "kind": "flashcards"
+ },
+ "Example translation": {
+  "ctx": "flashcards:exampleTr",
+  "kind": "flashcards"
+ },
+ "Exercise sequence": {
+  "ctx": "sec-timer#quickTrainingDetails",
+  "kind": "text"
+ },
+ "Explain the concept here using simple everyday words and clear analogies, as if teaching a younger sibling or beginner without any textbook notes...": {
+  "ctx": "sec-notes#dfFeynmanTextarea",
+  "kind": "placeholder"
+ },
+ "Explore and evaluate ideas": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "title"
+ },
+ "Export CSV": {
+  "ctx": "sec-analytics#df22AnalyticsHost | flashcards:exportCsv",
+  "kind": "text,flashcards"
+ },
+ "Export started": {
+  "ctx": "flashcards:exportShared",
+  "kind": "flashcards"
+ },
+ "Favorite": {
+  "ctx": "modal:noteModal#nsFavCheckLabel | flashcards:fav",
+  "kind": "text,flashcards"
+ },
+ "Favorites": {
+  "ctx": "flashcards:favorites",
+  "kind": "flashcards"
+ },
+ "Feynman Blank-Sheet Recall Studio": {
+  "ctx": "sec-notes#dfFeynmanStudioCard",
+  "kind": "text"
+ },
+ "Feynman Recall Lab": {
+  "ctx": "modal:dfZenStudySuiteModal#btnLaunchFeynmanStudio",
+  "kind": "text"
+ },
+ "Feynman Recall 🧠": {
+  "ctx": "sec-notes#btnLaunchFeynmanPill",
+  "kind": "text"
+ },
+ "Fill in the blank": {
+  "ctx": "flashcards:modeCloze",
+  "kind": "flashcards"
+ },
+ "Filter": {
+  "ctx": "flashcards:filter",
+  "kind": "flashcards"
+ },
+ "Filter by category": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "aria-label"
+ },
+ "Filter by project": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "aria-label"
+ },
+ "Filter by status": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "aria-label"
+ },
+ "Filters": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "text"
+ },
+ "Find in note": {
+  "ctx": "modal:noteModal#nsux-fields",
+  "kind": "text"
+ },
+ "Flashcards": {
+  "ctx": "sec-notes,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#flashcardsEntryLabel | sec-notes,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#flashcardsEntry | flashcards:title",
+  "kind": "text,aria-label,flashcards"
+ },
+ "Floating Scratchpad": {
+  "ctx": "modal:dfZenStudySuiteModal#btnToggleScratchpadOverlay",
+  "kind": "text"
+ },
+ "Focal Stream Speed Reader": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "Focus and break settings": {
+  "ctx": "modal:timerSettingsModal#tsetHeading",
+  "kind": "text"
+ },
+ "Focus session shortcuts": {
+  "ctx": "sec-timer#sec-timer",
+  "kind": "aria-label"
+ },
+ "Focus writing": {
+  "ctx": "modal:noteModal#nsux-focus-toggle",
+  "kind": "text"
+ },
+ "Focus · min": {
+  "ctx": "modal:timerSettingsModal#tsetFocusLabel",
+  "kind": "text"
+ },
+ "Forest & Wind": {
+  "ctx": "sec-sounds#sec-sounds",
+  "kind": "text"
+ },
+ "Formula Preset:": {
+  "ctx": "sec-notes#dfStemContentPane",
+  "kind": "text"
+ },
+ "Fri": {
+  "ctx": "sec-timer,sec-calendar#homeWeekStrip",
+  "kind": "text"
+ },
+ "Fri {0}-{1}-{2}": {
+  "ctx": "sec-timer#homeWeekStrip",
+  "kind": "aria-label"
+ },
+ "From": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Front (original)": {
+  "ctx": "flashcards:front",
+  "kind": "flashcards"
+ },
+ "General Study Session": {
+  "ctx": "sec-timer#df-current-task-name",
+  "kind": "text"
+ },
+ "Goal comparison": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Good": {
+  "ctx": "flashcards:good",
+  "kind": "flashcards"
+ },
+ "Hard": {
+  "ctx": "flashcards:hard",
+  "kind": "flashcards"
+ },
+ "Heading": {
+  "ctx": "modal:noteModal#nsux-tools",
+  "kind": "aria-label"
+ },
+ "Highland Wind": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "text,aria-label"
+ },
+ "History-backed analytics": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "aria-label"
+ },
+ "Ideas board": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "text"
+ },
+ "Ideas board — Explore and evaluate ideas": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "aria-label"
+ },
+ "Import": {
+  "ctx": "sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#sec-flashcards | flashcards:import | flashcards:importNow",
+  "kind": "text,aria-label,flashcards"
+ },
+ "Imported": {
+  "ctx": "flashcards:importOk",
+  "kind": "flashcards"
+ },
+ "Importing…": {
+  "ctx": "flashcards:importing",
+  "kind": "flashcards"
+ },
+ "Incorrect": {
+  "ctx": "flashcards:incorrectAnswers",
+  "kind": "flashcards"
+ },
+ "Infinite Study Whiteboard and Image Occlusion Engine": {
+  "ctx": "sec-notes#dfPillar4WhiteboardMount",
+  "kind": "aria-label"
+ },
+ "Infinite Whiteboard & Diagram Occlusion": {
+  "ctx": "sec-notes#dfPillar4WhiteboardMount",
+  "kind": "text"
+ },
+ "Infinite canvas & image occlusion cards": {
+  "ctx": "modal:dfZenStudySuiteModal#btnLaunchWhiteboardStudio",
+  "kind": "text"
+ },
+ "Install the voice data in Android Settings > System > Languages > Text-to-speech output.": {
+  "ctx": "flashcards:installVoice",
+  "kind": "flashcards"
+ },
+ "Instant gesture notes & calculations": {
+  "ctx": "modal:dfZenStudySuiteModal#btnToggleScratchpadOverlay",
+  "kind": "text"
+ },
+ "Interactive Vector Mind-Map Canvas (Pure SVG — Drag Nodes & Connect Ideas)": {
+  "ctx": "sec-notes#dfPillar1StudioMount",
+  "kind": "text"
+ },
+ "Intervals {0}/{1}": {
+  "ctx": "sec-timer#quickTrainingDetails",
+  "kind": "text"
+ },
+ "Invalid": {
+  "ctx": "flashcards:invalid",
+  "kind": "flashcards"
+ },
+ "Join or host a local study pod": {
+  "ctx": "sec-timer#dfPillar8TabContainer",
+  "kind": "text"
+ },
+ "Key Cue Questions": {
+  "ctx": "sec-notes#dfMindMapCanvasHost",
+  "kind": "text"
+ },
+ "Language": {
+  "ctx": "flashcards:ttsLanguage | flashcards:language",
+  "kind": "flashcards"
+ },
+ "Language (e.g. de)": {
+  "ctx": "flashcards:langFilter",
+  "kind": "flashcards"
+ },
+ "Large": {
+  "ctx": "flashcards:large",
+  "kind": "flashcards"
+ },
+ "Last {0} days": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Last {0} days: {1} min / Previous {2} days: {3} min (—)": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Learned": {
+  "ctx": "flashcards:learned",
+  "kind": "flashcards"
+ },
+ "Lecture summary": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "text"
+ },
+ "Lecture summary — Summarize lesson concepts": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "aria-label"
+ },
+ "Linked flashcard concepts (note ↔ flashcards)": {
+  "ctx": "sec-notes#dfPillar1StudioMount",
+  "kind": "text"
+ },
+ "Listening": {
+  "ctx": "flashcards:listening | flashcards:modeListening",
+  "kind": "flashcards"
+ },
+ "Load more": {
+  "ctx": "flashcards:loadMore",
+  "kind": "flashcards"
+ },
+ "Local Data": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#heroHeader",
+  "kind": "text"
+ },
+ "Long rest · min": {
+  "ctx": "modal:timerSettingsModal#tsetLongLabel",
+  "kind": "text"
+ },
+ "Main navigation": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#htmlRoot",
+  "kind": "aria-label"
+ },
+ "Main notes": {
+  "ctx": "modal:noteModal#nsux-cornell",
+  "kind": "text"
+ },
+ "Manual Backup": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#heroHeader",
+  "kind": "text,aria-label,title"
+ },
+ "Map → Flashcards": {
+  "ctx": "sec-notes#dfPillar1StudioMount",
+  "kind": "text"
+ },
+ "Mark complete": {
+  "ctx": "modal:noteModal#nsux-tools",
+  "kind": "text"
+ },
+ "Matches": {
+  "ctx": "flashcards:correct",
+  "kind": "flashcards"
+ },
+ "Medium": {
+  "ctx": "flashcards:medium",
+  "kind": "flashcards"
+ },
+ "Meeting minutes": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "text"
+ },
+ "Meeting minutes — Decisions and follow-up actions": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "aria-label"
+ },
+ "Milestones, blockers and next steps": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "title"
+ },
+ "Mindful Reading": {
+  "ctx": "sec-timer,sec-calendar#dailyGoalsRows | sec-timer#dailyGoalsRows",
+  "kind": "text,aria-label"
+ },
+ "Minutes ({0}-{1})": {
+  "ctx": "modal:customTimerModal#inpCustomMins",
+  "kind": "placeholder"
+ },
+ "Minutes come from your completed focus sessions.": {
+  "ctx": "sec-timer#dailyGoalsDescription",
+  "kind": "text"
+ },
+ "Mistake review": {
+  "ctx": "flashcards:modeMistakes",
+  "kind": "flashcards"
+ },
+ "Mixed practice": {
+  "ctx": "flashcards:modeMixed",
+  "kind": "flashcards"
+ },
+ "Mon": {
+  "ctx": "sec-timer,sec-calendar#homeWeekStrip",
+  "kind": "text"
+ },
+ "Mon {0}-{1}-{2}": {
+  "ctx": "sec-timer#homeWeekStrip",
+  "kind": "aria-label"
+ },
+ "More": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "text"
+ },
+ "More fields": {
+  "ctx": "flashcards:more",
+  "kind": "flashcards"
+ },
+ "More views": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "aria-label"
+ },
+ "Mountain Stream": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "text,aria-label"
+ },
+ "Multiple choice": {
+  "ctx": "flashcards:modeChoice",
+  "kind": "flashcards"
+ },
+ "My cards": {
+  "ctx": "flashcards:defaultDeckName",
+  "kind": "flashcards"
+ },
+ "My decks": {
+  "ctx": "flashcards:myDecks",
+  "kind": "flashcards"
+ },
+ "My notes": {
+  "ctx": "sec-notes#nsTotalLabel",
+  "kind": "text"
+ },
+ "Nature": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#navSounds",
+  "kind": "text"
+ },
+ "Nature sound controls": {
+  "ctx": "sec-sounds#mixerStatusTxt",
+  "kind": "text"
+ },
+ "Needs at least {0} cards with different answers in the deck.": {
+  "ctx": "flashcards:needFour",
+  "kind": "flashcards"
+ },
+ "Needs review": {
+  "ctx": "flashcards:review",
+  "kind": "flashcards"
+ },
+ "Net Effective": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "New cards": {
+  "ctx": "flashcards:newCards",
+  "kind": "flashcards"
+ },
+ "New concept node...": {
+  "ctx": "sec-notes#dfMindMapNodeInput",
+  "kind": "placeholder"
+ },
+ "New deck": {
+  "ctx": "flashcards:newDeck",
+  "kind": "flashcards"
+ },
+ "New note": {
+  "ctx": "sec-notes#sec-notes | modal:noteModal#nsEditorHeading",
+  "kind": "aria-label,text"
+ },
+ "New project": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "text"
+ },
+ "New task": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "placeholder,aria-label"
+ },
+ "Next": {
+  "ctx": "modal:noteModal#nsux-fields | flashcards:next",
+  "kind": "text,flashcards"
+ },
+ "Next Month": {
+  "ctx": "sec-calendar#sec-calendar",
+  "kind": "aria-label"
+ },
+ "No cards here yet.": {
+  "ctx": "flashcards:noCards",
+  "kind": "flashcards"
+ },
+ "No cards yet": {
+  "ctx": "sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#sec-flashcards | flashcards:emptyTitle",
+  "kind": "text,flashcards"
+ },
+ "No daily goals configured": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "No dated goal snapshots recorded": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "No matching tasks": {
+  "ctx": "sec-tasks#df-task-results",
+  "kind": "text"
+ },
+ "No recorded sessions in this period": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "No tasks for today yet": {
+  "ctx": "sec-timer#todayPlanPreview",
+  "kind": "text"
+ },
+ "None": {
+  "ctx": "flashcards:skipCol",
+  "kind": "flashcards"
+ },
+ "Note Title...": {
+  "ctx": "sec-notes#dfTriZoneTitleInput",
+  "kind": "placeholder"
+ },
+ "Note templates": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "aria-label"
+ },
+ "Notebook": {
+  "ctx": "sec-notes#nsux-book-filter | modal:noteModal#nsux-fields",
+  "kind": "aria-label,text"
+ },
+ "Notes": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#navNotes",
+  "kind": "text"
+ },
+ "Nothing is due right now.": {
+  "ctx": "flashcards:nothingDue",
+  "kind": "flashcards"
+ },
+ "November {0}": {
+  "ctx": "sec-calendar#calMonthYearTitle",
+  "kind": "text"
+ },
+ "Numbered list": {
+  "ctx": "modal:noteModal#nsux-tools",
+  "kind": "aria-label"
+ },
+ "Offline Study Pods & Silent Radar": {
+  "ctx": "sec-timer#dfPillar8StudioCard",
+  "kind": "text"
+ },
+ "Offline voices only": {
+  "ctx": "flashcards:offlineOnly",
+  "kind": "flashcards"
+ },
+ "Open or close studio and maintenance tools": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#sovereignCalmToolsToggle",
+  "kind": "aria-label"
+ },
+ "Open studios and tools panel": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#zenStudioTriggerPill",
+  "kind": "aria-label"
+ },
+ "Original": {
+  "ctx": "flashcards:sideFront",
+  "kind": "flashcards"
+ },
+ "Original dated goal targets": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Overdue": {
+  "ctx": "sec-tasks#df22TasksHost | flashcards:overdue",
+  "kind": "text,flashcards"
+ },
+ "Paste CSV, TSV or JSON text, or choose a file.": {
+  "ctx": "flashcards:importHelp",
+  "kind": "flashcards"
+ },
+ "Paste long study text or article here for RSVP & Visual Pacer...": {
+  "ctx": "sec-notes#dfRsvpSourceTextarea",
+  "kind": "placeholder"
+ },
+ "Paste your backup code here...": {
+  "ctx": "modal:cloudBackupModal#inpRestorePayload",
+  "kind": "placeholder"
+ },
+ "Period": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Period: {0} days": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Personal notes": {
+  "ctx": "flashcards:notes",
+  "kind": "flashcards"
+ },
+ "Pin": {
+  "ctx": "modal:noteModal#nsPinCheckLabel",
+  "kind": "text"
+ },
+ "Pine Breeze": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "text,aria-label"
+ },
+ "Pinned": {
+  "ctx": "sec-notes#nsPinnedLabel",
+  "kind": "text"
+ },
+ "Pinned only": {
+  "ctx": "sec-notes#nsPinnedOnlyLabel",
+  "kind": "text"
+ },
+ "Pitch (optional)": {
+  "ctx": "flashcards:pitch",
+  "kind": "flashcards"
+ },
+ "Plan today and track real work": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "text"
+ },
+ "Plan • Execute • Achieve": {
+  "ctx": "sec-timer#timerLinkedTask",
+  "kind": "text"
+ },
+ "Play example": {
+  "ctx": "flashcards:playExample",
+  "kind": "flashcards"
+ },
+ "Play original": {
+  "ctx": "flashcards:playFront",
+  "kind": "flashcards"
+ },
+ "Play translation": {
+  "ctx": "flashcards:playBack",
+  "kind": "flashcards"
+ },
+ "Play: Distant Thunder": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "aria-label"
+ },
+ "Play: Highland Wind": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "aria-label"
+ },
+ "Play: Mountain Stream": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "aria-label"
+ },
+ "Play: Pine Breeze": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "aria-label"
+ },
+ "Play: Soft Forest Rain": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "aria-label"
+ },
+ "Please enter a {0}-digit PIN or paste a QR Ticket.": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "Pod Name (e.g. Physics Library Pod)...": {
+  "ctx": "sec-timer#dfPillar8TabContainer",
+  "kind": "placeholder"
+ },
+ "Position pure procedural soundscapes around your head in {0}-degree spatial coordinates using Head-Related Transfer Functions (HRTF). Best experienced with headphones.": {
+  "ctx": "sec-sounds#dfPillar5TabHost",
+  "kind": "text"
+ },
+ "Prefer a confirmed male voice": {
+  "ctx": "flashcards:preferMale",
+  "kind": "flashcards"
+ },
+ "Prev Month": {
+  "ctx": "sec-calendar#sec-calendar",
+  "kind": "aria-label"
+ },
+ "Preview": {
+  "ctx": "sec-sounds,modal:noteModal#completionAlertPickerHost | flashcards:preview",
+  "kind": "text,flashcards"
+ },
+ "Preview: Distant Thunder": {
+  "ctx": "sec-sounds#completionAlertPickerHost",
+  "kind": "aria-label"
+ },
+ "Preview: Rain Tap": {
+  "ctx": "sec-sounds#completionAlertPickerHost",
+  "kind": "aria-label"
+ },
+ "Preview: Stream Ripple": {
+  "ctx": "sec-sounds#completionAlertPickerHost",
+  "kind": "aria-label"
+ },
+ "Preview: Vibration only": {
+  "ctx": "sec-sounds#completionAlertPickerHost",
+  "kind": "aria-label"
+ },
+ "Preview: Water Drop": {
+  "ctx": "sec-sounds#completionAlertPickerHost",
+  "kind": "aria-label"
+ },
+ "Preview: Wind Rustle": {
+  "ctx": "sec-sounds#completionAlertPickerHost",
+  "kind": "aria-label"
+ },
+ "Procedural L-system grove & habit heatmap": {
+  "ctx": "modal:dfZenStudySuiteModal#btnLaunchBotanicalGardenTimer",
+  "kind": "text"
+ },
+ "Progress": {
+  "ctx": "flashcards:progress",
+  "kind": "flashcards"
+ },
+ "Project plan": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "text"
+ },
+ "Project plan — Milestones, blockers and next steps": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "aria-label"
+ },
+ "Pronunciation": {
+  "ctx": "flashcards:modePron | flashcards:ttsTitle",
+  "kind": "flashcards"
+ },
+ "Pronunciation notes": {
+  "ctx": "flashcards:pron",
+  "kind": "flashcards"
+ },
+ "Pure SVG STEM & Strict Exam Simulator": {
+  "ctx": "sec-timer#studyContextSub",
+  "kind": "text"
+ },
+ "Pure SVG STEM Typesetter and Strict Timed Exam Simulator": {
+  "ctx": "sec-notes#dfPillar3StemMount",
+  "kind": "aria-label"
+ },
+ "Pure SVG formulas & strict exam simulator": {
+  "ctx": "modal:dfZenStudySuiteModal#btnLaunchStemStudio",
+  "kind": "text"
+ },
+ "Pure Vector SVG Typesetter Preview:": {
+  "ctx": "sec-notes#dfStemContentPane",
+  "kind": "text"
+ },
+ "Question and answer review": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "title"
+ },
+ "Question → Answer": {
+  "ctx": "flashcards:tQa",
+  "kind": "flashcards"
+ },
+ "Questions / cues": {
+  "ctx": "modal:noteModal#nsux-cornell",
+  "kind": "text"
+ },
+ "Quick Note": {
+  "ctx": "sec-timer,modal:brainDumpModal#sec-timer",
+  "kind": "text"
+ },
+ "Quick Symbol Insert ({0} Math & Greek Symbols):": {
+  "ctx": "sec-notes#dfStemContentPane",
+  "kind": "text"
+ },
+ "Quick focus durations": {
+  "ctx": "sec-timer#sec-timer",
+  "kind": "aria-label"
+ },
+ "Quick notes": {
+  "ctx": "sec-notes#sec-notes",
+  "kind": "text"
+ },
+ "Quick review": {
+  "ctx": "flashcards:modeQuick",
+  "kind": "flashcards"
+ },
+ "Quick sessions": {
+  "ctx": "sec-timer#sec-timer",
+  "kind": "text"
+ },
+ "Quick training": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#quickTrainingDetails | sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#quickTrainingCard",
+  "kind": "text,aria-label"
+ },
+ "Quote": {
+  "ctx": "modal:noteModal#nsux-tools",
+  "kind": "aria-label"
+ },
+ "Rain Tap": {
+  "ctx": "sec-sounds#completionAlertPickerHost",
+  "kind": "text"
+ },
+ "Random practice": {
+  "ctx": "flashcards:modeRandom",
+  "kind": "flashcards"
+ },
+ "Re-reads": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "Reading": {
+  "ctx": "sec-timer#domBtn-read",
+  "kind": "text"
+ },
+ "Reading guide & line spotlight": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "Reading summary": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "text"
+ },
+ "Reading summary — Capture ideas from a book": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "aria-label"
+ },
+ "Reading {0}/{1}": {
+  "ctx": "sec-timer#quickTrainingDetails",
+  "kind": "text"
+ },
+ "Reading: {0} min": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Ready to focus": {
+  "ctx": "sec-timer#focusStatusLabel",
+  "kind": "text"
+ },
+ "Ready-to-use templates": {
+  "ctx": "sec-notes#nsTemplatesTitle",
+  "kind": "text"
+ },
+ "Real-Time WPM Analytics & Reading Comprehension Tracker": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "Recall": {
+  "ctx": "sec-notes#sec-notes",
+  "kind": "text"
+ },
+ "Recently added": {
+  "ctx": "flashcards:recent",
+  "kind": "flashcards"
+ },
+ "Record options and reasoning": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "title"
+ },
+ "Record sets and progress": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "title"
+ },
+ "Recorded analytics": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Recorded minutes": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Redo": {
+  "ctx": "sec-tasks,sec-notes#df22TasksHost",
+  "kind": "text"
+ },
+ "Reflect on your day": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "title"
+ },
+ "Rename": {
+  "ctx": "flashcards:rename",
+  "kind": "flashcards"
+ },
+ "Repeat mistakes": {
+  "ctx": "flashcards:repeatMistakes",
+  "kind": "flashcards"
+ },
+ "Repetitions": {
+  "ctx": "flashcards:repeat",
+  "kind": "flashcards"
+ },
+ "Replay": {
+  "ctx": "flashcards:replay",
+  "kind": "flashcards"
+ },
+ "Rest (MM:SS)": {
+  "ctx": "sec-timer#quickTrainingDetails",
+  "kind": "text"
+ },
+ "Rest seconds": {
+  "ctx": "sec-timer#qtRest",
+  "kind": "aria-label"
+ },
+ "Restore": {
+  "ctx": "flashcards:restore",
+  "kind": "flashcards"
+ },
+ "Restore Code ✓": {
+  "ctx": "modal:cloudBackupModal#cloudBackupModal",
+  "kind": "text"
+ },
+ "Restore draft": {
+  "ctx": "modal:noteModal#nsDraftRestore",
+  "kind": "text"
+ },
+ "Resume": {
+  "ctx": "flashcards:resume",
+  "kind": "flashcards"
+ },
+ "Reveal answer": {
+  "ctx": "flashcards:reveal",
+  "kind": "flashcards"
+ },
+ "Reverse": {
+  "ctx": "flashcards:modeReverse",
+  "kind": "flashcards"
+ },
+ "Review wins and unfinished work": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "title"
+ },
+ "Reviewed": {
+  "ctx": "flashcards:reviewed",
+  "kind": "flashcards"
+ },
+ "STEM & Exam Studio": {
+  "ctx": "modal:dfZenStudySuiteModal#btnLaunchStemStudio",
+  "kind": "text"
+ },
+ "STEM Typesetter & Timed Exam Simulator": {
+  "ctx": "sec-notes#dfPillar3StemMount",
+  "kind": "text"
+ },
+ "Sat": {
+  "ctx": "sec-timer,sec-calendar#homeWeekStrip",
+  "kind": "text"
+ },
+ "Sat {0}-{1}-{2}": {
+  "ctx": "sec-timer#homeWeekStrip",
+  "kind": "aria-label"
+ },
+ "Save": {
+  "ctx": "sec-tasks#df22TasksHost | flashcards:save",
+  "kind": "text,flashcards"
+ },
+ "Save & Apply": {
+  "ctx": "modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal#dailyGoalsModal",
+  "kind": "text"
+ },
+ "Save anyway": {
+  "ctx": "flashcards:saveAnyway",
+  "kind": "flashcards"
+ },
+ "Save note": {
+  "ctx": "modal:noteModal#nsSaveButton",
+  "kind": "text"
+ },
+ "Saved": {
+  "ctx": "flashcards:saved",
+  "kind": "flashcards"
+ },
+ "Search cards": {
+  "ctx": "sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#sec-flashcards | flashcards:search",
+  "kind": "placeholder,aria-label,flashcards"
+ },
+ "Search language or country...": {
+  "ctx": "modal:langModal#inpLangCountrySearch",
+  "kind": "placeholder"
+ },
+ "Search notes or add task...": {
+  "ctx": "sec-notes#inpSearchNotes",
+  "kind": "placeholder,aria-label"
+ },
+ "Search tasks": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "placeholder,aria-label"
+ },
+ "Session Name (Study, Gym, Reading, Work)...": {
+  "ctx": "modal:customTimerModal#inpCustomTitle",
+  "kind": "placeholder"
+ },
+ "Session complete": {
+  "ctx": "flashcards:done",
+  "kind": "flashcards"
+ },
+ "Sessions": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Sessions per cycle": {
+  "ctx": "modal:timerSettingsModal#tsetRoundsLabel",
+  "kind": "text"
+ },
+ "Set goal": {
+  "ctx": "sec-timer#dailyGoalsRows",
+  "kind": "text"
+ },
+ "Set {0} to disable a goal. Saved focus sessions count toward each goal.": {
+  "ctx": "modal:dailyGoalsModal#goalsModalHint",
+  "kind": "text"
+ },
+ "Sets": {
+  "ctx": "sec-timer#quickTrainingDetails | sec-timer#qtSets",
+  "kind": "text,aria-label"
+ },
+ "Settings": {
+  "ctx": "sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#sec-flashcards | flashcards:settings",
+  "kind": "aria-label,flashcards"
+ },
+ "Share App": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#heroHeader",
+  "kind": "aria-label,title"
+ },
+ "Short rest · min": {
+  "ctx": "modal:timerSettingsModal#tsetShortLabel",
+  "kind": "text"
+ },
+ "Show examples": {
+  "ctx": "flashcards:showExamples",
+  "kind": "flashcards"
+ },
+ "Skip Step": {
+  "ctx": "sec-timer#focusHeroCard",
+  "kind": "aria-label,title"
+ },
+ "Skip duplicates": {
+  "ctx": "flashcards:skipDup",
+  "kind": "flashcards"
+ },
+ "Skip final rest": {
+  "ctx": "sec-timer#quickTrainingDetails",
+  "kind": "text"
+ },
+ "Sky & Thunder": {
+  "ctx": "sec-sounds#sec-sounds",
+  "kind": "text"
+ },
+ "Small": {
+  "ctx": "flashcards:small",
+  "kind": "flashcards"
+ },
+ "Soft Forest Rain": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "text,aria-label"
+ },
+ "Something went wrong": {
+  "ctx": "flashcards:error",
+  "kind": "flashcards"
+ },
+ "Sort": {
+  "ctx": "sec-notes#nsSortLabel | flashcards:sort",
+  "kind": "text,flashcards"
+ },
+ "Sort notes": {
+  "ctx": "sec-notes#nsSort",
+  "kind": "aria-label"
+ },
+ "Sort tasks": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "aria-label"
+ },
+ "Sound Chime": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#heroHeader",
+  "kind": "title"
+ },
+ "Source language": {
+  "ctx": "flashcards:srcLang",
+  "kind": "flashcards"
+ },
+ "Speech engine (device)": {
+  "ctx": "flashcards:ttsEngine",
+  "kind": "flashcards"
+ },
+ "Speech speed": {
+  "ctx": "flashcards:speed",
+  "kind": "flashcards"
+ },
+ "Speed ({0}–{1} WPM):": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "Speed Reading and Visual Pacing Engine": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "aria-label"
+ },
+ "Spoken side": {
+  "ctx": "flashcards:speakSide",
+  "kind": "flashcards"
+ },
+ "Sport: {0} min": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Start Deep Work": {
+  "ctx": "sec-timer#dailyGoalsRows",
+  "kind": "aria-label"
+ },
+ "Start Focus": {
+  "ctx": "sec-timer#qtStartButton",
+  "kind": "text"
+ },
+ "Start Reading": {
+  "ctx": "sec-timer#dailyGoalsRows",
+  "kind": "aria-label"
+ },
+ "Start Study": {
+  "ctx": "sec-timer#dailyGoalsRows",
+  "kind": "aria-label"
+ },
+ "Start Workout": {
+  "ctx": "sec-timer#dailyGoalsRows",
+  "kind": "aria-label"
+ },
+ "Start or pause timer": {
+  "ctx": "sec-timer#mainPlayBtn",
+  "kind": "aria-label"
+ },
+ "Status": {
+  "ctx": "sec-notes#nsux-status",
+  "kind": "aria-label"
+ },
+ "Step {0}: Choose or Enter a Concept to Explain from Memory:": {
+  "ctx": "sec-notes#dfPillar7TabContainer",
+  "kind": "text"
+ },
+ "Step {0}: Explain to a {1}-Year-Old (Zero Notes • Pure Intuition):": {
+  "ctx": "sec-notes#dfPillar7TabContainer",
+  "kind": "text"
+ },
+ "Stop": {
+  "ctx": "flashcards:stop",
+  "kind": "flashcards"
+ },
+ "Storage is full. Nothing was changed.": {
+  "ctx": "flashcards:storageFull",
+  "kind": "flashcards"
+ },
+ "Storage used": {
+  "ctx": "flashcards:storage",
+  "kind": "flashcards"
+ },
+ "Stream Ripple": {
+  "ctx": "sec-sounds#completionAlertPickerHost",
+  "kind": "text"
+ },
+ "Structured Cornell note-taking": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "title"
+ },
+ "Structured notes": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "text"
+ },
+ "Structured notes — Structured Cornell note-taking": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "aria-label"
+ },
+ "Studio Suite": {
+  "ctx": "sec-timer#btnZenStudySuite",
+  "kind": "text"
+ },
+ "Study": {
+  "ctx": "sec-timer#domBtn-study",
+  "kind": "text"
+ },
+ "Study Pod closed by host. Zero-Trace session purged.": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "Study direction": {
+  "ctx": "flashcards:direction",
+  "kind": "flashcards"
+ },
+ "Study now": {
+  "ctx": "flashcards:studyNow",
+  "kind": "flashcards"
+ },
+ "Study streak": {
+  "ctx": "flashcards:streak",
+  "kind": "flashcards"
+ },
+ "Study time (min)": {
+  "ctx": "flashcards:studyTime",
+  "kind": "flashcards"
+ },
+ "Study time is recorded by the Deep Focus timer when its session completes. Flashcards never adds time itself.": {
+  "ctx": "flashcards:timerNote",
+  "kind": "flashcards"
+ },
+ "Study {0}m": {
+  "ctx": "sec-timer#timerModeCaption",
+  "kind": "text"
+ },
+ "Study, Workout, Reading & Deep Work": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#hdrSubTitle",
+  "kind": "text"
+ },
+ "Study: {0} min": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Summarize lesson concepts": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "title"
+ },
+ "Summary": {
+  "ctx": "modal:noteModal#nsux-cornell",
+  "kind": "text"
+ },
+ "Summary Synthesis": {
+  "ctx": "sec-notes#dfMindMapCanvasHost",
+  "kind": "text"
+ },
+ "Sun": {
+  "ctx": "sec-timer,sec-calendar#homeWeekStrip",
+  "kind": "text"
+ },
+ "Sun {0}-{1}-{2}": {
+  "ctx": "sec-timer#homeWeekStrip",
+  "kind": "aria-label"
+ },
+ "Suspend": {
+  "ctx": "flashcards:suspend",
+  "kind": "flashcards"
+ },
+ "Sync Cues & [[WikiLinks]] → Flashcards": {
+  "ctx": "sec-notes#dfPillar1StudioMount",
+  "kind": "text"
+ },
+ "Synthesize the core takeaway in {0}-{1} sentences...": {
+  "ctx": "sec-notes#dfTriZoneSummaryInput",
+  "kind": "placeholder"
+ },
+ "Tag": {
+  "ctx": "sec-notes#nsux-tag-filter",
+  "kind": "aria-label"
+ },
+ "Tags (comma separated)": {
+  "ctx": "flashcards:tags",
+  "kind": "flashcards"
+ },
+ "Tags (comma-separated)": {
+  "ctx": "modal:noteModal#nsux-fields",
+  "kind": "text"
+ },
+ "Tap to start": {
+  "ctx": "sec-notes#nsTemplatesHint",
+  "kind": "text"
+ },
+ "Target Speed": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "Target language": {
+  "ctx": "flashcards:tgtLang",
+  "kind": "flashcards"
+ },
+ "Tasks": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#navTasks",
+  "kind": "text"
+ },
+ "Tasks Studio": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "text"
+ },
+ "Term → Definition": {
+  "ctx": "flashcards:tTerm",
+  "kind": "flashcards"
+ },
+ "Test Sound": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#heroHeader",
+  "kind": "text"
+ },
+ "Test speech": {
+  "ctx": "flashcards:ttsTest",
+  "kind": "flashcards"
+ },
+ "Text-to-speech is not available in this build.": {
+  "ctx": "flashcards:ttsUnavailable",
+  "kind": "flashcards"
+ },
+ "This Week": {
+  "ctx": "sec-timer#homeWeekStrip",
+  "kind": "aria-label"
+ },
+ "This card changed a lot, so it is due again for review.": {
+  "ctx": "flashcards:changedFlag",
+  "kind": "flashcards"
+ },
+ "This card has no usable example sentence.": {
+  "ctx": "flashcards:noBlank",
+  "kind": "flashcards"
+ },
+ "This deck has cards. Archive it instead.": {
+  "ctx": "flashcards:cantDeleteDeck",
+  "kind": "flashcards"
+ },
+ "This device does not confirm a male voice for this language.": {
+  "ctx": "flashcards:noMale",
+  "kind": "flashcards"
+ },
+ "This week": {
+  "ctx": "flashcards:week",
+  "kind": "flashcards"
+ },
+ "Thu": {
+  "ctx": "sec-timer,sec-calendar#homeWeekStrip",
+  "kind": "text"
+ },
+ "Thu {0}-{1}-{2}": {
+  "ctx": "sec-timer#homeWeekStrip",
+  "kind": "aria-label"
+ },
+ "Timer": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#navTimer | flashcards:timerOn",
+  "kind": "text,flashcards"
+ },
+ "Timer Reset": {
+  "ctx": "sec-timer#focusHeroCard",
+  "kind": "aria-label,title"
+ },
+ "Title": {
+  "ctx": "modal:noteModal#nsTitleLabel",
+  "kind": "text"
+ },
+ "Title or question": {
+  "ctx": "modal:noteModal#inpNoteTitle",
+  "kind": "placeholder"
+ },
+ "To": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Today": {
+  "ctx": "sec-tasks,sec-analytics#df22TasksHost",
+  "kind": "text"
+ },
+ "Today activity snapshot": {
+  "ctx": "sec-timer#sec-timer",
+  "kind": "aria-label"
+ },
+ "Today’s plan": {
+  "ctx": "sec-timer#sec-timer",
+  "kind": "text"
+ },
+ "Toggle Recall Mask": {
+  "ctx": "sec-notes#dfPillar1StudioMount",
+  "kind": "text"
+ },
+ "Total": {
+  "ctx": "flashcards:total",
+  "kind": "flashcards"
+ },
+ "Total Active Minutes Today": {
+  "ctx": "sec-timer#sec-timer",
+  "kind": "text"
+ },
+ "Track items to completion": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "title"
+ },
+ "Training presets": {
+  "ctx": "sec-timer#quickTrainingDetails",
+  "kind": "aria-label"
+ },
+ "Translation": {
+  "ctx": "flashcards:sideBack",
+  "kind": "flashcards"
+ },
+ "Tri-Zone Cornell Notes and Vector Mind-Map Studio": {
+  "ctx": "sec-notes#dfPillar1StudioMount",
+  "kind": "aria-label"
+ },
+ "Tue": {
+  "ctx": "sec-timer,sec-calendar#homeWeekStrip",
+  "kind": "text"
+ },
+ "Tue {0}-{1}-{2}": {
+  "ctx": "sec-timer#homeWeekStrip",
+  "kind": "aria-label"
+ },
+ "Type": {
+  "ctx": "modal:noteModal#nsTypeLabel",
+  "kind": "text"
+ },
+ "Type LaTeX or formula (e.g. x = \\frac{-b \\pm \\sqrt{b^{0} - {1}ac}}{{2}a})...": {
+  "ctx": "sec-notes#dfFormulaInput",
+  "kind": "placeholder"
+ },
+ "Type your answer": {
+  "ctx": "flashcards:yourAnswer",
+  "kind": "flashcards"
+ },
+ "Type your plain explanation above. The live jargon detector will flag complex academic terms in real time.": {
+  "ctx": "sec-notes#dfFeynmanFeedbackBox",
+  "kind": "text"
+ },
+ "Undo": {
+  "ctx": "sec-tasks,sec-notes#df22TasksHost | flashcards:undo",
+  "kind": "text,flashcards"
+ },
+ "Unique cards today": {
+  "ctx": "flashcards:uniqueToday",
+  "kind": "flashcards"
+ },
+ "Upcoming": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "text"
+ },
+ "Use the Deep Focus timer": {
+  "ctx": "flashcards:timerUse",
+  "kind": "flashcards"
+ },
+ "Vibration only": {
+  "ctx": "sec-sounds#completionAlertPickerHost",
+  "kind": "text"
+ },
+ "View all ↗": {
+  "ctx": "sec-timer#sec-timer",
+  "kind": "text"
+ },
+ "Voice": {
+  "ctx": "flashcards:ttsVoice",
+  "kind": "flashcards"
+ },
+ "Volume for Distant Thunder": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "aria-label"
+ },
+ "Volume for Highland Wind": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "aria-label"
+ },
+ "Volume for Mountain Stream": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "aria-label"
+ },
+ "Volume for Pine Breeze": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "aria-label"
+ },
+ "Volume for Soft Forest Rain": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "aria-label"
+ },
+ "Water & Rain": {
+  "ctx": "sec-sounds#sec-sounds",
+  "kind": "text"
+ },
+ "Water Drop": {
+  "ctx": "sec-sounds#completionAlertPickerHost",
+  "kind": "text"
+ },
+ "Water {0}/{1}": {
+  "ctx": "sec-timer#orbWaterTxt",
+  "kind": "text"
+ },
+ "Wed": {
+  "ctx": "sec-timer,sec-calendar#homeWeekStrip",
+  "kind": "text"
+ },
+ "Wed {0}-{1}-{2}": {
+  "ctx": "sec-timer#homeWeekStrip",
+  "kind": "aria-label"
+ },
+ "Weekly review": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "text"
+ },
+ "Weekly review — Review wins and unfinished work": {
+  "ctx": "sec-notes#nsTemplates",
+  "kind": "aria-label"
+ },
+ "Whiteboard & Occlusion": {
+  "ctx": "modal:dfZenStudySuiteModal#btnLaunchWhiteboardStudio",
+  "kind": "text"
+ },
+ "Wind Rustle": {
+  "ctx": "sec-sounds#completionAlertPickerHost",
+  "kind": "text"
+ },
+ "Word {0} / {1} • ~{2}m left": {
+  "ctx": "sec-notes#dfRsvpWordCounter",
+  "kind": "text"
+ },
+ "Word → Translation": {
+  "ctx": "flashcards:tWord",
+  "kind": "flashcards"
+ },
+ "Work minutes": {
+  "ctx": "sec-timer#qtWork",
+  "kind": "aria-label"
+ },
+ "Work: {0} min": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Workout": {
+  "ctx": "sec-timer#domBtn-sport",
+  "kind": "text"
+ },
+ "Workout log": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "text"
+ },
+ "Workout log — Record sets and progress": {
+  "ctx": "sec-notes,modal:noteModal#nsTemplates",
+  "kind": "aria-label"
+ },
+ "Workout {0}/{1}": {
+  "ctx": "sec-timer#quickTrainingDetails",
+  "kind": "text"
+ },
+ "Write cue questions (e.g. What is [[Active Recall]]?)...": {
+  "ctx": "sec-notes#dfTriZoneCuesInput",
+  "kind": "placeholder"
+ },
+ "Write here...": {
+  "ctx": "modal:noteModal#inpNoteBody",
+  "kind": "placeholder"
+ },
+ "Write lecture/study notes. Wrap concepts in [[Double Brackets]] to auto-link flashcards...": {
+  "ctx": "sec-notes#dfTriZoneMainInput",
+  "kind": "placeholder"
+ },
+ "Write, revisit and develop your thoughts.": {
+  "ctx": "sec-notes#nsSubtitle",
+  "kind": "text"
+ },
+ "Writing": {
+  "ctx": "flashcards:modeWriting",
+  "kind": "flashcards"
+ },
+ "Year": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Your current session is preserved; changes apply to new sessions.": {
+  "ctx": "modal:timerSettingsModal#tsetHint",
+  "kind": "text"
+ },
+ "Your ideas, organized": {
+  "ctx": "sec-notes#nsTitle",
+  "kind": "text"
+ },
+ "Zen Sanctuary": {
+  "ctx": "sec-analytics#btnLaunchBotanicalGarden",
+  "kind": "text"
+ },
+ "Zen Study Suite": {
+  "ctx": "modal:dfZenStudySuiteModal#zenSuiteTitle",
+  "kind": "text"
+ },
+ "Zone {0}: Cues & Recall Questions (?)": {
+  "ctx": "sec-notes#dfPillar1StudioMount",
+  "kind": "text"
+ },
+ "Zone {0}: Main notes (link ideas with [[Concept]])": {
+  "ctx": "sec-notes#dfPillar1StudioMount",
+  "kind": "text"
+ },
+ "Zone {0}: Summary Synthesis (Bottom Cornell Bar)": {
+  "ctx": "sec-notes#dfPillar1StudioMount",
+  "kind": "text"
+ },
+ "cards": {
+  "ctx": "flashcards:cards",
+  "kind": "flashcards"
+ },
+ "days": {
+  "ctx": "sec-timer#df-streak-label | flashcards:days",
+  "kind": "text,flashcards"
+ },
+ "e.g. stretches or deep reading": {
+  "ctx": "sec-timer#qtNewExercise",
+  "kind": "placeholder"
+ },
+ "e.g., Action Potential, Dijkstra Algorithm, Photosynthesis, SVD...": {
+  "ctx": "sec-notes#dfFeynmanConceptInp",
+  "kind": "placeholder"
+ },
+ "female (confirmed)": {
+  "ctx": "flashcards:female",
+  "kind": "flashcards"
+ },
+ "gender unknown": {
+  "ctx": "flashcards:genderUnknown",
+  "kind": "flashcards"
+ },
+ "male (confirmed)": {
+  "ctx": "flashcards:male",
+  "kind": "flashcards"
+ },
+ "mins": {
+  "ctx": "sec-timer#sec-timer",
+  "kind": "text"
+ },
+ "minutes": {
+  "ctx": "flashcards:timerMin",
+  "kind": "flashcards"
+ },
+ "needs network": {
+  "ctx": "flashcards:needsNet",
+  "kind": "flashcards"
+ },
+ "not installed": {
+  "ctx": "flashcards:notInstalled",
+  "kind": "flashcards"
+ },
+ "reading →": {
+  "ctx": "sec-notes#dfRsvpNextContext",
+  "kind": "text"
+ },
+ "today": {
+  "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "{0} ({1} logs)": {
+  "ctx": "sec-notes#dfKpiRegressions",
+  "kind": "text"
+ },
+ "{0} WPM": {
+  "ctx": "sec-notes#dfRsvpLiveWpmBadge",
+  "kind": "text"
+ },
+ "{0} words": {
+  "ctx": "modal:noteModal#nsCounter",
+  "kind": "text"
+ },
+ "{0}% Simple (Pure Intuition)": {
+  "ctx": "sec-notes#dfSimplicityLiveBadge",
+  "kind": "text"
+ },
+ "{0}D Spatial Audio & Bio-Frequency Synthesis": {
+  "ctx": "sec-sounds#dfPillar5SpatialMount",
+  "kind": "text"
+ },
+ "{0}Hz AMOLED": {
+  "ctx": "sec-analytics#btnLaunchHighPerfEngine",
+  "kind": "text"
+ },
+ "{0}° FRONT": {
+  "ctx": "sec-sounds#dfPillar5TabHost",
+  "kind": "text"
+ },
+ "{0}° LEFT": {
+  "ctx": "sec-sounds#dfPillar5TabHost",
+  "kind": "text"
+ },
+ "{0}° REAR": {
+  "ctx": "sec-sounds#dfPillar5TabHost",
+  "kind": "text"
+ },
+ "{0}° RIGHT": {
+  "ctx": "sec-sounds#dfPillar5TabHost",
+  "kind": "text"
+ },
+ "— OR JOIN VIA {0}-DIGIT PIN / QR CODE —": {
+  "ctx": "sec-timer#dfPillar8TabContainer",
+  "kind": "text"
+ },
+ "• List": {
+  "ctx": "modal:noteModal#nsux-tools",
+  "kind": "text"
+ },
+ "ℹ️ Statistics update only after a completed focus session": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "↑ 🔥 {0} days": {
+  "ctx": "sec-timer#hdrStreakBadge",
+  "kind": "text"
+ },
+ "↺ Sentence": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "↺ Undo": {
+  "ctx": "sec-notes#dfPillar4ContentPane",
+  "kind": "text"
+ },
+ "⏮ -{0} Word": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "⏱️ Timed Exam Simulator": {
+  "ctx": "sec-notes#dfPillar3StemMount",
+  "kind": "text"
+ },
+ "⏹ Stop": {
+  "ctx": "sec-sounds#sec-sounds",
+  "kind": "text"
+ },
+ "▲ Prev Line": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "▶ Auto-Advance Ruler": {
+  "ctx": "sec-notes#dfAutoPacerToggleBtn",
+  "kind": "text"
+ },
+ "▶ Start RSVP": {
+  "ctx": "sec-notes#dfRsvpPlayToggleBtn",
+  "kind": "text"
+ },
+ "▼ Next Line": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "▼ ORP Focal Anchor ▼": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "● Web Audio HRTF Ready": {
+  "ctx": "sec-sounds#dfHrtfLiveStatusBadge",
+  "kind": "text"
+ },
+ "☁️ Manual Backup & Restore": {
+  "ctx": "modal:cloudBackupModal#cloudBackupModal",
+  "kind": "text"
+ },
+ "⚙ Customize": {
+  "ctx": "sec-timer#timerSettingsChip",
+  "kind": "text"
+ },
+ "⚙️ Advanced studio & maintenance tools": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#sovereignCalmToolsLabel",
+  "kind": "text"
+ },
+ "⚠️ Backup copy failed — use Export Backup File": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "⚠️ Backup file is too large": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "⚠️ Backup invalid — original data left unchanged": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "⚠️ Clipboard unavailable — use Export Backup File": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "⚠️ Could not open Save As; use Share Backup": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "⚠️ Exported backup codes contain readable personal notes and tasks. They are NOT encrypted. Share or save them privately; anyone with the code can read its contents.": {
+  "ctx": "modal:cloudBackupModal#cloudBackupModal",
+  "kind": "text"
+ },
+ "⚠️ Finish the current training before changing linked tasks": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "⚠️ Paste backup code first": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "✏️ Pen": {
+  "ctx": "sec-notes#dfPillar4ContentPane",
+  "kind": "text"
+ },
+ "✏️ Quick Scratchpad": {
+  "ctx": "sec-notes#dfPillar4WhiteboardMount",
+  "kind": "text"
+ },
+ "✓ Achievement SVG Infographic Ready for Export": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "✓ Backup restored": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "✓ Disconnected & Zero-Trace Purged.": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "✓ Instant Autosave Ready": {
+  "ctx": "sec-notes#dfTriZoneSaveStatus",
+  "kind": "text"
+ },
+ "✓ Log WPM Session to localStorage": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "✓ Multi-Studio Audit Passed ({0}/{1} Flawless)": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "✓ Rolling Snapshot Slot #{0} Captured": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "✓ STEM Engine Ready": {
+  "ctx": "sec-notes#dfStemStudioBadge",
+  "kind": "text"
+ },
+ "✓ Storage Fortress Verified ({0}% Sealed)": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "✓ System Diagnostic Passed (Rating: AAA)": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "✓ Vector Engine Active": {
+  "ctx": "sec-notes#dfWhiteboardStudioBadge",
+  "kind": "text"
+ },
+ "✓ Wrapped Certificate Generated": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "✓ {0} SVG Nodes Leased & Recycled ({1} GC Pauses)": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "✓ {0}-Minute Morning Confidence Quiz Ready": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "✓ {0}m Focus Logged! Matrix & Tree Updated": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "✓ {0}m Sprint / {1}m Rest Cycles Activated": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "✦ Focus space": {
+  "ctx": "sec-timer#focusHeroCard",
+  "kind": "text"
+ },
+ "✦ Local LAN Study Pods & Peer Accountability": {
+  "ctx": "sec-timer#dfPillar8StudioCard",
+  "kind": "text"
+ },
+ "✦ NOTES STUDIO": {
+  "ctx": "sec-notes#nsEyebrow",
+  "kind": "text"
+ },
+ "✦ Plain Language & Recall Lab": {
+  "ctx": "sec-notes#dfFeynmanStudioCard",
+  "kind": "text"
+ },
+ "✦ YOUR DAILY TARGETS": {
+  "ctx": "sec-timer#goalsKicker",
+  "kind": "text"
+ },
+ "✦ {0}° Acoustic Physics": {
+  "ctx": "sec-sounds#dfPillar5SpatialMount",
+  "kind": "text"
+ },
+ "✧ Your progress": {
+  "ctx": "sec-timer#sec-timer",
+  "kind": "text"
+ },
+ "✨ Mix": {
+  "ctx": "sec-sounds#sec-sounds",
+  "kind": "text"
+ },
+ "✨ Studios": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#zenStudioTriggerLabel",
+  "kind": "text"
+ },
+ "✨ Suggest Analogy": {
+  "ctx": "sec-notes#dfPillar7TabContainer",
+  "kind": "text"
+ },
+ "⭕ Shape Snap": {
+  "ctx": "sec-notes#dfPillar4ContentPane",
+  "kind": "text"
+ },
+ "🌐 Language & Country Search": {
+  "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#heroHeader | modal:langModal#langModal",
+  "kind": "aria-label,text"
+ },
+ "🌐 {0}D Spatial Radar": {
+  "ctx": "sec-sounds#dfPillar5SpatialMount",
+  "kind": "text"
+ },
+ "🌧️ Scatter Drops {0}°": {
+  "ctx": "sec-sounds#dfPillar5TabHost",
+  "kind": "text"
+ },
+ "🌱 {0} Mastered Concepts": {
+  "ctx": "sec-notes#dfFeynmanStudioCard",
+  "kind": "text"
+ },
+ "🌿 Zen Sanctuary & {0} Heatmap ↗": {
+  "ctx": "modal:dfZenStudySuiteModal#btnLaunchBotanicalGardenTimer",
+  "kind": "text"
+ },
+ "🎚️ Multi-Track Mixer": {
+  "ctx": "sec-sounds#dfPillar5SpatialMount",
+  "kind": "text"
+ },
+ "🎛️ {0}-Band Masking EQ": {
+  "ctx": "sec-sounds#dfPillar5SpatialMount",
+  "kind": "text"
+ },
+ "🎧 {0}D Spatial & {1}Hz": {
+  "ctx": "sec-sounds#btnLaunch3DSpatialStudio",
+  "kind": "text"
+ },
+ "🎧 {0}D Spatial & {1}Hz ↗": {
+  "ctx": "modal:dfZenStudySuiteModal#btnLaunchSpatialAudioStudio",
+  "kind": "text"
+ },
+ "🎨 Vector Whiteboard": {
+  "ctx": "sec-notes#dfPillar4WhiteboardMount",
+  "kind": "text"
+ },
+ "🎯 Target:": {
+  "ctx": "sec-timer#df-timer-task-pill",
+  "kind": "text"
+ },
+ "🏆 Personal Best & Ghost": {
+  "ctx": "sec-timer#dfPillar8StudioCard",
+  "kind": "text"
+ },
+ "👁 {0}-Word Span Chunks": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "👥 Study Pod & Radar": {
+  "ctx": "sec-timer#dfPillar8StudioCard",
+  "kind": "text"
+ },
+ "💡 Elaborative Prompts": {
+  "ctx": "sec-notes#dfFeynmanStudioCard",
+  "kind": "text"
+ },
+ "💾 Backup exported — NOT encrypted": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "💾 Export Backup File (.zenbackup)": {
+  "ctx": "modal:cloudBackupModal#cloudBackupModal",
+  "kind": "text"
+ },
+ "💾 Step {0}: Save as Golden Note": {
+  "ctx": "sec-notes#dfPillar7TabContainer",
+  "kind": "text"
+ },
+ "📂 Load File": {
+  "ctx": "modal:cloudBackupModal#cloudBackupModal",
+  "kind": "text"
+ },
+ "📍 Jump to Bookmark": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "📐 Formula Typesetter": {
+  "ctx": "sec-notes#dfPillar3StemMount",
+  "kind": "text"
+ },
+ "📐 STEM & Exam Studio": {
+  "ctx": "sec-timer#studyContextBar",
+  "kind": "text"
+ },
+ "📐 Visual Frameworks": {
+  "ctx": "sec-notes#dfPillar4WhiteboardMount",
+  "kind": "text"
+ },
+ "📜 Commitment Contracts": {
+  "ctx": "sec-timer#dfPillar8StudioCard",
+  "kind": "text"
+ },
+ "📝 Blank-Sheet Brain-Dump": {
+  "ctx": "sec-notes#dfFeynmanStudioCard",
+  "kind": "text"
+ },
+ "📤 Copied to Clipboard!": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "📤 Share Backup Code (Manual)": {
+  "ctx": "modal:cloudBackupModal#cloudBackupModal",
+  "kind": "text"
+ },
+ "📥 Export Vector SVG": {
+  "ctx": "sec-notes#dfPillar4ContentPane",
+  "kind": "text"
+ },
+ "📥 Load Active Note": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "📥 TXT": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "📴 This device only — no network": {
+  "ctx": "sec-timer#dfPodOnlineStatusBadge",
+  "kind": "text"
+ },
+ "🔄 Orbit Wind Breeze Around Listener": {
+  "ctx": "sec-sounds#dfPillar5TabHost",
+  "kind": "text"
+ },
+ "🔄 P{0}P Deck Exchange": {
+  "ctx": "sec-timer#dfPillar8StudioCard",
+  "kind": "text"
+ },
+ "🔄 Restore Progress on New Phone:": {
+  "ctx": "modal:cloudBackupModal#cloudBackupModal",
+  "kind": "text"
+ },
+ "🔉 Volume": {
+  "ctx": "sec-sounds#soundsGridBox",
+  "kind": "text"
+ },
+ "🔍 Jargon Detector": {
+  "ctx": "sec-notes#dfFeynmanStudioCard",
+  "kind": "text"
+ },
+ "🔒 Nothing leaves your phone": {
+  "ctx": "sec-timer#dfPillar8StudioCard",
+  "kind": "text"
+ },
+ "🔔 Alarm & Notification Tested!": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "🔔 Synchronized Study Pod Chime: Cycle Completed!": {
+  "ctx": "toast",
+  "kind": "toast"
+ },
+ "🔖 Bookmark": {
+  "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "🔗 Connect {0} Nodes": {
+  "ctx": "sec-notes#dfPillar1StudioMount",
+  "kind": "text"
+ },
+ "🔗 Join Pod": {
+  "ctx": "sec-timer#dfPillar8TabContainer",
+  "kind": "text"
+ },
+ "🔥 {0}d Depth Streak": {
+  "ctx": "sec-notes#dfFeynmanStudioCard",
+  "kind": "text"
+ },
+ "🕸️ Mastery Radar": {
+  "ctx": "sec-notes#dfPillar3StemMount",
+  "kind": "text"
+ },
+ "🖍️ Highlighter": {
+  "ctx": "sec-notes#dfPillar4ContentPane",
+  "kind": "text"
+ },
+ "🚀 Host New Pod (Generate PIN)": {
+  "ctx": "sec-timer#dfPillar8TabContainer",
+  "kind": "text"
+ },
+ "🚨 Exam-Eve Rescue": {
+  "ctx": "sec-timer#dfPillar8StudioCard",
+  "kind": "text"
+ },
+ "🛡️ Smart Error-Bank": {
+  "ctx": "sec-notes#dfFeynmanStudioCard",
+  "kind": "text"
+ },
+ "🧘 Zen Focus Mode": {
+  "ctx": "sec-notes#dfFeynmanStudioCard",
+  "kind": "text"
+ },
+ "🧠 Feynman {0}-Step Lab": {
+  "ctx": "sec-notes#dfFeynmanStudioCard",
+  "kind": "text"
+ },
+ "🧠 {0}Hz / {1}Hz Bio-Frequencies": {
+  "ctx": "sec-sounds#dfPillar5SpatialMount",
+  "kind": "text"
+ },
+ "🧩 Spatial Recall": {
+  "ctx": "sec-notes#dfPillar4WhiteboardMount",
+  "kind": "text"
+ },
+ "🧮 STEM Scratchpad": {
+  "ctx": "sec-notes#dfPillar3StemMount",
+  "kind": "text"
+ },
+ "🧹 Eraser": {
+  "ctx": "sec-notes#dfPillar4ContentPane",
+  "kind": "text"
+ },
+ "🩺 Scientific academic & Diagram Occlusion Diagram Occlusion": {
+  "ctx": "sec-notes#dfPillar4WhiteboardMount",
+  "kind": "text"
+ },
+ "🪜 Multi-Step Problems": {
+  "ctx": "sec-notes#dfPillar3StemMount",
+  "kind": "text"
+ },
+ "＋ New note": {
+  "ctx": "sec-notes#nsNewButton",
+  "kind": "text"
+ },
+ "＋ New task": {
+  "ctx": "sec-tasks#df22TasksHost",
+  "kind": "text"
+ }
+}

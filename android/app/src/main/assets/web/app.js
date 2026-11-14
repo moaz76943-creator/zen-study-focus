@@ -1822,6 +1822,22 @@ const LANG_CATALOG = [
     "countries": "indonesia java"
   },
   {
+    "code": "ms",
+    "iso": "MS",
+    "enName": "Malay",
+    "nativeName": "Bahasa Melayu",
+    "dir": "ltr",
+    "countries": "malaysia brunei singapore"
+  },
+  {
+    "code": "om",
+    "iso": "OM",
+    "enName": "Oromo",
+    "nativeName": "Afaan Oromoo",
+    "dir": "ltr",
+    "countries": "ethiopia kenya"
+  },
+  {
     "code": "jw",
     "iso": "JW",
     "enName": "Javanese",
@@ -3255,6 +3271,8 @@ function renderLanguageList() {
 
   LANG_CATALOG.filter(l => {
     if (!l || dfIsExcludedLocale(l.code, l)) return false;
+    // The picker lists the official 100 languages; regional variants stay valid if already selected.
+    if (Array.isArray(window.DF_OFFICIAL_LANGS) && !window.DF_OFFICIAL_LANGS.includes(l.code) && l.code !== cfg.lang) return false;
     if (!q) return true;
     return (l.enName || '').toLowerCase().includes(q) ||
            (l.nativeName || '').toLowerCase().includes(q) ||
@@ -3324,7 +3342,8 @@ function localizeStarterPreviews(target) {
 
 function applyLanguage(code) {
   dfSyncInfiniteLocaleRegistry();
-  const rawInput = typeof code === 'string' ? code.toLowerCase().trim() : 'en';
+  let rawInput = typeof code === 'string' ? code.toLowerCase().trim() : 'en';
+  if (rawInput === 'jv') rawInput = 'jw'; // the catalog keeps the legacy code jw for Javanese (BCP-47: jv)
   const safeInput = dfIsExcludedLocale(rawInput) ? 'en' : rawInput;
   const baseCode = safeInput.split(/[-_]/)[0] || 'en';
   const meta = LANG_CATALOG.find(x => x.code.toLowerCase() === safeInput && !dfIsExcludedLocale(x.code, x))
@@ -3561,6 +3580,7 @@ function validateImportedBackup(raw) {
   if (!raw.tasksList.every(okTask) || !raw.notesList.every(okNote)
       || !uniqueRecordIds(raw.tasksList) || !uniqueRecordIds(raw.notesList)) return null;
   const candidateCfg = {...cfg, ...raw.cfg};
+  if (candidateCfg.lang === 'jv') candidateCfg.lang = 'jw';
   if (!LANG_CATALOG.some(l => l.code === candidateCfg.lang)) candidateCfg.lang = 'en';
   for (const key of ['todayMins', 'sessions', 'streak', 'water']) {
     const n = Number(candidateCfg[key]);
