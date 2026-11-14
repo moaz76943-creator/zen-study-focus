@@ -1,0 +1,68 @@
+{
+ "env": {
+  "browser": "chromium 153.0.8010.12",
+  "cpuThrottle": "4x",
+  "note": "not Android WebView"
+ },
+ "runs": [
+  {
+   "cards": 1000,
+   "previewMs": 20,
+   "importMs": 60,
+   "searchMs": 13,
+   "queueMs": 4,
+   "statsMs": 0,
+   "review20Ms": 85,
+   "addOneMs": 5,
+   "imported": 1000,
+   "storageKB": 1025,
+   "homeRenderMs": 19,
+   "domNodes": 58,
+   "heapMB": 14,
+   "reloadToReadyMs": 4184
+  },
+  {
+   "cards": 5000,
+   "previewMs": 49,
+   "importMs": 234,
+   "searchMs": 23,
+   "queueMs": 2,
+   "statsMs": 3,
+   "review20Ms": 99,
+   "addOneMs": 33,
+   "imported": 5000,
+   "storageKB": 5130,
+   "homeRenderMs": 14,
+   "domNodes": 58,
+   "heapMB": 14,
+   "reloadToReadyMs": 4571
+  },
+  {
+   "cards": 10000,
+   "previewMs": 77,
+   "importMs": 459,
+   "searchMs": 0,
+   "queueMs": 0,
+   "statsMs": 0,
+   "review20Ms": 0,
+   "addOneMs": 2,
+   "storageKB": 2,
+   "homeRenderMs": 4,
+   "domNodes": 58,
+   "heapMB": 14,
+   "reloadToReadyMs": 3977,
+   "refused": "STORAGE_FULL",
+   "storedAfterRefusal": 0
+  }
+ ],
+ "quota": {
+  "afterImport": 2,
+  "before": 2,
+  "fillKB": 5200,
+  "importRefused": true,
+  "importCode": "STORAGE_FULL",
+  "totalAfter": 3,
+  "keptOriginal": true,
+  "addResultOk": true
+ }
+}
