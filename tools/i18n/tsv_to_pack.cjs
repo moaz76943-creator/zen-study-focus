@@ -24,5 +24,10 @@ for (const line of fs.readFileSync(file, 'utf8').split('\n')) {
 }
 const ordered = {}; keys.forEach((k) => { if (k in pack.t) ordered[k] = pack.t[k]; }); pack.t = ordered;
 fs.mkdirSync(path.dirname(pf), { recursive: true });
-fs.writeFileSync(pf, JSON.stringify(pack, null, 1) + '\n');
+const outFd = fs.openSync(pf, fs.constants.O_WRONLY | fs.constants.O_CREAT | fs.constants.O_TRUNC | (fs.constants.O_NOFOLLOW || 0), 0o600);
+try {
+  if (!fs.fstatSync(outFd).isFile()) throw new Error('Expected regular pack output file');
+  fs.writeFileSync(outFd, JSON.stringify(pack, null, 1) + '\n');
+  fs.fsyncSync(outFd);
+} finally { fs.closeSync(outFd); }
 console.log(code, 'entries written', n, 'total', Object.keys(pack.t).length, '/', keys.length);
