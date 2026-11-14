@@ -188,19 +188,21 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
         long deadline = now + seconds * 1000L;
         SharedPreferences p = prefs(context);
         long token = p.getLong("token", 0) + 1;
-        clearSystemAlarm(context);
         String safeTitle = cleanTitle(context, title);
+        // A refused SharedPreferences write must leave the previously armed alarm and its token untouched.
         if (!p.edit().putBoolean("active", true).putLong("token", token)
                 .putLong("deadline", deadline).putString("title", safeTitle)
                 .putLong("lastNotified", 0).commit()) return;
+        clearSystemAlarm(context);
         scheduleSystemAlarm(context, token, deadline);
         showActive(context, deadline, safeTitle);
     }
 
     /** Called when user pauses/cancels a countdown. Never clears v21 WebView data. */
     public static synchronized void cancel(Context context) {
+        // Keep the armed alarm if the inactive state could not be persisted (state would still say active).
+        if (!prefs(context).edit().putBoolean("active", false).commit()) return;
         clearSystemAlarm(context);
-        prefs(context).edit().putBoolean("active", false).commit();
         NotificationManager manager = notifications(context);
         if (manager != null) manager.cancel(ACTIVE_NOTIFICATION);
     }
@@ -211,9 +213,9 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
         long now = System.currentTimeMillis();
         // Prevent duplicate alert if AlarmManager has already posted completion.
         if (!p.getBoolean("active", false) && now - p.getLong("lastNotified", 0) < 120000) return;
-        clearSystemAlarm(context);
         String safeTitle = cleanTitle(context, title);
         if (p.edit().putBoolean("active", false).putLong("lastNotified", now).commit()) {
+            clearSystemAlarm(context);
             showDone(context, safeTitle);
         }
     }
@@ -221,6 +223,13 @@ public final class FocusAlarmReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent == null) return;
+        // Serialize with the static synchronized schedule/cancel/completeNow (same class monitor).
+        synchronized (FocusAlarmReceiver.class) {
+            deliver(context, intent);
+        }
+    }
+
+    private static void deliver(Context context, Intent intent) {
         SharedPreferences p = prefs(context);
         if (!p.getBoolean("active", false)) return;
         long token = p.getLong("token", -1);
