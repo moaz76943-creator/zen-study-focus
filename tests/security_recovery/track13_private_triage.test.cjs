@@ -8,12 +8,13 @@ const {spawnSync}=require('node:child_process');
 const script=path.join(__dirname,'../../tools/security/track13_gitleaks_private_triage.py');
 const SHA='a'.repeat(40);
 const CFG_KEY=['zen','fortress','cfg','v21'].join('_');
+const APP_STORAGE_KEY='df_subject_pacing_balance_v21';
 function run(rows,sourceSha=SHA){
   const dir=fs.mkdtempSync(path.join(os.tmpdir(),'df-private-triage-'));
   try{
     const app=path.join(dir,'android/app/src/main/assets/web');
     fs.mkdirSync(app,{recursive:true});
-    fs.writeFileSync(path.join(app,'app.js'),"const SECRET_SALT = 'PUBLIC_COMPAT_TEST_FIXTURE_42';\n",{mode:0o600});
+    fs.writeFileSync(path.join(app,'app.js'),"const SECRET_SALT = 'PUBLIC_COMPAT_TEST_FIXTURE_42';\nconst STORAGE_KEY = 'df_subject_pacing_balance_v21';\n",{mode:0o600});
     fs.writeFileSync(path.join(app,'data_compat_v21.js'),"const SECRET_SALT = 'PUBLIC_COMPAT_TEST_FIXTURE_42';\n",{mode:0o600});
     const tests=path.join(dir,'tests');
     fs.mkdirSync(tests,{recursive:true});
@@ -37,16 +38,17 @@ test('candidate buckets never turn findings into PASS or leak matched secrets',(
   const rows=[
     {RuleID:'generic-api-key',Secret:'PUBLIC_COMPAT_TEST_FIXTURE_42',File:'web/app.js'},
     {RuleID:'generic-api-key',Secret:CFG_KEY,File:'tests/config.cjs'},
+    {RuleID:'generic-api-key',Secret:APP_STORAGE_KEY,File:'android/app/src/main/assets/web/app.js',StartLine:2},
     {RuleID:'generic-api-key',Secret:'COMMIT_FIXTURE',File:'ledger.txt'},
     {RuleID:'generic-api-key',Secret:sentinel,File:'private/'+sentinel}
   ];
   const r=run(rows);
   assert.equal(r.status,1);
   assert.equal(r.output.status,'REVIEW_REQUIRED');
-  assert.equal(r.output.findings,4);
+  assert.equal(r.output.findings,5);
   assert.deepEqual(r.output.categories,{
     compatibility_salt_candidate:1,
-    storage_key_candidate:1,
+    storage_key_candidate:2,
     git_commit_reference_candidate:1,
     corruption_fixture_candidate:0,
     unresolved:1
