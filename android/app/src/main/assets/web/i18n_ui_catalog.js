@@ -107,15 +107,28 @@
     observer.observe(doc.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ATTRS });
   }
   var textOrigUsed = false;
+  function script(src, cb) {
+    var s = doc.createElement('script'); s.src = src;
+    s.onload = s.onerror = function () { cb(); };
+    (doc.head || doc.documentElement).appendChild(s);
+  }
+  // Runtime packs store values aligned to the shared key list (locales/ui/_keys.js); expand once into a map.
+  function expand(code) {
+    var p = packs[code], K = root.DF_UI_KEYS;
+    if (!p || p.t || !p.v) return;
+    if (!K || K.hash !== p.keysHash) { delete packs[code]; return; } // stale pack: stay English rather than mis-assign
+    var t = Object.create(null);
+    for (var i = 0; i < K.k.length; i++) if (typeof p.v[i] === 'string' && p.v[i]) t[K.k[i]] = p.v[i];
+    p.t = t;
+  }
   function load(code, done) {
-    if (code === 'en' || packs[code]) return done();
+    if (code === 'en' || (packs[code] && packs[code].t)) return done();
     if (FORBIDDEN.test(code)) return done();
     if (loading[code]) { loading[code].push(done); return; }
     loading[code] = [done];
-    var s = doc.createElement('script');
-    s.src = 'locales/ui/' + code + '.js';
-    s.onload = s.onerror = function () { var cbs = loading[code] || []; delete loading[code]; cbs.forEach(function (f) { try { f(); } catch (_) {} }); };
-    (doc.head || doc.documentElement).appendChild(s);
+    var finish = function () { try { expand(code); } catch (_) {} var cbs = loading[code] || []; delete loading[code]; cbs.forEach(function (f) { try { f(); } catch (_) {} }); };
+    var getPack = function () { if (packs[code]) finish(); else script('locales/ui/' + code + '.js', finish); };
+    if (root.DF_UI_KEYS) getPack(); else script('locales/ui/_keys.js', getPack);
   }
   function apply(code) {
     var b = base(code || root.DF_CURRENT_LOCALE || (root.cfg && root.cfg.lang) || 'en');

@@ -25,14 +25,19 @@ function validate(code, pack) {
   }
   return errs;
 }
+const keys = Object.keys(src);
+const keysHash = require('crypto').createHash('sha256').update(JSON.stringify(keys)).digest('hex').slice(0, 12);
 let bad = 0; const built = [];
+if (require.main === module) fs.writeFileSync(path.join(outDir, '_keys.js'), '/* generated: English source keys for the UI catalog (tools/i18n/build_packs.cjs) */\nwindow.DF_UI_KEYS = ' + JSON.stringify({ hash: keysHash, k: keys }) + ';\n');
 const files = fs.existsSync(path.join(repo, 'i18n/packs')) ? fs.readdirSync(path.join(repo, 'i18n/packs')).filter((f) => f.endsWith('.json')) : [];
 for (const f of files) {
   const code = f.replace(/\.json$/, ''); const pack = JSON.parse(fs.readFileSync(path.join(repo, 'i18n/packs', f), 'utf8'));
   const errs = validate(code, pack);
   if (errs.length) { bad++; console.error(code, errs.slice(0, 10)); continue; }
-  const body = '/* generated from i18n/packs/' + f + ' by tools/i18n/build_packs.cjs — edit the JSON, not this file */\n(window.DF_UI_PACKS = window.DF_UI_PACKS || {})[' + JSON.stringify(code) + '] = ' + JSON.stringify({ status: pack.status, t: pack.t }) + ';\n';
-  fs.writeFileSync(path.join(outDir, code + '.js'), body); built.push(code);
+  // Compact runtime form: values aligned to the shared key list in _keys.js (saves the English text in every pack).
+  const v = keys.map((k) => (typeof pack.t[k] === 'string' ? pack.t[k] : null));
+  const body = '/* generated from i18n/packs/' + f + ' by tools/i18n/build_packs.cjs — edit the JSON, not this file */\n(window.DF_UI_PACKS = window.DF_UI_PACKS || {})[' + JSON.stringify(code) + '] = ' + JSON.stringify({ status: pack.status, keysHash: keysHash, v: v }) + ';\n';
+  if (require.main === module) fs.writeFileSync(path.join(outDir, code + '.js'), body); built.push(code);
 }
 if (require.main === module) { console.log('built', built.length, 'packs', bad ? '; INVALID: ' + bad : ''); process.exit(bad ? 1 : 0); }
-module.exports = { validate };
+module.exports = { validate, keysHash };
