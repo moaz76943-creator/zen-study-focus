@@ -3681,15 +3681,24 @@ function verifyAndRestoreBackupCode(codeStr) {
       tasksList = verified.tasksList;
       notesList = verified.notesList;
     }
+    let flashcardsRestoreFailed = '';
     if (verified.flashcardsV2 && window.DFFlashcardsApp) {
       const fcRes = window.DFFlashcardsApp.importSnapshot(verified.flashcardsV2, { mode: 'replace' });
-      if (!fcRes.ok) console.error('Flashcards restore failed; existing flashcards kept:', fcRes.code);
+      if (!fcRes.ok) { flashcardsRestoreFailed = fcRes.code || 'FLASHCARDS_RESTORE_FAILED'; console.error('Flashcards restore failed; existing flashcards kept:', fcRes.code); }
     }
     if (Array.isArray(verified.flashcardDecks)) {
       try {
         localStorage.setItem('df_vocab_bank', JSON.stringify(verified.flashcardDecks));
         localStorage.setItem('df_cards_v1', JSON.stringify(verified.flashcardDecks));
       } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+      // Older backups carry only the legacy card arrays: bring them into the live Flashcards store without
+      // clearing migration flags or touching the legacy keys; cards that already exist are not added twice.
+      if (!verified.flashcardsV2 && window.DFFlashcardsApp && typeof window.DFFlashcardsApp.migrateLegacy === 'function') {
+        try {
+          const lr = window.DFFlashcardsApp.migrateLegacy({ rescan: true });
+          if (!lr || lr.ok === false) flashcardsRestoreFailed = (lr && lr.code) || 'LEGACY_FLASHCARDS_NOT_IMPORTED';
+        } catch (_) { flashcardsRestoreFailed = 'LEGACY_FLASHCARDS_NOT_IMPORTED'; }
+      }
     }
     if (Array.isArray(verified.cfg.sessionHistory)) {
       try {
@@ -3699,6 +3708,10 @@ function verifyAndRestoreBackupCode(codeStr) {
     syncDailyRollover();
     applyLanguage(cfg.lang);
     closeModal('cloudBackupModal');
+    if (flashcardsRestoreFailed) {
+      showToast('⚠️ Backup partly restored: notes and tasks restored, flashcards NOT restored (' + flashcardsRestoreFailed + '). Your existing flashcards were kept.');
+      return true;
+    }
     showToast('✓ Backup restored');
     return true;
   } catch (e) {
