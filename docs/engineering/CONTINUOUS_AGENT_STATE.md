@@ -3,7 +3,7 @@
 Durable checkpoint for scheduled development runs. Update it with every merged step. No secrets or personal data here.
 
 ## Fixed rules
-- Repo: `moaz76943-creator/zen-study-focus`. Official branch: `integration/master-qa-verified-v21` (not `main`).
+- Repo: `moaz76943-creator/zen-study-focus`. Official branch: `integration/master-qa-verified-v21`; `main` was fast-forwarded to the same SHA (13b62ba9) on 2026-11-14 — keep them identical (main is the final unified destination).
 - Package `com.deepfocus.study`. Keep White Premium design, Arabic/RTL, Western digits 0-9, protected storage keys, old-backup compatibility.
 - Forbidden: Hebrew, Meditation section, unrequested AI features, Cloud TTS, mandatory accounts, a second timer, destructive data ops, force push, branch resets.
 
@@ -48,3 +48,11 @@ Efficient method: dump numbered source list, then one subagent per language writ
 - **English leak (priority 5), found 2026-11-14:** `analytics_studio.js` has 39 EN strings; `assets/i18n/df99_reviewed_packs.json` (51 locales) covers only 17 under `analytics`. The other 22 (all daily weekly monthly minuteUnit heatMinutes excluded invalidRange barAria heatAria exportSaved exportCancelled exportFailed today last7 last30 currentWeek priorWeek activitySplit historicalGoals noHistoricalGoals exportUnavailable) show in English for every non-Arabic locale, e.g. fr "Last 7 days: 20 min / Previous 7 days". Fix = add these keys per locale (about 1,100 strings) or map them to the 101-language catalog; check the size budget first.
 - Source bug: key "🩺 Scientific academic & Diagram Occlusion Diagram Occlusion" repeats a phrase (from runtime inventory); translations render it once.
 These are candidates for a later security/i18n-hardening task (priorities 6 and 8).
+
+
+## Checkpoint 2026-11-14 (evening)
+- Merged: #607, #614 (Analytics catalog fallback), #615 (KNOWN_FAILING 14 -> 0, Western-digit engine, local-day task date). `tests/KNOWN_FAILING.txt` is empty on the official branch; full gate 497/497.
+- #618 (open at time of writing): catalog packs for all 100 registry languages (47 added), all `ai-pending-review`. Source-level verification only; no device/emulator rendering check, no human review.
+- Pre-existing CI failures proven identical on the base branch (not caused by these PRs): CodeQL, Gitleaks, `source coverage` (legacy 99-language probe `tools/df99_full_app_coverage.cjs` / `tools/i18n/e2e/coverage.cjs` hard-codes 99), analytics-browser `share_card_clipboard_browser` timeout. Android CI scripts referenced the old package `com.zenstudy.focus`; fixed in #615 (applicationId is `com.deepfocus.study`, the Java class stays `com.zenstudy.focus.MainActivity`).
+- Open follow-ups: `bs` pack was re-translated (was 504/650 strings identical to `hr`, now 229, status ai-pending-review) and still needs native review; port the legacy 99-language coverage probe to the 100-language registry; triage Gitleaks/CodeQL findings; Yiddish: `assets/i18n/contributions/europe_extended/yi.json` is not part of the shipped catalog (excluded by policy, keep file, never add).
+- Next tracks: Localization runtime (screen-by-screen audit per language), Analytics 10k-record perf, Notes/Tasks scale tests, Timer lifecycle, Audio licensing, A11y, security findings.
