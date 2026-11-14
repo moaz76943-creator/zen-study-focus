@@ -12,10 +12,10 @@ Workflow (see `docs/i18n/README.md`): write `index|translation` TSV against `i18
 `node tools/i18n/tsv_to_pack.cjs <code> file.tsv` → `node tools/i18n/build_packs.cjs && node tools/i18n/coverage.cjs` →
 `node --test tests/i18n_catalog.test.cjs`. All packs are labelled `ai-pending-review` (not checked by a person).
 
-Done (631/631 strings): ar es zh hi fr de ru pt ja id tr ko vi it bn ur fa pl nl th sv el cs ro hu da fi no sk uk bg hr sr bs sl lt lv et sw fil ms ta te mr gu kn ml pa am.
+Done (631/631 strings): ar es zh hi fr de ru pt ja id tr ko vi it bn ur fa pl nl th sv el cs ro hu da fi no sk uk bg hr sr bs sl lt lv et sw fil ms ta te mr gu kn ml pa am az uz kk ka hy ne si my km lo mn af (61 + en).
 - `bs` is labelled `machine-unverified` (left as is).
 
-Remaining, in registry order: az uz kk ka hy ne si my km lo mn af sq eu ca gl is ga mk mt cy be ky tg tk ps ku so ha yo ig zu xh sn st tn rw mg ny eo la gd co fy haw hmn sm su jv om.
+Remaining, in registry order: sq eu ca gl is ga mk mt cy be ky tg tk ps ku so ha yo ig zu xh sn st tn rw mg ny eo la gd co fy haw hmn sm su jv om.
 
 ## Known pre-existing test failures (fail on the base branch too, not caused by pack work)
 - `tests/df_lane03_core_shell_locale.test.cjs`: only test 4 still fails (harness repaired in branch `ccr-618eb454-s60jxw`). Test 4 expects a reviewed DF99 shell pack to beat the legacy DICT; `dfGetLocalizedText` checks DICT first. Changing that order changes visible text in many languages, so it waits for a product decision.
@@ -29,18 +29,19 @@ Remaining, in registry order: az uz kk ka hy ne si my km lo mn af sq eu ca gl is
 | 2026-11-14 | db11002 | pack ms | #604 | merged 2971971 |
 | 2026-11-14 | 2971971 | packs ta te mr gu (4 parallel translation subagents) | #605 | merged b9fdcae |
 | 2026-11-14 | b9fdcae | packs kn ml pa am (catalog test 5/5; lane03 4 fail + lane11 3 fail identical on base) | #606 | merged 22c5cbd |
-| 2026-11-14 | 22c5cbd | packs az uz kk ka | #607 | MERGE_BLOCKED: size budget (see Next step). Still open. |
+| 2026-11-14 | 22c5cbd | packs az uz kk ka | #607 | merged 4915c28 after owner said finish the blocked work: `wind_breeze.ogg` re-encoded 256→112 kbps (3,467,115→1,590,090 B), budget not raised |
 | 2026-11-14 | 22c5cbd | locale guard synced to 101-code catalog; lane11 test fixed (10/10) | #608 | merged 41dea72 (verified locally: run_tests no new failures) |
 | 2026-11-14 | 41dea72 | lane03 harness repaired (9 tests: 8 pass); fix: English baseline no longer masks a Quick Training translation reached through alias keys (`navTrainingText` → `trainingTitle`) | #609 | merged 1e2e13b |
 | 2026-11-14 | 1e2e13b | 2 stale test harnesses repaired (note digit integrity, streak badge); KNOWN_FAILING 17 → 15; run_tests 478 pass, no new failures | #610 | merged 17faf63 (Gitleaks/CodeQL red on base too; Codex P2 → follow-up below) |
 | 2026-11-14 | 17faf63 | Codex P2 from #610: new `tests/i18n/notes_ui_authored_digit_integrity.test.cjs` saves through `saveNewNote()` → installed `DeepFocusNotesEditorUI` → `draftToSave()` → controller → Notes Core (fake DOM); mutation in `draftToSave()` caught | #611 | merged 58e2385 |
-| 2026-11-14 | 58e2385 | analytics heatmap test: heatmap is the element after the year `<h3>`, not the wrapper's last child (insight sections are appended after it); KNOWN_FAILING 15 → 14 | (this PR) | see PR |
+| 2026-11-14 | 58e2385 | analytics heatmap test: heatmap is the element after the year `<h3>`, not the wrapper's last child (insight sections are appended after it); KNOWN_FAILING 15 → 14 | #612 | merged 747ecb5 |
+| 2026-11-14 | 4915c28 | packs hy ne si my km lo mn af (8 parallel subagents; TSV checker: order, placeholders, native digits, leading symbols) | (this PR) | see PR |
 
 ## Next step
-**BLOCKER (since 2026-11-14 07:41 UTC, no owner reply yet):** with az/uz/kk/ka the web assets are 16,104,404 bytes, over `tests/ratchets.json` `webAssetsMaxBytes` 16,000,000 (`tests/guardrails.test.cjs` "size budgets hold"). The 46 packs still to come need about 1.9 MB more. Do not raise the ratchet without the owner. Options sent: (a) re-encode `audio/wind_breeze.ogg` (3.47 MB, 225 kbps) to about 112 kbps, saving about 1.7 MB; (b) a higher budget; (c) another cut. PR #607 stays open. No new packs until decided.
-While blocked: hardening work (lane03 test 4 needs a decision too). Next single-failure candidates: `tests/termux_fix02_locale_ui.test.cjs` (expects DF22 to win over `dfGetLocalizedText`; same product decision as lane03 test 4, so leave it), `tests/termux_fix27_tasks_notes_10_languages.test.cjs`, `tests/termux_fix30_bulk_tasks_goals_analytics.test.cjs`. Rule: fix the harness only when the app code is right; mutation-check every repaired test.
-After unblock: merge #607, then packs hy ne si my (then km lo mn af …). Branch pattern `i18n-packs-<n>` (last used: 12).
-Efficient method: dump numbered source list, then one subagent per language writes `index\ttranslation` TSV; spot-check alignment at several indices before building.
+Size budget fixed (owner approved finishing blocked work, 2026-11-14 ~12:05 UTC). Web assets 14,513,873 B after 62 packs; cap 16,000,000. The 30 left (mostly Latin, ~20-25 KB each) fit.
+In progress: packs sq eu ca gl is ga mk mt (subagents running; TSVs in session scratchpad, not durable — redo if lost). Then cy be ky tg tk ps ku so, then ha yo ig zu xh sn st tn, then rw mg ny eo la gd co fy haw hmn sm su jv om. Branch pattern `i18n-packs-<n>` (last used: 13).
+Efficient method: numbered source list (`index\tEnglish`), one subagent per language writes `index\ttranslation` TSV; validate (631 lines, order, placeholders, no native digits, leading symbols) before `tsv_to_pack.cjs`.
+After packs: analytics English leak (below), then hardening (`termux_fix27`, `termux_fix30`); lane03 test 4 and `termux_fix02` wait on a DICT-vs-DF22 priority decision.
 
 ## Pre-existing failing CI gates (not required by branch protection; PR state "unstable", not "blocked")
 - Gitleaks (generic-api-key hits in app.js, garden/contracts/security modules) and CodeQL (path-injection, fs-race, insecure-randomness in existing files).
