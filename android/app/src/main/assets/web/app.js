@@ -915,7 +915,7 @@ function computeHash(str) {
   const s = str + SECRET_SALT;
   for (let i = 0; i < s.length; i++) {
     h ^= s.charCodeAt(i);
-    h += (h << 1) + (h << 4) + (h << 7) + (h << 8) + (h << 24);
+    h = Math.imul(h, 16777619);
   }
   return (h >>> 0).toString(16);
 }
