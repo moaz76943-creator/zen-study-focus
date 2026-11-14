@@ -10,7 +10,6 @@ permissions:
   security-events: write
   contents: read
   actions: read
-  contents: read
 concurrency:
   group: track13-codeql-${{ github.ref }}
   cancel-in-progress: true

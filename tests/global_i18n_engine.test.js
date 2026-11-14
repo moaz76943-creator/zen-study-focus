@@ -1,13 +1,28 @@
 const assert = require('assert');
+const fs = require('fs');
+const path = require('path');
 const GlobalI18nEngine = require('../android/app/src/main/assets/web/modules/i18n/global_i18n_engine.js');
 
-console.log('🧪 Starting GlobalI18nEngine (Axis 10: M8558-M8567) Unit Tests...');
+console.log('🧪 Starting GlobalI18nEngine + official 100-language catalog tests...');
+
+// Test 0: Official 100-language policy (availability remains pack-status gated)
+const catalog = JSON.parse(fs.readFileSync(path.join(__dirname, '../i18n/languages.json'), 'utf8'));
+const catalogCodes = catalog.languages.map(language => language.code);
+assert.strictEqual(catalogCodes.length, 100);
+assert.strictEqual(new Set(catalogCodes).size, 100);
+assert.ok(!catalogCodes.includes('he'));
+assert.ok(!catalogCodes.includes('iw'));
+assert.match(catalog.note, /100-language/i);
+console.log('  ✓ Official 100-language catalog and Hebrew exclusion verified.');
 
 const i18n = new GlobalI18nEngine();
 
 // Test 1: Registry Initialization
 const reg = i18n.dfInitGlobalDictionaryRegistry();
-assert.strictEqual(reg.supportedLanguagesCount, 10);
+assert.strictEqual(reg.supportedLanguagesCount, 16);
+assert.strictEqual(reg.maxSupportedLanguages, 16);
+for (const code of ['it', 'ru', 'pt', 'nl', 'pl', 'sv']) assert.ok(reg.supportedCodes.includes(code));
+assert.strictEqual(reg.supportedCodes.length <= 16, true);
 assert.ok(reg.supportedCodes.includes('ar'));
 assert.ok(reg.supportedCodes.includes('zh'));
 console.log('  ✓ dfInitGlobalDictionaryRegistry verified.');
@@ -49,9 +64,10 @@ console.log('  ✓ dfSupportBilingualFlashcardDecks verified.');
 
 // Test 7: Translation Completeness 100%
 const audit = i18n.dfAuditTranslationCompleteness100();
-assert.strictEqual(audit.is100PercentComplete, true);
-assert.strictEqual(audit.auditedLanguagesCount, 10);
-console.log('  ✓ dfAuditTranslationCompleteness100 verified.');
+assert.strictEqual(audit.auditedLanguagesCount, 16);
+assert.strictEqual(audit.is100PercentComplete, false);
+assert.ok(audit.missingKeysPerLanguage.it.length > 0);
+console.log('  ✓ dfAuditTranslationCompleteness100 reports untranslated additions honestly.');
 
 // Test 8: Milestone Seal M8567
 const seal = i18n.dfGetMilestoneM8567GlobalI18nSeal();
