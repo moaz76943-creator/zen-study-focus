@@ -43,6 +43,10 @@
   "ctx": "sec-notes#dfMindMapCanvasHost",
   "kind": "text"
  },
+ "Active Recall: Key Formula & Law": {
+  "ctx": "sec-notes#closeout-2026-11-15 sample note title (starter data)",
+  "kind": "text"
+ },
  "Active Sound Source:": {
   "ctx": "sec-sounds#dfPillar5TabHost",
   "kind": "text"
@@ -251,6 +255,10 @@
   "ctx": "flashcards:mapColumn",
   "kind": "flashcards"
  },
+ "Complete Chapter {0} & Core Concepts": {
+  "ctx": "sec-notes#closeout-2026-11-15 sample task title (starter data)",
+  "kind": "text"
+ },
  "Completed": {
   "ctx": "sec-tasks#df22TasksHost",
   "kind": "text"
@@ -299,9 +307,21 @@
   "ctx": "flashcards:continueSession",
   "kind": "flashcards"
  },
+ "Cool-down stretch.": {
+  "ctx": "sec-notes#closeout-2026-11-15 sample workout list line",
+  "kind": "text"
+ },
  "Copied to clipboard": {
   "ctx": "flashcards:copied",
   "kind": "flashcards"
+ },
+ "Copy": {
+  "ctx": "sec-notes#closeout-2026-11-15 button: copy text to clipboard",
+  "kind": "text"
+ },
+ "Copy Markdown": {
+  "ctx": "sec-notes#closeout-2026-11-15 button: copy note as Markdown text",
+  "kind": "text"
  },
  "Copy all notes": {
   "ctx": "sec-notes#nsExport",
@@ -334,6 +354,10 @@
  "Create a deck first.": {
   "ctx": "flashcards:noDecks",
   "kind": "flashcards"
+ },
+ "Create tasks from unchecked items": {
+  "ctx": "sec-notes#closeout-2026-11-15 button: turn unchecked checklist items of a note into tasks",
+  "kind": "text"
  },
  "Cues: {0} | Density Ratio: {1} | WikiLinks: {2}": {
   "ctx": "sec-notes#dfTriZoneMetrics",
@@ -587,6 +611,10 @@
   "ctx": "modal:noteModal#nsux-fields",
   "kind": "text"
  },
+ "Finish Deep Work Project Milestone": {
+  "ctx": "sec-notes#closeout-2026-11-15 sample task title (starter data)",
+  "kind": "text"
+ },
  "Flashcards": {
   "ctx": "sec-notes,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#flashcardsEntryLabel | sec-notes,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#flashcardsEntry | flashcards:title",
   "kind": "text,aria-label,flashcards"
@@ -597,6 +625,10 @@
  },
  "Focal Stream Speed Reader": {
   "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "Focus & Performance": {
+  "ctx": "sec-notes#closeout-2026-11-15 app tagline: focus and performance",
   "kind": "text"
  },
  "Focus and break settings": {
@@ -651,6 +683,14 @@
   "ctx": "flashcards:good",
   "kind": "flashcards"
  },
+ "Grouping adjacent words into semantic chunks expands peripheral vision span and suppresses subvocalization at speeds between {0} and {1} words per minute.": {
+  "ctx": "sec-notes#closeout-2026-11-15 speed-reading tutorial sentence 4 (separate words with spaces; keep {0} and {1})",
+  "kind": "text"
+ },
+ "HIIT Strength & Cardio Session ({0} Sets)": {
+  "ctx": "sec-notes#closeout-2026-11-15 sample task title (starter data)",
+  "kind": "text"
+ },
  "Hard": {
   "ctx": "flashcards:hard",
   "kind": "flashcards"
@@ -658,6 +698,10 @@
  "Heading": {
   "ctx": "modal:noteModal#nsux-tools",
   "kind": "aria-label"
+ },
+ "Hidden Answer: Performance = Focused Time × Intensity.": {
+  "ctx": "sec-notes#closeout-2026-11-15 sample note body (starter data); keep × and =",
+  "kind": "text"
  },
  "Highland Wind": {
   "ctx": "sec-sounds#soundsGridBox",
@@ -706,6 +750,10 @@
  "Install the voice data in Android Settings > System > Languages > Text-to-speech output.": {
   "ctx": "flashcards:installVoice",
   "kind": "flashcards"
+ },
+ "Instant Reading Comprehension Check (Cloze Recall):": {
+  "ctx": "sec-notes#closeout-2026-11-15 speed-reader: heading above a fill-in-the-blank question",
+  "kind": "text"
  },
  "Instant gesture notes & calculations": {
   "ctx": "modal:dfZenStudySuiteModal#btnToggleScratchpadOverlay",
@@ -871,6 +919,10 @@
   "ctx": "sec-sounds#soundsGridBox",
   "kind": "text,aria-label"
  },
+ "Move to trash": {
+  "ctx": "sec-notes#closeout-2026-11-15 button: move a note to the trash (recoverable)",
+  "kind": "text"
+ },
  "Multiple choice": {
   "ctx": "flashcards:modeChoice",
   "kind": "flashcards"
@@ -970,6 +1022,10 @@
  "None": {
   "ctx": "flashcards:skipCol",
   "kind": "flashcards"
+ },
+ "Note #{0}": {
+  "ctx": "sec-notes#closeout-2026-11-15 label linking a flashcard to a note; {0} is the note id like n1",
+  "kind": "text"
  },
  "Note Title...": {
   "ctx": "sec-notes#dfTriZoneTitleInput",
@@ -1259,6 +1315,14 @@
   "ctx": "sec-notes#dfPillar2SpeedReaderMount",
   "kind": "text"
  },
+ "Read / Review": {
+  "ctx": "sec-notes#closeout-2026-11-15 button: switch a note to reading/review mode",
+  "kind": "text"
+ },
+ "Read {0} Pages of Reference Book": {
+  "ctx": "sec-notes#closeout-2026-11-15 sample task title (starter data)",
+  "kind": "text"
+ },
  "Reading": {
   "ctx": "sec-timer#domBtn-read | analytics:domain",
   "kind": "text,analytics"
@@ -1293,6 +1357,10 @@
  },
  "Real-Time WPM Analytics & Reading Comprehension Tracker": {
   "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "Real-time comprehension checks ensure that high velocity translates into genuine Net Effective WPM and durable long-term memory retention.": {
+  "ctx": "sec-notes#closeout-2026-11-15 speed-reading tutorial sentence 5 (separate words with spaces)",
   "kind": "text"
  },
  "Recall": {
@@ -1347,6 +1415,10 @@
   "ctx": "flashcards:replay",
   "kind": "flashcards"
  },
+ "Reset": {
+  "ctx": "sec-notes#closeout-2026-11-15 timer button: reset the countdown",
+  "kind": "text"
+ },
  "Rest (MM:SS)": {
   "ctx": "sec-timer#quickTrainingDetails",
   "kind": "text"
@@ -1386,6 +1458,10 @@
  "Reviewed": {
   "ctx": "flashcards:reviewed",
   "kind": "flashcards"
+ },
+ "Reviewing concepts at increasing intervals strengthens long-term memory retention.": {
+  "ctx": "sec-notes#closeout-2026-11-15 sample note body (starter data)",
+  "kind": "text"
  },
  "STEM & Exam Studio": {
   "ctx": "modal:dfZenStudySuiteModal#btnLaunchStemStudio",
@@ -1535,6 +1611,10 @@
   "ctx": "flashcards:srcLang",
   "kind": "flashcards"
  },
+ "Spaced Repetition System": {
+  "ctx": "sec-notes#closeout-2026-11-15 sample note title (starter data)",
+  "kind": "text"
+ },
  "Speech engine (device)": {
   "ctx": "flashcards:ttsEngine",
   "kind": "flashcards"
@@ -1551,6 +1631,10 @@
   "ctx": "sec-notes#dfPillar2SpeedReaderMount",
   "kind": "aria-label"
  },
+ "Speed reading with Rapid Serial Visual Presentation (RSVP) eliminates unnecessary eye saccades by anchoring every word at its Optical Recognition Point (ORP).": {
+  "ctx": "sec-notes#closeout-2026-11-15 speed-reading tutorial sentence 1 (words are paced one by one: separate words with spaces, also for scripts normally written without spaces)",
+  "kind": "text"
+ },
  "Spoken side": {
   "ctx": "flashcards:speakSide",
   "kind": "flashcards"
@@ -1561,6 +1645,10 @@
  },
  "Sport: {0} min": {
   "ctx": "sec-analytics#df22AnalyticsHost",
+  "kind": "text"
+ },
+ "Start": {
+  "ctx": "sec-notes#closeout-2026-11-15 timer button: start the countdown",
   "kind": "text"
  },
  "Start Deep Work": {
@@ -1618,6 +1706,10 @@
  "Structured Cornell note-taking": {
   "ctx": "sec-notes,modal:noteModal#nsTemplates",
   "kind": "title"
+ },
+ "Structured Notes": {
+  "ctx": "sec-notes#closeout-2026-11-15 note category label (Cornell-style structured notes)",
+  "kind": "text"
  },
  "Structured notes": {
   "ctx": "sec-notes,modal:noteModal#nsTemplates",
@@ -1715,6 +1807,10 @@
   "ctx": "modal:noteModal#nsux-fields",
   "kind": "text"
  },
+ "Tap answer to reveal": {
+  "ctx": "sec-notes#closeout-2026-11-15 hint on a flashcard-style note: tap to show the hidden answer",
+  "kind": "text"
+ },
  "Tap to start": {
   "ctx": "sec-notes#nsTemplatesHint",
   "kind": "text"
@@ -1750,6 +1846,10 @@
  "Text-to-speech is not available in this build.": {
   "ctx": "flashcards:ttsUnavailable",
   "kind": "flashcards"
+ },
+ "The Visual Guide and Span Expander ruler prevents backward eye regression by illuminating the active study line while gently dimming surrounding paragraphs.": {
+  "ctx": "sec-notes#closeout-2026-11-15 speed-reading tutorial sentence 3 (separate words with spaces)",
+  "kind": "text"
  },
  "This Week": {
   "ctx": "sec-timer#homeWeekStrip",
@@ -1919,6 +2019,10 @@
   "ctx": "sec-sounds#soundsGridBox",
   "kind": "aria-label"
  },
+ "Warm-up {0}m": {
+  "ctx": "sec-notes#closeout-2026-11-15 sample workout list line; m = minutes",
+  "kind": "text"
+ },
  "Water & Rain": {
   "ctx": "sec-sounds#sec-sounds",
   "kind": "text"
@@ -1951,6 +2055,10 @@
   "ctx": "sec-notes#nsTemplates",
   "kind": "aria-label"
  },
+ "When your eyes fixate slightly left of the center of a word, the fovea decodes the entire lexical unit simultaneously without horizontal scanning.": {
+  "ctx": "sec-notes#closeout-2026-11-15 speed-reading tutorial sentence 2 (separate words with spaces)",
+  "kind": "text"
+ },
  "Whiteboard & Occlusion": {
   "ctx": "modal:dfZenStudySuiteModal#btnLaunchWhiteboardStudio",
   "kind": "text"
@@ -1981,6 +2089,10 @@
  },
  "Workout": {
   "ctx": "sec-timer#domBtn-sport",
+  "kind": "text"
+ },
+ "Workout & Training Log": {
+  "ctx": "sec-notes#closeout-2026-11-15 sample note title (starter data)",
   "kind": "text"
  },
  "Workout log": {
@@ -2051,6 +2163,10 @@
   "ctx": "flashcards:cards",
   "kind": "flashcards"
  },
+ "cognitive": {
+  "ctx": "sec-notes#closeout-2026-11-15 single word (adjective), fill-in-the-blank answer option",
+  "kind": "text"
+ },
  "days": {
   "ctx": "sec-timer#df-streak-label | flashcards:days",
   "kind": "text,flashcards"
@@ -2067,9 +2183,17 @@
   "ctx": "flashcards:female",
   "kind": "flashcards"
  },
+ "fixation": {
+  "ctx": "sec-notes#closeout-2026-11-15 single word (noun), fill-in-the-blank answer option: eye fixation",
+  "kind": "text"
+ },
  "gender unknown": {
   "ctx": "flashcards:genderUnknown",
   "kind": "flashcards"
+ },
+ "lexical": {
+  "ctx": "sec-notes#closeout-2026-11-15 single word (adjective), fill-in-the-blank answer option",
+  "kind": "text"
  },
  "male (confirmed)": {
   "ctx": "flashcards:male",
@@ -2095,6 +2219,10 @@
   "ctx": "flashcards:notInstalled",
   "kind": "flashcards"
  },
+ "peripheral": {
+  "ctx": "sec-notes#closeout-2026-11-15 single word (adjective), fill-in-the-blank answer option: peripheral vision",
+  "kind": "text"
+ },
  "reading →": {
   "ctx": "sec-notes#dfRsvpNextContext",
   "kind": "text"
@@ -2103,12 +2231,28 @@
   "ctx": "analytics:heatMinutes",
   "kind": "analytics"
  },
+ "regression": {
+  "ctx": "sec-notes#closeout-2026-11-15 single word (noun), fill-in-the-blank answer option: eye regression",
+  "kind": "text"
+ },
+ "retention": {
+  "ctx": "sec-notes#closeout-2026-11-15 single word (noun), fill-in-the-blank answer option: memory retention",
+  "kind": "text"
+ },
+ "subvocal": {
+  "ctx": "sec-notes#closeout-2026-11-15 single word (adjective), fill-in-the-blank answer option: subvocal speech",
+  "kind": "text"
+ },
  "today": {
   "ctx": "sec-analytics#df22AnalyticsHost",
   "kind": "text"
  },
  "{0} ({1} logs)": {
   "ctx": "sec-notes#dfKpiRegressions",
+  "kind": "text"
+ },
+ "{0} Sets Compound Exercises": {
+  "ctx": "sec-notes#closeout-2026-11-15 sample workout list line",
   "kind": "text"
  },
  "{0} WPM": {
@@ -2165,6 +2309,10 @@
  },
  "↺ Sentence": {
   "ctx": "sec-notes#dfPillar2SpeedReaderMount",
+  "kind": "text"
+ },
+ "↺ Target term was: {0} (Logged {1}%)": {
+  "ctx": "sec-notes#closeout-2026-11-15 speed-reader feedback; {0} the correct word, {1} the logged percent",
   "kind": "text"
  },
  "↺ Undo": {
@@ -2266,6 +2414,10 @@
  "✓ Backup restored": {
   "ctx": "toast",
   "kind": "toast"
+ },
+ "✓ Correct Recall! Comprehension: {0}% ({1})": {
+  "ctx": "sec-notes#closeout-2026-11-15 speed-reader feedback; {0} percent, {1} the correct word",
+  "kind": "text"
  },
  "✓ Disconnected & Zero-Trace Purged.": {
   "ctx": "toast",
