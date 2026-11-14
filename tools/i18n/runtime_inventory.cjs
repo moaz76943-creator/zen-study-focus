@@ -24,7 +24,8 @@ async function collect(p) {
 }
 (async () => {
   const langs = process.argv.slice(2).length ? process.argv.slice(2) : ['en'];
-  const srv = http.createServer((q, r) => { const f = path.join(root, q.url === '/' ? 'index.html' : decodeURIComponent(q.url.split('?')[0])); fs.readFile(f, (e, d) => { if (e) { r.statusCode = 404; r.end(); } else { r.setHeader('content-type', mime[path.extname(f)] || 'application/octet-stream'); r.end(d); } }); });
+  const srv = http.createServer((q, r) => { let f; try { f = path.resolve(root, '.' + (q.url === '/' ? '/index.html' : decodeURIComponent(q.url.split('?')[0]))); } catch (_e) { f = null; }
+    if (!f || (f !== root && !f.startsWith(root + path.sep))) { r.statusCode = 403; r.end(); return; } fs.readFile(f, (e, d) => { if (e) { r.statusCode = 404; r.end(); } else { r.setHeader('content-type', mime[path.extname(f)] || 'application/octet-stream'); r.end(d); } }); });
   await new Promise((r) => srv.listen(0, r)); const base = 'http://localhost:' + srv.address().port;
   const b = await chromium.launch(); fs.mkdirSync('i18n-out', { recursive: true });
   for (const lang of langs) {
