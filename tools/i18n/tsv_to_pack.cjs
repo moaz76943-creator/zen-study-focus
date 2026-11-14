@@ -7,7 +7,9 @@ const repo = path.resolve(__dirname, '../..');
 const [code, file, status] = process.argv.slice(2);
 const keys = Object.keys(JSON.parse(fs.readFileSync(path.join(repo, 'i18n/source_en.json'), 'utf8')));
 const pf = path.join(repo, 'i18n/packs', code + '.json');
-const pack = fs.existsSync(pf) ? JSON.parse(fs.readFileSync(pf, 'utf8')) : { status: status || 'ai-pending-review', translator: 'Claude (AI), not reviewed by a person', t: {} };
+let existing = null;
+try { existing = JSON.parse(fs.readFileSync(pf, 'utf8')); } catch (e) { if (e.code !== 'ENOENT') throw e; }
+const pack = existing ? existing : { status: status || 'ai-pending-review', translator: 'Claude (AI), not reviewed by a person', t: {} };
 if (status) pack.status = status;
 let n = 0;
 for (const line of fs.readFileSync(file, 'utf8').split('\n')) {
