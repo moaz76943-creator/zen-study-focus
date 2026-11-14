@@ -44,6 +44,9 @@ test('every pack passes structural validation and its runtime file is up to date
     assert.deepEqual(validate(code, pack), [], code);
     assert.ok(pack.status !== 'human-reviewed' && pack.status !== 'native-speaker-reviewed' || pack.reviewEvidence, code + ': reviewed status needs reviewEvidence');
     const rt = fs.readFileSync(path.join(web, 'locales/ui', code + '.js'), 'utf8');
-    assert.ok(rt.includes(JSON.stringify(pack.t).slice(0, 200)), code + ': run node tools/i18n/build_packs.cjs');
+    const { keysHash } = require(path.join(repo, 'tools/i18n/build_packs.cjs'));
+    assert.ok(rt.includes('"keysHash":"' + keysHash + '"'), code + ': runtime pack is stale — run node tools/i18n/build_packs.cjs');
+    const keysFile = fs.readFileSync(path.join(web, 'locales/ui/_keys.js'), 'utf8');
+    assert.ok(keysFile.includes('"hash":"' + keysHash + '"'), '_keys.js stale');
   }
 });
