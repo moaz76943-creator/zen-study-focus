@@ -26,7 +26,9 @@
       genderUnknown: 'gender unknown', male: 'male (confirmed)', female: 'female (confirmed)', needsNet: 'needs network', notInstalled: 'not installed', noMale: 'This device does not confirm a male voice for this language.', autoVoice: 'Automatic', actualSpeed: 'Configured speed',
       speakSide: 'Spoken side', sideFront: 'Original', sideBack: 'Translation', direction: 'Study direction', import: 'Import', importHelp: 'Paste CSV, TSV or JSON text, or choose a file.', choose: 'Choose file', preview: 'Preview', importNow: 'Import', importOk: 'Imported', invalid: 'Invalid', duplicates: 'Duplicates', skipDup: 'Skip duplicates',
       storage: 'Storage used', suspend: 'Suspend', resume: 'Resume', fav: 'Favorite', filter: 'Filter', sort: 'Sort', cantDeleteDeck: 'This deck has cards. Archive it instead.', error: 'Something went wrong', storageFull: 'Storage is full. Nothing was changed.', language: 'Language', loadMore: 'Load more', copied: 'Copied to clipboard', exportShared: 'Export started', installVoice: 'Install the voice data in Android Settings > System > Languages > Text-to-speech output.',
-      defaultDeck: 'My cards', noDecks: 'Create a deck first.', end: 'End session'
+      defaultDeck_: '', defaultDeckName: 'My cards', noDecks: 'Create a deck first.', end: 'End session',
+      modeChoice: 'Multiple choice', modeCloze: 'Fill in the blank', modeMixed: 'Mixed practice', modeMistakes: 'Mistake review', almost: 'Almost — check the spelling', needFour: 'Needs at least 4 cards with different answers in the deck.', noBlank: 'This card has no usable example sentence.',
+      timerUse: 'Use the Deep Focus timer', timerMin: 'minutes', timerOn: 'Timer', timerNote: 'Study time is recorded by the Deep Focus timer when its session completes. Flashcards never adds time itself.', timerBusy: 'A timer session is already active; it will keep running.', repeatMistakes: 'Repeat mistakes', textSize: 'Card text size', small: 'Small', medium: 'Medium', large: 'Large', showExamples: 'Show examples', defaultMode: 'Default study mode', defaultDeck: 'Default deck', langFilter: 'Language (e.g. de)', allStates: 'All', mapColumn: 'Column for', skipCol: 'None', playExample: 'Play example', importing: 'Importing…', correctAnswers: 'Correct', incorrectAnswers: 'Incorrect'
     },
     ar: {
       title: 'البطاقات التعليمية', search: 'ابحث في البطاقات', add: 'إضافة بطاقة', settings: 'الإعدادات', back: 'رجوع', save: 'حفظ', cancel: 'إلغاء', del: 'حذف', edit: 'تعديل', undo: 'تراجع',
@@ -46,7 +48,9 @@
       genderUnknown: 'الجنس غير معروف', male: 'ذكر (مؤكد)', female: 'أنثى (مؤكد)', needsNet: 'يحتاج إنترنت', notInstalled: 'غير مثبت', noMale: 'لا يؤكد هذا الجهاز وجود صوت ذكوري لهذه اللغة.', autoVoice: 'تلقائي', actualSpeed: 'السرعة المضبوطة',
       speakSide: 'الوجه المنطوق', sideFront: 'الأصل', sideBack: 'الترجمة', direction: 'اتجاه الدراسة', import: 'استيراد', importHelp: 'الصق نص CSV أو TSV أو JSON، أو اختر ملفاً.', choose: 'اختر ملفاً', preview: 'معاينة', importNow: 'استيراد', importOk: 'تم استيراد', invalid: 'غير صالحة', duplicates: 'مكررة', skipDup: 'تخطَّ المكررات',
       storage: 'المساحة المستخدمة', suspend: 'تعليق', resume: 'استئناف', fav: 'مفضلة', filter: 'تصفية', sort: 'ترتيب', cantDeleteDeck: 'تحتوي هذه المجموعة على بطاقات. أرشفها بدلاً من حذفها.', error: 'حدث خطأ ما', storageFull: 'المساحة ممتلئة. لم يتغير شيء.', language: 'اللغة', loadMore: 'عرض المزيد', copied: 'تم النسخ إلى الحافظة', exportShared: 'بدأ التصدير', installVoice: 'ثبّت بيانات الصوت من إعدادات أندرويد > النظام > اللغات > إخراج تحويل النص إلى كلام.',
-      defaultDeck: 'بطاقاتي', noDecks: 'أنشئ مجموعة أولاً.', end: 'إنهاء الجلسة'
+      defaultDeck_: '', defaultDeckName: 'بطاقاتي', noDecks: 'أنشئ مجموعة أولاً.', end: 'إنهاء الجلسة',
+      modeChoice: 'اختيار من متعدد', modeCloze: 'أكمل الفراغ', modeMixed: 'تدريب مختلط', modeMistakes: 'مراجعة الأخطاء', almost: 'تقريباً — راجع الإملاء', needFour: 'تحتاج المجموعة إلى 4 بطاقات على الأقل بإجابات مختلفة.', noBlank: 'لا تحتوي هذه البطاقة على جملة مثال صالحة.',
+      timerUse: 'استخدم مؤقت Deep Focus', timerMin: 'دقيقة', timerOn: 'المؤقت', timerNote: 'يسجَّل وقت الدراسة بواسطة مؤقت Deep Focus عند اكتمال جلسته. لا تضيف البطاقات أي وقت بنفسها.', timerBusy: 'توجد جلسة مؤقت نشطة بالفعل وستستمر.', repeatMistakes: 'أعد الأخطاء', textSize: 'حجم نص البطاقة', small: 'صغير', medium: 'متوسط', large: 'كبير', showExamples: 'إظهار الأمثلة', defaultMode: 'نمط الدراسة الافتراضي', defaultDeck: 'المجموعة الافتراضية', langFilter: 'اللغة (مثل de)', allStates: 'الكل', mapColumn: 'عمود', skipCol: 'بدون', playExample: 'نطق المثال', importing: 'جارٍ الاستيراد…', correctAnswers: 'صحيحة', incorrectAnswers: 'خاطئة'
     }
   };
   var COMMON_LANGS = ['ar', 'ar-JO', 'de-DE', 'en-GB', 'en-US', 'es-ES', 'fr-FR', 'it-IT', 'pt-BR', 'tr-TR', 'ru-RU', 'ja-JP', 'ko-KR', 'zh-CN', 'hi-IN', 'nl-NL', 'pl-PL', 'sv-SE', 'id-ID', 'bn-BD'];
@@ -97,7 +101,7 @@
   }
   function ensureDeck() {
     var decks = app.listDecks(); if (decks.length) return decks[0];
-    var r = app.createDeck({ name: T('defaultDeck') }); return r.ok ? r.deck : null;
+    var r = app.createDeck({ name: T('defaultDeckName') }); return r.ok ? r.deck : null;
   }
   function homeView() {
     var st = app.stats(), decks = app.listDecks(), root = h('div', { class: 'fc-view' });
@@ -156,6 +160,13 @@
     var f = Object.assign({}, state.filter || {}); var q = f.q || ''; if (deckId) f.deckId = deckId;
     var res = app.search(q, Object.assign({}, f, { limit: 50, offset: state.page * 50 })), root = h('div', { class: 'fc-view' });
     root.appendChild(header(deckId ? (deckName(deckId)) : (q ? q : T('allCards')), deckId ? 'deck' : 'home', [btn('+', function () { go('edit', { editId: '', deckId: deckId }); }, 'fc-icon primary', T('add'))]));
+    var fb = h('div', { class: 'fc-row' });
+    var fs = h('select', { 'aria-label': T('filter') }, [['', T('allStates')], ['due', T('dueDeck')], ['favorites', T('favorites')], ['difficult', T('difficult')]].map(function (o) { return h('option', { value: o[0], text: o[1] }); }));
+    fs.value = state.filter && state.filter.due ? 'due' : (state.filter && state.filter.favorites ? 'favorites' : (state.filter && state.filter.difficult ? 'difficult' : ''));
+    fs.addEventListener('change', function () { var n = Object.assign({}, state.filter || {}); delete n.due; delete n.favorites; delete n.difficult; if (fs.value) n[fs.value] = true; state.filter = n; state.page = 0; render(); });
+    var fl = h('input', { type: 'text', placeholder: T('langFilter'), 'aria-label': T('langFilter'), dir: 'ltr', maxlength: 35, value: (state.filter && state.filter.language) || '' });
+    fl.addEventListener('change', function () { var n = Object.assign({}, state.filter || {}); if (fl.value.trim()) n.language = fl.value.trim(); else delete n.language; state.filter = n; state.page = 0; render(); });
+    fb.appendChild(fs); fb.appendChild(fl); root.appendChild(fb);
     root.appendChild(h('small', { text: N(res.total) + ' ' + T('cards') }));
     if (!res.items.length) root.appendChild(h('p', { class: 'fc-muted', text: T('noCards') }));
     res.items.forEach(function (c) { root.appendChild(cardRow(c, render)); });
@@ -237,63 +248,103 @@
   }
 
   // ---------- study ----------
-  var MODES = [['classic', 'modeClassic'], ['reverse', 'modeReverse'], ['both', 'modeBoth'], ['listening', 'modeListening'], ['pronunciation', 'modePron'], ['writing', 'modeWriting'], ['quick', 'modeQuick'], ['random', 'modeRandom'], ['custom', 'modeCustom']];
+  var MODES = [['classic', 'modeClassic'], ['reverse', 'modeReverse'], ['both', 'modeBoth'], ['listening', 'modeListening'], ['pronunciation', 'modePron'], ['writing', 'modeWriting'], ['choice', 'modeChoice'], ['cloze', 'modeCloze'], ['mixed', 'modeMixed'], ['quick', 'modeQuick'], ['random', 'modeRandom'], ['mistakes', 'modeMistakes']];
+  function timerGlobals() { try { return { running: typeof timerRunning !== 'undefined' && timerRunning, left: typeof timerLeft !== 'undefined' ? timerLeft : 0, active: typeof timerSessionId !== 'undefined' && !!timerSessionId }; } catch (_) { return null; } }
+  function fmtClock(sec) { sec = Math.max(0, Math.round(sec)); return N(Math.floor(sec / 60)) + ':' + (sec % 60 < 10 ? '0' : '') + N(sec % 60); }
+  // Starts/continues the EXISTING Deep Focus timer. Flashcards keeps no timer and writes no minutes of its own.
+  function startDeepFocusTimer(mins) {
+    var g = timerGlobals(); if (!g || typeof selectTimerMode !== 'function' || typeof toggleTimerPlay !== 'function') return false;
+    if (g.running) { toast(T('timerBusy')); return true; }
+    if (g.active) { toggleTimerPlay(); return true; }
+    if (selectTimerMode(mins, 'focus') === false) return false;
+    toggleTimerPlay(); return true;
+  }
   function studyStartView() {
     var root = h('div', { class: 'fc-view' }); root.appendChild(header(T('studyNow'), state.deckId ? 'deck' : 'home'));
-    var st = app.deckStats(state.deckId || ''), grid = h('div', { class: 'fc-modes' });
-    MODES.forEach(function (m) {
-      if (m[0] === 'custom') return;
-      grid.appendChild(btn(T(m[1]), function () { beginStudy(m[0], {}); }, m[0] === 'classic' ? 'primary' : ''));
-    });
+    var st = app.deckStats(state.deckId || ''), grid = h('div', { class: 'fc-modes' }), dm = app.getPrefs().defaultMode;
+    MODES.forEach(function (m) { grid.appendChild(btn(T(m[1]), function () { beginStudy(m[0], {}); }, m[0] === dm ? 'primary' : '')); });
     root.appendChild(h('small', { text: N(st.due) + ' ' + T('due') + ' · ' + N(st.new) + ' ' + T('newCards') }));
-    root.appendChild(grid);
+    var tm = null, g0 = timerGlobals();
+    if (g0 && typeof selectTimerMode === 'function') {
+      var dur = select(T('timerUse'), 'fcTimerMin', [['0', '—'], ['15', '15 ' + T('timerMin')], ['25', '25 ' + T('timerMin')], ['45', '45 ' + T('timerMin')]], '0');
+      tm = h('div', { class: 'fc-more' }, [dur, h('small', { class: 'fc-muted', text: T('timerNote') })]);
+    }
+    root.appendChild(grid); if (tm) root.appendChild(tm);
     var cu = h('details', { class: 'fc-more' }, [h('summary', { text: T('modeCustom') }),
       select(T('direction'), 'fcDir', [['forward', T('modeClassic')], ['reverse', T('modeReverse')], ['both', T('modeBoth')]], app.getPrefs().direction),
       text(T('total'), 'fcCount', '20'), text(T('tags'), 'fcQTags', ''),
-      select(T('type'), 'fcQSet', [['due', T('dueDeck')], ['new', T('newCards')], ['favorites', T('favorites')], ['difficult', T('difficult')], ['all', T('allCards')]], 'due'),
+      select(T('type'), 'fcQSet', [['due', T('dueDeck')], ['new', T('newCards')], ['favorites', T('favorites')], ['difficult', T('difficult')], ['mistakes', T('modeMistakes')], ['all', T('allCards')]], 'due'),
       btn(T('studyNow'), function () { beginStudy('custom', { mode: val('fcQSet'), limit: parseInt(val('fcCount'), 10) || 20, tags: val('fcQTags').split(',').map(function (x) { return x.trim(); }).filter(Boolean), direction: val('fcDir') }); }, 'primary')]);
     root.appendChild(cu);
     return root;
   }
   function beginStudy(modeName, o) {
-    var qmode = modeName === 'random' ? 'random' : (modeName === 'quick' ? 'quick' : (o.mode || 'due'));
-    var q = app.buildQueue({ mode: qmode, deckId: state.deckId || '', limit: o.limit || 50, tags: o.tags });
+    var qmode = modeName === 'random' ? 'random' : (modeName === 'quick' ? 'quick' : (modeName === 'mistakes' ? 'mistakes' : (o.mode || 'due')));
+    var q = o.queue || app.buildQueue({ mode: qmode, deckId: state.deckId || '', limit: o.limit || 50, tags: o.tags });
     if (!q.length) return toast(T('nothingDue'));
     var dir = o.direction || (modeName === 'reverse' ? 'reverse' : (modeName === 'both' ? 'both' : app.getPrefs().direction));
+    var mins = parseInt(val('fcTimerMin') || '0', 10);
+    if (mins > 0) startDeepFocusTimer(mins);
     var r = app.startSession({ queue: q, deckId: state.deckId || '', studyMode: modeName, direction: dir });
     if (!r.ok) return toast(errText(r));
-    state.study = { mode: modeName, revealed: false, started: Date.now(), written: '', match: null };
+    state.study = { mode: modeName, revealed: false, started: Date.now(), written: '', match: null, missed: [], choice: null };
     go('study');
   }
-  function resumeStudy() { var s = app.resumeSession(); if (!s) return; state.study = { mode: s.studyMode, revealed: false, started: Date.now(), written: '', match: null }; go('study'); }
+  function resumeStudy() { var s = app.resumeSession(); if (!s) return; state.study = { mode: s.studyMode, revealed: false, started: Date.now(), written: '', match: null, missed: [], choice: null }; go('study'); }
+  // Every mode reuses the same card data; modes that need data a card lacks fall back to Classic for that card.
+  function cardMode(c, s) {
+    var m = state.study.mode, order = ['classic', 'choice', 'writing', 'cloze'];
+    if (m === 'mixed') m = order[s.index % order.length];
+    if (m === 'choice' && app.distractors(c.id, 3).length < 3) return 'classic';
+    if (m === 'cloze' && !app.makeCloze(c.id)) return 'classic';
+    return m;
+  }
   function studyView() {
     var s = app.resumeSession(), root = h('div', { class: 'fc-view' });
     if (!s || s.index >= s.queue.length) return summaryView(s);
     var c = app.getCard(s.queue[s.index]);
     if (!c || c.suspended) { app.advanceSession(s.id); return studyView(); }
+    var mode = cardMode(c, s), prefs = app.getPrefs();
     var dir = s.direction === 'both' ? (s.index % 2 ? 'reverse' : 'forward') : s.direction;
-    if (state.study.mode === 'listening' || state.study.mode === 'pronunciation') dir = 'forward';
+    if (mode === 'listening' || mode === 'pronunciation' || mode === 'cloze') dir = 'forward';
+    if (state.study.mode === 'reverse') dir = 'reverse';
     var rev = dir === 'reverse', question = rev ? c.backText : c.frontText, answer = rev ? c.frontText : c.backText, qSide = rev ? 'back' : 'front', aSide = rev ? 'front' : 'back';
-    var mode = state.study.mode, hideQ = mode === 'listening';
-    root.appendChild(header(N(s.index + 1) + ' / ' + N(s.queue.length), null, [btn(T('end'), function () { endStudy(); }, '', T('end'))]));
-    var face = h('div', { class: 'fc-face', dir: 'auto', lang: (rev ? c.targetLanguage : c.sourceLanguage) || null }, [h('div', { class: 'fc-q', text: hideQ && !state.study.revealed ? '🔊' : question, dir: 'auto' })]);
-    if (c.flag) face.appendChild(h('small', { class: 'fc-warn', text: c.flag.reason ? T('changedFlag') : '' }));
+    var cloze = mode === 'cloze' ? app.makeCloze(c.id) : null, st = state.study;
+    var header2 = [];
+    var tg = timerGlobals();
+    if (tg && (tg.running || tg.active)) { var clock = h('small', { class: 'fc-muted', text: T('timerOn') + ' ' + fmtClock(timerLeft) }); header2.push(clock); if (!st.tick) st.tick = setInterval(function () { if (state.view !== 'study') { clearInterval(st.tick); st.tick = null; return; } var g = timerGlobals(); if (g) clock.textContent = T('timerOn') + ' ' + fmtClock(g.left); }, 1000); }
+    header2.push(btn(T('end'), function () { endStudy(); }, '', T('end')));
+    root.appendChild(header(N(s.index + 1) + ' / ' + N(s.queue.length), null, header2));
+    var hideQ = mode === 'listening';
+    var face = h('div', { class: 'fc-face', lang: (rev ? c.targetLanguage : c.sourceLanguage) || null }, [h('div', { class: 'fc-q', dir: 'auto', text: cloze ? cloze.text : (hideQ && !st.revealed ? '🔊' : question) })]);
+    if (c.flag) face.appendChild(h('small', { class: 'fc-warn', text: T('changedFlag') }));
     root.appendChild(face);
-    var audio = h('div', { class: 'fc-row' }, [btn('🔊 ' + T(qSide === 'front' ? 'playFront' : 'playBack'), function () { speakCard(c, qSide); }), btn('⏹ ' + T('stop'), function () { stopSpeech(); }, '', T('stop'))]);
-    root.appendChild(audio);
-    if (mode === 'writing' && !state.study.revealed) {
-      var inp = h('input', { type: 'text', id: 'fcWrite', class: 'fc-write', dir: 'auto', placeholder: T('yourAnswer'), autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' });
-      root.appendChild(inp);
-    }
-    if (!state.study.revealed) {
-      root.appendChild(btn(T('reveal'), function () {
-        if (mode === 'writing') { var w = val('fcWrite'); state.study.match = app.util.norm(w) === app.util.norm(answer); }
-        state.study.revealed = true; state.study.revealedAt = Date.now(); render();
-      }, 'primary big'));
-      if ((mode === 'listening' || mode === 'pronunciation') && tts && tts.available()) setTimeout(function () { if (state.view === 'study') speakCard(c, 'front'); }, 150);
+    root.appendChild(h('div', { class: 'fc-row' }, [btn('🔊 ' + T(qSide === 'front' ? 'playFront' : 'playBack'), function () { speakCard(c, cloze ? 'front' : qSide); }), btn('⏹ ' + T('stop'), function () { stopSpeech(); }, '', T('stop'))]));
+    function reveal(match) { st.match = match; st.revealed = true; st.revealedAt = Date.now(); render(); }
+    if (!st.revealed) {
+      if (mode === 'choice') {
+        var key = rev ? 'frontText' : 'backText', opts = app.distractors(c.id, 3).concat([c[key]]);
+        if (!st.choice || st.choice.id !== c.id) { var o2 = opts.slice().sort(function (a, b) { return a.localeCompare(b); }); st.choice = { id: c.id, opts: o2 }; }
+        var box = h('div', { class: 'fc-choices' });
+        st.choice.opts.forEach(function (o) { box.appendChild(btn(o, function () { reveal(app.util.norm(o) === app.util.norm(c[key]) ? 'exact' : 'wrong'); }, 'choice')); });
+        root.appendChild(box);
+      } else {
+        if (mode === 'writing' || mode === 'cloze') root.appendChild(h('input', { type: 'text', id: 'fcWrite', class: 'fc-write', dir: 'auto', placeholder: T('yourAnswer'), autocomplete: 'off', autocapitalize: 'off', spellcheck: 'false' }));
+        root.appendChild(btn(T('reveal'), function () {
+          var m = null;
+          if (mode === 'writing') m = app.checkAnswer(answer, val('fcWrite')).result;
+          else if (mode === 'cloze') m = app.checkAnswer(cloze.answer, val('fcWrite')).result;
+          reveal(m);
+        }, 'primary big'));
+        if ((mode === 'listening' || mode === 'pronunciation') && tts && tts.available()) setTimeout(function () { if (state.view === 'study') speakCard(c, 'front'); }, 150);
+      }
     } else {
-      root.appendChild(h('div', { class: 'fc-a', text: answer, dir: 'auto' }));
-      if (state.study.match !== null) root.appendChild(h('small', { class: state.study.match ? 'fc-ok' : 'fc-warn', text: state.study.match ? T('correct') : T('different') }));
+      root.appendChild(h('div', { class: 'fc-a', dir: 'auto', text: cloze ? cloze.answer : answer }));
+      if (st.match) root.appendChild(h('small', { class: st.match === 'exact' ? 'fc-ok' : 'fc-warn', text: st.match === 'exact' ? T('correct') : (st.match === 'close' ? T('almost') : T('different')) }));
+      if (prefs.showExamples && c.exampleText) {
+        root.appendChild(h('div', { class: 'fc-example', dir: 'auto' }, [h('span', { text: c.exampleText }), c.exampleTranslation ? h('small', { class: 'fc-muted', text: c.exampleTranslation }) : null]));
+        root.appendChild(btn('🔊 ' + T('playExample'), function () { speakCard({ frontText: c.exampleText, sourceLanguage: c.sourceLanguage, backText: c.exampleTranslation, targetLanguage: c.targetLanguage }, 'front'); }, 'ghost'));
+      }
       root.appendChild(btn('🔊 ' + T(aSide === 'front' ? 'playFront' : 'playBack'), function () { speakCard(c, aSide); }));
       var pv = app.previewIntervals(c.id), rate = h('div', { class: 'fc-rate' });
       [[1, 'again'], [2, 'hard'], [3, 'good'], [4, 'easy']].forEach(function (r) {
@@ -302,7 +353,7 @@
       });
       root.appendChild(rate);
     }
-    root.appendChild(h('div', { class: 'fc-row' }, [btn(T('edit'), function () { stopSpeech(); go('edit', { editId: c.id }); }, 'ghost'), btn(T('suspend'), function () { app.setSuspended(c.id, true); app.advanceSession(s.id); state.study.revealed = false; render(); }, 'ghost')]));
+    root.appendChild(h('div', { class: 'fc-row' }, [btn(T('edit'), function () { stopSpeech(); go('edit', { editId: c.id }); }, 'ghost'), btn(T('suspend'), function () { app.setSuspended(c.id, true); app.advanceSession(s.id); st.revealed = false; render(); }, 'ghost')]));
     return root;
   }
   var rating = false;
@@ -313,15 +364,20 @@
     var r = app.reviewCard(c.id, g, { sessionId: s.id, submissionId: s.id + ':' + s.index + ':' + c.id, responseMs: ms });
     rating = false;
     if (!r.ok) return toast(errText(r));
-    state.study.revealed = false; state.study.match = null; state.study.started = Date.now(); render();
+    if (g === 1 && state.study.missed.indexOf(c.id) < 0) state.study.missed.push(c.id);
+    state.study.revealed = false; state.study.match = null; state.study.choice = null; state.study.started = Date.now(); render();
   }
-  function endStudy() { stopSpeech(); app.completeSession(); state.study = null; go('home'); }
+  function endStudy() { stopSpeech(); if (state.study && state.study.tick) clearInterval(state.study.tick); app.completeSession(); state.study = null; go('home'); }
   function summaryView(s) {
     var root = h('div', { class: 'fc-view' }), done = s ? app.completeSession() : null, d = done && done.ok ? done.session : null;
+    var missed = state.study && state.study.missed ? state.study.missed.slice() : [];
+    if (state.study && state.study.tick) clearInterval(state.study.tick);
     root.appendChild(header(T('done'), 'home'));
-    if (d) root.appendChild(h('div', { class: 'fc-stats' }, [stat(T('reviewed'), d.reviewedCount), stat(T('accuracy') + ' %', d.reviewedCount ? d.correctCount * 100 / d.reviewedCount : 0), stat(T('studyTime'), d.durationSeconds / 60)]));
+    if (d) root.appendChild(h('div', { class: 'fc-stats' }, [stat(T('reviewed'), d.reviewedCount), stat(T('correctAnswers'), d.correctCount), stat(T('incorrectAnswers'), d.incorrectCount), stat(T('studyTime'), d.durationSeconds / 60)]));
     state.study = null;
-    root.appendChild(btn(T('title'), function () { go('home'); }, 'primary big'));
+    if (missed.length) root.appendChild(btn(T('repeatMistakes') + ' (' + N(missed.length) + ')', function () { beginStudy('mistakes', { queue: missed }); }, 'primary big'));
+    root.appendChild(btn(T('title'), function () { go('home'); }, missed.length ? '' : 'primary big'));
+    var tg = timerGlobals(); if (tg && (tg.running || tg.active)) root.appendChild(h('small', { class: 'fc-muted', text: T('timerNote') }));
     return root;
   }
   function statsView() {
@@ -351,11 +407,23 @@
     root2.appendChild(btn(T('preview'), function () {
       clear(out);
       var parsed = app.parseImport(ta.value); if (!parsed.ok) return out.appendChild(h('p', { class: 'fc-warn', text: parsed.error || T('error') }));
-      var map = app.guessMapping(parsed.headers), pv = app.previewImport(parsed, map, { deckId: val('fcImpDeck') });
-      if (!pv.ok) return out.appendChild(h('p', { class: 'fc-warn', text: pv.error || T('error') }));
-      out.appendChild(h('div', { class: 'fc-stats' }, [stat(T('total'), pv.total), stat(T('invalid'), pv.invalid.length), stat(T('duplicates'), pv.duplicates)]));
-      pv.records.slice(0, 5).forEach(function (r) { out.appendChild(h('div', { class: 'fc-card-row' }, [h('div', { class: 'fc-card-text' }, [h('strong', { text: r.content.frontText, dir: 'auto' }), h('span', { text: r.content.backText, dir: 'auto' })])])); });
-      out.appendChild(btn(T('importNow'), function () { var r = app.commitImport(pv, { deckId: val('fcImpDeck'), skipDuplicates: true }); if (!r.ok) return toast(errText(r)); toast(T('importOk') + ' ' + N(r.imported)); go('home'); }, 'primary'));
+      var map = app.guessMapping(parsed.headers);
+      var mapBox = h('div', { class: 'fc-map' });
+      ['frontText', 'backText', 'sourceLanguage', 'targetLanguage', 'exampleText', 'exampleTranslation', 'personalNotes', 'tags'].forEach(function (f) {
+        var sel = select(T('mapColumn') + ' ' + f, 'fcMap_' + f, [['-1', T('skipCol')]].concat(parsed.headers.map(function (hd, i) { return [String(i), String(hd || (N(i + 1)))]; })), String(map[f] === undefined ? -1 : map[f]));
+        sel.querySelector('select').addEventListener('change', function (e) { var v = parseInt(e.target.value, 10); if (v < 0) delete map[f]; else map[f] = v; showPreview(); });
+        mapBox.appendChild(sel);
+      });
+      out.appendChild(mapBox); var pvBox = h('div'); out.appendChild(pvBox);
+      function showPreview() {
+      clear(pvBox);
+      var pv = app.previewImport(parsed, map, { deckId: val('fcImpDeck') });
+      if (!pv.ok) return pvBox.appendChild(h('p', { class: 'fc-warn', text: pv.error || T('error') }));
+      pvBox.appendChild(h('div', { class: 'fc-stats' }, [stat(T('total'), pv.total), stat(T('invalid'), pv.invalid.length), stat(T('duplicates'), pv.duplicates)]));
+      pv.records.slice(0, 5).forEach(function (r) { pvBox.appendChild(h('div', { class: 'fc-card-row' }, [h('div', { class: 'fc-card-text' }, [h('strong', { text: r.content.frontText, dir: 'auto' }), h('span', { text: r.content.backText, dir: 'auto' })])])); });
+      pvBox.appendChild(h('div', { class: 'fc-row' }, [btn(T('cancel'), function () { clear(out); }), btn(T('importNow'), function (ev) { var b0 = ev && ev.currentTarget; if (b0) { b0.disabled = true; b0.textContent = T('importing'); } setTimeout(function () { var r = app.commitImport(pv, { deckId: val('fcImpDeck'), skipDuplicates: true }); if (!r.ok) { if (b0) { b0.disabled = false; b0.textContent = T('importNow'); } return toast(errText(r)); } toast(T('importOk') + ' ' + N(r.imported)); go('home'); }, 30); }, 'primary')]));
+      }
+      showPreview();
     }, 'primary'));
     root2.appendChild(out); return root2;
   }
@@ -368,6 +436,14 @@
     root2.querySelector('#fcGoal').addEventListener('change', function (e) { saveP({ dailyGoal: parseInt(e.target.value, 10) }); });
     var dirSel = select(T('direction'), 'fcPDir', [['forward', T('modeClassic')], ['reverse', T('modeReverse')], ['both', T('modeBoth')]], p.direction); root2.appendChild(dirSel);
     dirSel.querySelector('select').addEventListener('change', function (e) { saveP({ direction: e.target.value }); });
+    var tsz = select(T('textSize'), 'fcTsz', [['small', T('small')], ['medium', T('medium')], ['large', T('large')]], p.textSize); root2.appendChild(tsz);
+    tsz.querySelector('select').addEventListener('change', function (e) { saveP({ textSize: e.target.value }); render(); });
+    var exb = h('input', { type: 'checkbox', checked: p.showExamples }); exb.addEventListener('change', function () { saveP({ showExamples: exb.checked }); });
+    root2.appendChild(h('label', { class: 'fc-check' }, [exb, h('span', { text: T('showExamples') })]));
+    var dms = select(T('defaultMode'), 'fcDMode', MODES.map(function (m) { return [m[0], T(m[1])]; }), p.defaultMode || 'classic'); root2.appendChild(dms);
+    dms.querySelector('select').addEventListener('change', function (e) { saveP({ defaultMode: e.target.value }); });
+    var dks = select(T('defaultDeck'), 'fcDDeck', [['', T('allStates')]].concat(app.listDecks().map(function (d) { return [d.id, d.name]; })), p.defaultDeckId || ''); root2.appendChild(dks);
+    dks.querySelector('select').addEventListener('change', function (e) { saveP({ defaultDeckId: e.target.value }); });
     root2.appendChild(h('h3', { text: T('ttsTitle') }));
     if (!tts || !tts.available()) { root2.appendChild(h('p', { class: 'fc-warn', text: T('ttsUnavailable') })); }
     var rep = select(T('repeat'), 'fcRep', [1, 2, 3, 4, 5, 6, 7, 8, 9].map(function (n) { return [N(n), N(n) + 'x']; }), N(p.repeat)); root2.appendChild(rep);
@@ -421,6 +497,7 @@
     clear(mount);
     var node; try { node = (views[state.view] || homeView)(); } catch (e) { node = h('p', { class: 'fc-warn', text: T('error') }); if (root.__dfRecordError) root.__dfRecordError('flashcards-ui', e); }
     mount.appendChild(node); mount.appendChild(h('div', { class: 'fc-toast', role: 'status', 'aria-live': 'polite', text: state.toast || '' }));
+    var sz = app.getPrefs().textSize; mount.style.setProperty('--fc-scale', sz === 'large' ? '1.3' : (sz === 'small' ? '0.88' : '1'));
     mount.setAttribute('dir', lang() === 'ar' ? 'rtl' : (document.documentElement.getAttribute('dir') || 'ltr'));
   }
   function init() {
