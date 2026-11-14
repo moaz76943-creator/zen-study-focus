@@ -36,6 +36,6 @@ Efficient method: dump numbered source list, then one subagent per language writ
 
 ## Pre-existing failing CI gates (not required by branch protection; PR state "unstable", not "blocked")
 - Gitleaks (generic-api-key hits in app.js, garden/contracts/security modules) and CodeQL (path-injection, fs-race, insecure-randomness in existing files).
-- Lane11 `tests/i18n/visual/rtl_typography_numerals.test.cjs`: 3 tests fail on base (99-code catalog guard, Kurmanji direction, RTL CSS guards).
+- Lane11 `tests/i18n/visual/rtl_typography_numerals.test.cjs`: FIXED in branch `ccr-618eb454-5fbejb` (10/10): `js/localization_fallback_guard.js` synced to the 101-code app catalog (+ms om prs, -yi; prs RTL); test now expects `overflow-wrap: break-word` (d8bb074 removed `anywhere` on purpose). Removed from `tests/KNOWN_FAILING.txt`. Next hardening candidate: lane03 harness (needs `dfSyncInfiniteLocaleRegistry` stub etc.).
 - Source bug: key "🩺 Scientific academic & Diagram Occlusion Diagram Occlusion" repeats a phrase (from runtime inventory); translations render it once.
 These are candidates for a later security/i18n-hardening task (priorities 6 and 8).
