@@ -4,7 +4,7 @@
 //   node tools/run_tests.mjs            # gate (exit 1 on a new failure)
 //   node tools/run_tests.mjs --update   # rewrite KNOWN_FAILING.txt from current results
 import { spawn } from 'node:child_process';
-import { readdirSync, readFileSync, statSync, writeFileSync, existsSync } from 'node:fs';
+import { readdirSync, readFileSync, statSync, writeFileSync, existsSync, constants, openSync, closeSync, fsyncSync } from 'node:fs';
 import { join, relative, resolve, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
@@ -70,7 +70,8 @@ if (process.argv.includes('--update')) {
   const body = '# Legacy tests that currently fail (stale harnesses / retired features).\n' +
     '# Do not add new entries: fix the regression instead. Regenerate with --update after repairing some.\n' +
     failing.join('\n') + '\n';
-  writeFileSync(knownFile, body);
+  const fd = openSync(knownFile, constants.O_WRONLY | constants.O_CREAT | constants.O_TRUNC | (constants.O_NOFOLLOW || 0), 0o600);
+  try { writeFileSync(fd, body); fsyncSync(fd); } finally { closeSync(fd); }
   console.log(`wrote ${failing.length} entries to tests/KNOWN_FAILING.txt`);
   process.exit(0);
 }
