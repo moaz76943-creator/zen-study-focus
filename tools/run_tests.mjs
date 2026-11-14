@@ -48,9 +48,9 @@ function run(file) {
 
 const files = ['test', 'tests'].filter((d) => existsSync(join(root, d)))
   .flatMap((d) => walk(join(root, d))).sort();
-const known = new Set(existsSync(knownFile)
-  ? readFileSync(knownFile, 'utf8').split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#'))
-  : []);
+let knownText = '';
+try { knownText = readFileSync(knownFile, 'utf8'); } catch (e) { if (e.code !== 'ENOENT') throw e; }
+const known = new Set(knownText.split('\n').map((l) => l.trim()).filter((l) => l && !l.startsWith('#')));
 
 const results = new Map();
 let next = 0;
