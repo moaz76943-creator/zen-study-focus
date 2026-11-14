@@ -12,7 +12,7 @@ test('commitment contract id uses CSPRNG, not Math.random (js/insecure-randomnes
 test('static test servers reject path traversal outside the web root (js/path-injection)', () => {
   for (const p of ['tools/i18n/runtime_inventory.cjs', 'tools/perf/flashcards_perf.cjs']) {
     const s = R(p);
-    assert.match(s, /startsWith\(root \+ path\.sep\)/, p);
+    assert.match(s, /staticFiles\.get\(key\)/, p);
     assert.ok(!/path\.join\(root, q\.url/.test(s), p);
   }
 });

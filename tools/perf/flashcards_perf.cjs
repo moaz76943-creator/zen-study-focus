@@ -5,8 +5,20 @@ const http = require('http'), fs = require('fs'), path = require('path');
 const { chromium } = require('playwright');
 const root = path.resolve(__dirname, '../../android/app/src/main/assets/web');
 const mime = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json' };
-const srv = http.createServer((q, r) => { let f; try { f = path.resolve(root, '.' + (q.url === '/' ? '/index.html' : decodeURIComponent(q.url.split('?')[0]))); } catch (_e) { f = null; }
-    if (!f || (f !== root && !f.startsWith(root + path.sep))) { r.statusCode = 403; r.end(); return; } fs.readFile(f, (e, d) => { if (e) { r.statusCode = 404; r.end(); } else { r.setHeader('content-type', mime[path.extname(f)] || 'application/octet-stream'); r.end(d); } }); });
+const staticFiles = new Map();
+(function index(dir, rel) {
+  for (const ent of fs.readdirSync(dir, { withFileTypes: true })) {
+    const abs = path.join(dir, ent.name), key = rel + '/' + ent.name;
+    if (ent.isDirectory()) index(abs, key); else if (ent.isFile()) staticFiles.set(key, abs);
+  }
+})(root, '');
+function staticLookup(url) {
+  let key; try { key = decodeURIComponent(String(url).split('?')[0]); } catch (_e) { return null; }
+  if (key === '/') key = '/index.html';
+  return staticFiles.get(key) || null; // only files indexed under the web root can ever be served
+}
+const srv = http.createServer((q, r) => { const f = staticLookup(q.url);
+    if (!f) { r.statusCode = 404; r.end(); return; } fs.readFile(f, (e, d) => { if (e) { r.statusCode = 404; r.end(); } else { r.setHeader('content-type', mime[path.extname(f)] || 'application/octet-stream'); r.end(d); } }); });
 (async () => {
   await new Promise((r) => srv.listen(0, r)); const base = 'http://localhost:' + srv.address().port;
   const b = await chromium.launch(); const ctx = await b.newContext({ viewport: { width: 360, height: 760 } }); const p = await ctx.newPage();
