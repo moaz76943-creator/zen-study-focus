@@ -29,9 +29,11 @@ Remaining, in registry order: hy ne si my km lo mn af sq eu ca gl is ga mk mt cy
 | 2026-11-14 | db11002 | pack ms | #604 | merged 2971971 |
 | 2026-11-14 | 2971971 | packs ta te mr gu (4 parallel translation subagents) | #605 | merged b9fdcae |
 | 2026-11-14 | b9fdcae | packs kn ml pa am (catalog test 5/5; lane03 4 fail + lane11 3 fail identical on base) | #606 | merged 22c5cbd |
-| 2026-11-14 | 22c5cbd | packs az uz kk ka (catalog 5/5; lane03 4 fail, lane11 3 fail = base) | (this PR) | see PR |
+| 2026-11-14 | 22c5cbd | packs az uz kk ka (catalog 5/5; lane03 4 fail, lane11 3 fail = base) | #607 | MERGE_BLOCKED: new node-tests failure `tests/guardrails.test.cjs` size budget (web assets 16104404 > 16000000) |
 
 ## Next step
+**BLOCKER (2026-11-14):** web assets exceed `tests/ratchets.json` `webAssetsMaxBytes` 16000000 once az/uz/kk/ka are added (+~170 KB; the 46 remaining packs need ~1.9 MB more). The ratchet must not be raised without the user's decision. Options sent to the user: (a) re-encode `audio/wind_breeze.ogg` (3.47 MB, 225 kbps, 123 s) to ~112 kbps, saving ~1.7 MB; (b) the user approves a higher budget; (c) another size reduction. Do not start more packs until this is decided. PR #607 stays open.
+
 Next batch of packs: hy ne si my (then km lo mn af …). Branch pattern `i18n-packs-<n>` (last used: 12).
 Efficient method: dump numbered source list, then one subagent per language writes `index\ttranslation` TSV; spot-check alignment at several indices before building.
 
