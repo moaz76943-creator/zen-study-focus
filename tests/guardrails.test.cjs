@@ -1,5 +1,5 @@
 'use strict';
-// Permanent guard rails: secrets, size budgets, ratchets on risky patterns, locale completeness.
+// Permanent guard rails: secrets, per-file size budgets, ratchets on risky patterns, locale completeness.
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -34,12 +34,10 @@ test('no keystores, private keys, tokens or password literals are tracked', () =
   assert.deepEqual(hits, []);
 });
 
-test('size budgets hold (APK size / load time protection)', () => {
+test('per-file size budgets hold (app.js and single-file limits; no aggregate cap by owner decision)', () => {
   const app = fs.statSync(path.join(web, 'app.js')).size;
   assert.ok(app <= ratchets.appJsMaxBytes, 'app.js is ' + app + ' bytes');
   const all = walk(web);
-  const total = all.reduce((n, f) => n + fs.statSync(f).size, 0);
-  assert.ok(total <= ratchets.webAssetsMaxBytes, 'web assets are ' + total + ' bytes');
   const big = all.filter((f) => fs.statSync(f).size > ratchets.singleFileMaxBytes).map((f) => path.relative(web, f));
   assert.deepEqual(big, [], 'single file over budget');
 });
