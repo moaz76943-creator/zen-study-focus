@@ -24,7 +24,7 @@ jobs:
           java-version: '17'
       - name: Native source and translation regressions
         run: python3 -m unittest discover -s tests/i18n/native_android -p 'test_*.py' -v
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
         with:
           gradle-version: '8.13'
       - name: Android SDK 36
