@@ -7,7 +7,6 @@ tests/accessibility/locale_button_name.test.cjs
 tests/critical_room7/w03_contract.test.cjs
 tests/df_lane03_core_shell_locale.test.cjs
 tests/global_i18n_engine.test.js
-tests/i18n/analytics/analytics_studio_i18n.test.cjs
 tests/i18n/tasks/tasks_studio_i18n.test.cjs
 tests/runtime_activator/studio_runtime_user_text.test.cjs
 tests/termux_fix01_consent_kickstart_digits.test.cjs
