@@ -212,6 +212,27 @@ async function flashcards(b, base) {
     await p.click('#sec-flashcards .fc-btn.rate.r1'); await p.waitForTimeout(200);
     const t1 = await p.evaluate(() => ({ studied: typeof timerActiveMs === 'number' ? timerActiveMs : 0 }));
     if (t1.studied - t0.studied > 5000) fail(`flashcards ${lang}: flashcards touched the timer accounting ${JSON.stringify([t0, t1])}`);
+    // Finding A: a failing flashcards write must not end in a full-success restore message; existing cards stay.
+    const fa = await p.evaluate(() => {
+      const code = generateEncryptedBackupCode(); const before = DFFlashcardsApp.stats().total;
+      DFFlashcardsApp.addCard({ deckId: DFFlashcardsApp.listDecks()[0].id, frontText: 'after-backup', backText: 'x' });
+      const mid = DFFlashcardsApp.stats().total;
+      const orig = Storage.prototype.setItem;
+      Storage.prototype.setItem = function (k, v) { if (String(k).indexOf('df_fc_') === 0) throw new Error('QuotaExceededError'); return orig.call(this, k, v); };
+      let ok; try { ok = verifyAndRestoreBackupCode(code); } finally { Storage.prototype.setItem = orig; }
+      return { before, mid, ok, after: DFFlashcardsApp.stats().total, toast: document.getElementById('toastText').textContent };
+    });
+    if (fa.after !== fa.mid || /^✓/.test(fa.toast) || !/flashcards/i.test(fa.toast)) fail(`flashcards ${lang}: restore false success or data lost ${JSON.stringify(fa)}`);
+    // Finding B: an old backup (legacy arrays only) restores into an install whose migration flag is already set.
+    const fb = await p.evaluate(() => {
+      const legacy = [{ front: 'altes-Wort', back: 'old word' }];
+      localStorage.setItem('df_cards_v1', JSON.stringify(legacy));
+      const t0 = DFFlashcardsApp.stats().total;
+      const r1 = DFFlashcardsApp.migrateLegacy({ rescan: true }); const t1 = DFFlashcardsApp.stats().total;
+      const r2 = DFFlashcardsApp.migrateLegacy({ rescan: true }); const t2 = DFFlashcardsApp.stats().total;
+      return { t0, t1, t2, r1: r1.migrated, r2: r2.migrated, keys: ['df_vocab_bank','df_vocab_bank_v1','df_flashcards_v1','df_vocab_flashcards_v21'].map(k => (localStorage.getItem(k) || '').slice(0, 200)), fronts: DFFlashcardsApp.search('').items.map(c => c.frontText).join('|'), keyKept: localStorage.getItem('df_cards_v1') === JSON.stringify(legacy) };
+    });
+    if (fb.t1 <= fb.t0 || fb.t2 !== fb.t1 || !fb.keyKept || fb.fronts.split('altes-Wort').length !== 2) fail(`flashcards ${lang}: legacy restore path ${JSON.stringify(fb)}`);
     await p.evaluate(() => DFFlashcardsUI.leave());
     // leaving the section stops speech
     const stopCalled = await p.evaluate(() => { let n = 0; window.ZenNative = Object.assign(window.ZenNative || {}, { ttsInit: () => '{"ok":true,"status":"ready"}', ttsStop: () => { n++; return '{"ok":true}'; }, ttsSpeak: () => '{"ok":true}' }); DFFlashcardsUI.show(); switchTab('sec-timer', document.getElementById('navTimer')); return n; });

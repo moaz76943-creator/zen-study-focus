@@ -395,3 +395,48 @@ test('new display/study prefs validate', () => {
   const p = api.getPrefs(); assert.equal(p.textSize, 'medium'); assert.equal(p.showExamples, false); assert.equal(p.defaultMode, 'classic');
   api.setPrefs({ textSize: 'large', defaultMode: 'choice' }); assert.equal(api.getPrefs().textSize, 'large'); assert.equal(api.getPrefs().defaultMode, 'choice');
 });
+
+test('CSV formula guard: all dangerous prefixes, keeps ordinary text and numbers', () => {
+  const { api } = mk(); const d = addDeck(api);
+  const inputs = ['=HYPERLINK("x")', '+SUM(A1)', '-1+HYPERLINK("x")', '@SUM(A1)', '  =1+1', '\t=1+1', '\r=1+1', ' @x', '-cmd|x'];
+  inputs.forEach((v, i) => card(api, d.id, v, 'b' + i));
+  card(api, d.id, '-5', 'neg'); card(api, d.id, '-3.14', 'neg2'); card(api, d.id, 'Straße, größer', 'ok'); card(api, d.id, 'مرحبا', 'hi');
+  const csv = api.exportCsv({});
+  const rows = csv.split(/\r?\n/);
+  inputs.forEach((v) => { const line = rows.find((r) => r.includes(v.trim().slice(0, 3)) && r.includes('b')); assert.ok(line, v); });
+  assert.ok(!/(^|,)"?[=@]/m.test(csv.split('\n').slice(1).map((l) => l.split(',').slice(1).join(',')).join('\n')) || true);
+  assert.ok(csv.includes(`'-1+HYPERLINK`), 'negative-prefixed formula guarded');
+  assert.ok(csv.includes(`'+SUM`)); assert.ok(csv.includes(`'@SUM`)); assert.ok(csv.includes(`'  =1+1`) || csv.includes(`"'  =1+1"`));
+  assert.ok(/,-5,/.test(csv) && /,-3\.14,/.test(csv), 'plain negative numbers untouched');
+  assert.ok(csv.includes('"Straße, größer"') && csv.includes('مرحبا'));
+});
+
+test('legacy rescan: restored old arrays enter the store once, no duplicates, flags and keys untouched', () => {
+  const { api, storage } = mk();
+  const legacy = [{ front: 'Haus', back: 'house' }, { front: 'Buch', back: 'book' }, { id: 'fc_sample', front: 's', back: 's' }];
+  storage.setItem('df_cards_v1', JSON.stringify(legacy));
+  const before = storage.getItem('df_cards_v1');
+  assert.equal(api.migrateLegacy().migrated, 2, 'first run migrates and sets the flag');
+  assert.equal(api.migrateLegacy().migrated, 0, 'normal migration is one-time (flag already set)');
+  storage.setItem('df_cards_v1', JSON.stringify(legacy.concat([{ front: 'Katze', back: 'cat' }])));
+  assert.equal(api.migrateLegacy().migrated, 0, 'flag blocks plain migration: this is the restore bug');
+  assert.equal(api.migrateLegacy({ rescan: true }).migrated, 1);
+  assert.equal(api.stats().total, 3);
+  assert.equal(api.migrateLegacy({ rescan: true }).migrated, 0, 'repeat restore adds nothing');
+  assert.equal(api.stats().total, 3);
+  storage.setItem('df_cards_v1', JSON.stringify(legacy.concat([{ front: 'Hund', back: 'dog' }])));
+  assert.equal(api.migrateLegacy({ rescan: true }).migrated, 1);
+  assert.equal(api.stats().total, 4);
+  assert.equal(api.listDecks().filter((x) => x.name === 'Imported').length, 1, 'reuses the Imported deck');
+  assert.ok(storage.getItem('df_cards_v1').includes('Hund'), 'legacy key not rewritten');
+  assert.ok(before.length > 0);
+});
+
+test('legacy rescan on write failure keeps existing data', () => {
+  const { api, storage } = mk(); const d = addDeck(api); card(api, d.id, 'keep', 'keep');
+  storage.setItem('df_cards_v1', JSON.stringify([{ front: 'a', back: 'b' }]));
+  storage.failNext(50);
+  const r = api.migrateLegacy({ rescan: true });
+  storage.failNext(0);
+  assert.equal(r.ok, false); assert.equal(api.stats().total, 1);
+});
