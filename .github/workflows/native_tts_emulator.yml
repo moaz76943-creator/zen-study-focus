@@ -46,7 +46,7 @@ jobs:
         run: |
           sdkmanager_bin="$(find /usr/local/lib/android/sdk/cmdline-tools -name sdkmanager -type f -print -quit)"
           "$sdkmanager_bin" 'platforms;android-36' 'build-tools;36.0.0'
-      - uses: gradle/actions/setup-gradle@v4
+      - uses: gradle/actions/setup-gradle@v6
         with: { gradle-version: '8.11.1' }
       - run: bash tests/android_tts/prepare_test_build.sh
       - name: Compile app and test APK
