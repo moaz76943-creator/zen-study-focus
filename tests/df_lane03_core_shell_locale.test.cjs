@@ -39,7 +39,7 @@ function makeElement(tag='SPAN',text='',key=null) {
   const attrs={};
   if(key!==null)attrs['data-i18n']=key;
   return {
-    tagName:tag, textContent:text, value:'', isContentEditable:false, attrs,
+    tagName:tag, textContent:text, value:'', isContentEditable:false, attrs, children:[],
     getAttribute(name){return this.attrs[name]??null;},
     setAttribute(name,value){this.attrs[name]=String(value);}
   };
@@ -52,6 +52,11 @@ function setup(initialLanguage='en') {
   };
   const sources=[
     index('const ARABIC_ZERO_OFFSET = ',"document.addEventListener('input'"),
+    // Locale helpers applyLanguage() depends on. The regional dialect matrix, the infinite registry
+    // singleton and the real L() are left out so this harness keeps its small mock catalog and DICT.
+    index('const DF_EXCLUDED_LOCALE_CODES = ','// Regional & World Dialect Matrix'),
+    index('function dfSyncInfiniteLocaleRegistry() {','window.dfSyncInfiniteLocaleRegistry = '),
+    index('const DF_KEY_ALIAS_MAP = ','function L() {'),
     index('const SHELL_LABELS = ','const CONFIRMATION_TEXT = '),
     index('function localizeStarterPreviews(target) {','/* ========================================================\n   3. CLOUD BACKUP')
   ].join('\n');
