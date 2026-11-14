@@ -16,17 +16,18 @@ Last refreshed: 2026-11-14 (UTC+3 evening), verified HEAD 2a4b7c8e at the start 
 - Android CI scripts/Python tests aligned with applicationId `com.deepfocus.study`.
 - QA debug APK (QA only, not a release): workflow `df06_exact_source_packages.yml` run 43636459729, SOURCE_SHA 2a4b7c8ef5c65364a9b446309d3a35e49a869be5, versionName 666.0.0 / code 41386, `app-debug.apk` SHA256 `9a0b43c5a0c3f25c3ae051383202f49d71143fdc928fa669971f9842158b54c3` (re-verified). Proves compile/package only.
 
-## Known failing CI (identical on base; not required by branch protection)
-- Gitleaks: tree = 2 public storage-key/fixture strings in `tests/security_recovery/track13_private_triage.test.cjs`; history = 12 findings, 4 unresolved (needs a real Gitleaks run). CodeQL fail-closed. Legacy `source coverage` probe hard-coded to 99 locales (being ported to the 100-language registry). analytics-browser `share_card_clipboard_browser` timeout.
-
-## Backlog (priority order)
-1. Port 99-locale coverage tooling to the 100-language registry.
-2. CodeQL findings with evidence. 3. Gitleaks tree + history triage (no broad allowlists).
-4. Runtime localization audit (RTL, digits, placeholders, fallback, English leaks).
-5. Analytics 10,000-record performance. 6. Notes/Tasks scale, persistence, recovery.
-7. Timer lifecycle/alarms/notifications/Doze/duplicate completion. 8. Audio sources/licenses/playback/focus.
-9. Accessibility + responsive. 10. Backup/restore/SAF/interrupted writes/v21 preservation.
-11. Device/emulator tests where available (label NOT_TESTED otherwise).
+## Status after the closeout run (2026-11-14/15)
+- Integrated: #620 (asset cap removed), #621 (coverage probes use `i18n/languages.json`, jv->jw alias, `prs` documented legacy), #622 (CodeQL fixes at source + Notes cap fix + alarm commit ordering + scale probes), #623 (Gitleaks exact value+path exceptions). main == integration.
+- CodeQL: 8 -> 1 open. Remaining `js/http-to-file-access` at `tests/android_e2e_recovery/private_evidence.cjs:68` is the hardened O_EXCL|O_NOFOLLOW evidence writer; its adjudication digest (`tools/security/codeql_adjudications.json`) is stale after tooling edits and needs an INDEPENDENT re-review (not self-approved).
+- Gitleaks: tree = 0, history = 1. **REAL SECRET**: `.github/workflows/build_release_aab.yml` @ 3a51d4a6 (removed in c81aee2e) held a base64 keystore + plaintext alias/password, reachable from tags v441.0.0+. BLOCKED BY OWNER DECISION: rotate that key, decide on history rewrite. Not allowlisted.
+- Notes: creating beyond MAX_NOTES used to lock the collection (fixed, `NOTE_LIMIT_REACHED`). Analytics/Notes/Tasks 10k probes: `tools/perf/analytics_scale.cjs`, `tools/perf/notes_tasks_scale.cjs` (Node, not Android).
+- Timer alarm: schedule/cancel/completeNow clear the AlarmManager alarm only after the state commit; delivery shares the class monitor (source test only; Android delivery NOT_TESTED).
+- Responsive: `tools/perf/responsive_320.cjs` - 320px, 100%/200% text, en/ar/de/ru, 0 off-screen controls after the Studios-pill fix (ViewportOptimizer no longer overwrites inline transforms). TalkBack and contrast NOT_TESTED.
+- Runtime i18n audit (10 languages, headless Chromium): digits all Western; 43-69 of ~570 visible strings per language still English (loanwords/brands, speed-reading tutorial text and seeded sample tasks/notes that are not in the 650-key catalog). The catalog is a DOM gap-filler over the legacy dictionaries. PARTIAL.
+- Design decision for owner: a sub-minute timer completion is stored in `sessionHistory` with `minutes:0` (it is the idempotency record); Analytics counts it as a session. Excluding it breaks existing contract tests, so it was left unchanged.
+- Audio: 6 ogg + 5 wav, all decodable, all in license registers (Wikimedia CC0/PD, VCSL/Dewdrop CC0); online licence re-verification and loop/mix/audio-focus on device NOT_TESTED.
+- Old PRs closed as superseded: #580 #548 #545 #549 #551 #518; #516 re-applied on HEAD via #622.
+- CI known red (infra/pre-existing): `analytics-browser` (share-card clipboard timeout), emulator `device (30/35)` (APK-not-installed flake; `android-smoke (30/35)` pass).
 
 ## Device-only / human-only (cannot be done here)
 Real-device timer/Doze/notification/audio-focus/Bluetooth checks; native-speaker review of all 99 non-English packs (especially low-resource: sm haw hmn gd co fy la om).
@@ -35,4 +36,5 @@ Real-device timer/Doze/notification/audio-focus/Bluetooth checks; native-speaker
 | Date | HEAD | Work | PR | Result |
 |---|---|---|---|---|
 | 2026-11-14 | 2a4b7c8e | 100/100 packs + QA APK dispatch | #618 | merged |
-| 2026-11-14 | 2a4b7c8e | remove global web-assets cap; refresh this file | this PR | see PR |
+| 2026-11-14 | 8dea4186 | closeout: #620-#623 integrated | #620-#623 | merged |
+| 2026-11-15 | 8dea4186 | responsive pill fix, state refresh, final QA APK | this PR | see PR |
