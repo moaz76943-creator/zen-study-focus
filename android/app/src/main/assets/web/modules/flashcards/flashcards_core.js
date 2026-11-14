@@ -741,9 +741,19 @@
       if (typeof o.onProgress === 'function') o.onProgress(cards.length, cards.length);
       return { ok: true, imported: cards.length, skipped: preview.records.length - cards.length, invalid: preview.invalid.length };
     }
+    // A cell is dangerous when, after skipping whitespace/control/invisible characters, it starts with = + - @.
+    // Plain signed numbers (-5, -3.14, +2) stay readable; anything else with a leading - or + is guarded.
+    function needsFormulaGuard(v) {
+      var t = v.replace(/^[\s\u0000-\u001f\u007f\u00a0\u200b-\u200f\u2028\u2029\ufeff]+/, '');
+      if (!t) return false;
+      var c = t.charAt(0);
+      if (c === '=' || c === '@') return true;
+      if (c === '+' || c === '-') return !/^[+-]?\d+([.,]\d+)?$/.test(t) || t !== v;
+      return /^[\t\r]/.test(v);
+    }
     function csvCell(v, safe) {
       v = String(v == null ? '' : v);
-      if (safe && /^[=+@]|^-[^\d\s.]/.test(v)) v = "'" + v;
+      if (safe && needsFormulaGuard(v)) v = "'" + v;
       return /[",\r\n\t]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
     }
     function exportCsv(o) {
@@ -833,10 +843,10 @@
     }
 
     // ---------- legacy migration (read-only on legacy keys) ----------
-    function migrateLegacy() {
-      var found = [], moved = 0;
+    function migrateLegacy(opts) {
+      var rescan = !!(opts && opts.rescan), found = [], moved = 0;
       LEGACY_KEYS.forEach(function (key) {
-        if (meta.migrated[key]) return;
+        if (meta.migrated[key] && !rescan) return;
         var raw = storage.getItem(key); if (raw == null) return;
         var arr; try { arr = JSON.parse(raw); } catch (_) { meta.migrated[key] = 'unreadable'; return; }
         if (!Array.isArray(arr)) { meta.migrated[key] = 'not-a-list'; return; }
@@ -859,11 +869,16 @@
         });
       });
       if (items.length) {
-        var made = createDeck({ name: 'Imported', description: 'Cards found from earlier versions' });
-        if (!made.ok) return made; deck = made.deck;
         var seen = Object.create(null), cards = [];
+        // Restoring an older backup re-reads the legacy keys: cards that already exist anywhere are never added twice.
+        if (rescan) allCards().forEach(function (c0) { seen[norm(c0.frontText) + '|' + norm(c0.backText)] = 1; });
+        var fresh = items.filter(function (it) { return !seen[norm(it.content.frontText) + '|' + norm(it.content.backText)]; });
+        if (!fresh.length) { found.forEach(function (f) { meta.migrated[f.key] = 'done'; }); persist([]); return { ok: true, migrated: 0 }; }
+        var existing = rescan ? meta.decks.filter(function (d) { return d.name === 'Imported' && !d.archived; })[0] : null;
+        var made = existing ? { ok: true, deck: existing } : createDeck({ name: 'Imported', description: 'Cards found from earlier versions' });
+        if (!made.ok) return made; deck = made.deck;
         items.forEach(function (it) { var k = norm(it.content.frontText) + '|' + norm(it.content.backText); if (seen[k]) return; seen[k] = 1; cards.push(newCardRecord(it.content, deck.id)); });
-        var r = commitNewCards(cards); if (!r.ok) { deleteDeck(deck.id); return r; }
+        var r = commitNewCards(cards); if (!r.ok) { if (!existing) deleteDeck(deck.id); return r; }
         moved = cards.length;
       }
       found.forEach(function (f) { meta.migrated[f.key] = 'done'; });
