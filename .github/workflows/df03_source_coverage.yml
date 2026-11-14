@@ -1,4 +1,4 @@
-name: DF03 99-locale source audit (informational, not translation acceptance)
+name: DF03 100-language source audit (informational, not translation acceptance)
 on:
   pull_request:
     branches: [integration/master-qa-verified-v21]
@@ -8,6 +8,8 @@ on:
       - 'android/app/src/main/assets/web/app.js'
       - 'android/app/src/main/assets/web/quick_training.js'
       - 'android/app/src/main/assets/web/js/df99_**'
+      - 'tools/df99_full_app_coverage.cjs'
+      - 'i18n/languages.json'
       - '.github/workflows/df03_source_coverage.yml'
   workflow_dispatch:
 permissions:
@@ -36,8 +38,9 @@ jobs:
           node tools/i18n/e2e/coverage.cjs --output artifacts/df03-source
           node - <<'NODE'
           const r=require('./artifacts/df03-source/PER_LANGUAGE_COVERAGE.json');
-          if(r.catalog_count!==99 || r.summary.PASS+r.summary.FAIL+r.summary.NOT_TESTED!==99)
-            throw Error('Invalid 99-language inventory');
+          const N=require('./i18n/languages.json');const n=(N.languages||N).length;
+          if(r.catalog_count!==n || r.summary.PASS+r.summary.FAIL+r.summary.NOT_TESTED!==n)
+            throw Error('Invalid '+n+'-language inventory');
           console.log('SOURCE ONLY; translated=',r.summary.PASS,'missing=',r.summary.FAIL,
             'not tested=',r.summary.NOT_TESTED,'; English fallback remains untranslated');
           NODE
@@ -45,7 +48,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: df03-99-language-source-gap-report
+          name: df03-100-language-source-gap-report
           path: artifacts/df03-source/
           if-no-files-found: warn
           retention-days: 14
