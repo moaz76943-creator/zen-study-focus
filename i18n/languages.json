@@ -1,0 +1,1238 @@
+{
+ "note": "Official 100-language list for DEEP FOCUS. Hebrew is permanently excluded. Regional variants (e.g. prs = Dari, ar-EG) resolve to their base language and are not counted.",
+ "variants": {
+  "prs": "fa",
+  "jw": "jv"
+ },
+ "languages": [
+  {
+   "code": "ar",
+   "enName": "Arabic",
+   "nativeName": "العربية",
+   "script": "Arab",
+   "dir": "rtl",
+   "plural": [
+    "few",
+    "many",
+    "one",
+    "two",
+    "zero",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "en",
+   "enName": "English",
+   "nativeName": "English",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "source"
+  },
+  {
+   "code": "es",
+   "enName": "Spanish",
+   "nativeName": "Español",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "many",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "zh",
+   "enName": "Chinese",
+   "nativeName": "中文 (简体)",
+   "script": "Hans",
+   "dir": "ltr",
+   "plural": [
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "hi",
+   "enName": "Hindi",
+   "nativeName": "हिन्दी",
+   "script": "Deva",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "fr",
+   "enName": "French",
+   "nativeName": "Français",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "many",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "de",
+   "enName": "German",
+   "nativeName": "Deutsch",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ru",
+   "enName": "Russian",
+   "nativeName": "Русский",
+   "script": "Cyrl",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "many",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "pt",
+   "enName": "Portuguese",
+   "nativeName": "Português",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "many",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ja",
+   "enName": "Japanese",
+   "nativeName": "日本語",
+   "script": "Jpan",
+   "dir": "ltr",
+   "plural": [
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "id",
+   "enName": "Indonesian",
+   "nativeName": "Bahasa Indonesia",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "tr",
+   "enName": "Turkish",
+   "nativeName": "Türkçe",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ko",
+   "enName": "Korean",
+   "nativeName": "한국어",
+   "script": "Kore",
+   "dir": "ltr",
+   "plural": [
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "vi",
+   "enName": "Vietnamese",
+   "nativeName": "Tiếng Việt",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "it",
+   "enName": "Italian",
+   "nativeName": "Italiano",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "many",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "bn",
+   "enName": "Bengali",
+   "nativeName": "বাংলা",
+   "script": "Beng",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ur",
+   "enName": "Urdu",
+   "nativeName": "اردو",
+   "script": "Arab",
+   "dir": "rtl",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "fa",
+   "enName": "Persian",
+   "nativeName": "فارسی",
+   "script": "Arab",
+   "dir": "rtl",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "pl",
+   "enName": "Polish",
+   "nativeName": "Polski",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "many",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "nl",
+   "enName": "Dutch",
+   "nativeName": "Nederlands",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "th",
+   "enName": "Thai",
+   "nativeName": "ไทย",
+   "script": "Thai",
+   "dir": "ltr",
+   "plural": [
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "sv",
+   "enName": "Swedish",
+   "nativeName": "Svenska",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "el",
+   "enName": "Greek",
+   "nativeName": "Ελληνικά",
+   "script": "Grek",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "cs",
+   "enName": "Czech",
+   "nativeName": "Čeština",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "many",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ro",
+   "enName": "Romanian",
+   "nativeName": "Română",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "hu",
+   "enName": "Hungarian",
+   "nativeName": "Magyar",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "da",
+   "enName": "Danish",
+   "nativeName": "Dansk",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "fi",
+   "enName": "Finnish",
+   "nativeName": "Suomi",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "no",
+   "enName": "Norwegian",
+   "nativeName": "Norsk",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "sk",
+   "enName": "Slovak",
+   "nativeName": "Slovenčina",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "many",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "uk",
+   "enName": "Ukrainian",
+   "nativeName": "Українська",
+   "script": "Cyrl",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "many",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "bg",
+   "enName": "Bulgarian",
+   "nativeName": "Български",
+   "script": "Cyrl",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "hr",
+   "enName": "Croatian",
+   "nativeName": "Hrvatski",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "sr",
+   "enName": "Serbian",
+   "nativeName": "Српски",
+   "script": "Cyrl",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "sl",
+   "enName": "Slovenian",
+   "nativeName": "Slovenščina",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "one",
+    "two",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "lt",
+   "enName": "Lithuanian",
+   "nativeName": "Lietuvių",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "many",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "lv",
+   "enName": "Latvian",
+   "nativeName": "Latviešu",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "zero",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "et",
+   "enName": "Estonian",
+   "nativeName": "Eesti",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "sw",
+   "enName": "Swahili",
+   "nativeName": "Kiswahili",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "fil",
+   "enName": "Filipino",
+   "nativeName": "Filipino",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ta",
+   "enName": "Tamil",
+   "nativeName": "தமிழ்",
+   "script": "Taml",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "te",
+   "enName": "Telugu",
+   "nativeName": "తెలుగు",
+   "script": "Telu",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "mr",
+   "enName": "Marathi",
+   "nativeName": "मराठी",
+   "script": "Deva",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "gu",
+   "enName": "Gujarati",
+   "nativeName": "ગુજરાતી",
+   "script": "Gujr",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "kn",
+   "enName": "Kannada",
+   "nativeName": "ಕನ್ನಡ",
+   "script": "Knda",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ml",
+   "enName": "Malayalam",
+   "nativeName": "മലയാളം",
+   "script": "Mlym",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "pa",
+   "enName": "Punjabi",
+   "nativeName": "ਪੰਜਾਬੀ",
+   "script": "Guru",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "am",
+   "enName": "Amharic",
+   "nativeName": "አማርኛ",
+   "script": "Ethi",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "az",
+   "enName": "Azerbaijani",
+   "nativeName": "Azərbaycan",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "uz",
+   "enName": "Uzbek",
+   "nativeName": "Oʻzbek",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "kk",
+   "enName": "Kazakh",
+   "nativeName": "Қазақ",
+   "script": "Cyrl",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ka",
+   "enName": "Georgian",
+   "nativeName": "ქართული",
+   "script": "Geor",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "hy",
+   "enName": "Armenian",
+   "nativeName": "Հայերեն",
+   "script": "Armn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ne",
+   "enName": "Nepali",
+   "nativeName": "नेपाली",
+   "script": "Deva",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "si",
+   "enName": "Sinhala",
+   "nativeName": "සිංහල",
+   "script": "Sinh",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "my",
+   "enName": "Burmese",
+   "nativeName": "မြန်မာ",
+   "script": "Mymr",
+   "dir": "ltr",
+   "plural": [
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "km",
+   "enName": "Khmer",
+   "nativeName": "ខ្មែរ",
+   "script": "Khmr",
+   "dir": "ltr",
+   "plural": [
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "lo",
+   "enName": "Lao",
+   "nativeName": "ລາວ",
+   "script": "Laoo",
+   "dir": "ltr",
+   "plural": [
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "mn",
+   "enName": "Mongolian",
+   "nativeName": "Монгол",
+   "script": "Cyrl",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "af",
+   "enName": "Afrikaans",
+   "nativeName": "Afrikaans",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "sq",
+   "enName": "Albanian",
+   "nativeName": "Shqip",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "eu",
+   "enName": "Basque",
+   "nativeName": "Euskara",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ca",
+   "enName": "Catalan",
+   "nativeName": "Català",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "many",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "gl",
+   "enName": "Galician",
+   "nativeName": "Galego",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "is",
+   "enName": "Icelandic",
+   "nativeName": "Íslenska",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ga",
+   "enName": "Irish",
+   "nativeName": "Gaeilge",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "many",
+    "one",
+    "two",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "mk",
+   "enName": "Macedonian",
+   "nativeName": "Македонски",
+   "script": "Cyrl",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "mt",
+   "enName": "Maltese",
+   "nativeName": "Malti",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "many",
+    "one",
+    "two",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "cy",
+   "enName": "Welsh",
+   "nativeName": "Cymraeg",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "many",
+    "one",
+    "two",
+    "zero",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "be",
+   "enName": "Belarusian",
+   "nativeName": "Беларуская",
+   "script": "Cyrl",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "many",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "bs",
+   "enName": "Bosnian",
+   "nativeName": "Bosanski",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ky",
+   "enName": "Kyrgyz",
+   "nativeName": "Кыргызча",
+   "script": "Cyrl",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "tg",
+   "enName": "Tajik",
+   "nativeName": "Тоҷикӣ",
+   "script": "Cyrl",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "tk",
+   "enName": "Turkmen",
+   "nativeName": "Türkmen",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ps",
+   "enName": "Pashto",
+   "nativeName": "پښتو",
+   "script": "Arab",
+   "dir": "rtl",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ku",
+   "enName": "Kurdish",
+   "nativeName": "Kurdî",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "so",
+   "enName": "Somali",
+   "nativeName": "Soomaali",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ha",
+   "enName": "Hausa",
+   "nativeName": "Hausa",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "yo",
+   "enName": "Yoruba",
+   "nativeName": "Yorùbá",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ig",
+   "enName": "Igbo",
+   "nativeName": "Igbo",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "zu",
+   "enName": "Zulu",
+   "nativeName": "isiZulu",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "xh",
+   "enName": "Xhosa",
+   "nativeName": "isiXhosa",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "sn",
+   "enName": "Shona",
+   "nativeName": "chiShona",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "st",
+   "enName": "Southern Sotho",
+   "nativeName": "Sesotho",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "tn",
+   "enName": "Tswana",
+   "nativeName": "Setswana",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "rw",
+   "enName": "Kinyarwanda",
+   "nativeName": "Kinyarwanda",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "mg",
+   "enName": "Malagasy",
+   "nativeName": "Malagasy",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "ny",
+   "enName": "Chichewa",
+   "nativeName": "ChiCheŵa",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "eo",
+   "enName": "Esperanto",
+   "nativeName": "Esperanto",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "la",
+   "enName": "Latin",
+   "nativeName": "Latina",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "gd",
+   "enName": "Scottish Gaelic",
+   "nativeName": "Gàidhlig",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "few",
+    "one",
+    "two",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "co",
+   "enName": "Corsican",
+   "nativeName": "Corsu",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "fy",
+   "enName": "Western Frisian",
+   "nativeName": "Frysk",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "haw",
+   "enName": "Hawaiian",
+   "nativeName": "ʻŌlelo Hawaiʻi",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "hmn",
+   "enName": "Hmong",
+   "nativeName": "Hmoob",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "sm",
+   "enName": "Samoan",
+   "nativeName": "Gagana faʻa Sāmoa",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "su",
+   "enName": "Sundanese",
+   "nativeName": "Basa Sunda",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "jv",
+   "enName": "Javanese",
+   "nativeName": "Basa Jawa",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "other"
+   ],
+   "status": "ai-pending-review",
+   "catalogCode": "jw"
+  },
+  {
+   "code": "ms",
+   "enName": "Malay",
+   "nativeName": "Bahasa Melayu",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "other"
+   ],
+   "status": "ai-pending-review"
+  },
+  {
+   "code": "om",
+   "enName": "Oromo",
+   "nativeName": "Afaan Oromoo",
+   "script": "Latn",
+   "dir": "ltr",
+   "plural": [
+    "one",
+    "other"
+   ],
+   "status": "ai-pending-review"
+  }
+ ]
+}

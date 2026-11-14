@@ -7,7 +7,8 @@ const target=process.argv[3]||path.join(root,'android/app/src/main/assets/web/js
 const app=fs.readFileSync(path.join(root,'android/app/src/main/assets/web/app.js'),'utf8');
 const cat=app.slice(app.indexOf('const LANG_CATALOG = ['),app.indexOf('const DICT = {'));
 const languages=new Set([...cat.matchAll(/"code"\s*:\s*"([a-z]+)"/g)].map(m=>m[1]));
-if(languages.size!==99)throw Error('Official catalog must contain 99 distinct languages');
+// 100 official languages (i18n/languages.json) + Dari (prs) kept as a regional variant of Persian = 101 catalog codes.
+if(languages.size!==101)throw Error('Official catalog must contain 101 distinct codes (100 languages + prs variant)');
 const namespaces=new Set(['timer','goals','tasks','notes','analytics','analyticsDomain']);
 const packs=JSON.parse(fs.readFileSync(source,'utf8'));
 if(!packs||Array.isArray(packs)||typeof packs!=='object')throw Error('Expected a locale-object map');

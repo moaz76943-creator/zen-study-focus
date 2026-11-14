@@ -58,8 +58,15 @@
   var app = null, tts = null, mount = null, state = { view: 'home', deckId: '', filter: null, page: 0, editId: '', study: null, importParsed: null, lastDeleted: '', toast: '' };
   var el = null;
 
+  function rawLang() { try { return (typeof cfg !== 'undefined' && cfg && cfg.lang) ? String(cfg.lang).toLowerCase().split(/[-_]/)[0] : 'en'; } catch (_) { return 'en'; } }
   function lang() { try { var l = (typeof cfg !== 'undefined' && cfg && cfg.lang) ? String(cfg.lang) : 'en'; return S[l] ? l : 'en'; } catch (_) { return 'en'; } }
-  function T(k) { var d = S[lang()]; return (d && d[k]) || S.en[k] || k; }
+  // Own en/ar strings first, then the shared UI catalog (locales/ui/<code>.js, keyed by the English text), then English.
+  function T(k) {
+    var d = S[lang()]; if (d && d[k]) return d[k];
+    var en = S.en[k] || k, cat = root.DFUiCatalog;
+    if (cat && rawLang() !== 'en' && !S[rawLang()]) { var t = cat.translate(en); if (t) return t; }
+    return en;
+  }
   function N(n) { return String(Math.round(Number(n) || 0)); } // Western digits only
 
   function h(tag, attrs, kids) {

@@ -22,3 +22,5 @@ android/local.properties
 .DS_Store
 .env
 .env.*
+i18n-out/
+perf-out/

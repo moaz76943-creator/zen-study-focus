@@ -48,7 +48,7 @@ function report(){
   const keys=Object.keys(english);
   if(keys.length<35||keys.some(k=>typeof arabic[k]!=='string'))throw Error('ANALYTICS_KEYSET_CHANGED');
   const codes=Array.from(c.codes);
-  if(codes.length!==99||new Set(codes).size!==99||codes.some(v=>v==='he'||v==='iw'))
+  if(codes.length!==101||new Set(codes).size!==101||  /* 100 official + prs variant */codes.some(v=>v==='he'||v==='iw'))
     throw Error('EXPECTED_99_LOCALES_WITHOUT_HEBREW');
   const MISSING='__DF09_SOURCE_MISSING_REPORT__';
   const languages=codes.map(code=>{

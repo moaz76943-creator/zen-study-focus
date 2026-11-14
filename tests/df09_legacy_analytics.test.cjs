@@ -111,7 +111,7 @@ test('offline scripts reinitialize Bengali Analytics on a fresh reopen without u
 test('source inventory counts live 99-locale Analytics labels separately from fallback',()=>{
   const audit=require('../tools/localization_100/analytics_live_99_report.cjs').report();
   assert.equal(audit.scope,'source-only-analytics');
-  assert.equal(audit.registered,99);
+  assert.equal(audit.registered,101); // 100 official languages + prs variant
   assert.ok(audit.keys>=35);
   assert.equal(audit.releaseApproved,false);
   assert.equal(audit.certifiedLanguages,0);
@@ -223,7 +223,7 @@ test('coverage separates missing fallback, English-identical source, and non-Eng
 });
 test('live Analytics inventory never certifies source-identical English candidates',()=>{
   const audit=require('../tools/localization_100/analytics_live_99_report.cjs').report();
-  assert.equal(audit.registered,99);
+  assert.equal(audit.registered,101); // 100 official languages + prs variant
   for(const entry of audit.languages.filter(x=>!['en','ar'].includes(x.code))){
     assert.equal(entry.explicitSourceKeys,
       entry.nonEnglishSourceKeys+entry.englishIdenticalCandidates,entry.code);
