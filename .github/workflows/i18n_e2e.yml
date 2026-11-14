@@ -1,0 +1,220 @@
+name: DF-LANE-13 Real Android E2E (source audit in DF03)
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'tests/i18n/e2e/**'
+      - 'tools/i18n/e2e/**'
+      - '.github/workflows/i18n_e2e.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: df13-e2e-${{ github.ref }}
+  # Finish the currently running immutable-SHA Android job; queue the latest PR update.
+  # Avoid cancelling every API30/API35 run during concurrent lane updates.
+  cancel-in-progress: false
+
+jobs:
+  harness:
+    name: E2E transport and source contract tests
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Validate exact-head harness without emulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n tools/i18n/e2e/run_android.sh
+          node --test tests/i18n/e2e/*.test.cjs
+          python3 -m unittest discover -s tests/i18n/e2e -p '*_test.py' -v
+          python3 -m unittest discover -s tests/i18n/e2e/scenarios -p '*_test.py' -v
+
+  build_apk:
+    name: One fresh-HEAD APK for both Android APIs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+      - name: Install Android 36 build dependencies
+        working-directory: android
+        shell: bash
+        run: |
+          set -euo pipefail
+          SDKMANAGER="$(find "${ANDROID_HOME:-/usr/local/lib/android/sdk}/cmdline-tools" -type f -name sdkmanager -print -quit)"
+          test -x "$SDKMANAGER"
+          "$SDKMANAGER" 'platforms;android-36' 'build-tools;36.0.0'
+          gradle wrapper --gradle-version 8.11.1 --distribution-type bin --no-daemon
+          chmod +x gradlew
+      - name: Build and attest one APK from immutable checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha || github.sha }}"
+          mkdir -p artifacts/i18n-e2e/build
+          git rev-parse HEAD > artifacts/i18n-e2e/build/SOURCE_SHA.txt
+          git rev-parse HEAD:android > artifacts/i18n-e2e/build/ANDROID_TREE.txt
+          rm -f android/app/build/outputs/apk/debug/app-debug.apk
+          cd android
+          ./gradlew :app:assembleDebug --no-daemon --stacktrace
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          test -s "$APK"
+          PKG="$("${ANDROID_HOME:-/usr/local/lib/android/sdk}/build-tools/36.0.0/aapt" dump badging "$APK" | grep '^package:' | cut -d "'" -f2)"
+          test "$PKG" = com.zenstudy.focus
+          cp "$APK" ../artifacts/i18n-e2e/build/app-debug.apk
+          printf '%s\n' "$PKG" > ../artifacts/i18n-e2e/build/PACKAGE_ID.txt
+          sha256sum ../artifacts/i18n-e2e/build/app-debug.apk | awk '{print $1}' > ../artifacts/i18n-e2e/build/APK_SHA256.txt
+          test "$(wc -c < ../artifacts/i18n-e2e/build/APK_SHA256.txt)" -eq 65
+      - name: Build separate test-only persistent accessibility probe
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle -p tools/i18n/e2e/probe assembleDebug --no-daemon --stacktrace
+          cp tools/i18n/e2e/probe/build/outputs/apk/debug/*-debug.apk artifacts/i18n-e2e/build/accessibility-probe.apk
+          sha256sum artifacts/i18n-e2e/build/accessibility-probe.apk | awk '{print $1}' > artifacts/i18n-e2e/build/PROBE_SHA256.txt
+      - name: Upload one APK with provenance
+        uses: actions/upload-artifact@v4
+        with:
+          name: df13-fresh-head-apk
+          path: artifacts/i18n-e2e/build/
+          if-no-files-found: error
+          retention-days: 14
+
+  android:
+    name: Android WebView API ${{ matrix.api }}
+    needs: build_apk
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: ${{ matrix.job_timeout }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - api: 30
+            runner: ubuntu-24.04
+            job_timeout: 50
+            gpu: swiftshader_indirect
+            profile: pixel_3a
+            heap: 256M
+            ram: 2048M
+            emulator_build: 15004761
+            boot_timeout: 600
+            animations: true
+            emulator_options: '-no-window -no-snapshot -gpu swiftshader_indirect -feature -Vulkan -noaudio -no-boot-anim -camera-back none -memory 2048 -cores 2'
+          - api: 35
+            # A/B test against PR #287's *real launch smoke* environment, not
+            # an inferred WebView E2E PASS: ubuntu-26.04 + emulator 37.2.12.
+            # Previous 36.4.10/off/no-probe variant died by host SIGSEGV.
+            runner: ubuntu-26.04
+            job_timeout: 65
+            # Emulator 37 deprecated swiftshader_indirect. Use the supported
+            # software renderer and disable Vulkan on this API35 trial only.
+            # Documentation: developer.android.com/studio/run/emulator-troubleshooting
+            gpu: swiftshader
+            profile: pixel_2
+            heap: 512M
+            ram: 3072M
+            emulator_build: 16428233
+            boot_timeout: 1200
+            animations: false
+            emulator_options: '-no-window -gpu swiftshader -feature -Vulkan -no-snapshot -noaudio -no-boot-anim'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Check out expected source and initialize NOT_TESTED evidence
+        shell: bash
+        env:
+          DF13_API: ${{ matrix.api }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ github.event.pull_request.head.sha || github.sha }}"
+          mkdir -p "artifacts/i18n-e2e/api${DF13_API}"
+          git rev-parse HEAD > "artifacts/i18n-e2e/api${DF13_API}/SOURCE_SHA.txt"
+          python3 -m py_compile tools/i18n/e2e/android_device.py
+          python3 - <<'PY'
+          import json, os
+          from pathlib import Path
+          root = Path('artifacts/i18n-e2e/api' + os.environ['DF13_API'])
+          root.joinpath('DEVICE_MATRIX.json').write_text(json.dumps({
+            'TASK_ID': 'DF13-A-ANDROID-CI-RECOVERY',
+            'SOURCE_SHA': (root/'SOURCE_SHA.txt').read_text().strip(),
+            'API': int(os.environ['DF13_API']),
+            'status': 'NOT_TESTED',
+            'test_results': {},
+            'device_matrix': [],
+            'BLOCKERS': ['Emulator/UIAutomator has not completed; no Android PASS is established']
+          }, indent=2) + '\n')
+          PY
+          python3 tools/i18n/e2e/emulator_crash.py /tmp/android-runner > "artifacts/i18n-e2e/api${DF13_API}/EMULATOR_BASELINE.json"
+      - name: Download the exact single APK built by this workflow
+        uses: actions/download-artifact@v4
+        with:
+          name: df13-fresh-head-apk
+          path: artifacts/i18n-e2e/build/
+      - name: Verify source and APK identity before emulator starts
+        shell: bash
+        env:
+          DF13_API: ${{ matrix.api }}
+        run: |
+          set -euo pipefail
+          BUILD=artifacts/i18n-e2e/build
+          test -s "$BUILD/app-debug.apk"
+          test "$(cat "$BUILD/SOURCE_SHA.txt")" = "$(git rev-parse HEAD)"
+          test "$(cat "$BUILD/PACKAGE_ID.txt")" = com.zenstudy.focus
+          EXPECTED="$(cat "$BUILD/APK_SHA256.txt")"
+          [[ "$EXPECTED" =~ ^[a-f0-9]{64}$ ]]
+          test "$(sha256sum "$BUILD/app-debug.apk" | awk '{print $1}')" = "$EXPECTED"
+          cp "$BUILD/APK_SHA256.txt" "artifacts/i18n-e2e/api${DF13_API}/APK_SHA256.txt"
+      - name: Enable KVM acceleration before emulator boot
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -c /dev/kvm
+          sudo chmod 0666 /dev/kvm
+          test -r /dev/kvm && test -w /dev/kvm
+      - name: Execute real Android E2E via explicit Bash
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          DF13_GPU: ${{ matrix.gpu }}
+        with:
+          api-level: ${{ matrix.api }}
+          # Pin each emulator image to the *actual build ID* under test.\n          emulator-build: ${{ matrix.emulator_build }}
+          arch: x86_64
+          target: google_apis
+          # API35 uses the Pixel 2 / 512M heap profile that completed #287's
+          # process-launch smoke; full UI acceptance remains independently gated.
+          profile: ${{ matrix.profile }}
+          heap-size: ${{ matrix.heap }}
+          ram-size: ${{ matrix.ram }}
+          emulator-options: ${{ matrix.emulator_options }}
+          disable-animations: ${{ matrix.animations }}
+          emulator-boot-timeout: ${{ matrix.boot_timeout }}
+          script: bash tools/i18n/e2e/run_android.sh ${{ matrix.api }}
+      - name: Upload per-device JSON screenshots and limited logs even on failure
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: df13-android-api${{ matrix.api }}-device-evidence
+          path: artifacts/i18n-e2e/api${{ matrix.api }}/
+          if-no-files-found: warn
+          retention-days: 14
