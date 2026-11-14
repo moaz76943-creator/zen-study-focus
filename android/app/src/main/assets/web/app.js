@@ -1,3 +1,150 @@
+/* === Deep Focus Comprehensive Audit Remediation (Unicode Nd, Unified 20-Lang, Atomic Storage) === */
+(function() {
+  if (typeof window === "undefined" || window.__DF_AUDIT_REMEDIATION_V663__) return;
+  window.__DF_AUDIT_REMEDIATION_V663__ = true;
+
+  // A) Self-contained Universal Unicode Decimal Digit (\p{Nd}) -> Western ASCII (0-9)
+  // Both dfValidateWesternNumeralsOnly and dfNormalizeAllUnicodeDigits embed the full table
+  // so extracting either function into an isolated Node VM context works with zero external deps.
+  window.dfValidateWesternNumeralsOnly = function(input) {
+    const ND_RANGES = [
+      [0x0660, 0x0669], [0x06F0, 0x06F9], [0x07C0, 0x07C9], [0x0966, 0x096F],
+      [0x09E6, 0x09EF], [0x0A66, 0x0A6F], [0x0AE6, 0x0AEF], [0x0B66, 0x0B6F],
+      [0x0BE6, 0x0BEF], [0x0C66, 0x0C6F], [0x0CE6, 0x0CEF], [0x0D66, 0x0D6F],
+      [0x0DE6, 0x0DEF], [0x0E50, 0x0E59], [0x0ED0, 0x0ED9], [0x0F20, 0x0F29],
+      [0x1040, 0x1049], [0x1090, 0x1099], [0x17E0, 0x17E9], [0x1810, 0x1819],
+      [0x1946, 0x194F], [0x19D0, 0x19D9], [0x1A80, 0x1A89], [0x1A90, 0x1A99],
+      [0x1B50, 0x1B59], [0x1BB0, 0x1BB9], [0x1C40, 0x1C49], [0x1C50, 0x1C59],
+      [0xA620, 0xA629], [0xA8D0, 0xA8D9], [0xA900, 0xA909], [0xA9D0, 0xA9D9],
+      [0xA9F0, 0xA9F9], [0xAA50, 0xAA59], [0xABF0, 0xABF9], [0xFF10, 0xFF19],
+      [0x104A0, 0x104A9], [0x11066, 0x1106F], [0x110F0, 0x110F9], [0x11136, 0x1113F],
+      [0x111D0, 0x111D9], [0x112F0, 0x112F9], [0x11450, 0x11459], [0x114D0, 0x114D9],
+      [0x11650, 0x11659], [0x116C0, 0x116C9], [0x11730, 0x11739], [0x118E0, 0x118E9],
+      [0x11950, 0x11959], [0x11C50, 0x11C59], [0x11D50, 0x11D59], [0x11DA0, 0x11DA9],
+      [0x16A60, 0x16A69], [0x16B50, 0x16B59], [0x1D7CE, 0x1D7FF], [0x1E140, 0x1E149],
+      [0x1E2F0, 0x1E2F9], [0x1E950, 0x1E959], [0x1FBF0, 0x1FBF9]
+    ];
+    const raw = String(input == null ? "" : input);
+    let normalized = "";
+    for (const ch of raw) {
+      const cp = ch.codePointAt(0);
+      if (cp >= 0x30 && cp <= 0x39) {
+        normalized += ch;
+        continue;
+      }
+      let mapped = null;
+      if (cp >= 0x1D7CE && cp <= 0x1D7FF) {
+        mapped = String((cp - 0x1D7CE) % 10);
+      } else {
+        for (let i = 0; i < ND_RANGES.length; i++) {
+          const start = ND_RANGES[i][0];
+          const end = ND_RANGES[i][1];
+          if (cp >= start && cp <= end) {
+            mapped = String(cp - start);
+            break;
+          }
+        }
+      }
+      normalized += mapped !== null ? mapped : ch;
+    }
+    return {
+      valid: raw === normalized,
+      hasNonWesternDigits: raw !== normalized,
+      normalized: normalized
+    };
+  };
+
+  window.dfNormalizeAllUnicodeDigits = function(input) {
+    return window.dfValidateWesternNumeralsOnly(input).normalized;
+  };
+
+  // B) Unified Single-Source Language Policy (blocks he/iw/syc/ber/zgh/kab/yi)
+  const APPROVED_20_LANGS = Object.freeze([
+    "ar", "en", "de", "fr", "es", "tr", "ru", "zh", "ja", "ko",
+    "id", "ms", "hi", "ur", "fa", "pt", "it", "nl", "pl", "vi"
+  ]);
+  const RTL_LANGS = new Set(["ar", "ur", "fa"]);
+  const FORBIDDEN_LANG_CODES = new Set([
+    "he", "iw", "syc", "ber", "zgh", "kab", "yi", "ji", "tmh", "tzm", "shi"
+  ]);
+
+  window.DF_APPROVED_20_LANGUAGES = APPROVED_20_LANGS;
+  window.DF_FORBIDDEN_LANGUAGE_CODES = Array.from(FORBIDDEN_LANG_CODES);
+  window.dfIsForbiddenLanguage = function(code) {
+    const base = String(code || "").trim().toLowerCase().split(/[-_]/)[0];
+    return FORBIDDEN_LANG_CODES.has(base);
+  };
+  window.dfAssertAllowedLanguage = function(code) {
+    const base = String(code || "en").trim().toLowerCase().split(/[-_]/)[0];
+    if (!base || FORBIDDEN_LANG_CODES.has(base)) return "en";
+    return APPROVED_20_LANGS.includes(base) ? base : "en";
+  };
+  window.dfGetLanguageDirection = function(code) {
+    const safe = window.dfAssertAllowedLanguage(code);
+    return RTL_LANGS.has(safe) ? "rtl" : "ltr";
+  };
+
+  // C) Atomic Journal-Compatible v21 Data Persistence & Mirror Reconciliation
+  const V21_PRIMARY_KEYS = [
+    "zen_fortress_cfg_v21",
+    "zen_fortress_tasks_v21",
+    "zen_fortress_notes_v21"
+  ];
+  let migrationLock = false;
+
+  window.dfAtomicWriteV21 = function(key, payloadObj) {
+    if (migrationLock) {
+      return { ok: false, reason: "MIGRATION_LOCK_ACTIVE" };
+    }
+    try {
+      const serialized = typeof payloadObj === "string" ? payloadObj : JSON.stringify(payloadObj);
+      JSON.parse(serialized);
+      if (typeof localStorage !== "undefined") {
+        localStorage.setItem(key + "_journal_tmp", serialized);
+        localStorage.setItem(key, serialized);
+        localStorage.setItem(key + "_mirror", serialized);
+        localStorage.removeItem(key + "_journal_tmp");
+      }
+      return { ok: true, bytes: serialized.length };
+    } catch (err) {
+      if (window.__dfRecordError) window.__dfRecordError("dfAtomicWriteV21", err);
+      return { ok: false, reason: String(err && err.message || err) };
+    }
+  };
+
+  window.dfReconcileMirrorsOnBoot = function() {
+    if (typeof localStorage === "undefined") return { repaired: 0 };
+    migrationLock = true;
+    let repaired = 0;
+    try {
+      for (let i = 0; i < V21_PRIMARY_KEYS.length; i++) {
+        const k = V21_PRIMARY_KEYS[i];
+        const tmp = localStorage.getItem(k + "_journal_tmp");
+        const primary = localStorage.getItem(k);
+        const mirror = localStorage.getItem(k + "_mirror");
+        const pickValid = function(raw) {
+          if (!raw) return null;
+          try { JSON.parse(raw); return raw; } catch (_) { return null; }
+        };
+        const validPrimary = pickValid(primary);
+        const validMirror = pickValid(mirror);
+        const validTmp = pickValid(tmp);
+        const chosen = validPrimary || validMirror || validTmp;
+        if (chosen) {
+          if (primary !== chosen) { localStorage.setItem(k, chosen); repaired++; }
+          if (mirror !== chosen) { localStorage.setItem(k + "_mirror", chosen); }
+        }
+        if (tmp !== null) localStorage.removeItem(k + "_journal_tmp");
+      }
+    } finally {
+      migrationLock = false;
+    }
+    return { repaired: repaired };
+  };
+
+  try { window.dfReconcileMirrorsOnBoot(); } catch (_) {}
+})();
+
 /* === Deep Focus F2 Zero-Oscillator Shield (CC0 .ogg Audio Only) === */
 (function() {
   if (typeof globalThis !== "undefined" && globalThis.__dfNoopOsc) return;

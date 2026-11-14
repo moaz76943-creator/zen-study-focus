@@ -166,3 +166,8 @@
   if (doc.readyState === 'loading') doc.addEventListener('DOMContentLoaded', boot); else boot();
   root.addEventListener && root.addEventListener('load', function () { hook(); apply(root.DF_CURRENT_LOCALE || (root.cfg && root.cfg.lang)); });
 })(typeof window !== 'undefined' ? window : this);
+
+/* === Unified Language Policy Bridge (v663) === */
+if (typeof window !== "undefined" && window.DF_FORBIDDEN_LANGUAGE_CODES) {
+  window.FORBIDDEN_LANGUAGE_CODES = window.DF_FORBIDDEN_LANGUAGE_CODES;
+}

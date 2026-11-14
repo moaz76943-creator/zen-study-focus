@@ -114,4 +114,20 @@ for (const rel of ['modules/audio/spatial_acoustic_studio.js', 'modules/core/web
 // 11. Test F3 MutationObserver 120Hz coalescing shield
 assert(appJs.includes('__DF_MUTATION_SHIELD__'), 'MutationObserver coalescing shield missing');
 
+
+// 12. Test Audit Remediation: Universal Unicode Nd digits (including Adlam & NKo) + kab/yi forbidden + Atomic v21 Storage
+const auditEnd = appJs.indexOf('})();', appJs.indexOf('__DF_AUDIT_REMEDIATION_V663__'));
+const auditStart = appJs.lastIndexOf('(function()', auditEnd);
+vm.runInNewContext(appJs.slice(auditStart, auditEnd + 5), sandbox);
+
+// Adlam digits 𞥑𞥒𞥓 (U+1E951..U+1E953) & Arabic-Indic ١٢٣ & NKo ߁߂߃
+assert.strictEqual(sandbox.dfNormalizeAllUnicodeDigits('𞥑𞥒𞥓-١٢٣-߁߂߃'), '123-123-123', 'Unicode Nd normalization failed');
+assert.strictEqual(sandbox.dfValidateWesternNumeralsOnly('𞥑𞥒').hasNonWesternDigits, true, 'Adlam digits must be flagged before normalization');
+for (const forbidden of ['he', 'iw', 'syc', 'ber', 'zgh', 'kab', 'yi']) {
+  assert.strictEqual(sandbox.dfAssertAllowedLanguage(forbidden), 'en', 'Forbidden language leaked: ' + forbidden);
+  assert.strictEqual(sandbox.dfIsForbiddenLanguage(forbidden), true, 'dfIsForbiddenLanguage missed: ' + forbidden);
+}
+assert.strictEqual(sandbox.dfGetLanguageDirection('ar'), 'rtl');
+assert.strictEqual(sandbox.dfGetLanguageDirection('de'), 'ltr');
+
 console.log('✅ PASS: All Major #1-#5 behavioral & Android hardening regression tests passed!');

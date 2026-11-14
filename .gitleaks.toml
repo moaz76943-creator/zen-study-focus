@@ -1,0 +1,15 @@
+title = "Deep Focus Gitleaks Configuration"
+
+[allowlist]
+description = "Allow public storage schema key names, test fixtures, and non-secret hashes"
+paths = [
+  '''tests/.*''',
+  '''docs/.*''',
+  '''.*\.md$''',
+  '''android/app/src/main/assets/web/locale_.*\.js$'''
+]
+regexes = [
+  '''zen_fortress_[a-z0-9_]+''',
+  '''ZEN21::[A-Za-z0-9+/=]+''',
+  '''sha256-[A-Za-z0-9+/=]+'''
+]
