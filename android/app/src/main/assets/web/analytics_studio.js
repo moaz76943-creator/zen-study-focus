@@ -58,6 +58,9 @@
     for(const [key,fallback] of Object.entries(base)){
       const value=typeof dict?.t==='function'?dict.t(code,'analytics',key,fallback):fallback;
       translated[key]=typeof value==='string'&&value.trim()?value:fallback;
+      // Second source: the shared 100-language UI catalog (same pack every other screen uses).
+      // Only fills strings the reviewed DF99 dictionaries left in English.
+      if(code!=='en'&&code!=='ar'&&translated[key]===fallback)translated[key]=catalogText(code,fallback);
     }
     // Reuse already reviewed analytics labels for accessibility when the
     // optional, more specific SVG keys have not yet been translated.
@@ -78,7 +81,18 @@
   function domainText(locale,domain,fallback){
     const dict=globalThis.DF99Locale,code=normalizedLocale(locale);
     const value=typeof dict?.t==='function'?dict.t(code,'analyticsDomain',domain,fallback):fallback;
-    return typeof value==='string'&&value.trim()?value:fallback;
+    const out=typeof value==='string'&&value.trim()?value:fallback;
+    return code!=='en'&&code!=='ar'&&out===fallback?catalogText(code,fallback):out;
+  }
+  // Catalog lookup for the active app language. Variants map like the catalog does (prs→fa, jw→jv).
+  // Returns the English fallback unchanged when the pack is not loaded or lacks the string.
+  function catalogText(code,fallback){
+    const cat=globalThis.DFUiCatalog;
+    if(!cat||typeof cat.translate!=='function'||typeof cat.active!=='function')return fallback;
+    const want=({prs:'fa',jw:'jv'})[code]||code;
+    if(cat.active()!==want)return fallback;
+    const out=cat.translate(fallback);
+    return typeof out==='string'&&out.trim()?out:fallback;
   }
 
   function barsSvg(daily,{width=720,height=160,locale='en',strings}={}){

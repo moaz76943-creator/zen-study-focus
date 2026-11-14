@@ -245,6 +245,14 @@
       if (root.DeepFocusNotesEditorUI) root.DeepFocusNotesEditorUI.renderStack();
     }
   }
+  // The 100-language UI catalog loads its pack lazily; once it is applied for the current language,
+  // rebuild Analytics so labels built in JS (options, composites, aria) use it too.
+  if (root.addEventListener) root.addEventListener('df-ui-catalog-applied', (event) => {
+    if (!mounted || !analyticsUi) return;
+    const lang = event && event.detail && event.detail.lang;
+    if (!lang || lang === 'en') return;
+    try { mountAnalytics(); } catch (_) {}
+  });
   function onTab(section) {
     if (!mounted) return;
     if (section === 'sec-tasks' && tasksUi) tasksUi.refresh();

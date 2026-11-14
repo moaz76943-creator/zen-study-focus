@@ -24,6 +24,12 @@ for (const m of app.matchAll(/showToast\((['"`])((?:(?!\1)[^\\$]|\\.)*)\1\)/g)) 
 const ui = fs.readFileSync(path.join(web, 'modules/flashcards/flashcards_ui.js'), 'utf8');
 const en = ui.match(/\n    en: \{([\s\S]*?)\n    \},/)[1];
 for (const m of en.matchAll(/([A-Za-z_][A-Za-z0-9_]*): '((?:[^'\\]|\\.)*)'/g)) if (m[2]) add(m[2].replace(/\\'/g, "'"), 'flashcards:' + m[1], 'flashcards');
+// Analytics Studio builds labels in JS (select options, composite lines, aria). Include its English table so the
+// shared catalog covers what the reviewed DF99 analytics dictionaries leave in English.
+const an = fs.readFileSync(path.join(web, 'analytics_studio.js'), 'utf8');
+const anEn = an.match(/const EN=Object\.freeze\(\{([\s\S]*?)\}\);/)[1];
+for (const m of anEn.matchAll(/([A-Za-z_][A-Za-z0-9_]*):'((?:[^'\\]|\\.)*)'/g)) if (m[2]) add(m[2].replace(/\\'/g, "'"), 'analytics:' + m[1], 'analytics');
+for (const d of ['Study', 'Reading', 'Work', 'Sport']) add(d, 'analytics:domain', 'analytics');
 const out = {}; [...cat.keys()].sort().forEach((k) => { const v = cat.get(k); out[k] = { ctx: [...v.contexts].slice(0, 4).join(' | '), kind: [...v.kinds].join(',') }; });
 fs.writeFileSync(path.resolve(__dirname, '../../i18n/source_en.json'), JSON.stringify(out, null, 1) + '\n');
 console.log('source strings:', Object.keys(out).length, 'chars:', Object.keys(out).join('').length);

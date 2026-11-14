@@ -56,8 +56,8 @@
   "kind": "aria-label"
  },
  "Activity": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:activity",
+  "kind": "text,analytics"
  },
  "Add Q&A": {
   "ctx": "modal:noteModal#nsux-recall",
@@ -80,8 +80,8 @@
   "kind": "flashcards"
  },
  "All": {
-  "ctx": "sec-notes#sec-notes | flashcards:allStates",
-  "kind": "text,flashcards"
+  "ctx": "sec-notes#sec-notes | flashcards:allStates | analytics:all",
+  "kind": "text,flashcards,analytics"
  },
  "All ({0})": {
   "ctx": "sec-sounds#sec-sounds",
@@ -116,8 +116,8 @@
   "kind": "flashcards"
  },
  "Average session": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:average",
+  "kind": "text,analytics"
  },
  "Azimuth ({0}° Horizontal Pan):": {
   "ctx": "sec-sounds#dfPillar5TabHost",
@@ -159,9 +159,25 @@
   "ctx": "modal:noteModal#nsux-tools",
   "kind": "aria-label"
  },
+ "CSV export is unavailable on this Android version until native Save As is supported": {
+  "ctx": "analytics:exportUnavailable",
+  "kind": "analytics"
+ },
+ "CSV file saved": {
+  "ctx": "analytics:exportSaved",
+  "kind": "analytics"
+ },
+ "CSV save cancelled": {
+  "ctx": "analytics:exportCancelled",
+  "kind": "analytics"
+ },
  "Calendar": {
   "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#navCalendar",
   "kind": "text"
+ },
+ "Calendar year heatmap of verified session records": {
+  "ctx": "analytics:heatAria",
+  "kind": "analytics"
  },
  "Cancel": {
   "ctx": "modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfZenStudySuiteModal#langModal | modal:dailyGoalsModal,modal:customTimerModal,modal:noteModal#dailyGoalsModal | flashcards:cancel",
@@ -211,6 +227,10 @@
   "ctx": "flashcards:choose",
   "kind": "flashcards"
  },
+ "Choose valid start and end dates (maximum {0} days)": {
+  "ctx": "analytics:invalidRange",
+  "kind": "analytics"
+ },
  "Choose your activity": {
   "ctx": "sec-timer#sec-timer",
   "kind": "text"
@@ -234,6 +254,10 @@
  "Completed": {
   "ctx": "sec-tasks#df22TasksHost",
   "kind": "text"
+ },
+ "Completed tasks": {
+  "ctx": "analytics:tasks",
+  "kind": "analytics"
  },
  "Completed tasks: {0} / {1}": {
   "ctx": "sec-analytics#df22AnalyticsHost",
@@ -295,6 +319,10 @@
   "ctx": "flashcards:correctAnswers",
   "kind": "flashcards"
  },
+ "Could not save CSV": {
+  "ctx": "analytics:exportFailed",
+  "kind": "analytics"
+ },
  "Create Cloze Card": {
   "ctx": "sec-notes#dfStemContentPane",
   "kind": "text"
@@ -312,8 +340,8 @@
   "kind": "text"
  },
  "Current streak": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:streak",
+  "kind": "text,analytics"
  },
  "Custom front → back": {
   "ctx": "flashcards:tCustom",
@@ -331,6 +359,10 @@
   "ctx": "sec-timer,modal:customTimerModal#modeCustomBtn",
   "kind": "text"
  },
+ "Daily": {
+  "ctx": "analytics:daily",
+  "kind": "analytics"
+ },
  "Daily Goals": {
   "ctx": "sec-timer#goalsEditButton",
   "kind": "text"
@@ -340,8 +372,8 @@
   "kind": "text"
  },
  "Daily distribution": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:chart",
+  "kind": "text,analytics"
  },
  "Daily goal": {
   "ctx": "flashcards:dailyGoal",
@@ -483,6 +515,10 @@
   "ctx": "flashcards:exampleTr",
   "kind": "flashcards"
  },
+ "Excluded sessions": {
+  "ctx": "analytics:excluded",
+  "kind": "analytics"
+ },
  "Exercise sequence": {
   "ctx": "sec-timer#quickTrainingDetails",
   "kind": "text"
@@ -496,8 +532,8 @@
   "kind": "title"
  },
  "Export CSV": {
-  "ctx": "sec-analytics#df22AnalyticsHost | flashcards:exportCsv",
-  "kind": "text,flashcards"
+  "ctx": "sec-analytics#df22AnalyticsHost | flashcards:exportCsv | analytics:export",
+  "kind": "text,flashcards,analytics"
  },
  "Export started": {
   "ctx": "flashcards:exportShared",
@@ -596,8 +632,8 @@
   "kind": "aria-label"
  },
  "From": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:start",
+  "kind": "text,analytics"
  },
  "Front (original)": {
   "ctx": "flashcards:front",
@@ -608,8 +644,8 @@
   "kind": "text"
  },
  "Goal comparison": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:goal",
+  "kind": "text,analytics"
  },
  "Good": {
   "ctx": "flashcards:good",
@@ -708,8 +744,8 @@
   "kind": "flashcards"
  },
  "Last {0} days": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:last7 | analytics:last30 | analytics:currentWeek",
+  "kind": "text,analytics"
  },
  "Last {0} days: {1} min / Previous {2} days: {3} min (—)": {
   "ctx": "sec-analytics#df22AnalyticsHost",
@@ -815,6 +851,10 @@
   "ctx": "sec-timer#homeWeekStrip",
   "kind": "aria-label"
  },
+ "Monthly": {
+  "ctx": "analytics:monthly",
+  "kind": "analytics"
+ },
  "More": {
   "ctx": "sec-tasks#df22TasksHost",
   "kind": "text"
@@ -908,20 +948,20 @@
   "kind": "text,flashcards"
  },
  "No daily goals configured": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:noGoals",
+  "kind": "text,analytics"
  },
  "No dated goal snapshots recorded": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:noHistoricalGoals",
+  "kind": "text,analytics"
  },
  "No matching tasks": {
   "ctx": "sec-tasks#df-task-results",
   "kind": "text"
  },
  "No recorded sessions in this period": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:noData",
+  "kind": "text,analytics"
  },
  "No tasks for today yet": {
   "ctx": "sec-timer#todayPlanPreview",
@@ -980,8 +1020,8 @@
   "kind": "flashcards"
  },
  "Original dated goal targets": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:historicalGoals",
+  "kind": "text,analytics"
  },
  "Overdue": {
   "ctx": "sec-tasks#df22TasksHost | flashcards:overdue",
@@ -1000,8 +1040,8 @@
   "kind": "placeholder"
  },
  "Period": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:period",
+  "kind": "text,analytics"
  },
  "Period: {0} days": {
   "ctx": "sec-analytics#df22AnalyticsHost",
@@ -1119,6 +1159,10 @@
   "ctx": "sec-sounds#completionAlertPickerHost",
   "kind": "aria-label"
  },
+ "Previous {0} days": {
+  "ctx": "analytics:priorWeek",
+  "kind": "analytics"
+ },
  "Procedural L-system grove & habit heatmap": {
   "ctx": "modal:dfZenStudySuiteModal#btnLaunchBotanicalGardenTimer",
   "kind": "text"
@@ -1216,8 +1260,8 @@
   "kind": "text"
  },
  "Reading": {
-  "ctx": "sec-timer#domBtn-read",
-  "kind": "text"
+  "ctx": "sec-timer#domBtn-read | analytics:domain",
+  "kind": "text,analytics"
  },
  "Reading guide & line spotlight": {
   "ctx": "sec-notes#dfPillar2SpeedReaderMount",
@@ -1268,12 +1312,16 @@
   "kind": "title"
  },
  "Recorded analytics": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:title",
+  "kind": "text,analytics"
  },
  "Recorded minutes": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:minutes",
+  "kind": "text,analytics"
+ },
+ "Recorded minutes by credited day": {
+  "ctx": "analytics:barAria",
+  "kind": "analytics"
  },
  "Redo": {
   "ctx": "sec-tasks,sec-notes#df22TasksHost",
@@ -1391,6 +1439,10 @@
   "ctx": "sec-tasks#df22TasksHost",
   "kind": "placeholder,aria-label"
  },
+ "Select a day for details": {
+  "ctx": "analytics:details",
+  "kind": "analytics"
+ },
  "Session Name (Study, Gym, Reading, Work)...": {
   "ctx": "modal:customTimerModal#inpCustomTitle",
   "kind": "placeholder"
@@ -1400,8 +1452,8 @@
   "kind": "flashcards"
  },
  "Sessions": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:sessions",
+  "kind": "text,analytics"
  },
  "Sessions per cycle": {
   "ctx": "modal:timerSettingsModal#tsetRoundsLabel",
@@ -1503,6 +1555,10 @@
   "ctx": "flashcards:speakSide",
   "kind": "flashcards"
  },
+ "Sport": {
+  "ctx": "analytics:domain",
+  "kind": "analytics"
+ },
  "Sport: {0} min": {
   "ctx": "sec-analytics#df22AnalyticsHost",
   "kind": "text"
@@ -1576,8 +1632,8 @@
   "kind": "text"
  },
  "Study": {
-  "ctx": "sec-timer#domBtn-study",
-  "kind": "text"
+  "ctx": "sec-timer#domBtn-study | analytics:domain",
+  "kind": "text,analytics"
  },
  "Study Pod closed by host. Zero-Trace session purged.": {
   "ctx": "toast",
@@ -1727,6 +1783,10 @@
   "ctx": "sec-timer#homeWeekStrip",
   "kind": "aria-label"
  },
+ "Time by activity": {
+  "ctx": "analytics:activitySplit",
+  "kind": "analytics"
+ },
  "Timer": {
   "ctx": "sec-timer,sec-tasks,sec-calendar,sec-notes,sec-sounds,sec-analytics,sec-flashcards,modal:langModal,modal:cloudBackupModal,modal:dailyGoalsModal,modal:timerSettingsModal,modal:customTimerModal,modal:noteModal,modal:brainDumpModal,modal:dfQuickScratchpadModal,modal:dfZenStudySuiteModal#navTimer | flashcards:timerOn",
   "kind": "text,flashcards"
@@ -1744,12 +1804,12 @@
   "kind": "placeholder"
  },
  "To": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:end",
+  "kind": "text,analytics"
  },
  "Today": {
-  "ctx": "sec-tasks,sec-analytics#df22TasksHost",
-  "kind": "text"
+  "ctx": "sec-tasks,sec-analytics#df22TasksHost | analytics:today",
+  "kind": "text,analytics"
  },
  "Today activity snapshot": {
   "ctx": "sec-timer#sec-timer",
@@ -1879,6 +1939,10 @@
   "ctx": "sec-timer#homeWeekStrip",
   "kind": "aria-label"
  },
+ "Weekly": {
+  "ctx": "analytics:weekly",
+  "kind": "analytics"
+ },
  "Weekly review": {
   "ctx": "sec-notes#nsTemplates",
   "kind": "text"
@@ -1902,6 +1966,10 @@
  "Word → Translation": {
   "ctx": "flashcards:tWord",
   "kind": "flashcards"
+ },
+ "Work": {
+  "ctx": "analytics:domain",
+  "kind": "analytics"
  },
  "Work minutes": {
   "ctx": "sec-timer#qtWork",
@@ -1948,8 +2016,8 @@
   "kind": "flashcards"
  },
  "Year": {
-  "ctx": "sec-analytics#df22AnalyticsHost",
-  "kind": "text"
+  "ctx": "sec-analytics#df22AnalyticsHost | analytics:year",
+  "kind": "text,analytics"
  },
  "Your current session is preserved; changes apply to new sessions.": {
   "ctx": "modal:timerSettingsModal#tsetHint",
@@ -2007,6 +2075,10 @@
   "ctx": "flashcards:male",
   "kind": "flashcards"
  },
+ "min": {
+  "ctx": "analytics:minuteUnit",
+  "kind": "analytics"
+ },
  "mins": {
   "ctx": "sec-timer#sec-timer",
   "kind": "text"
@@ -2026,6 +2098,10 @@
  "reading →": {
   "ctx": "sec-notes#dfRsvpNextContext",
   "kind": "text"
+ },
+ "recorded minutes": {
+  "ctx": "analytics:heatMinutes",
+  "kind": "analytics"
  },
  "today": {
   "ctx": "sec-analytics#df22AnalyticsHost",
@@ -2507,7 +2583,7 @@
   "ctx": "sec-notes#dfPillar4ContentPane",
   "kind": "text"
  },
- "🩺 Scientific academic & Diagram Occlusion Diagram Occlusion": {
+ "🩺 Scientific & Academic Diagram Occlusion": {
   "ctx": "sec-notes#dfPillar4WhiteboardMount",
   "kind": "text"
  },
