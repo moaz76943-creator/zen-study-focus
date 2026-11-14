@@ -14,7 +14,7 @@ function run(rows,sourceSha=SHA){
   try{
     const app=path.join(dir,'android/app/src/main/assets/web');
     fs.mkdirSync(app,{recursive:true});
-    fs.writeFileSync(path.join(app,'app.js'),"const SECRET_SALT = 'PUBLIC_COMPAT_TEST_FIXTURE_42';\n",{mode:0o600});
+    fs.writeFileSync(path.join(app,'app.js'),"const SECRET_SALT = 'PUBLIC_COMPAT_TEST_FIXTURE_42';\nconst STORAGE_KEY = 'df_subject_pacing_balance_v21';\n",{mode:0o600});
     fs.writeFileSync(path.join(app,'data_compat_v21.js'),"const SECRET_SALT = 'PUBLIC_COMPAT_TEST_FIXTURE_42';\n",{mode:0o600});
     const tests=path.join(dir,'tests');
     fs.mkdirSync(tests,{recursive:true});
@@ -38,7 +38,7 @@ test('candidate buckets never turn findings into PASS or leak matched secrets',(
   const rows=[
     {RuleID:'generic-api-key',Secret:'PUBLIC_COMPAT_TEST_FIXTURE_42',File:'web/app.js'},
     {RuleID:'generic-api-key',Secret:CFG_KEY,File:'tests/config.cjs'},
-    {RuleID:'generic-api-key',Secret:APP_STORAGE_KEY,File:'android/app/src/main/assets/web/app.js',StartLine:1},
+    {RuleID:'generic-api-key',Secret:APP_STORAGE_KEY,File:'android/app/src/main/assets/web/app.js',StartLine:2},
     {RuleID:'generic-api-key',Secret:'COMMIT_FIXTURE',File:'ledger.txt'},
     {RuleID:'generic-api-key',Secret:sentinel,File:'private/'+sentinel}
   ];
