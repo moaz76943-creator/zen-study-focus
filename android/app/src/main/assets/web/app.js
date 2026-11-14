@@ -3085,6 +3085,20 @@ function dfGetLocalizedText(key, langCode, fallback) {
         }
       }
     }
+
+    // 6b. Alias keys in this language's premium and Quick Training packs (e.g. navTrainingText →
+    // quickTraining/trainingTitle). Checked before the English baseline so English never masks
+    // a real translation in the active language.
+    const aliasKeys = DF_KEY_ALIAS_MAP[key] || [];
+    // QUICK_TRANSLATIONS rows are arrays ordered like QUICK_KEYS (quick_training.js).
+    const quickRow = typeof QUICK_TRANSLATIONS !== 'undefined' && Array.isArray(QUICK_TRANSLATIONS[lc])
+      && typeof QUICK_KEYS !== 'undefined' && Array.isArray(QUICK_KEYS) ? QUICK_TRANSLATIONS[lc] : null;
+    for (let a = 0; a < aliasKeys.length; a++) {
+      const alias = aliasKeys[a];
+      if (df22 && typeof df22[alias] === 'string' && df22[alias].trim()) return toWest(df22[alias]);
+      const qi = quickRow ? QUICK_KEYS.indexOf(alias) : -1;
+      if (qi >= 0 && typeof quickRow[qi] === 'string' && quickRow[qi].trim()) return toWest(quickRow[qi]);
+    }
   }
 
   // 7. English baseline fallbacks (never return raw key or undefined)
