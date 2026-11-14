@@ -10,7 +10,6 @@ tests/global_i18n_engine.test.js
 tests/i18n/analytics/analytics_studio_i18n.test.cjs
 tests/i18n/core_authored_digit_integrity.test.cjs
 tests/i18n/tasks/tasks_studio_i18n.test.cjs
-tests/i18n/visual/rtl_typography_numerals.test.cjs
 tests/runtime_activator/studio_runtime_user_text.test.cjs
 tests/termux_fix01_consent_kickstart_digits.test.cjs
 tests/termux_fix02_locale_ui.test.cjs

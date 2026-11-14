@@ -55,16 +55,17 @@ test('failed persistence is never reported as a saved language', () => {
   assert.equal(r.reason,'LANGUAGE_SAVE_FAILED');
   assert.equal(old.lang,'en');
 });
-test('locale guard matches official app runtime 99-code catalog, never legacy 100-code registry', () => {
+test('locale guard matches official app runtime 101-code catalog (English + 100 languages, no Hebrew)', () => {
   const expected=officialCatalog.map(item=>item.code);
-  assert.equal(expected.length,99);
-  assert.equal(new Set(expected).size,99);
+  assert.equal(expected.length,101);
+  assert.equal(new Set(expected).size,101);
   assert.deepEqual(locales.SUPPORTED_LOCALES,expected);
   for(const code of expected) assert.equal(locales.isLocaleAllowed(code),true,code);
-  for(const code of ['he','iw','he-IL','iw_IL','xyz','ms','lb','ckb','sd','ug','tt','ba','cv','ceb','jv'])
+  for(const code of ['he','iw','he-IL','iw_IL','xyz','yi','lb','ckb','sd','ug','tt','ba','cv','ceb','jv'])
     assert.equal(locales.isLocaleAllowed(code),false,code);
   assert.equal(locales.isLocaleAllowed('BN-BD'),true);
   assert.equal(locales.isLocaleAllowed('jw'),true);
+  for(const code of ['ms','om','prs']) assert.equal(locales.isLocaleAllowed(code),true,code);
 });
 test('direction matches every official runtime script; Latin Kurmanji is LTR', () => {
   for(const entry of officialCatalog) {
@@ -72,7 +73,8 @@ test('direction matches every official runtime script; Latin Kurmanji is LTR', (
   }
   assert.equal(locales.isRtlLocale('UR-PK'),true);
   assert.equal(locales.isRtlLocale('ku'),false);
-  assert.equal(locales.isRtlLocale('yi'),true);
+  assert.equal(locales.isRtlLocale('prs'),true);
+  assert.equal(locales.isRtlLocale('yi'),false);
   assert.equal(locales.isRtlLocale('bn'),false);
 });
 test('missing translations fall back only to English without changing stored notes', () => {
@@ -84,7 +86,9 @@ test('missing translations fall back only to English without changing stored not
 test('RTL, wrapping, button focus and narrow devices have specific CSS guards',()=>{
   const white=css('white_2100.css'),ui=css('ui_components_v22.css');
   for(const source of [white,ui]) {
-    assert.match(source,/overflow-wrap:\s*anywhere/);
+    // d8bb074: overflow-wrap:anywhere caused mid-word breaks; break-word is the contract now.
+    assert.match(source,/overflow-wrap:\s*break-word/);
+    assert.doesNotMatch(source,/overflow-wrap:\s*anywhere/);
     assert.match(source,/:focus-visible/);
     assert.match(source,/html\[dir="rtl"\]/);
     assert.match(source,/max-inline-size/);
