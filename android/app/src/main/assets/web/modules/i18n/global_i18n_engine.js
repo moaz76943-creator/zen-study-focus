@@ -1,7 +1,7 @@
 /**
  * DEEP FOCUS - Axis 10: Global i18n & RTL/LTR Language Engine
  * Milestone M8558 - M8567 | Sovereign Offline Architecture
- * 10 Approved Languages, Strict Language Exclusion Barrier, Western Numerals Global Guard
+ * Maximum 16 Approved Languages, Strict Language Exclusion Barrier, Western Numerals Global Guard
  */
 
 (function (root, factory) {
@@ -16,11 +16,12 @@
   'use strict';
 
   const STORAGE_KEY_LANG = 'df_active_language_code_v1';
+  const MAX_SUPPORTED_LANGUAGES = 16;
   
   // Permanent sovereign exclusion guard (Policy Invariant)
   const FORBIDDEN_LANGUAGE_CODES = ['he', 'iw', 'syc', 'ber', 'zgh'];
 
-  // Approved 10 Global Languages
+  // Approved runtime languages (hard ceiling: 16)
   const SUPPORTED_LANGUAGES = {
     ar: { name: 'العربية', dir: 'rtl', label: 'العربية' },
     en: { name: 'English', dir: 'ltr', label: 'English' },
@@ -31,8 +32,18 @@
     id: { name: 'Bahasa Indonesia', dir: 'ltr', label: 'Indonesia' },
     ja: { name: '日本語', dir: 'ltr', label: '日本語' },
     ko: { name: '한국어', dir: 'ltr', label: '한국어' },
-    zh: { name: '简体中文', dir: 'ltr', label: '中文' }
+    zh: { name: '简体中文', dir: 'ltr', label: '中文' },
+    it: { name: 'Italiano', dir: 'ltr', label: 'Italiano' },
+    ru: { name: 'Русский', dir: 'ltr', label: 'Русский' },
+    pt: { name: 'Português', dir: 'ltr', label: 'Português' },
+    nl: { name: 'Nederlands', dir: 'ltr', label: 'Nederlands' },
+    pl: { name: 'Polski', dir: 'ltr', label: 'Polski' },
+    sv: { name: 'Svenska', dir: 'ltr', label: 'Svenska' }
   };
+
+  if (Object.keys(SUPPORTED_LANGUAGES).length > MAX_SUPPORTED_LANGUAGES) {
+    throw new Error('Supported language registry exceeds the 16-language product limit.');
+  }
 
   const DICTIONARY = {
     ar: {
@@ -214,7 +225,10 @@
       studyPods: '学习室',
       botanicalGarden: '植物园',
       wrappedReport: '每周回顾'
-    }
+    },
+    // These six locales are enabled in the selector; until their full dictionaries
+    // are reviewed, the engine deliberately falls back to English and reports gaps.
+    it: {}, ru: {}, pt: {}, nl: {}, pl: {}, sv: {}
   };
 
   class GlobalI18nEngine {
@@ -240,6 +254,7 @@
     dfInitGlobalDictionaryRegistry() {
       return {
         supportedLanguagesCount: Object.keys(SUPPORTED_LANGUAGES).length,
+        maxSupportedLanguages: MAX_SUPPORTED_LANGUAGES,
         supportedCodes: Object.keys(SUPPORTED_LANGUAGES),
         languagesMetadata: SUPPORTED_LANGUAGES
       };
@@ -356,7 +371,8 @@
       const missingReport = {};
       let totalKeysCount = 0;
 
-      for (const [code, dict] of Object.entries(DICTIONARY)) {
+      for (const [code, language] of Object.entries(SUPPORTED_LANGUAGES)) {
+        const dict = DICTIONARY[code] || {};
         missingReport[code] = [];
         baseKeys.forEach(k => {
           totalKeysCount++;
@@ -369,7 +385,7 @@
       const is100PercentComplete = Object.values(missingReport).every(arr => arr.length === 0);
       return {
         is100PercentComplete: is100PercentComplete,
-        auditedLanguagesCount: Object.keys(DICTIONARY).length,
+        auditedLanguagesCount: Object.keys(SUPPORTED_LANGUAGES).length,
         missingKeysPerLanguage: missingReport,
         totalDictionaryTokens: totalKeysCount
       };
@@ -388,8 +404,8 @@
     }
 
     t(key) {
-      const dict = DICTIONARY[this.currentLang] || DICTIONARY.ar;
-      return dict[key] || key;
+      const dict = DICTIONARY[this.currentLang] || {};
+      return dict[key] || DICTIONARY.en[key] || DICTIONARY.ar[key] || key;
     }
 
     // M8567: dfGetMilestoneM8567GlobalI18nSeal
