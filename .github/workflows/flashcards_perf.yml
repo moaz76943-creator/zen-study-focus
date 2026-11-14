@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { persist-credentials: false }
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v7
         with: { node-version: '22' }
       - run: npm install --no-save playwright@1.49.1 && npx playwright install --with-deps chromium
       - run: node tools/perf/flashcards_perf.cjs
