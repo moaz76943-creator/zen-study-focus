@@ -48,7 +48,7 @@ Repetitions 1–9: JS starts the next utterance only after the native `done` eve
 | JS speech controller | IMPLEMENTED AND VERIFIED against a fake bridge (logic only) |
 | Male voice preference | PARTIALLY IMPLEMENTED — only voices the engine labels male can be preferred; many devices label none |
 | Offline voices | BLOCKED BY PLATFORM — depends on installed voice data; reported per voice |
-| Emulator tests of native TTS | IMPLEMENTED, RESULT PENDING — `tests/android_tts` instrumentation runs the shipped `NativeTts` on API 30/35 emulators via `.github/workflows/native_tts_emulator.yml`; see the workflow run for actual results. Images without an engine/voice data report SKIP lines, never PASS. Audible output and voice quality are NOT verifiable on an emulator |
+| Native TTS on Android emulator | IMPLEMENTED AND VERIFIED (API 30 and 35, google_apis x86_64, run 43534537171): 24 checks pass — init, engine/language/voice discovery (62–68 languages, 51 English voices), language status, invalid input, rate/pitch bounds, replacement without overlap, stop, engine restart, shutdown. NOT verified: audible output, voice quality, offline voice data, real-device engines |
 | Translations | PARTIAL — English and Arabic complete; 18 other locales have NO reviewed pack and show English. `tests/flashcards_locale_coverage.test.cjs` pins that gap list (it may only shrink) and fails on any incomplete or English-copy pack. Add a reviewed pack as `S.<code>` in flashcards_ui.js |
 | 50,000 cards | BLOCKED BY STORAGE — localStorage quota is far below 50k cards; 10k small cards fit; measured in Node only |
 | Quick edit during study, undo | Quick edit IMPLEMENTED; undo works for edit/delete/move (last 20, in memory only) |
