@@ -97,7 +97,13 @@ test('day/week/month interactions and full year heatmap cannot fabricate events'
  assert.equal(data.daily.length,2);assert.equal(data.weekly.length,2);assert.equal(data.monthly.length,1);
  grouping.value='weekly';grouping.events.change();assert.equal(x.inst.getReport().totals.sessions,2);
  grouping.value='monthly';grouping.events.change();assert.equal(x.inst.getReport().totals.minutes,20);
- const heat=x.wrapper.children[x.wrapper.children.length-1];
+ // Insight sections are appended after the year block, so the heatmap is the element
+ // right after the last direct <h3> (the year heading), not the wrapper's last child.
+ const kids=x.wrapper.children;
+ const yearIdx=kids.map(c=>c.tagName).lastIndexOf('H3');
+ assert.ok(yearIdx>=0&&yearIdx<kids.length-1,'year heading not found');
+ const heat=kids[yearIdx+1];
+ assert.match(heat.innerHTML,/^<svg[^>]*aria-label=/);
  assert.match(heat.innerHTML,/2026-10-19/);
 });
 
