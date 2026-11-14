@@ -1,0 +1,78 @@
+name: Native TTS on Android emulator
+on:
+  pull_request:
+    branches: [integration/master-qa-verified-v21]
+    paths:
+      - 'android/app/src/main/java/com/zenstudy/focus/NativeTts.java'
+      - 'tests/android_tts/**'
+      - '.github/workflows/native_tts_emulator.yml'
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: native-tts-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - uses: actions/setup-node@v4
+        with: { node-version: '22' }
+      - run: |
+          node --test tests/android_tts/source_contract.test.cjs
+          bash -n tests/android_tts/prepare_test_build.sh
+          bash -n tests/android_tts/run_ci.sh
+  android:
+    name: Real NativeTts on emulator API${{ matrix.api }}
+    needs: source
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [30, 35]
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with: { persist-credentials: false }
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: '17' }
+      - name: Install Android 36 compilation SDK
+        shell: bash
+        run: |
+          sdkmanager_bin="$(find /usr/local/lib/android/sdk/cmdline-tools -name sdkmanager -type f -print -quit)"
+          "$sdkmanager_bin" 'platforms;android-36' 'build-tools;36.0.0'
+      - uses: gradle/actions/setup-gradle@v4
+        with: { gradle-version: '8.11.1' }
+      - run: bash tests/android_tts/prepare_test_build.sh
+      - name: Compile app and test APK
+        working-directory: android
+        run: gradle assembleDebug assembleDebugAndroidTest --no-daemon
+      - name: Emulator KVM access
+        run: |
+          test -c /dev/kvm
+          sudo chmod 666 /dev/kvm
+      - name: NativeTts on a real emulator
+        uses: reactivecircus/android-emulator-runner@v2
+        env:
+          TTS_EVIDENCE: ${{ runner.temp }}/tts-api-${{ matrix.api }}
+        with:
+          api-level: ${{ matrix.api }}
+          arch: x86_64
+          target: google_apis
+          profile: pixel_6
+          emulator-boot-timeout: 600
+          disable-animations: true
+          emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect
+          script: bash tests/android_tts/run_ci.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-tts-api${{ matrix.api }}-${{ github.sha }}
+          path: ${{ runner.temp }}/tts-api-${{ matrix.api }}/
+          retention-days: 7
+          if-no-files-found: warn
