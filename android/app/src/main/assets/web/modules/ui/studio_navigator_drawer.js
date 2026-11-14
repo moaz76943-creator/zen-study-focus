@@ -52,6 +52,9 @@
             pill.style.bottom = "calc(96px + env(safe-area-inset-bottom, 0px))";
             pill.style.left = "50%";
             pill.style.transform = "translateX(-50%)";
+            // left:50% shrinks the available width to half the viewport; large text then overflows the right edge.
+            pill.style.width = "max-content";
+            pill.style.maxWidth = "calc(100vw - 32px)";
             pill.style.background = "rgba(18, 18, 18, 0.85)";
             pill.style.backdropFilter = "blur(12px)";
             pill.style.border = "1px solid rgba(255, 255, 255, 0.15)";
