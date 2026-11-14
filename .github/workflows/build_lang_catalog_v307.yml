@@ -123,7 +123,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload verified APK and integrity evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: DeepFocus-v3.0.7-Core-Languages-Debug-APK
           if-no-files-found: error

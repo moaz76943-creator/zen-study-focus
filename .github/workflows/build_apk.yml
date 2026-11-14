@@ -111,7 +111,7 @@ jobs:
             echo "This APK has the Android debug signature, not a Play release upload signature."
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Upload verified APK, SHA256 and signing evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: DeepFocus-Sanitized-v3.0.3-v3.0.3-Debug-APK
           if-no-files-found: error

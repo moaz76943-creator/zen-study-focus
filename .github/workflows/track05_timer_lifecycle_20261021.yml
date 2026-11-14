@@ -60,7 +60,7 @@ jobs:
         shell: bash
         run: |
           printf '%s\n' "HEAD=$(git rev-parse HEAD)" "GITHUB_SHA=$GITHUB_SHA" "RELEASE_APPROVED=NO" > "$RUNNER_TEMP/track05-evidence.txt"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: track05-timer-source-${{ github.sha }}
@@ -134,7 +134,7 @@ jobs:
         run: |
           git rev-parse HEAD > "$RUNNER_TEMP/track05-android/source_sha.txt"
           printf '%s\n' 'RELEASE_APPROVED=NO' 'Android smoke does not certify 20-language native dialogs, DND, or SAF.' > "$RUNNER_TEMP/track05-android/limits.txt"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: track05-android-api30-${{ github.sha }}

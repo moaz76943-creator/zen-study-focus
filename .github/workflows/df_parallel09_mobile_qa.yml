@@ -42,7 +42,7 @@ jobs:
           mkdir -p "${{ runner.temp }}/df09"
           git rev-parse HEAD > "${{ runner.temp }}/df09/SOURCE_SHA.txt"
           printf 'Chromium CSS font emulation is not Android system font scaling, WebView or TalkBack proof. RELEASE_APPROVED=NO.\n' > "${{ runner.temp }}/df09/SCOPE.txt"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: df09-premium-mobile-${{ github.sha }}

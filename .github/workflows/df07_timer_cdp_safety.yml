@@ -33,7 +33,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/df07-evidence"
           git rev-parse HEAD > "$RUNNER_TEMP/df07-evidence/QA_SHA.txt"
           printf 'JS VM/source and CDP timeout unit tests only; actual native Android dialog and ADB reconnect NOT_TESTED.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df07-evidence/LIMITS.txt"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: DF07-timer-cdp-${{ github.sha }}

@@ -60,7 +60,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/df07-button-bindings"
           git rev-parse HEAD > "$RUNNER_TEMP/df07-button-bindings/QA_SHA.txt"
           printf 'Live desktop Chromium binding tests; NOT semantic acceptance for every button, Android native dialogs, or SAF.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df07-button-bindings/LIMITS.txt"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: DF07-control-bindings-${{ github.sha }}

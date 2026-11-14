@@ -59,7 +59,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/df07-touch"
           git rev-parse HEAD > "$RUNNER_TEMP/df07-touch/QA_SHA.txt"
           printf 'Chromium mobile touch only. Android, native dialogs, SAF and TalkBack NOT_TESTED.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df07-touch/LIMITS.txt"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: DF07-touch-${{ github.sha }}

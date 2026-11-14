@@ -164,7 +164,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload Release and fallback Debug AAB plus verification receipts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: DeepFocus-Mission177-v3.0.2-AAB-${{ steps.signing.outputs.mode }}
           if-no-files-found: error

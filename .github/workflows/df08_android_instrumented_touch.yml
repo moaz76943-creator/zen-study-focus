@@ -92,7 +92,7 @@ jobs:
           git rev-parse HEAD > "$RUNNER_TEMP/df08-api-${{ matrix.api }}/EXACT_SOURCE_SHA.txt"
           printf 'Android emulator API${{ matrix.api }} only. CDP disabled. Physical handset/TalkBack NOT_TESTED. RELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df08-api-${{ matrix.api }}/LIMITS.txt"
           test "$(git diff --name-only)" = "android/app/build.gradle"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: DF08-real-android-API${{ matrix.api }}-${{ github.sha }}

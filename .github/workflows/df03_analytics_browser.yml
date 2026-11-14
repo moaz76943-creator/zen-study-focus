@@ -53,7 +53,7 @@ jobs:
         run: |
           git rev-parse HEAD > "$RUNNER_TEMP/ANALYTICS_SOURCE_SHA.txt"
           printf 'Browser DOM only; no Android E2E, no full translation parity, no release approval\n' > "$RUNNER_TEMP/ANALYTICS_LIMITS.txt"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: df03-analytics-20-locale-${{ github.sha }}

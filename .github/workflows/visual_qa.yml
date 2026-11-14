@@ -40,7 +40,7 @@ jobs:
           echo "Inspect the attached screenshot artifacts or run locally with debug enabled." >> $GITHUB_STEP_SUMMARY
       - name: Upload Mobile Screenshots Artifact
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: visual-qa-screenshots
           path: tests/screenshots/

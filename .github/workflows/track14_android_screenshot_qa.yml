@@ -61,7 +61,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/track14-android"
           git rev-parse HEAD > "$RUNNER_TEMP/track14-android/EXACT_SHA.txt"
           printf 'Android emulator screenshots are visual artifacts, not semantic app feature, TalkBack or IME PASS.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/track14-android/GATES.txt"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: track14-android-emulator-screens-${{ github.sha }}

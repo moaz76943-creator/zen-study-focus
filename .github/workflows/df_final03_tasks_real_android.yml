@@ -91,7 +91,7 @@ jobs:
           git rev-parse HEAD > "$RUNNER_TEMP/df03-api-${{ matrix.api }}/EXACT_SOURCE_SHA.txt"
           printf 'API${{ matrix.api }} disposable emulator only. PHYSICAL_HANDSET=NOT_TESTED; IME=NOT_TESTED; SAF=NOT_TESTED; RELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df03-api-${{ matrix.api }}/LIMITS.txt"
           test "$(git diff --name-only)" = 'android/app/build.gradle'
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: DF03-Tasks-real-Android-API${{ matrix.api }}-${{ github.sha }}
