@@ -1,0 +1,5077 @@
+[
+ {
+  "kind": "text",
+  "text": "EN",
+  "where": "currentLangIso",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "English • English",
+  "where": "currentLangLabel",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Focus & Performance",
+  "where": "hdrMainTitle",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Study, Workout, Reading & Deep Work",
+  "where": "hdrSubTitle",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Local Data",
+  "where": "heroHeader",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Manual Backup",
+  "where": "heroHeader",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Test Sound",
+  "where": "heroHeader",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✦ Focus space",
+  "where": "focusHeroCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Ready to focus",
+  "where": "focusStatusLabel",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "25m",
+  "where": "modeFocusBtn",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "5m",
+  "where": "modeShortBtn",
+  "screens": [
+   "sec-timer",
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "15m",
+  "where": "modeLongBtn",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Custom ⚡",
+  "where": "modeCustomBtn",
+  "screens": [
+   "sec-timer",
+   "modal:customTimerModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Study 25m",
+  "where": "timerModeCaption",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Plan • Execute • Achieve",
+  "where": "timerLinkedTask",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "-5m",
+  "where": "focusHeroCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "-1m",
+  "where": "focusHeroCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "+1m",
+  "where": "focusHeroCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "+5m",
+  "where": "focusHeroCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "+10m",
+  "where": "focusHeroCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Choose your activity",
+  "where": "sec-timer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "A tailored session for every goal",
+  "where": "sec-timer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Study",
+  "where": "domBtn-study",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Workout",
+  "where": "domBtn-sport",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Reading",
+  "where": "domBtn-read",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Deep Work",
+  "where": "domBtn-work",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Quick sessions",
+  "where": "sec-timer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⚙ Customize",
+  "where": "timerSettingsChip",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📐 STEM & Exam Studio",
+  "where": "studyContextBar",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Pure SVG STEM & Strict Exam Simulator",
+  "where": "studyContextSub",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Studio Suite",
+  "where": "btnZenStudySuite",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Quick training",
+  "where": "quickTrainingDetails",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Custom work-and-rest intervals",
+  "where": "quickTrainingDetails",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Sets",
+  "where": "quickTrainingDetails",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Rest (MM:SS)",
+  "where": "quickTrainingDetails",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Skip final rest",
+  "where": "quickTrainingDetails",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Exercise sequence",
+  "where": "quickTrainingDetails",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "+ Add",
+  "where": "quickTrainingDetails",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Intervals 20/10",
+  "where": "quickTrainingDetails",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Workout 4/1",
+  "where": "quickTrainingDetails",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Reading 20/5",
+  "where": "quickTrainingDetails",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Deep work 50/10",
+  "where": "quickTrainingDetails",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Start Focus",
+  "where": "qtStartButton",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🎯 Target:",
+  "where": "df-timer-task-pill",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "General Study Session",
+  "where": "df-current-task-name",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Change",
+  "where": "df-change-task-btn",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "days",
+  "where": "df-streak-label",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✧ Your progress",
+  "where": "sec-timer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Today’s plan",
+  "where": "sec-timer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "View all ↗",
+  "where": "sec-timer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Mon",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer",
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Tue",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer",
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Wed",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer",
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Thu",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer",
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Fri",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer",
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Sat",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer",
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Sun",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer",
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "No tasks for today yet",
+  "where": "todayPlanPreview",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✦ YOUR DAILY TARGETS",
+  "where": "goalsKicker",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "A little progress, each day",
+  "where": "dailyGoalsHeading",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Minutes come from your completed focus sessions.",
+  "where": "dailyGoalsDescription",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Daily Goals",
+  "where": "goalsEditButton",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Deep Study",
+  "where": "dailyGoalsRows",
+  "screens": [
+   "sec-timer",
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Set goal",
+  "where": "dailyGoalsRows",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Mindful Reading",
+  "where": "dailyGoalsRows",
+  "screens": [
+   "sec-timer",
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Active Break",
+  "where": "dailyGoalsRows",
+  "screens": [
+   "sec-timer",
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Total Active Minutes Today",
+  "where": "sec-timer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "mins",
+  "where": "sec-timer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "↑ 🔥 0 days",
+  "where": "hdrStreakBadge",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Quick Note",
+  "where": "sec-timer",
+  "screens": [
+   "sec-timer",
+   "modal:brainDumpModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Water 0/8",
+  "where": "orbWaterTxt",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Backup Export",
+  "where": "sec-timer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Desk Clock",
+  "where": "sec-timer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✦ Local LAN Study Pods & Peer Accountability",
+  "where": "dfPillar8StudioCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Offline Study Pods & Silent Radar",
+  "where": "dfPillar8StudioCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📴 This device only — no network",
+  "where": "dfPodOnlineStatusBadge",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🔒 Nothing leaves your phone",
+  "where": "dfPillar8StudioCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "👥 Study Pod & Radar",
+  "where": "dfPillar8StudioCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🔄 P2P Deck Exchange",
+  "where": "dfPillar8StudioCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📜 Commitment Contracts",
+  "where": "dfPillar8StudioCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🏆 Personal Best & Ghost",
+  "where": "dfPillar8StudioCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🚨 Exam-Eve Rescue",
+  "where": "dfPillar8StudioCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Join or host a local study pod",
+  "where": "dfPillar8TabContainer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Connect with classmates on the same Wi-Fi or Mobile Hotspot without internet or external servers. Synchronize Pomodoro timers, Tibet singing bell chimes, and peer presence with <50ms clock drift.",
+  "where": "dfPillar8TabContainer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🚀 Host New Pod (Generate PIN)",
+  "where": "dfPillar8TabContainer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "— OR JOIN VIA 4-DIGIT PIN / QR CODE —",
+  "where": "dfPillar8TabContainer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🔗 Join Pod",
+  "where": "dfPillar8TabContainer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Tasks",
+  "where": "navTasks",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Calendar",
+  "where": "navCalendar",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Notes",
+  "where": "navNotes",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Timer",
+  "where": "navTimer",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Nature",
+  "where": "navSounds",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Analytics",
+  "where": "navAnalytics",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✨ Studios",
+  "where": "zenStudioTriggerLabel",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⚙️ Advanced studio & maintenance tools",
+  "where": "sovereignCalmToolsLabel",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Manual Backup",
+  "where": "heroHeader",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Manual Backup",
+  "where": "heroHeader",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Share App",
+  "where": "heroHeader",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Share App",
+  "where": "heroHeader",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "🌐 Language & Country Search",
+  "where": "heroHeader",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Cloud Backup",
+  "where": "heroHeader",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Sound Chime",
+  "where": "heroHeader",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Timer Reset",
+  "where": "focusHeroCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Timer Reset",
+  "where": "focusHeroCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Start or pause timer",
+  "where": "mainPlayBtn",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Skip Step",
+  "where": "focusHeroCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Skip Step",
+  "where": "focusHeroCard",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Focus session shortcuts",
+  "where": "sec-timer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Quick focus durations",
+  "where": "sec-timer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Quick training",
+  "where": "quickTrainingCard",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Sets",
+  "where": "qtSets",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Work minutes",
+  "where": "qtWork",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Rest seconds",
+  "where": "qtRest",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "e.g. stretches or deep reading",
+  "where": "qtNewExercise",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Training presets",
+  "where": "quickTrainingDetails",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Today activity snapshot",
+  "where": "sec-timer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "This Week",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Mon 2026-11-09",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Tue 2026-11-10",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Wed 2026-11-11",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Thu 2026-11-12",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Fri 2026-11-13",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Sat 2026-11-14",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Sun 2026-11-15",
+  "where": "homeWeekStrip",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Deep Study",
+  "where": "dailyGoalsRows",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Start Study",
+  "where": "dailyGoalsRows",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Mindful Reading",
+  "where": "dailyGoalsRows",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Start Reading",
+  "where": "dailyGoalsRows",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Active Break",
+  "where": "dailyGoalsRows",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Start Workout",
+  "where": "dailyGoalsRows",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Deep Work",
+  "where": "dailyGoalsRows",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Start Deep Work",
+  "where": "dailyGoalsRows",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Pod Name (e.g. Physics Library Pod)...",
+  "where": "dfPillar8TabContainer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Enter 4-Digit PIN (e.g. 4829)...",
+  "where": "dfPillar8TabContainer",
+  "screens": [
+   "sec-timer"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Main navigation",
+  "where": "htmlRoot",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Open studios and tools panel",
+  "where": "zenStudioTriggerPill",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Open or close studio and maintenance tools",
+  "where": "sovereignCalmToolsToggle",
+  "screens": [
+   "sec-timer",
+   "sec-tasks",
+   "sec-calendar",
+   "sec-notes",
+   "sec-sounds",
+   "sec-analytics",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Tasks Studio",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Plan today and track real work",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "More",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "＋ New task",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "New project",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Undo",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks",
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Redo",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks",
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Save",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Today",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks",
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Upcoming",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Overdue",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Completed",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Filters",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "No matching tasks",
+  "where": "df-task-results",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Advanced tasks and calendar",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "New task",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "New task",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "More views",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Search tasks",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Search tasks",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Filter by category",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Filter by status",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Sort tasks",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Filter by project",
+  "where": "df22TasksHost",
+  "screens": [
+   "sec-tasks"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "November 2026",
+  "where": "calMonthYearTitle",
+  "screens": [
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "+ Add Note to Date",
+  "where": "sec-calendar",
+  "screens": [
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✅ Complete Chapter 1 & Core Concepts",
+  "where": "calendarDayAgendaBox",
+  "screens": [
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📋 HIIT Strength & Cardio Session (4 Sets)",
+  "where": "calendarDayAgendaBox",
+  "screens": [
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📋 Read 25 Pages of Reference Book",
+  "where": "calendarDayAgendaBox",
+  "screens": [
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📋 Finish Deep Work Project Milestone",
+  "where": "calendarDayAgendaBox",
+  "screens": [
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "💻 Work",
+  "where": "calendarDayAgendaBox",
+  "screens": [
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📝 Spaced Repetition System",
+  "where": "calendarDayAgendaBox",
+  "screens": [
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Reviewing concepts at increasing intervals strengthens long-term memory retention.",
+  "where": "calendarDayAgendaBox",
+  "screens": [
+   "sec-calendar",
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📝 Active Recall: Key Formula & Law",
+  "where": "calendarDayAgendaBox",
+  "screens": [
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Hidden Answer: Performance = Focused Time × Intensity.",
+  "where": "calendarDayAgendaBox",
+  "screens": [
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📝 Workout & Training Log",
+  "where": "calendarDayAgendaBox",
+  "screens": [
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "1. Warm-up 5m 2. 4 Sets Compound Exercises 3. Cool-down stretch.",
+  "where": "calendarDayAgendaBox",
+  "screens": [
+   "sec-calendar",
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Prev Month",
+  "where": "sec-calendar",
+  "screens": [
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Next Month",
+  "where": "sec-calendar",
+  "screens": [
+   "sec-calendar"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✦ NOTES STUDIO",
+  "where": "nsEyebrow",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Your ideas, organized",
+  "where": "nsTitle",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Write, revisit and develop your thoughts.",
+  "where": "nsSubtitle",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "My notes",
+  "where": "nsTotalLabel",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Pinned",
+  "where": "nsPinnedLabel",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "＋ New note",
+  "where": "nsNewButton",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Flashcards",
+  "where": "flashcardsEntryLabel",
+  "screens": [
+   "sec-notes",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Ready-to-use templates",
+  "where": "nsTemplatesTitle",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Tap to start",
+  "where": "nsTemplatesHint",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Structured notes",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Active recall",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Reading summary",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Meeting minutes",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Project plan",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Workout log",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Ideas board",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Checklist",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Lecture summary",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Weekly review",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Decision log",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Daily journal",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Pinned only",
+  "where": "nsPinnedOnlyLabel",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Sort",
+  "where": "nsSortLabel",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "All",
+  "where": "sec-notes",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Recall",
+  "where": "sec-notes",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Quick notes",
+  "where": "sec-notes",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Feynman Recall 🧠",
+  "where": "btnLaunchFeynmanPill",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Cornell Notes & Mind-Map Studio",
+  "where": "dfPillar1StudioMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✓ Instant Autosave Ready",
+  "where": "dfTriZoneSaveStatus",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Chapter Template",
+  "where": "dfPillar1StudioMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Toggle Recall Mask",
+  "where": "dfPillar1StudioMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Sync Cues & [[WikiLinks]] → Flashcards",
+  "where": "dfPillar1StudioMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Zone 1: Cues & Recall Questions (?)",
+  "where": "dfPillar1StudioMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Zone 2: Main notes (link ideas with [[Concept]])",
+  "where": "dfPillar1StudioMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Zone 3: Summary Synthesis (Bottom Cornell Bar)",
+  "where": "dfPillar1StudioMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Cues: 2 | Density Ratio: 0.68 | WikiLinks: 4",
+  "where": "dfTriZoneMetrics",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Linked flashcard concepts (note ↔ flashcards)",
+  "where": "dfPillar1StudioMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🗂 Active Recall ↔ Note #n1",
+  "where": "dfBidirConceptPills",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🗂 Spaced Repetition ↔ Note #n1",
+  "where": "dfBidirConceptPills",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Interactive Vector Mind-Map Canvas (Pure SVG — Drag Nodes & Connect Ideas)",
+  "where": "dfPillar1StudioMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "+ Add Branch",
+  "where": "dfPillar1StudioMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🔗 Connect 2 Nodes",
+  "where": "dfPillar1StudioMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Auto-Layout",
+  "where": "dfPillar1StudioMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Map → Flashcards",
+  "where": "dfPillar1StudioMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Core Concept",
+  "where": "dfMindMapCanvasHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Key Cue Questions",
+  "where": "dfMindMapCanvasHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Summary Synthesis",
+  "where": "dfMindMapCanvasHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Active Flashcard Link",
+  "where": "dfMindMapCanvasHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Focal Stream Speed Reader",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "300 WPM",
+  "where": "dfRsvpLiveWpmBadge",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "▼ ORP Focal Anchor ▼",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "reading →",
+  "where": "dfRsvpNextContext",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "S",
+  "where": "dfRsvpWordStage",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "p",
+  "where": "dfRsvpWordStage",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "eed",
+  "where": "dfRsvpWordStage",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Speed (100–1000 WPM):",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Word 1 / 107 • ~1m left",
+  "where": "dfRsvpWordCounter",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "▶ Start RSVP",
+  "where": "dfRsvpPlayToggleBtn",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⏮ -1 Word",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "+1 Word ⏭",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "↺ Sentence",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🔖 Bookmark",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📍 Jump to Bookmark",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Reading guide & line spotlight",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "▲ Prev Line",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "▼ Next Line",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "▶ Auto-Advance Ruler",
+  "where": "dfAutoPacerToggleBtn",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "👁 3-Word Span Chunks",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Speed reading with Rapid Serial Visual Presentation (RSVP) eliminates unnecessary eye saccades by anchoring every word at its Optical Recognition Point (ORP).",
+  "where": "dfVisualGuideLinesHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "When your eyes fixate slightly left of the center of a word, the fovea decodes the entire lexical unit simultaneously without horizontal scanning.",
+  "where": "dfVisualGuideLinesHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "The Visual Guide and Span Expander ruler prevents backward eye regression by illuminating the active study line while gently dimming surrounding paragraphs.",
+  "where": "dfVisualGuideLinesHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Grouping adjacent words into semantic chunks expands peripheral vision span and suppresses subvocalization at speeds between 300 and 1000 words per minute.",
+  "where": "dfVisualGuideLinesHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Real-time comprehension checks ensure that high velocity translates into genuine Net Effective WPM and durable long-term memory retention.",
+  "where": "dfVisualGuideLinesHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⟦ Speed reading with ⟧",
+  "where": "dfSpanChunksHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⟦ Rapid Serial Visual ⟧",
+  "where": "dfSpanChunksHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⟦ Presentation (RSVP) eliminates ⟧",
+  "where": "dfSpanChunksHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⟦ unnecessary eye saccades ⟧",
+  "where": "dfSpanChunksHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⟦ by anchoring every ⟧",
+  "where": "dfSpanChunksHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⟦ word at its ⟧",
+  "where": "dfSpanChunksHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⟦ Optical Recognition Point ⟧",
+  "where": "dfSpanChunksHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⟦ (ORP). ⟧",
+  "where": "dfSpanChunksHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📥 Load Active Note",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Real-Time WPM Analytics & Reading Comprehension Tracker",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✓ Log WPM Session to localStorage",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Target Speed",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Net Effective",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Comprehension",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Re-reads",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "0 (0 logs)",
+  "where": "dfKpiRegressions",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Instant Reading Comprehension Check (Cloze Recall):",
+  "where": "dfCompCheckHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Speed reading with Rapid Serial Visual Presentation (RSVP) _____ unnecessary eye saccades by anchoring every word at its Optical Recognition Point (ORP).",
+  "where": "dfCompCheckHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "eliminates",
+  "where": "dfCompCheckHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "regression",
+  "where": "dfCompCheckHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "peripheral",
+  "where": "dfCompCheckHost",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "STEM Typesetter & Timed Exam Simulator",
+  "where": "dfPillar3StemMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✓ STEM Engine Ready",
+  "where": "dfStemStudioBadge",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📐 Formula Typesetter",
+  "where": "dfPillar3StemMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🪜 Multi-Step Problems",
+  "where": "dfPillar3StemMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⏱️ Timed Exam Simulator",
+  "where": "dfPillar3StemMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🕸️ Mastery Radar",
+  "where": "dfPillar3StemMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🧮 STEM Scratchpad",
+  "where": "dfPillar3StemMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Quick Symbol Insert (24 Math & Greek Symbols):",
+  "where": "dfStemContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "π",
+  "where": "dfStemContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "θ",
+  "where": "dfStemContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "α",
+  "where": "dfStemContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "β",
+  "where": "dfStemContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "λ",
+  "where": "dfStemContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Δ",
+  "where": "dfStemContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Σ",
+  "where": "dfStemContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Ω",
+  "where": "dfStemContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Formula Preset:",
+  "where": "dfStemContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Create Cloze Card",
+  "where": "dfStemContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Pure Vector SVG Typesetter Preview:",
+  "where": "dfStemContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "E",
+  "where": "dfSvgFormulaStage",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "m",
+  "where": "dfSvgFormulaStage",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "c",
+  "where": "dfSvgFormulaStage",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Infinite Whiteboard & Diagram Occlusion",
+  "where": "dfPillar4WhiteboardMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✓ Vector Engine Active",
+  "where": "dfWhiteboardStudioBadge",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🎨 Vector Whiteboard",
+  "where": "dfPillar4WhiteboardMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🩺 Scientific academic & Diagram Occlusion Diagram Occlusion",
+  "where": "dfPillar4WhiteboardMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📐 Visual Frameworks",
+  "where": "dfPillar4WhiteboardMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🧩 Spatial Recall",
+  "where": "dfPillar4WhiteboardMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✏️ Quick Scratchpad",
+  "where": "dfPillar4WhiteboardMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✏️ Pen",
+  "where": "dfPillar4ContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🖍️ Highlighter",
+  "where": "dfPillar4ContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🧹 Eraser",
+  "where": "dfPillar4ContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⭕ Shape Snap",
+  "where": "dfPillar4ContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "↺ Undo",
+  "where": "dfPillar4ContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Clear",
+  "where": "dfPillar4ContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Canvas View: 600×360 Vector • Stylus Smoothing: Catmull-Rom Bezier",
+  "where": "dfPillar4ContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📥 Export Vector SVG",
+  "where": "dfPillar4ContentPane",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✦ Plain Language & Recall Lab",
+  "where": "dfFeynmanStudioCard",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Feynman Blank-Sheet Recall Studio",
+  "where": "dfFeynmanStudioCard",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🌱 8 Mastered Concepts",
+  "where": "dfFeynmanStudioCard",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🔥 7d Depth Streak",
+  "where": "dfFeynmanStudioCard",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🧘 Zen Focus Mode",
+  "where": "dfFeynmanStudioCard",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🧠 Feynman 4-Step Lab",
+  "where": "dfFeynmanStudioCard",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📝 Blank-Sheet Brain-Dump",
+  "where": "dfFeynmanStudioCard",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🔍 Jargon Detector",
+  "where": "dfFeynmanStudioCard",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🛡️ Smart Error-Bank",
+  "where": "dfFeynmanStudioCard",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "💡 Elaborative Prompts",
+  "where": "dfFeynmanStudioCard",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Step 1: Choose or Enter a Concept to Explain from Memory:",
+  "where": "dfPillar7TabContainer",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Step 2: Explain to a 12-Year-Old (Zero Notes • Pure Intuition):",
+  "where": "dfPillar7TabContainer",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "100% Simple (Pure Intuition)",
+  "where": "dfSimplicityLiveBadge",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Type your plain explanation above. The live jargon detector will flag complex academic terms in real time.",
+  "where": "dfFeynmanFeedbackBox",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "💾 Step 4: Save as Golden Note",
+  "where": "dfPillar7TabContainer",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✨ Suggest Analogy",
+  "where": "dfPillar7TabContainer",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Workout & Training Log",
+  "where": "notesStackBox",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Edit",
+  "where": "notesStackBox",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Read / Review",
+  "where": "notesStackBox",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Duplicate",
+  "where": "notesStackBox",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Copy",
+  "where": "notesStackBox",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Copy Markdown",
+  "where": "notesStackBox",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Archive",
+  "where": "notesStackBox",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Move to trash",
+  "where": "notesStackBox",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Create tasks from unchecked items",
+  "where": "notesStackBox",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Active Recall: Key Formula & Law",
+  "where": "notesStackBox",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Tap answer to reveal",
+  "where": "notesStackBox",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Structured Notes",
+  "where": "notesStackBox",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Spaced Repetition System",
+  "where": "notesStackBox",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Flashcards",
+  "where": "flashcardsEntry",
+  "screens": [
+   "sec-notes",
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Note templates",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Structured notes — Structured Cornell note-taking",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Structured Cornell note-taking",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Active recall — Question and answer review",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Question and answer review",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Reading summary — Capture ideas from a book",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Capture ideas from a book",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Meeting minutes — Decisions and follow-up actions",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Decisions and follow-up actions",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Project plan — Milestones, blockers and next steps",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Milestones, blockers and next steps",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Workout log — Record sets and progress",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Record sets and progress",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Ideas board — Explore and evaluate ideas",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Explore and evaluate ideas",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Checklist — Track items to completion",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Track items to completion",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Lecture summary — Summarize lesson concepts",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Summarize lesson concepts",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Weekly review — Review wins and unfinished work",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Review wins and unfinished work",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Decision log — Record options and reasoning",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Record options and reasoning",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Daily journal — Reflect on your day",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "title",
+  "text": "Reflect on your day",
+  "where": "nsTemplates",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Search notes or add task...",
+  "where": "inpSearchNotes",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Search notes or add task...",
+  "where": "inpSearchNotes",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Copy all notes",
+  "where": "nsExport",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Sort notes",
+  "where": "nsSort",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Tri-Zone Cornell Notes and Vector Mind-Map Studio",
+  "where": "dfPillar1StudioMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Note Title...",
+  "where": "dfTriZoneTitleInput",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Write cue questions (e.g. What is [[Active Recall]]?)...",
+  "where": "dfTriZoneCuesInput",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Write lecture/study notes. Wrap concepts in [[Double Brackets]] to auto-link flashcards...",
+  "where": "dfTriZoneMainInput",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Synthesize the core takeaway in 1-2 sentences...",
+  "where": "dfTriZoneSummaryInput",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "New concept node...",
+  "where": "dfMindMapNodeInput",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Speed Reading and Visual Pacing Engine",
+  "where": "dfPillar2SpeedReaderMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Paste long study text or article here for RSVP & Visual Pacer...",
+  "where": "dfRsvpSourceTextarea",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Pure SVG STEM Typesetter and Strict Timed Exam Simulator",
+  "where": "dfPillar3StemMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Type LaTeX or formula (e.g. x = \\frac{-b \\pm \\sqrt{b^2 - 4ac}}{2a})...",
+  "where": "dfFormulaInput",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "E = m c^2",
+  "where": "dfSvgFormulaStage",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Infinite Study Whiteboard and Image Occlusion Engine",
+  "where": "dfPillar4WhiteboardMount",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "e.g., Action Potential, Dijkstra Algorithm, Photosynthesis, SVD...",
+  "where": "dfFeynmanConceptInp",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Explain the concept here using simple everyday words and clear analogies, as if teaching a younger sibling or beginner without any textbook notes...",
+  "where": "dfFeynmanTextarea",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Status",
+  "where": "nsux-status",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Notebook",
+  "where": "nsux-book-filter",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Tag",
+  "where": "nsux-tag-filter",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "New note",
+  "where": "sec-notes",
+  "screens": [
+   "sec-notes"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Nature sound controls",
+  "where": "mixerStatusTxt",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🎧 3D Spatial & 40Hz",
+  "where": "btnLaunch3DSpatialStudio",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✨ Mix",
+  "where": "sec-sounds",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⏹ Stop",
+  "where": "sec-sounds",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "✦ 360° Acoustic Physics",
+  "where": "dfPillar5SpatialMount",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "3D Spatial Audio & Bio-Frequency Synthesis",
+  "where": "dfPillar5SpatialMount",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "● Web Audio HRTF Ready",
+  "where": "dfHrtfLiveStatusBadge",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🌐 3D Spatial Radar",
+  "where": "dfPillar5SpatialMount",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🧠 40Hz / 10Hz Bio-Frequencies",
+  "where": "dfPillar5SpatialMount",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🎛️ 10-Band Masking EQ",
+  "where": "dfPillar5SpatialMount",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🎚️ Multi-Track Mixer",
+  "where": "dfPillar5SpatialMount",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Position pure procedural soundscapes around your head in 360-degree spatial coordinates using Head-Related Transfer Functions (HRTF). Best experienced with headphones.",
+  "where": "dfPillar5TabHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "1m",
+  "where": "dfPillar5TabHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "2.5m",
+  "where": "dfPillar5TabHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "0° FRONT",
+  "where": "dfPillar5TabHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "90° RIGHT",
+  "where": "dfPillar5TabHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "180° REAR",
+  "where": "dfPillar5TabHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "270° LEFT",
+  "where": "dfPillar5TabHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Active Sound Source:",
+  "where": "dfPillar5TabHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Azimuth (360° Horizontal Pan):",
+  "where": "dfPillar5TabHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Distance (HRTF Rolloff):",
+  "where": "dfPillar5TabHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "2.5 m",
+  "where": "dfPillar5TabHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🔄 Orbit Wind Breeze Around Listener",
+  "where": "dfPillar5TabHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🌧️ Scatter Drops 360°",
+  "where": "dfPillar5TabHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "All (5)",
+  "where": "sec-sounds",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Water & Rain",
+  "where": "sec-sounds",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Forest & Wind",
+  "where": "sec-sounds",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Sky & Thunder",
+  "where": "sec-sounds",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Completion Sound",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Choose a sound",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Water Drop",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Preview",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Stream Ripple",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Rain Tap",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Wind Rustle",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Distant Thunder",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Vibration only",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Soft Forest Rain",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🔉 Volume",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Mountain Stream",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Pine Breeze",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Highland Wind",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Completion Sound",
+  "where": "df-tone-picker-card",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Preview: Water Drop",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Preview: Stream Ripple",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Preview: Rain Tap",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Preview: Wind Rustle",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Preview: Distant Thunder",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Preview: Vibration only",
+  "where": "completionAlertPickerHost",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Soft Forest Rain",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Play: Soft Forest Rain",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Volume for Soft Forest Rain",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Mountain Stream",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Play: Mountain Stream",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Volume for Mountain Stream",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Pine Breeze",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Play: Pine Breeze",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Volume for Pine Breeze",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Highland Wind",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Play: Highland Wind",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Volume for Highland Wind",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Distant Thunder",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Play: Distant Thunder",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Volume for Distant Thunder",
+  "where": "soundsGridBox",
+  "screens": [
+   "sec-sounds"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "120Hz AMOLED",
+  "where": "btnLaunchHighPerfEngine",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Zen Sanctuary",
+  "where": "btnLaunchBotanicalGarden",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Recorded analytics",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Activity",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Period",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "From",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "To",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Export CSV",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "today",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Period: 7 days",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Period: 30 days",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Recorded minutes",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Sessions",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Average session",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Current streak",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Daily distribution",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "No recorded sessions in this period",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Study: 0 min",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Reading: 0 min",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Work: 0 min",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Sport: 0 min",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Goal comparison",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "No daily goals configured",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Completed tasks: 0 / 0",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Year",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Last 7 days",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Last 30 days",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Last 7 days: 0 min / Previous 7 days: 0 min (—)",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Original dated goal targets",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "No dated goal snapshots recorded",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "History-backed analytics",
+  "where": "df22AnalyticsHost",
+  "screens": [
+   "sec-analytics"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "No cards yet",
+  "where": "sec-flashcards",
+  "screens": [
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Create a card to start. Everything stays on your phone and works offline.",
+  "where": "sec-flashcards",
+  "screens": [
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Add your first card",
+  "where": "sec-flashcards",
+  "screens": [
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Import",
+  "where": "sec-flashcards",
+  "screens": [
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Settings",
+  "where": "sec-flashcards",
+  "screens": [
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Add card",
+  "where": "sec-flashcards",
+  "screens": [
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Search cards",
+  "where": "sec-flashcards",
+  "screens": [
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Search cards",
+  "where": "sec-flashcards",
+  "screens": [
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Add your first card",
+  "where": "sec-flashcards",
+  "screens": [
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Import",
+  "where": "sec-flashcards",
+  "screens": [
+   "sec-flashcards",
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfQuickScratchpadModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🌐 Language & Country Search",
+  "where": "langModal",
+  "screens": [
+   "modal:langModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Cancel",
+  "where": "langModal",
+  "screens": [
+   "modal:langModal",
+   "modal:cloudBackupModal",
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal",
+   "modal:noteModal",
+   "modal:brainDumpModal",
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Search language or country...",
+  "where": "inpLangCountrySearch",
+  "screens": [
+   "modal:langModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "☁️ Manual Backup & Restore",
+  "where": "cloudBackupModal",
+  "screens": [
+   "modal:cloudBackupModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "⚠️ Exported backup codes contain readable personal notes and tasks. They are NOT encrypted. Share or save them privately; anyone with the code can read its contents.",
+  "where": "cloudBackupModal",
+  "screens": [
+   "modal:cloudBackupModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📤 Share Backup Code (Manual)",
+  "where": "cloudBackupModal",
+  "screens": [
+   "modal:cloudBackupModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "💾 Export Backup File (.zenbackup)",
+  "where": "cloudBackupModal",
+  "screens": [
+   "modal:cloudBackupModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🔄 Restore Progress on New Phone:",
+  "where": "cloudBackupModal",
+  "screens": [
+   "modal:cloudBackupModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Restore Code ✓",
+  "where": "cloudBackupModal",
+  "screens": [
+   "modal:cloudBackupModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "📂 Load File",
+  "where": "cloudBackupModal",
+  "screens": [
+   "modal:cloudBackupModal"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Paste your backup code here...",
+  "where": "inpRestorePayload",
+  "screens": [
+   "modal:cloudBackupModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Daily activity goals",
+  "where": "goalsModalHeading",
+  "screens": [
+   "modal:dailyGoalsModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Set 0 to disable a goal. Saved focus sessions count toward each goal.",
+  "where": "goalsModalHint",
+  "screens": [
+   "modal:dailyGoalsModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Cancel",
+  "where": "dailyGoalsModal",
+  "screens": [
+   "modal:dailyGoalsModal",
+   "modal:customTimerModal",
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Save & Apply",
+  "where": "dailyGoalsModal",
+  "screens": [
+   "modal:dailyGoalsModal",
+   "modal:timerSettingsModal",
+   "modal:customTimerModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Focus and break settings",
+  "where": "tsetHeading",
+  "screens": [
+   "modal:timerSettingsModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Your current session is preserved; changes apply to new sessions.",
+  "where": "tsetHint",
+  "screens": [
+   "modal:timerSettingsModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Focus · min",
+  "where": "tsetFocusLabel",
+  "screens": [
+   "modal:timerSettingsModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Short rest · min",
+  "where": "tsetShortLabel",
+  "screens": [
+   "modal:timerSettingsModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Long rest · min",
+  "where": "tsetLongLabel",
+  "screens": [
+   "modal:timerSettingsModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Sessions per cycle",
+  "where": "tsetRoundsLabel",
+  "screens": [
+   "modal:timerSettingsModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Defaults",
+  "where": "tsetReset",
+  "screens": [
+   "modal:timerSettingsModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "20m",
+  "where": "customTimerModal",
+  "screens": [
+   "modal:customTimerModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "35m",
+  "where": "customTimerModal",
+  "screens": [
+   "modal:customTimerModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "45m",
+  "where": "customTimerModal",
+  "screens": [
+   "modal:customTimerModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "60m",
+  "where": "customTimerModal",
+  "screens": [
+   "modal:customTimerModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "90m",
+  "where": "customTimerModal",
+  "screens": [
+   "modal:customTimerModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "120m",
+  "where": "customTimerModal",
+  "screens": [
+   "modal:customTimerModal"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Minutes (1-240)",
+  "where": "inpCustomMins",
+  "screens": [
+   "modal:customTimerModal"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Session Name (Study, Gym, Reading, Work)...",
+  "where": "inpCustomTitle",
+  "screens": [
+   "modal:customTimerModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "New note",
+  "where": "nsEditorHeading",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Title",
+  "where": "nsTitleLabel",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Type",
+  "where": "nsTypeLabel",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Date",
+  "where": "nsDateLabel",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Content",
+  "where": "nsBodyLabel",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "H1",
+  "where": "nsux-tools",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "• List",
+  "where": "nsux-tools",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Mark complete",
+  "where": "nsux-tools",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Focus writing",
+  "where": "nsux-focus-toggle",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "0 words",
+  "where": "nsCounter",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Find in note",
+  "where": "nsux-fields",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Next",
+  "where": "nsux-fields",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Questions / cues",
+  "where": "nsux-cornell",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Main notes",
+  "where": "nsux-cornell",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Summary",
+  "where": "nsux-cornell",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Notebook",
+  "where": "nsux-fields",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Tags (comma-separated)",
+  "where": "nsux-fields",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Add Q&A",
+  "where": "nsux-recall",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Restore draft",
+  "where": "nsDraftRestore",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Discard",
+  "where": "nsDraftDiscard",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Pin",
+  "where": "nsPinCheckLabel",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Favorite",
+  "where": "nsFavCheckLabel",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Blur text for active recall (Tap to reveal)",
+  "where": "noteModal",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Save note",
+  "where": "nsSaveButton",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Title or question",
+  "where": "inpNoteTitle",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Heading",
+  "where": "nsux-tools",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Bulleted list",
+  "where": "nsux-tools",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Checklist",
+  "where": "nsux-tools",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Numbered list",
+  "where": "nsux-tools",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "aria-label",
+  "text": "Quote",
+  "where": "nsux-tools",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "placeholder",
+  "text": "Write here...",
+  "where": "inpNoteBody",
+  "screens": [
+   "modal:noteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Zen Study Suite",
+  "where": "zenSuiteTitle",
+  "screens": [
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Contextual Advanced Learning Studios",
+  "where": "dfZenStudySuiteModal",
+  "screens": [
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "STEM & Exam Studio",
+  "where": "btnLaunchStemStudio",
+  "screens": [
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Pure SVG formulas & strict exam simulator",
+  "where": "btnLaunchStemStudio",
+  "screens": [
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Whiteboard & Occlusion",
+  "where": "btnLaunchWhiteboardStudio",
+  "screens": [
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Infinite canvas & image occlusion cards",
+  "where": "btnLaunchWhiteboardStudio",
+  "screens": [
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🎧 3D Spatial & 40Hz ↗",
+  "where": "btnLaunchSpatialAudioStudio",
+  "screens": [
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Binaural acoustics & gamma brainwaves",
+  "where": "btnLaunchSpatialAudioStudio",
+  "screens": [
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Floating Scratchpad",
+  "where": "btnToggleScratchpadOverlay",
+  "screens": [
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Instant gesture notes & calculations",
+  "where": "btnToggleScratchpadOverlay",
+  "screens": [
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Feynman Recall Lab",
+  "where": "btnLaunchFeynmanStudio",
+  "screens": [
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Blank-sheet active recall & simplification",
+  "where": "btnLaunchFeynmanStudio",
+  "screens": [
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "🌿 Zen Sanctuary & 365 Heatmap ↗",
+  "where": "btnLaunchBotanicalGardenTimer",
+  "screens": [
+   "modal:dfZenStudySuiteModal"
+  ]
+ },
+ {
+  "kind": "text",
+  "text": "Procedural L-system grove & habit heatmap",
+  "where": "btnLaunchBotanicalGardenTimer",
+  "screens": [
+   "modal:dfZenStudySuiteModal"
+  ]
+ }
+]
