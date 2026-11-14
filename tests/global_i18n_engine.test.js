@@ -7,7 +7,10 @@ const i18n = new GlobalI18nEngine();
 
 // Test 1: Registry Initialization
 const reg = i18n.dfInitGlobalDictionaryRegistry();
-assert.strictEqual(reg.supportedLanguagesCount, 10);
+assert.strictEqual(reg.supportedLanguagesCount, 16);
+assert.strictEqual(reg.maxSupportedLanguages, 16);
+for (const code of ['it', 'ru', 'pt', 'nl', 'pl', 'sv']) assert.ok(reg.supportedCodes.includes(code));
+assert.strictEqual(reg.supportedCodes.length <= 16, true);
 assert.ok(reg.supportedCodes.includes('ar'));
 assert.ok(reg.supportedCodes.includes('zh'));
 console.log('  ✓ dfInitGlobalDictionaryRegistry verified.');
@@ -50,8 +53,10 @@ console.log('  ✓ dfSupportBilingualFlashcardDecks verified.');
 // Test 7: Translation Completeness 100%
 const audit = i18n.dfAuditTranslationCompleteness100();
 assert.strictEqual(audit.is100PercentComplete, true);
-assert.strictEqual(audit.auditedLanguagesCount, 10);
-console.log('  ✓ dfAuditTranslationCompleteness100 verified.');
+assert.strictEqual(audit.auditedLanguagesCount, 16);
+assert.strictEqual(audit.is100PercentComplete, false);
+assert.ok(audit.missingKeysPerLanguage.it.length > 0);
+console.log('  ✓ dfAuditTranslationCompleteness100 reports untranslated additions honestly.');
 
 // Test 8: Milestone Seal M8567
 const seal = i18n.dfGetMilestoneM8567GlobalI18nSeal();
