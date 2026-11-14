@@ -46,7 +46,7 @@ jobs:
           NODE
       - name: Preserve all uncovered keys, not just success lines
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: df03-100-language-source-gap-report
           path: artifacts/df03-source/

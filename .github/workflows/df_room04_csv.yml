@@ -136,7 +136,7 @@ jobs:
           emulator-options: -no-window -no-snapshot -no-audio -no-boot-anim -gpu swiftshader_indirect -feature -Vulkan -skin 720x1280 -dpi-device 240
           script: bash "$RUNNER_TEMP/df-room04-disposable.sh"
       - name: Preserve evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         if: always()
         with:
           name: DF-ROOM04-CSV-API${{ matrix.api }}-${{ github.event.pull_request.head.sha || github.sha }}

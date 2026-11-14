@@ -53,7 +53,7 @@ jobs:
           mkdir -p "$RUNNER_TEMP/df07-live-buttons"
           git rev-parse HEAD > "$RUNNER_TEMP/df07-live-buttons/QA_SHA.txt"
           printf 'Actual desktop Chromium button clicks; Android native dialog and SAF NOT_TESTED.\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df07-live-buttons/LIMITS.txt"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: DF07-real-timer-buttons-${{ github.sha }}

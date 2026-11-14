@@ -124,7 +124,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
       - name: Upload QA packages and provenance
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: df06-qa-packages-${{ github.event.pull_request.head.sha || github.sha }}
           path: ${{ runner.temp }}/df06-packages/

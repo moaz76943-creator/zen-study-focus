@@ -130,7 +130,7 @@ jobs:
           } >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload APK with source, audio inventory, signing and SHA256 evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: DeepFocus-Studio-Audio-v3.0.5-Debug-APK
           if-no-files-found: error

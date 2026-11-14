@@ -52,7 +52,7 @@ jobs:
         run: |
           mkdir -p "$RUNNER_TEMP/df-final03"
           printf 'CHROMIUM_SOURCE=REAL\nANDROID_EMULATOR=NOT_TESTED_IN_THIS_JOB\nPHYSICAL_ANDROID=NOT_TESTED\nRELEASE_APPROVED=NO\n' > "$RUNNER_TEMP/df-final03/LIMITS.txt"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: DF-FINAL03-Tasks-Chromium-${{ github.sha }}

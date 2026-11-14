@@ -33,7 +33,7 @@ jobs:
           b="$(git rev-parse refs/remotes/origin/df-device-integration)"
           node tools/recovery_branch_guard/merge_probe.cjs "$a" "$b" artifacts/merge-report
           cat artifacts/merge-report/report.md
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: DeepFocus-Original-vs-Android-Integration-ReadOnly
