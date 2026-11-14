@@ -4,10 +4,17 @@
 // Merges into i18n/packs/<code>.json (existing entries are replaced only for the indices given).
 const fs = require('fs'), path = require('path');
 const repo = path.resolve(__dirname, '../..');
-const [code, file, status] = process.argv.slice(2);
+const [code, file, status] = process.argv.slice(2);\nif (!/^[A-Za-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/.test(code || '')) throw new Error('invalid language code');
 const keys = Object.keys(JSON.parse(fs.readFileSync(path.join(repo, 'i18n/source_en.json'), 'utf8')));
 const pf = path.join(repo, 'i18n/packs', code + '.json');
-const pack = fs.existsSync(pf) ? JSON.parse(fs.readFileSync(pf, 'utf8')) : { status: status || 'ai-pending-review', translator: 'Claude (AI), not reviewed by a person', t: {} };
+function readRegularFileNoFollow(filePath) {
+  const fd = fs.openSync(filePath, fs.constants.O_RDONLY | (fs.constants.O_NOFOLLOW || 0));
+  try {
+    if (!fs.fstatSync(fd).isFile()) throw new Error('Expected regular pack file');
+    return fs.readFileSync(fd, 'utf8');
+  } finally { fs.closeSync(fd); }
+}
+const pack = fs.existsSync(pf) ? JSON.parse(readRegularFileNoFollow(pf)) : { status: status || 'ai-pending-review', translator: 'Claude (AI), not reviewed by a person', t: {} };
 if (status) pack.status = status;
 let n = 0;
 for (const line of fs.readFileSync(file, 'utf8').split('\n')) {
