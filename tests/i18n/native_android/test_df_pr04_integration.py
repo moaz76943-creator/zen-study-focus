@@ -6,8 +6,10 @@ J=R/'android/app/src/main/java/com/zenstudy/focus'
 class PR04NativeSafety(unittest.TestCase):
  def test_package_id_and_saf(self):
   src=(J/'MainActivity.java').read_text()
+  # The shipped applicationId is com.deepfocus.study; the legacy namespace id stays accepted.
+  self.assertIn('"com.deepfocus.study".equals(getPackageName())',src)
   self.assertIn('"com.zenstudy.focus".equals(getPackageName())',src)
-  self.assertNotIn('com.deepfocus.study',src)
+  self.assertIn('applicationId "com.deepfocus.study"',(R/'android/app/build.gradle').read_text())
   for s in ('REQUEST_BACKUP_IMPORT','ACTION_OPEN_DOCUMENT','MAX_BACKUP_IMPORT_BYTES','backupImportPickerOpen','verifyAndRestoreBackupCode','JSONObject.quote(backupCode)'): self.assertIn(s,src)
  def test_consent_on_user_timer_start_only(self):
   src=(J/'MainActivity.java').read_text()
@@ -18,7 +20,7 @@ class PR04NativeSafety(unittest.TestCase):
   src=(R/'android/app/src/main/assets/web/app.js').read_text()
   body=src.split('function applyLanguage(code)',1)[1].split('function generateEncryptedBackupCode()',1)[0]
   self.assertLess(body.index("saveFortressData('zen_fortress_cfg_v21', cfg)"),body.index('window.ZenNative.setNativeLocale(meta.code)'))
-  self.assertIn('cfg.lang=previousLang',body)
+  self.assertRegex(body,r'cfg\.lang\s*=\s*previousLang')
   self.assertIn('if (el.isContentEditable',body)
  def test_restore_rearm_never_reprompts_native_permission(self):
   src=(J/'MainActivity.java').read_text()
