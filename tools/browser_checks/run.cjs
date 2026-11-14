@@ -197,6 +197,22 @@ async function flashcards(b, base) {
     if (persisted.total !== 1 || persisted.reps !== 1 || !persisted.front.startsWith('<img')) fail(`flashcards ${lang}: not persisted ${JSON.stringify(persisted)}`);
     const rt = await p.evaluate(() => { const snap = JSON.parse(JSON.stringify(DFFlashcardsApp.exportSnapshot())); const env = buildSovereignBackupEnvelopeObject(); const inBundle = JSON.parse(env.bundle).flashcardsV2; DFFlashcardsApp.deleteCard(snap.cards[0].id); const r = DFFlashcardsApp.importSnapshot(inBundle, { mode: 'replace' }); return { inBundle: !!inBundle && inBundle.cards.length === 1, restored: r.ok, total: DFFlashcardsApp.stats().total }; });
     if (!rt.inBundle || !rt.restored || rt.total !== 1) fail(`flashcards ${lang}: ZEN21 backup does not carry flashcards ${JSON.stringify(rt)}`);
+    // balanced directive: multiple choice, mistakes repeat, timer not duplicated
+    await p.evaluate(() => { for (const [f, b] of [['one', 'uno'], ['two', 'dos'], ['three', 'tres'], ['four', 'cuatro']]) DFFlashcardsApp.addCard({ deckId: DFFlashcardsApp.listDecks()[0].id, frontText: f, backText: b }); DFFlashcardsApp.setPrefs({ defaultMode: 'choice', textSize: 'large' }); });
+    await p.reload(); await p.waitForTimeout(1500);
+    await p.evaluate(() => { const t = document.getElementById('sec-flashcards'); if (!t.classList.contains('active')) { switchTab('sec-notes', document.getElementById('navNotes')); document.getElementById('flashcardsEntry').click(); } });
+    await p.waitForTimeout(400);
+    const t0 = await p.evaluate(() => ({ studied: typeof timerActiveMs === 'number' ? timerActiveMs : 0 }));
+    await p.click('#sec-flashcards .fc-quick .fc-btn.primary'); await p.waitForTimeout(100);
+    await p.click('#sec-flashcards .fc-modes .fc-btn.primary'); await p.waitForTimeout(250);
+    const mc = await p.evaluate(() => ({ n: document.querySelectorAll('#sec-flashcards .fc-choices button').length, scale: getComputedStyle(document.getElementById('sec-flashcards')).getPropertyValue('--fc-scale') }));
+    if (mc.n < 2 || mc.n > 4) fail(`flashcards ${lang}: multiple choice not rendered ${JSON.stringify(mc)}`);
+    await p.click('#sec-flashcards .fc-choices button'); await p.waitForTimeout(150);
+    if (!(await p.$('#sec-flashcards .fc-btn.rate.r1'))) fail(`flashcards ${lang}: no rating after choice`);
+    await p.click('#sec-flashcards .fc-btn.rate.r1'); await p.waitForTimeout(200);
+    const t1 = await p.evaluate(() => ({ studied: typeof timerActiveMs === 'number' ? timerActiveMs : 0 }));
+    if (t1.studied - t0.studied > 5000) fail(`flashcards ${lang}: flashcards touched the timer accounting ${JSON.stringify([t0, t1])}`);
+    await p.evaluate(() => DFFlashcardsUI.leave());
     // leaving the section stops speech
     const stopCalled = await p.evaluate(() => { let n = 0; window.ZenNative = Object.assign(window.ZenNative || {}, { ttsInit: () => '{"ok":true,"status":"ready"}', ttsStop: () => { n++; return '{"ok":true}'; }, ttsSpeak: () => '{"ok":true}' }); DFFlashcardsUI.show(); switchTab('sec-timer', document.getElementById('navTimer')); return n; });
     if (stopCalled < 1) fail(`flashcards ${lang}: speech not stopped when leaving the section`);

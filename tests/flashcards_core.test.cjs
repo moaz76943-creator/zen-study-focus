@@ -350,3 +350,48 @@ test('performance smoke: 10k cards search / queue / stats stay fast (in-memory s
   console.log(`# perf(10k, node, in-memory): import ${t1 - t0} ms, search ${tSearch} ms, queue+stats ${tQ} ms`);
   assert.ok(tSearch < 1500 && tQ < 1500);
 });
+
+test('typed answers: exact / close spelling slip / wrong; several meanings; no meaningful characters dropped', () => {
+  const { api } = mk();
+  assert.equal(api.checkAnswer('house', 'House').result, 'exact');
+  assert.equal(api.checkAnswer('house', 'hause').result, 'close');
+  assert.equal(api.checkAnswer('house', 'tree').result, 'wrong');
+  assert.equal(api.checkAnswer('house; home\nbuilding', 'home').result, 'exact');
+  assert.equal(api.checkAnswer('كِتاب', 'كتاب').result, 'exact');
+  assert.equal(api.checkAnswer('über', 'uber').result, 'exact'); // diacritic tolerance is for comparison only
+  assert.equal(api.checkAnswer('x', '').result, 'wrong');
+});
+test('multiple choice distractors come from the same deck, are unique, never the answer', () => {
+  const { api } = mk({ random: () => 0.1 });
+  const d = addDeck(api), e = addDeck(api, 'other');
+  const ids = ['a', 'b', 'c', 'd', 'e'].map((x) => card(api, d.id, x, 'm' + x).card.id);
+  card(api, e.id, 'z', 'mz'); card(api, d.id, 'dupe', 'MA');
+  const ds = api.distractors(ids[0], 3);
+  assert.equal(ds.length, 3); assert.ok(!ds.includes('ma') && !ds.includes('mz') && !ds.map((x) => x.toLowerCase()).includes('ma'));
+  assert.equal(new Set(ds).size, 3);
+  assert.deepEqual(api.distractors(card(api, addDeck(api, 'solo').id, 's', 't').card.id, 3), []);
+});
+test('cloze: blank from the example only when it contains the answer', () => {
+  const { api } = mk();
+  const d = addDeck(api);
+  const a = card(api, d.id, 'Haus', 'house', { exampleText: 'Das Haus ist groß.' }).card;
+  assert.deepEqual(api.makeCloze(a.id), { text: 'Das _____ ist groß.', answer: 'Haus' });
+  assert.equal(api.makeCloze(card(api, d.id, 'Baum', 'tree', { exampleText: 'Nothing here' }).card.id), null);
+  assert.equal(api.makeCloze(card(api, d.id, 'Hund', 'dog').card.id), null);
+});
+test('mistake review queue and language filter', () => {
+  const { api, clock } = mk();
+  const d = addDeck(api);
+  const a = card(api, d.id, 'a', 'a', { sourceLanguage: 'de-DE' }).card, b = card(api, d.id, 'b', 'b', { sourceLanguage: 'en-US' }).card;
+  api.reviewCard(a.id, 1); api.reviewCard(b.id, 3);
+  assert.deepEqual(api.buildQueue({ mode: 'mistakes' }), [a.id]);
+  clock.t += 60000; api.reviewCard(a.id, 3);
+  assert.deepEqual(api.buildQueue({ mode: 'mistakes' }), [], 'a corrected card leaves mistake review');
+  assert.equal(api.search('', { language: 'de' }).total, 1); assert.equal(api.search('', { language: 'en-US' }).total, 1); assert.equal(api.search('', { language: 'fr' }).total, 0);
+});
+test('new display/study prefs validate', () => {
+  const { api } = mk();
+  api.setPrefs({ textSize: 'huge', showExamples: false, defaultMode: 'nope' });
+  const p = api.getPrefs(); assert.equal(p.textSize, 'medium'); assert.equal(p.showExamples, false); assert.equal(p.defaultMode, 'classic');
+  api.setPrefs({ textSize: 'large', defaultMode: 'choice' }); assert.equal(api.getPrefs().textSize, 'large'); assert.equal(api.getPrefs().defaultMode, 'choice');
+});

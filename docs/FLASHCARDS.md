@@ -35,7 +35,15 @@ Repetitions 1–9: JS starts the next utterance only after the native `done` eve
 | Search incl. Arabic diacritics | IMPLEMENTED AND VERIFIED |
 | CSV/TSV/JSON import (preview, transactional), CSV export | IMPLEMENTED AND VERIFIED (Anki packages NOT supported) |
 | ZEN21 backup/restore of flashcards | IMPLEMENTED AND VERIFIED (round trip in browser) |
-| Study modes classic/reverse/both/listening/pronunciation/writing/quick/random/custom | IMPLEMENTED BUT NOT FULLY VERIFIED (only classic exercised end to end in browser) |
+| Study modes classic/reverse/both/listening/pronunciation/writing/quick/random/custom | IMPLEMENTED BUT NOT FULLY VERIFIED (classic and multiple choice exercised end to end in browser; others only by unit tests of their helpers) |
+| Multiple choice, fill in the blank, mixed practice, typed answers (exact / close spelling / different) | IMPLEMENTED (helpers unit-tested; multiple choice driven in a real browser; cloze and typed UI not browser-driven) |
+| Mistake review and "Repeat mistakes" at session end | IMPLEMENTED BUT NOT FULLY VERIFIED (missed list built from Again ratings; not browser-driven) |
+| Multiple meanings | IMPLEMENTED — separate lines or `;` in the back text are accepted as alternative answers |
+| Deep Focus timer integration | IMPLEMENTED BUT NOT FULLY VERIFIED — uses the existing timer functions only; browser test confirms flashcards do not change timer accounting; live countdown display not browser-verified |
+| Settings: text size, examples, default mode/deck, daily target | IMPLEMENTED (text size applied in browser test; others not individually driven) |
+| Search language filter, import column mapping, cancel, importing state | IMPLEMENTED BUT NOT FULLY VERIFIED (import progress is a busy state, not a percentage) |
+| Play example audio | IMPLEMENTED BUT NOT VERIFIED (needs device TTS) |
+| Separate main-navigation button | NOT IMPLEMENTED — entry is under Notes to keep the bottom bar uncrowded |
 | Native TTS bridge (Java) | IMPLEMENTED BUT NOT VERIFIED — Java is compiled only by CI; never run on an emulator or device |
 | JS speech controller | IMPLEMENTED AND VERIFIED against a fake bridge (logic only) |
 | Male voice preference | PARTIALLY IMPLEMENTED — only voices the engine labels male can be preferred; many devices label none |
