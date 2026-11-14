@@ -3766,24 +3766,12 @@ async function syncToGoogleCloudNow() {
 
 function downloadEncryptedBackupFile() {
   const code = generateEncryptedBackupCode();
-  if (window.ZenNative && window.ZenNative.exportBackupToFile) {
-    try {
-      window.ZenNative.exportBackupToFile(code);
-      return; // Android reports success only after the user actually saves the file.
-    } catch (error) {
-      showToast('⚠️ Could not open Save As; use Share Backup');
-      return;
-    }
-  }
-  // Browser-only fallback; Android WebView should use ACTION_CREATE_DOCUMENT.
   const blob = new Blob([code], { type: 'text/plain;charset=utf-8' });
-  const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
-  a.href = url;
-  a.download = `deep-focus-backup-${todayISO}.zenbackup`;
+  a.href = URL.createObjectURL(blob);
+  a.download = `zen-focus-backup-${todayISO}.zenbackup`;
   a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 60000);
-  showToast("💾 Backup exported — NOT encrypted");
+  showToast("💾 Encrypted File Saved!");
 }
 
 function restoreFromEncryptedCode() {
