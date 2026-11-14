@@ -67,3 +67,13 @@ Which voices/engines exist, whether a language needs data download, offline beha
 - CSV: formula guard now covers leading whitespace/control characters and `= + - @`; plain numbers stay readable (core test).
 - Study modes: `tests/flashcards_modes.test.cjs` covers every mode's queue, session, resume, cancel, duplicate submissions, suspended/archived/empty cases. Only classic and multiple choice are driven through the real UI.
 - Not done in this round: Android WebView performance benchmarks, reviewed translations for 18 locales, a physical-device pass.
+
+## Measured capacity and performance (no device available)
+Reproduce: `NODE_PATH=$(npm root -g) node tools/perf/flashcards_perf.cjs` (also `.github/workflows/flashcards_perf.yml`, nightly). Real Chromium, real localStorage, 4x CPU throttle; this is NOT Android WebView and NOT a phone.
+- 1,000 cards (~1 MB stored): import ~73 ms, search ~17 ms, queue ~3 ms, review 20 cards ~109 ms.
+- 5,000 cards (~5 MB stored): import ~256 ms, search ~25 ms, queue ~3 ms, add one ~33 ms.
+- 10,000 cards of this size: refused cleanly with STORAGE_FULL, zero cards stored, existing data untouched.
+- Supported capacity with the current localStorage design: roughly 5,000 cards of ~1 KB each. Larger collections are refused, not corrupted. No second database was introduced.
+- Quota exhaustion: with storage full, a large import is refused (no partial import) and existing cards are kept.
+- Home screen renders ~58 DOM nodes regardless of collection size (lists are paged).
+- Not measured: Android WebView timings, scrolling frame rate, process memory on a phone, cold start on a device.
