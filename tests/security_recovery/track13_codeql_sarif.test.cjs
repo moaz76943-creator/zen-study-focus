@@ -18,6 +18,14 @@ const sarif = findings => ({version:'2.1.0',runs:[{tool:{driver:{name:'CodeQL'}}
 test('clean CodeQL SARIF yields exact SHA and PASS',()=>{
   const r=run(sarif([]));assert.equal(r.status,0);assert.deepEqual([r.out.status,r.out.findings,r.out.sha],['PASS',0,SHA]);assert.deepEqual(r.out.rule_counts,{});
 });
+test('review digest exposes only SHA-256 bindings for exact adjudication refresh',()=>{
+  const r=run(sarif([]));
+  assert.equal(r.status,0);
+  assert.deepEqual(Object.keys(r.out.review_digest).sort(),['executableSourceSha256','sourceSha256']);
+  assert.match(r.out.review_digest.sourceSha256,/^[a-f0-9]{64}$/);
+  assert.match(r.out.review_digest.executableSourceSha256,/^[a-f0-9]{64}$/);
+  assert.ok(!JSON.stringify(r.out.review_digest).includes('private_evidence'));
+});
 test('a CodeQL result makes security FAIL without printing snippet, path or message',()=>{
   const secret='ULTRA-SENSITIVE-SYNTHETIC-VALUE';
   const r=run(sarif([{ruleId:secret,message:{text:secret},locations:[{physicalLocation:{artifactLocation:{uri:secret}}}]}]));
