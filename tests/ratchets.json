@@ -7,6 +7,5 @@
   "evalOrNewFunction": 0,
   "consoleLog": 205,
   "appJsMaxBytes": 3800000,
-  "webAssetsMaxBytes": 16000000,
   "singleFileMaxBytes": 3800000
 }
