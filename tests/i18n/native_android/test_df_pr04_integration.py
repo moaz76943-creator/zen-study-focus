@@ -66,7 +66,7 @@ class PR04NativeSafety(unittest.TestCase):
   self.assertIn('timeout 40 adb wait-for-device',source)
   self.assertIn('test "$installed" -eq 1',source)
   self.assertIn('adb shell pm list packages',source)
-  self.assertIn('adb shell pidof com.zenstudy.focus',source)
+  self.assertIn('adb shell pidof com.deepfocus.study',source)
 
  def test_package_service_is_ready_before_attempting_to_install(self):
   # API30 run 40297710521 had sys.boot_completed=1 but no 'package'
