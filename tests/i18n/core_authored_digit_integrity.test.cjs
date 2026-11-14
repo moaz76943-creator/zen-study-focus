@@ -34,7 +34,28 @@ test('quick-added task preserves the exact user-authored numerals in persisted t
  assert.equal(f.tasks[0].title,'خطة ۲۰۲۶');
 });
 test('new note preserves exactly entered title and body numerals in v21 record',()=>{
- const f=fixture();run('saveNewNote',f.ctx,'pinNoteToTodayCalendar');
+ // saveNewNote() now lives in notes_studio.js and hands off to the v21 Notes UX controller.
+ // Check both paths: the real controller + real Notes Core, and the legacy fallback.
+ const web=path.resolve(__dirname,'../../android/app/src/main/assets/web');
+ const core=require(path.join(web,'notes_core_v21.js'));
+ const ui=require(path.join(web,'notes_editor_ui.js'));
+ let state={notesList:[],tasksList:[]};
+ const ctl=ui.createController({core,readState:()=>JSON.parse(JSON.stringify(state)),
+  nextNumericId:()=>72,now:()=>1000,
+  commitNotes(before,after){state={...state,notesList:after.notesList};return true;}});
+ ctl.save({id:null,title:'ملاحظة ۱۲۳',body:'النص ١٢٣',catKey:'cornell',calDate:'2026-10-26'});
+ assert.equal(state.notesList[0].id,72);
+ assert.equal(state.notesList[0].title,'ملاحظة ۱۲۳');
+ assert.equal(state.notesList[0].body,'النص ١٢٣');
+
+ const studio=fs.readFileSync(path.join(web,'notes_studio.js'),'utf8');
+ const start=studio.indexOf('function saveNewNote(');
+ const end=studio.indexOf('\nfunction nsToggleFlag(',start);
+ assert.ok(start>=0&&end>start,'missing isolated saveNewNote function');
+ const f=fixture();
+ f.fields.nsPinCheck={checked:false};f.fields.nsFavCheck={checked:false};
+ Object.assign(f.ctx,{window:{},nsEditId:null,nsSave(){},nsLabel:()=>'',Date});
+ vm.runInNewContext(studio.slice(start,end)+'\nsaveNewNote();',f.ctx);
  assert.equal(f.notes[0].title,'ملاحظة ۱۲۳');
  assert.equal(f.notes[0].body,'النص ١٢٣');
 });
