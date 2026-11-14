@@ -9,6 +9,10 @@ const ROOT=path.resolve(__dirname,'../../..');
 const WEB=path.join(ROOT,'android/app/src/main/assets/web');
 const read=name=>fs.readFileSync(path.join(WEB,name),'utf8');
 const SECTIONS=['sec-timer','sec-tasks','sec-calendar','sec-notes','sec-sounds','sec-analytics'];
+// Authoritative language set = i18n/languages.json (100). The legacy app catalog still uses 'jw' for Javanese
+// and ships a 'prs' (Dari) variant that is not a registry language; both are handled explicitly below.
+const REGISTRY=(()=>{const r=JSON.parse(fs.readFileSync(path.join(ROOT,'i18n/languages.json'),'utf8'));return (r.languages||r).map(x=>x.code);})();
+const LEGACY_CODE=code=>code==='jv'?'jw':code;
 const REQUIRED_AREAS=Object.freeze(['timer','goals','tasks','notes','analytics','analyticsDomain']);
 function fraction(value) {
   const m=/^(\d+)\/(\d+)$/.exec(value||'');
@@ -18,8 +22,9 @@ function fraction(value) {
   return {translated,total,missing:total-translated};
 }
 function summarize(raw,source,sha) {
-  if(!raw || raw.target!==99 || !Array.isArray(raw.summary))throw Error('Not a 99-locale inventory');
-  if(raw.summary.length!==99 || new Set(raw.summary.map(x=>x.code)).size!==99)throw Error('Duplicate/missing locale');
+  const N=REGISTRY.length;
+  if(!raw || raw.target!==N || !Array.isArray(raw.summary))throw Error('Not a '+N+'-locale inventory');
+  if(raw.summary.length!==N || new Set(raw.summary.map(x=>x.code)).size!==N)throw Error('Duplicate/missing locale');
   if(raw.summary.some(x=>x.code==='he'||x.code==='iw'))throw Error('Excluded language detected');
   const langs=raw.summary.map(entry=>{
     const sections=Object.fromEntries(Object.entries(entry.areas||{}).map(([name,value])=>[name,fraction(value)]));
@@ -42,7 +47,7 @@ function summarize(raw,source,sha) {
     };
   });
   return {task_id:'DF-LANE-13-REAL-END-TO-END-QA',kind:'SOURCE_DICTIONARY_AUDIT_NOT_ANDROID',
-    SOURCE_SHA:sha,catalog_count:99,summary:{PASS:langs.filter(x=>x.status==='PASS').length,FAIL:langs.filter(x=>x.status==='FAIL').length,NOT_TESTED:langs.filter(x=>x.status==='NOT_TESTED').length},
+    SOURCE_SHA:sha,catalog_count:REGISTRY.length,summary:{PASS:langs.filter(x=>x.status==='PASS').length,FAIL:langs.filter(x=>x.status==='FAIL').length,NOT_TESTED:langs.filter(x=>x.status==='NOT_TESTED').length},
     per_language_coverage:langs,device_matrix_status:'NOT_TESTED',
     measurement_note:'Translation strings are measured from registered dictionaries. Fallback/missing is NOT translated; Android E2E is independent.'};
 }
@@ -56,7 +61,7 @@ function sourceEmptyCounts() {
   const app=read('app.js'),quick=read('quick_training.js');
   const a=app.indexOf('let todayISO ='),b=quick.indexOf('let quickTraining = null;');
   if(a<0||b<0)throw Error('Dictionary initialization boundary changed');
-  const ctx={window:{},document:{addEventListener(){}},console};
+  const ctx={window:{addEventListener(){},removeEventListener(){},dispatchEvent(){}},document:{addEventListener(){}},console};
   vm.createContext(ctx);
   for(const f of ['locale_rows.js','locale_extras.js'])vm.runInContext(read(f),ctx,{filename:f,timeout:2500});
   vm.runInContext(app.slice(0,a)+'\nthis.__core=DICT;this.__catalog=LANG_CATALOG;',ctx,{filename:'app:catalog',timeout:5000});
@@ -70,7 +75,7 @@ function sourceEmptyCounts() {
 }
 // Independently enumerate absent section keys for translation lane handoff.
 function missingKeysByLanguage(raw) {
-  const ctx={window:{},document:{addEventListener(){}},console};
+  const ctx={window:{addEventListener(){},removeEventListener(){},dispatchEvent(){}},document:{addEventListener(){}},console};
   vm.createContext(ctx);
   for(const file of ['locale_rows.js','locale_extras.js'])vm.runInContext(read(file),ctx,{filename:file,timeout:2500});
   const app=read('app.js'),quick=read('quick_training.js');
@@ -86,7 +91,7 @@ function missingKeysByLanguage(raw) {
     if(!Array.isArray(keys?.[area])||keys[area].length===0)throw Error('Missing source key inventory: '+area);
   return Object.fromEntries(raw.summary.map(lang=>[lang.code,Object.fromEntries(
     REQUIRED_AREAS.map(area=>[area,keys[area].filter(key=>
-      ctx.window.DF99Locale.coverage([lang.code],area,[key])[0].translated===0)])
+      ctx.window.DF99Locale.coverage([LEGACY_CODE(lang.code)],area,[key])[0].translated===0)])
   )]));
 }
 
@@ -189,7 +194,7 @@ function flattenSourceLeaves(input,prefix='',out={}) {
 }
 
 function detailedSourceAudit(raw) {
- const ctx={window:{},document:{addEventListener(){}},console};
+ const ctx={window:{addEventListener(){},removeEventListener(){},dispatchEvent(){}},document:{addEventListener(){}},console};
  vm.createContext(ctx);
  for(const file of ['locale_rows.js','locale_extras.js'])
    vm.runInContext(read(file),ctx,{filename:file,timeout:2500});
@@ -203,8 +208,10 @@ function detailedSourceAudit(raw) {
  for(const file of ['locale_premium_v22.js','js/df99_multiscreen_i18n.js','js/df99_reviewed_packs.js'])
    vm.runInContext(read(file),ctx,{filename:file,timeout:5000});
  const codes=ctx.__catalog.map(x=>x.code);
- if(codes.length!==99||new Set(codes).size!==99||codes.some(x=>x==='he'||x==='iw')||
-   codes.some(x=>!raw.summary.some(y=>y.code===x)))throw Error('Coverage source catalog mismatch');
+ const aliasOnly=codes.filter(x=>!REGISTRY.includes(x)&&x!=='jw');
+ if(new Set(codes).size!==codes.length||codes.some(x=>x==='he'||x==='iw')||aliasOnly.some(x=>x!=='prs')||
+   REGISTRY.some(x=>!codes.includes(LEGACY_CODE(x)))||raw.summary.some(y=>!REGISTRY.includes(y.code)))
+   throw Error('Coverage source catalog mismatch (registry vs app catalog)');
  const englishCore=flattenSourceLeaves(ctx.__core.en||{});
  const coreKeys=Object.keys(englishCore).sort(),quickKeys=Array.from(ctx.__quickKeys||[]);
  if(!coreKeys.length||!quickKeys.length||new Set(quickKeys).size!==quickKeys.length)
@@ -219,17 +226,17 @@ function detailedSourceAudit(raw) {
      }
      result.push(auditSection({code,section:label,keys,owner,source_file:REVIEWED_FILE,
        read:key=>{
-         const measured=ctx.window.DF99Locale.coverage([code],family,[key])[0].translated===1;
-         const value=ctx.window.DF99Locale.t(code,family,key,'__DF13_UNTRANSLATED__');
+         const measured=ctx.window.DF99Locale.coverage([LEGACY_CODE(code)],family,[key])[0].translated===1;
+         const value=ctx.window.DF99Locale.t(LEGACY_CODE(code),family,key,'__DF13_UNTRANSLATED__');
          return {proven:measured&&value!=='__DF13_UNTRANSLATED__',value};
        }}));
    }
-   const eligible=eligibleCoreDictionary(code,ctx.__core);
+   const eligible=eligibleCoreDictionary(LEGACY_CODE(code),ctx.__core);
    const core=eligible?flattenSourceLeaves(eligible):null;
    result.push(auditSection({code,section:'Core',keys:coreKeys,owner:'F',
      source_file:'android/app/src/main/assets/web/app.js',english:englishCore,
      read:key=>({proven:!!core&&Object.prototype.hasOwnProperty.call(core,key),value:core?.[key]})}));
-   const q=eligibleCoreDictionary(code,ctx.__quick);
+   const q=eligibleCoreDictionary(LEGACY_CODE(code),ctx.__quick);
    result.push(auditSection({code,section:'Quick Training',keys:quickKeys,owner:'F',
      source_file:'android/app/src/main/assets/web/quick_training.js',english:englishQuick,
      read:key=>{const i=quickKeys.indexOf(key);
@@ -313,7 +320,7 @@ function run(outDir,strict) {
   const file=path.join(outDir,'PER_LANGUAGE_COVERAGE.json');
   fs.writeFileSync(file,JSON.stringify(result,null,2)+'\n');
   const head=['# DF-LANE-13 Source-only Coverage','','SOURCE_SHA: '+result.SOURCE_SHA,
-    'Catalog: 99; PASS: '+result.summary.PASS+'; FAIL: '+result.summary.FAIL,
+    'Catalog: '+REGISTRY.length+'; PASS: '+result.summary.PASS+'; FAIL: '+result.summary.FAIL,
     'This is NOT Android verification. Missing or fallback strings are failures.','',
     '| Language | Coverage | Missing / fallback | Empty core / quick | Status |',
     '|---|---:|---:|---:|---|'];
