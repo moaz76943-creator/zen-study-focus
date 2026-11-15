@@ -29,6 +29,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 public class MainActivity extends AppCompatActivity {
@@ -73,13 +74,17 @@ public class MainActivity extends AppCompatActivity {
         }
 
         webView = new WebView(this);
+        // AMOLED black behind the inset padding strips so white status-bar icons stay visible.
+        webView.setBackgroundColor(0xFF000000);
         setContentView(webView);
         // targetSdk 35+ enforces edge-to-edge: keep web content clear of system bars,
         // display cutouts and the on-screen keyboard.
+        WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         ViewCompat.setOnApplyWindowInsetsListener(webView, (v, windowInsets) -> {
             Insets bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()
                     | WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.ime());
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            v.setClipToPadding(true);
             return WindowInsetsCompat.CONSUMED;
         });
 

@@ -367,6 +367,7 @@
     .sbg-ocean { background-image: linear-gradient(180deg, rgba(3, 105, 161, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/ocean.jpg'); background-color: #0284c7; }
     .sbg-rain { background-image: linear-gradient(180deg, rgba(51, 65, 85, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/rain.jpg'); background-color: #475569; }
     .sbg-fire { background-image: linear-gradient(180deg, rgba(180, 83, 9, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/fire.svg'); background-color: #d97706; }
+    .sbg-drip { background-image: linear-gradient(180deg, rgba(8, 145, 178, 0.3) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/stream.jpg'); background-color: #0891b2; }
     .sbg-forest { background-image: linear-gradient(180deg, rgba(5, 150, 105, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/forest.jpg'); background-color: #059669; }
     .sbg-stream { background-image: linear-gradient(180deg, rgba(2, 132, 199, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/stream.jpg'); background-color: #0369a1; }
     .sbg-leaves { background-image: linear-gradient(180deg, rgba(22, 101, 52, 0.25) 0%, rgba(15, 23, 42, 0.88) 100%), url('images/leaves.jpg'); background-color: #15803d; }
@@ -1528,6 +1529,22 @@ body {
     -webkit-overflow-scrolling: touch !important;
     margin: auto !important;
   }
+</style>
+<!-- DEEP FIX: Spatial Studio compact cap — nature sounds grid stays visible & reachable -->
+<style id="df-spatial-compact-sounds-fix">
+  #dfPillar5SpatialMount { scroll-margin-top: 20px; scroll-margin-bottom: 120px; touch-action: pan-y; }
+  #dfPillar5SpatialMount .df-white-premium {
+    max-height: min(46vh, 440px);
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+    padding: 12px !important;
+    margin: 10px 0 !important;
+  }
+  #dfPillar5SpatialMount :is(canvas) { max-width: 100%; height: auto; }
+  #soundsGridBox { touch-action: pan-y; }
 </style>
 <!-- TASK #818: Force High Contrast on Local Data Pill Across All Tabs -->
 <style id="task-818-contrast-fix">

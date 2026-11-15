@@ -48,25 +48,35 @@
             pill.className = "interactive-action";
             pill.setAttribute("aria-label", (document.documentElement.lang || "").toLowerCase().indexOf("ar") === 0 ? "فتح لوحة الاستوديوهات والأدوات" : "Open studios and tools panel");
             pill.style.position = "fixed";
-            // Sit above the bottom navigation bar instead of covering its centre tab.
-            pill.style.bottom = "calc(96px + env(safe-area-inset-bottom, 0px))";
-            pill.style.left = "50%";
-            pill.style.transform = "translateX(-50%)";
-            // left:50% shrinks the available width to half the viewport; large text then overflows the right edge.
-            pill.style.width = "max-content";
-            pill.style.maxWidth = "calc(100vw - 32px)";
-            pill.style.background = "rgba(18, 18, 18, 0.85)";
+            // Docked to the bottom-right corner above the bottom nav capsule: never covers the FAB (left) or the centred nav tabs.
+            pill.style.bottom = "calc(108px + env(safe-area-inset-bottom, 0px))";
+            pill.style.right = "12px";
+            pill.style.left = "auto";
+            pill.style.transform = "none";
+            // High contrast on AMOLED/dark content; WCAG-large text, 48px tap target.
+            pill.style.width = "auto";
+            pill.style.maxWidth = "min(320px, calc(100vw - 64px))";
+            pill.style.minHeight = "48px";
+            pill.style.background = "rgba(17, 24, 39, 0.97)";
             pill.style.backdropFilter = "blur(12px)";
-            pill.style.border = "1px solid rgba(255, 255, 255, 0.15)";
-            pill.style.borderRadius = "28px";
-            pill.style.padding = "10px 22px";
+            pill.style.border = "2px solid #22c55e";
+            pill.style.borderRadius = "999px";
+            pill.style.padding = "12px 16px";
             pill.style.color = "#ffffff";
             pill.style.fontSize = "0.92rem";
-            pill.style.fontWeight = "600";
+            pill.style.fontWeight = "800";
+            pill.style.letterSpacing = "0.3px";
+            pill.style.textShadow = "0 1px 2px rgba(0,0,0,0.8)";
             pill.style.cursor = "pointer";
-            pill.style.zIndex = "800";
+            pill.style.zIndex = "150";
             pill.style.display = "flex";
             pill.style.alignItems = "center";
+            pill.style.justifyContent = "center";
+            pill.style.overflow = "hidden";
+            pill.style.textOverflow = "ellipsis";
+            pill.style.whiteSpace = "nowrap";
+            pill.style.touchAction = "manipulation";
+            pill.style.webkitTapHighlightColor = "transparent";
             pill.style.gap = "8px";
             pill.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.6)";
 
