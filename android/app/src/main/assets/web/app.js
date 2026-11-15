@@ -1135,10 +1135,14 @@ function saveFortressData(key, obj) {
         if (previous === null) localStorage.removeItem(name);
         else localStorage.setItem(name, previous);
         if (localStorage.getItem(name) !== previous) rollbackErrors.push(name);
-      } catch (rollbackError) { rollbackErrors.push(name); }
+      } catch (rollbackError) { if (typeof window !== 'undefined' && window.__dfRecordError) window.__dfRecordError('saveFortressData_rollback', rollbackError); rollbackErrors.push(name); }
     }
-    if (rollbackErrors.length)
+    if (rollbackErrors.length) {
+      if (typeof window !== 'undefined' && window.__dfRecordError) window.__dfRecordError('saveFortressData_rollback_unverified', new Error(rollbackErrors.join(',')));
       throw new Error('STORAGE_WRITE_FAILED_ROLLBACK_UNVERIFIED:' + rollbackErrors.join(','));
+    }
+    if (typeof window !== 'undefined' && window.__dfRecordError) window.__dfRecordError('saveFortressData_write', writeError);
+    try { if (typeof showToast === 'function') showToast(typeof L === 'function' && L().saveFailed ? L().saveFailed : 'Save failed'); } catch (_) {}
     throw writeError;
   }
 }

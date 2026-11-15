@@ -53,6 +53,16 @@
     }
   }
 
+  var _pendingSafResultCb = null;
+  global.dfOnBackupExportResult = function (status) {
+    global.__dfLastBackupExportStatus = status;
+    if (typeof _pendingSafResultCb === "function") {
+      var cb = _pendingSafResultCb;
+      _pendingSafResultCb = null;
+      try { cb(status); } catch (err) { if (global.__dfRecordError) global.__dfRecordError("backup_825_cb", err); }
+    }
+  };
+
   async function exportWebViewSafe(options) {
     var opts = options && typeof options === "object" ? options : {};
     if (opts.allowPlaintext !== true) {
@@ -64,6 +74,8 @@
       if (global.ZenNative && typeof global.ZenNative.exportBackupToFile === "function" && typeof global.generateEncryptedBackupCode === "function") {
         var code = global.generateEncryptedBackupCode();
         if (typeof code === "string" && code.indexOf("ZEN21::") === 0) {
+          if (typeof opts.onResult === "function") _pendingSafResultCb = opts.onResult;
+          global.__dfLastBackupExportStatus = "started";
           global.ZenNative.exportBackupToFile(code);
           return { method: "zen_native_saf", status: "started", ok: true };
         }

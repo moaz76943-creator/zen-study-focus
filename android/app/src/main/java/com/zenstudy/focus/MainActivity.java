@@ -625,7 +625,14 @@ public class MainActivity extends AppCompatActivity {
         }
         pendingExportFile.delete();
         if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null
-                || payload == null) return;
+                || payload == null) {
+            runOnUiThread(() -> {
+                if (webView != null && !isDestroyed()) {
+                    webView.evaluateJavascript("window.dfOnBackupExportResult && window.dfOnBackupExportResult('cancelled');", null);
+                }
+            });
+            return;
+        }
         final Uri exportTarget = data.getData();
         final byte[] exportBytes = payload.getBytes(StandardCharsets.UTF_8);
         new Thread(() -> {
@@ -644,6 +651,9 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, NativeLocaleStrings.get(MainActivity.this,
                         ok ? R.string.native_backup_exported : R.string.native_backup_save_failed),
                         Toast.LENGTH_LONG).show();
+                if (webView != null && !isDestroyed()) {
+                    webView.evaluateJavascript("window.dfOnBackupExportResult && window.dfOnBackupExportResult('" + (ok ? "saved" : "failed") + "');", null);
+                }
             });
         }, "df-backup-export").start();
     }
