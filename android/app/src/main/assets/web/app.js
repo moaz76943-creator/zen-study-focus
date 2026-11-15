@@ -2190,7 +2190,8 @@ const DICT = {
     sounds: {
       ocean: 'Ocean Waves', rain: 'Soft Forest Rain', fire: 'Campfire Woods', forest: 'Pine Breeze',
       stream: 'Mountain Stream', leaves: 'Rustling Leaves', waterfall: 'Lush Waterfall', night: 'Night Crickets',
-      thunder: 'Distant Thunder', wind: 'Highland Wind', winrain: 'Rain on Window', earth: 'Deep Earth Rumble'
+      thunder: 'Distant Thunder', wind: 'Highland Wind', winrain: 'Rain on Window', earth: 'Deep Earth Rumble',
+      drip: 'Water Drip'
     },
     sampleTasks: [
       'Complete Chapter 1 & Core Concepts', 'HIIT Strength & Cardio Session (4 Sets)', 'Read 25 Pages of Reference Book', 'Finish Deep Work Project Milestone'
@@ -2231,7 +2232,8 @@ const DICT = {
     sounds: {
       ocean: 'أمواج المحيط', rain: 'مطر الغابة الناعم', fire: 'حطب المدفأة', forest: 'نسيم الصنوبر',
       stream: 'جدول ماء جبلي', leaves: 'حفيف أوراق الشجر', waterfall: 'شلال متدفق', night: 'ليل الريف والجدجد',
-      thunder: 'رعد ومطر بعيد', wind: 'رياح القمم الثلجية', winrain: 'مطر على النافذة', earth: 'هدير الأرض العازل'
+      thunder: 'رعد ومطر بعيد', wind: 'رياح القمم الثلجية', winrain: 'مطر على النافذة', earth: 'هدير الأرض العازل',
+      drip: 'قطرة ماء'
     },
     sampleTasks: [
       'إتمام مراجعة الفصل الأول والمفاهيم', 'تمرين رياضي متكامل (4 جولات لياقة)', 'قراءة 25 صفحة من الكتاب المقرر', 'إنجاز مرحلة المشروع والعمل العميق'
@@ -2271,7 +2273,8 @@ const DICT = {
     sounds: {
       ocean: 'Olas del Océano', rain: 'Lluvia del Bosque', fire: 'Fuego de Leña', forest: 'Brisa de Pinos',
       stream: 'Arroyo de Montaña', leaves: 'Hojas Susurrantes', waterfall: 'Cascada Natural', night: 'Grillos Nocturnos',
-      thunder: 'Truenos Lejanos', wind: 'Viento de Cumbre', winrain: 'Lluvia en Ventana', earth: 'Aislamiento Tierra'
+      thunder: 'Truenos Lejanos', wind: 'Viento de Cumbre', winrain: 'Lluvia en Ventana', earth: 'Aislamiento Tierra',
+      drip: 'Gota de Agua'
     },
     sampleTasks: [
       'Completar Capítulo 1 y Conceptos Clave', 'Sesión de Entrenamiento y Fuerza (4 Series)', 'Leer 25 Páginas del Libro Base', 'Avanzar Proyecto de Trabajo Profundo'
@@ -5383,7 +5386,9 @@ const SOUNDS_DATA = [
   { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: "audio/flowing_water.ogg", url: "audio/flowing_water.ogg" },
   { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: "audio/forest_birds.ogg", url: "audio/forest_birds.ogg" },
   { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: "audio/wind_breeze.ogg", url: "audio/wind_breeze.ogg" },
-  { id: 'thunder', cat: 'warm', cls: 'sbg-thunder', vol: 0.6, src: "audio/rain_thunder.ogg", url: "audio/rain_thunder.ogg" }
+  { id: 'thunder', cat: 'warm', cls: 'sbg-thunder', vol: 0.6, src: "audio/rain_thunder.ogg", url: "audio/rain_thunder.ogg" },
+  { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.62, src: "audio/campfire_embers.ogg", url: "audio/campfire_embers.ogg" },
+  { id: 'drip', cat: 'water', cls: 'sbg-drip', vol: 0.5, src: "audio/water_drop.ogg", url: "audio/water_drop.ogg" }
 ];
 
 let soundCat = 'all';
@@ -5915,7 +5920,8 @@ if (typeof DICT !== 'undefined') {
       "thunder": "Truenos Lejanos",
       "wind": "Viento Fuerte",
       "winrain": "Lluvia en Ventana",
-      "earth": "Susurro Profundo"
+      "earth": "Susurro Profundo",
+      "drip": "Gota de Agua"
     }
   },
   "fr": {
@@ -6006,7 +6012,8 @@ if (typeof DICT !== 'undefined') {
       "thunder": "Tonnerre Lointain",
       "wind": "Vent d’Altitude",
       "winrain": "Pluie sur la Fenêtre",
-      "earth": "Gronderie Terrestre"
+      "earth": "Gronderie Terrestre",
+      "drip": "Goutte d’Eau"
     }
   },
   "tr": {
@@ -6097,7 +6104,8 @@ if (typeof DICT !== 'undefined') {
       "thunder": "Uzak Gök Gürültüsü",
       "wind": "Yayla Rüzgarı",
       "winrain": "Cama Vuran Yağmur",
-      "earth": "Derin Toprak Uğultusu"
+      "earth": "Derin Toprak Uğultusu",
+      "drip": "Su Damlası"
     }
   }
 });

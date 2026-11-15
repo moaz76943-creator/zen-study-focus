@@ -34,6 +34,12 @@
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/20090610_0_ambience.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
     },
     {
+      "file": "campfire_embers.ogg",
+      "size_kb": 216.0,
+      "license": "CC0 / Public Domain",
+      "source": "Procedurally synthesized with ffmpeg (brown-noise low-frequency rumble + high-frequency crackle flutter, amix); original work, no third-party sample or recording, dedicated to the public domain"
+    },
+    {
       "file": "water_drop.ogg",
       "size_kb": 750.0,
       "license": "Public domain",
