@@ -13174,6 +13174,14 @@ window.FlashQuizEngine = FlashQuizEngine;
     }
 
     dfStopAmbientSoundscape();
+    if (window.SovereignAudioCues && typeof window.SovereignAudioCues.playAmbient === "function") {
+      try {
+        window.SovereignAudioCues.playAmbient(type === "white_noise" ? "rain" : type);
+        localStorage.setItem("df_active_soundscape_v1", type);
+        return { active: true, type: type, mode: "cc0_ogg" };
+      } catch (_) {}
+    }
+    return { active: false, reason: "no_harsh_whitenoise" }; // Delegated to CC0 .ogg SovereignAudioCues
 
     try {
       if (typeof window === "undefined") return { active: false, reason: "no_window" };
@@ -83064,8 +83072,10 @@ window.SovereignEyeComfort = (function() {
           var obs = new MutationObserver(function () {
             if (debounceTimer) clearTimeout(debounceTimer);
             debounceTimer = setTimeout(function () {
-              wireAllInteractiveButtons();
-            }, 120);
+          if (window.__dfWiringRunning) return;
+          window.__dfWiringRunning = true;
+          try { wireAllInteractiveButtons(); } finally { window.__dfWiringRunning = false; }
+        }, 260);
           });
           obs.observe(document.body, { childList: true, subtree: true });
         }
