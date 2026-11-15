@@ -430,9 +430,13 @@ public class MainActivity extends AppCompatActivity {
         @JavascriptInterface
         public void exportBackupToFile(String backupCode) {
             if (backupCode == null || !backupCode.startsWith("ZEN21::")
-                    || backupCode.length() > 14000000) return;
+                    || backupCode.length() > MAX_BACKUP_IMPORT_BYTES) return;
             runOnUiThread(() -> {
                 backupAwaitingSave = backupCode;
+                try (FileOutputStream tmpOut = new FileOutputStream(new File(getFilesDir(), "pending_backup_export.tmp"))) {
+                    tmpOut.write(backupCode.getBytes(StandardCharsets.UTF_8));
+                    tmpOut.getFD().sync();
+                } catch (Exception ignored) {}
                 Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("text/plain");
@@ -444,6 +448,7 @@ public class MainActivity extends AppCompatActivity {
                     startActivityForResult(intent, REQUEST_BACKUP_EXPORT);
                 } catch (Exception e) {
                     backupAwaitingSave = null;
+                    new File(getFilesDir(), "pending_backup_export.tmp").delete();
                     Toast.makeText(MainActivity.this, NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_picker_unavailable),
                             Toast.LENGTH_LONG).show();
                 }
@@ -609,6 +614,16 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode != REQUEST_BACKUP_EXPORT) return;
         String payload = backupAwaitingSave;
         backupAwaitingSave = null;
+        File pendingExportFile = new File(getFilesDir(), "pending_backup_export.tmp");
+        if (payload == null && pendingExportFile.exists() && pendingExportFile.length() <= MAX_BACKUP_IMPORT_BYTES) {
+            try (java.io.FileInputStream fis = new java.io.FileInputStream(pendingExportFile)) {
+                byte[] buf = new byte[(int) pendingExportFile.length()];
+                int off = 0, n;
+                while (off < buf.length && (n = fis.read(buf, off, buf.length - off)) > 0) off += n;
+                if (off > 0) payload = new String(buf, 0, off, StandardCharsets.UTF_8);
+            } catch (Exception ignored) {}
+        }
+        pendingExportFile.delete();
         if (resultCode != Activity.RESULT_OK || data == null || data.getData() == null
                 || payload == null) return;
         final Uri exportTarget = data.getData();

@@ -3868,7 +3868,7 @@ function validateImportedBackup(raw) {
 function verifyAndRestoreBackupCode(codeStr) {
   try {
     const clean = String(codeStr || '').trim();
-    if (clean.length > 14000000 || !clean) throw new Error('Invalid backup size');
+    if (clean.length > 8388608 || !clean) throw new Error('Invalid backup size');
     let decoded = null;
     if (clean.startsWith('{')) {
       decoded = JSON.parse(clean);
