@@ -11,5 +11,6 @@
   - Spatial Studio card capped (`#dfPillar5SpatialMount .df-white-premium` max-height 46vh / 440px, touch-action pan-y) so the nature grid is never pushed under the fold.
   - Floating "✨ الاستوديوهات (10)" pill: right-corner docked, high-contrast (#111827 solid + 2px green border), 48px min tap target, z-index 150 (below modal overlay, above nav/FAB), never covers FAB or centered nav tabs.
   - `node tools/run_tests.mjs` → 501/501 pass after changes. Campfire source documented in `audio/LICENSES.json`.
+  - CI on HEAD `9f004ab3`: CI tests ✓, Build Production AAB & APK ✓ (run 43673789288, signed upload-key APK `deep-focus-apk-upload-key` → `artifacts/df-apk-latest/app-release.apk`, 10,584,798 bytes, verified zip integrity + contains campfire_embers.ogg, .sbg-drip, spatial cap, right-docked pill, fire/drip tiles), Mobile Visual QA ✓, Track 13 CodeQL ✓, P0 SAF QA ✓. Track 13 Gitleaks history finding (commit 0efc9c80) is pre-existing; current tree scan is ZERO_FINDINGS PASS.
 - **Remaining Manual Gates:** Play Console keystore rotation (`DF-004` / Gitleaks) + real-device QA on Xiaomi 17T Pro.
 - **Rule for All Agents:** Always commit onto `integration/master-qa-verified-v21` (never `force push` or delete branches).
