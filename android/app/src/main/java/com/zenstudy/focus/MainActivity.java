@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
             Insets bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()
                     | WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.ime());
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
-            v.setClipToPadding(true);
+            webView.setClipToPadding(true);
             return WindowInsetsCompat.CONSUMED;
         });
 
