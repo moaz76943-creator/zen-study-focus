@@ -55,6 +55,17 @@
 
   async function exportWebViewSafe() {
     var jsonStr = JSON.stringify(collectLocalBackupObject(), null, 2);
+    // 0. Native ZenNative.exportBackupToFile (canonical MainActivity bridge)
+    try {
+      if (global.ZenNative && typeof global.ZenNative.exportBackupToFile === "function" && typeof global.generateEncryptedBackupCode === "function") {
+        var code = global.generateEncryptedBackupCode();
+        if (typeof code === "string" && code.indexOf("ZEN21::") === 0) {
+          global.ZenNative.exportBackupToFile(code);
+          return { method: "zen_native_saf", ok: true };
+        }
+      }
+    } catch (_) {}
+
     // 1. Native AndroidBridge if available
     try {
       if (global.AndroidBridge && typeof global.AndroidBridge.exportBackup === "function") {
