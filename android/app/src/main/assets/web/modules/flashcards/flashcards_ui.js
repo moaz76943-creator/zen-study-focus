@@ -529,7 +529,7 @@
   root.DFFlashcardsUI = api;
   // The backup code needs the data layer even if the user never opened the section.
   document.addEventListener('DOMContentLoaded', function () {
-    try { init(); } catch (_) {}
+    try { init(); } catch (err) { if (window.__dfRecordError) window.__dfRecordError('flashcards_init', err); }
     var lbl = document.getElementById('flashcardsEntryLabel'), b = document.getElementById('flashcardsEntry');
     if (lbl) lbl.textContent = T('title'); if (b) b.setAttribute('aria-label', T('title'));
   });

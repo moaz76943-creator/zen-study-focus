@@ -12,7 +12,7 @@
         var k = localStorage.key(i);
         if (k) payload.storage[k] = localStorage.getItem(k);
       }
-    } catch (_) {}
+    } catch (err) { if (global.__dfRecordError) global.__dfRecordError("backup_825", err); }
     return payload;
   }
 
@@ -53,7 +53,11 @@
     }
   }
 
-  async function exportWebViewSafe() {
+  async function exportWebViewSafe(options) {
+    var opts = options && typeof options === "object" ? options : {};
+    if (opts.allowPlaintext !== true) {
+      return { ok: false, status: "blocked_plaintext", error: "Encrypted native export unavailable; explicit plaintext confirmation required." };
+    }
     var jsonStr = JSON.stringify(collectLocalBackupObject(), null, 2);
     // 0. Native ZenNative.exportBackupToFile (canonical MainActivity bridge)
     try {
@@ -61,10 +65,10 @@
         var code = global.generateEncryptedBackupCode();
         if (typeof code === "string" && code.indexOf("ZEN21::") === 0) {
           global.ZenNative.exportBackupToFile(code);
-          return { method: "zen_native_saf", ok: true };
+          return { method: "zen_native_saf", status: "started", ok: true };
         }
       }
-    } catch (_) {}
+    } catch (err) { if (global.__dfRecordError) global.__dfRecordError("backup_825", err); }
 
     // 1. Native AndroidBridge if available
     try {
@@ -72,7 +76,7 @@
         global.AndroidBridge.exportBackup(jsonStr);
         return { method: "android_bridge", ok: true };
       }
-    } catch (_) {}
+    } catch (err) { if (global.__dfRecordError) global.__dfRecordError("backup_825", err); }
 
     // 2. Web Share API (works cleanly on Android 15 WebView / Chrome)
     try {
@@ -83,7 +87,7 @@
         });
         return { method: "web_share", ok: true };
       }
-    } catch (_) {}
+    } catch (err) { if (global.__dfRecordError) global.__dfRecordError("backup_825", err); }
 
     // 3. Clipboard fallback
     try {
@@ -91,7 +95,7 @@
         await navigator.clipboard.writeText(jsonStr);
         return { method: "clipboard", ok: true };
       }
-    } catch (_) {}
+    } catch (err) { if (global.__dfRecordError) global.__dfRecordError("backup_825", err); }
 
     // 4. Standard Blob Download
     try {
@@ -133,7 +137,7 @@
         try {
           if (snapshot[written[r]] === null) localStorage.removeItem(written[r]);
           else localStorage.setItem(written[r], snapshot[written[r]]);
-        } catch (_) {}
+        } catch (err) { if (global.__dfRecordError) global.__dfRecordError("backup_825", err); }
       }
       return { ok: false, error: err && err.message ? err.message : "Storage write failed", rolledBack: true };
     }

@@ -18,19 +18,48 @@
     return JSON.stringify(data, null, 2);
   }
 
+  var ALLOWED_KEY_812 = /^(zen_fortress_(cfg|tasks|notes)_v21(_mirror)?|df_[A-Za-z0-9_]{1,80})$/;
+
   function restoreFromJson(rawJson) {
     try {
-      var parsed = JSON.parse(rawJson);
-      if (!parsed || typeof parsed.storage !== "object") {
+      var parsed = JSON.parse(rawJson, function (k, v) {
+        return (k === "__proto__" || k === "constructor" || k === "prototype") ? undefined : v;
+      });
+      if (!parsed || typeof parsed.storage !== "object" || Array.isArray(parsed.storage)) {
         return { ok: false, error: "Invalid backup format" };
       }
       var keys = Object.keys(parsed.storage);
+      if (keys.length === 0) return { ok: false, error: "Empty backup storage" };
       for (var i = 0; i < keys.length; i++) {
-        localStorage.setItem(keys[i], String(parsed.storage[keys[i]]));
+        var k = keys[i];
+        if (!ALLOWED_KEY_812.test(k)) {
+          return { ok: false, error: "Disallowed key: " + String(k).slice(0, 40) };
+        }
+        if (typeof parsed.storage[k] !== "string") {
+          return { ok: false, error: "Non-string value for key: " + k };
+        }
+      }
+      var snap = [];
+      for (var s = 0; s < keys.length; s++) {
+        snap.push([keys[s], localStorage.getItem(keys[s])]);
+      }
+      try {
+        for (var w = 0; w < keys.length; w++) {
+          localStorage.setItem(keys[w], parsed.storage[keys[w]]);
+          if (localStorage.getItem(keys[w]) !== parsed.storage[keys[w]]) {
+            throw new Error("Write verification failed: " + keys[w]);
+          }
+        }
+      } catch (writeErr) {
+        for (var r = 0; r < snap.length; r++) {
+          if (snap[r][1] === null) localStorage.removeItem(snap[r][0]);
+          else localStorage.setItem(snap[r][0], snap[r][1]);
+        }
+        throw writeErr;
       }
       return { ok: true, restoredKeys: keys.length };
     } catch (e) {
-      return { ok: false, error: e.message };
+      return { ok: false, error: e && e.message ? e.message : "Restore failed" };
     }
   }
 
@@ -98,8 +127,14 @@
   };
 
   // Override exportToClipboard fallback if needed so Manual Backup always shows UI feedback
-  if (global.SovereignDataVault) {
-    global.SovereignDataVault.openBackupModal = openBackupModal;
+  function bindVaultModal() {
+    if (global.SovereignDataVault) {
+      global.SovereignDataVault.openBackupModal = openBackupModal;
+    }
+  }
+  bindVaultModal();
+  if (typeof document !== "undefined" && document.addEventListener) {
+    document.addEventListener("DOMContentLoaded", bindVaultModal);
   }
 
   if (typeof module !== "undefined" && module.exports) {

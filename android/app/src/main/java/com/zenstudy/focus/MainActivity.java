@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     private String analyticsAwaitingSave = null;
     private String analyticsAwaitingRequest = null;
     private static final int REQUEST_BACKUP_IMPORT = 7412;
-    private static final int MAX_BACKUP_IMPORT_BYTES = 8 * 1024 * 1024;
+    private static final int MAX_BACKUP_IMPORT_BYTES = 14 * 1024 * 1024;
     private static final int MAX_SHARE_TEXT_CHARS = 200 * 1000;
     private boolean backupImportPickerOpen = false;
     // Renderer-death loop guard: recreate() is only safe if the crash is not immediate and repeating.

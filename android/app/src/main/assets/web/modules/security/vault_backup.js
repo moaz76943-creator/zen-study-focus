@@ -160,6 +160,24 @@
                 plan.push(['df_syllabus_roadmap_v1', JSON.stringify(dataObj.syllabus)]);
             }
             addArray('cognitiveHistory', 'df_cognitive_history_v1');
+            if (dataObj.coreFortressV21 !== undefined) {
+                if (!dataObj.coreFortressV21 || typeof dataObj.coreFortressV21 !== 'object' || Array.isArray(dataObj.coreFortressV21)) {
+                    throw new Error('Vault field "coreFortressV21" must be an object.');
+                }
+                const CORE_V21_KEYS = [
+                    'zen_fortress_cfg_v21',
+                    'zen_fortress_cfg_v21_mirror',
+                    'zen_fortress_tasks_v21',
+                    'zen_fortress_tasks_v21_mirror',
+                    'zen_fortress_notes_v21',
+                    'zen_fortress_notes_v21_mirror'
+                ];
+                for (const [k, v] of Object.entries(dataObj.coreFortressV21)) {
+                    if (!CORE_V21_KEYS.includes(k)) throw new Error('Disallowed coreFortressV21 key: ' + k);
+                    if (typeof v !== 'string') throw new Error('coreFortressV21 value must be string: ' + k);
+                    plan.push([k, v]);
+                }
+            }
             for (const [key, text] of plan) {
                 if (typeof text !== 'string' || text.length > MAX_VAULT_BYTES) throw new Error('Vault record too large: ' + key);
             }
