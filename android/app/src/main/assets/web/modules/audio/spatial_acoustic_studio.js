@@ -34,6 +34,41 @@
   const LIMITER_DB = -6.0;
   const LIMITER_LINEAR = Math.pow(10, LIMITER_DB / 20); // ≈ 0.501
   const FADE_OUT_SEC = 0.06;
+  const XFADE_MS = 20; // Crossfade duration for seamless looping
+
+  // Generate a seamlessly looping buffer by crossfading end to start
+  function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
+    const extraSec = XFADE_MS / 1000;
+    const totalSec = durationSec + extraSec;
+    const bufferSize = Math.floor(ctx.sampleRate * totalSec);
+    const tempBuffer = ctx.createBuffer(numChannels, bufferSize, ctx.sampleRate);
+    const channelData = [];
+    for (let ch = 0; ch < numChannels; ch++) {
+      channelData.push(tempBuffer.getChannelData(ch));
+    }
+    
+    // Generate extra-long buffer
+    generatorFn(channelData, ctx.sampleRate, totalSec);
+    
+    // Create final buffer with exact duration
+    const finalSize = Math.floor(ctx.sampleRate * durationSec);
+    const finalBuffer = ctx.createBuffer(numChannels, finalSize, ctx.sampleRate);
+    
+    const xfadeSamples = Math.floor(ctx.sampleRate * extraSec);
+    for (let ch = 0; ch < numChannels; ch++) {
+      const finalData = finalBuffer.getChannelData(ch);
+      const tempChData = channelData[ch];
+      // Copy main portion
+      finalData.set(tempChData.subarray(0, finalSize));
+      // Crossfade loop point: blend end into start
+      for (let i = 0; i < xfadeSamples; i++) {
+        const t = i / xfadeSamples;
+        const endIdx = finalSize - xfadeSamples + i;
+        finalData[i] = (1 - t) * finalData[i] + t * tempChData[endIdx];
+      }
+    }
+    return finalBuffer;
+  }
 
   class AcousticStudio {
     constructor(options = {}) {
@@ -94,6 +129,12 @@
       this.analyser = this.audioCtx.createAnalyser();
       this.analyser.fftSize = 64;
 
+      // DC-blocking high-pass filter (15Hz) to protect transducer coils from infrasonic content
+      this.dcBlockFilter = this.audioCtx.createBiquadFilter();
+      this.dcBlockFilter.type = 'highpass';
+      this.dcBlockFilter.frequency.setValueAtTime(15, this.audioCtx.currentTime);
+      this.dcBlockFilter.Q.setValueAtTime(0.707, this.audioCtx.currentTime); // Butterworth
+
       this.eqFilters = EQ_FREQUENCIES.map((freq, idx) => {
         const filter = this.audioCtx.createBiquadFilter();
         if (idx === 0) {
@@ -109,6 +150,8 @@
         return filter;
       });
 
+      // Chain: DC block -> EQ filters -> master gain -> analyser -> destination
+      this.dcBlockFilter.connect(this.eqFilters[0]);
       for (let i = 0; i < this.eqFilters.length - 1; i++) {
         this.eqFilters[i].connect(this.eqFilters[i + 1]);
       }
@@ -123,36 +166,46 @@
     /** Paul Kellet pink-noise, pre-rendered, bounded well under the limiter. */
     generatePinkNoiseBuffer(durationSec = 5) {
       const ctx = this.initAudioContext();
-      const bufferSize = Math.floor(ctx.sampleRate * durationSec);
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
+      return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+        const data = channelData[0];
+        const bufferSize = Math.floor(sampleRate * totalSec);
 
-      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        b0 = 0.99886 * b0 + white * 0.0555179;
-        b1 = 0.99332 * b1 + white * 0.0750759;
-        b2 = 0.96900 * b2 + white * 0.1538520;
-        b3 = 0.86650 * b3 + white * 0.3104856;
-        b4 = 0.55000 * b4 + white * 0.5329522;
-        b5 = -0.7616 * b5 - white * 0.0168980;
-        const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-        b6 = white * 0.115926;
-        data[i] = pink * 0.06;
-      }
-      return buffer;
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+          b6 = white * 0.115926;
+          data[i] = pink * 0.06;
+        }
+        // Hard safety clamp
+        for (let i = 0; i < bufferSize; i++) {
+          if (data[i] > 1.0) data[i] = 1.0;
+          else if (data[i] < -1.0) data[i] = -1.0;
+        }
+      }, 1);
     }
 
     /** Rain: quiet white bed, all spectral shaping done by the biquad chain. */
     generateRainBuffer(durationSec = 5) {
       const ctx = this.initAudioContext();
-      const bufferSize = Math.floor(ctx.sampleRate * durationSec);
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * 0.08;
-      }
-      return buffer;
+      return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+        const data = channelData[0];
+        const bufferSize = Math.floor(sampleRate * totalSec);
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * 0.08;
+        }
+        // Hard safety clamp
+        for (let i = 0; i < bufferSize; i++) {
+          if (data[i] > 1.0) data[i] = 1.0;
+          else if (data[i] < -1.0) data[i] = -1.0;
+        }
+      }, 1);
     }
 
     /**
@@ -161,39 +214,55 @@
      */
     generateOceanBuffer(durationSec = 5) {
       const ctx = this.initAudioContext();
-      const bufferSize = Math.floor(ctx.sampleRate * durationSec);
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
+      return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+        const data = channelData[0];
+        const bufferSize = Math.floor(sampleRate * totalSec);
 
-      const swellHz = 0.08;
-      let lastOut = 0.0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        lastOut = (lastOut + (0.02 * white)) / 1.02;
-        const t = i / ctx.sampleRate;
-        // 0.55..1.0 swell, keeps the noise well below the limiter ceiling.
-        const swell = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(2 * Math.PI * swellHz * t));
-        data[i] = lastOut * 1.5 * swell;
-      }
-      return buffer;
+        const swellHz = 0.08;
+        let lastOut = 0.0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          lastOut = (lastOut + (0.02 * white)) / 1.02;
+          const t = i / sampleRate;
+          // 0.55..1.0 swell, keeps the noise well below the limiter ceiling.
+          const swell = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(2 * Math.PI * swellHz * t));
+          data[i] = lastOut * 1.5 * swell;
+        }
+        // Hard safety clamp
+        for (let i = 0; i < bufferSize; i++) {
+          if (data[i] > 1.0) data[i] = 1.0;
+          else if (data[i] < -1.0) data[i] = -1.0;
+        }
+      }, 1);
     }
 
     /** 40Hz gamma binaural beat baked into a stereo buffer (216Hz L, 256Hz R). */
     generateBinaural40HzBuffer(durationSec = 5) {
       const ctx = this.initAudioContext();
-      const bufferSize = Math.floor(ctx.sampleRate * durationSec);
-      const buffer = ctx.createBuffer(2, bufferSize, ctx.sampleRate);
-      const left = buffer.getChannelData(0);
-      const right = buffer.getChannelData(1);
+      // Ensure duration contains integer cycles of both 216Hz and 256Hz
+      // LCM of periods: 216 and 256 -> 216=2^3*3^3, 256=2^8 -> LCM=2^8*3^3=6912
+      // Fundamental period = 6912/216 = 32 seconds for 216Hz, 6912/256 = 27 seconds for 256Hz
+      // For 5 seconds: 216*5=1080 cycles (integer), 256*5=1280 cycles (integer) - perfect!
+      return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+        const left = channelData[0];
+        const right = channelData[1];
+        const bufferSize = Math.floor(sampleRate * totalSec);
 
-      const amp = 0.18;
-      const TWO_PI = Math.PI * 2;
-      for (let i = 0; i < bufferSize; i++) {
-        const t = i / ctx.sampleRate;
-        left[i] = Math.sin(TWO_PI * 216 * t) * amp;
-        right[i] = Math.sin(TWO_PI * 256 * t) * amp;
-      }
-      return buffer;
+        const amp = 0.18;
+        const TWO_PI = Math.PI * 2;
+        for (let i = 0; i < bufferSize; i++) {
+          const t = i / sampleRate;
+          left[i] = Math.sin(TWO_PI * 216 * t) * amp;
+          right[i] = Math.sin(TWO_PI * 256 * t) * amp;
+        }
+        // Hard safety clamp
+        for (let i = 0; i < bufferSize; i++) {
+          if (left[i] > 1.0) left[i] = 1.0;
+          else if (left[i] < -1.0) left[i] = -1.0;
+          if (right[i] > 1.0) right[i] = 1.0;
+          else if (right[i] < -1.0) right[i] = -1.0;
+        }
+      }, 2);
     }
 
     startPreset(presetName = 'pink_noise') {
@@ -238,9 +307,9 @@
         for (let i = 0; i < shapers.length - 1; i++) {
           shapers[i].connect(shapers[i + 1]);
         }
-        shapers[shapers.length - 1].connect(this.eqFilters[0]);
+        shapers[shapers.length - 1].connect(this.dcBlockFilter);
       } else {
-        source.connect(this.eqFilters[0]);
+        source.connect(this.dcBlockFilter);
       }
 
       source.start();

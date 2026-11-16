@@ -37822,25 +37822,46 @@ window.dfStopAllSounds = function() {
 };
 
 window.dfGenerateNoiseBuffer = function(ctx, type) {
-  const bufferSize = ctx.sampleRate * 2;
-  const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-  const data = buffer.getChannelData(0);
+  const durationSec = 2;
+  const XFADE_MS = 20;
+  const extraSec = XFADE_MS / 1000;
+  const totalSec = durationSec + extraSec;
+  const bufferSize = Math.floor(ctx.sampleRate * totalSec);
+  const tempBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const tempData = tempBuffer.getChannelData(0);
+  
   let lastOut = 0.0;
   for (let i = 0; i < bufferSize; i++) {
     const white = Math.random() * 2 - 1;
     if (type === "brown") {
-      data[i] = (lastOut + (0.02 * white)) / 1.02;
-      lastOut = data[i];
-      data[i] *= 1.2; // 3.5 clipped the sample above ±1.0 -> audible static
+      tempData[i] = (lastOut + (0.02 * white)) / 1.02;
+      lastOut = tempData[i];
+      tempData[i] *= 1.2; // 3.5 clipped the sample above ±1.0 -> audible static
     } else {
-      data[i] = white * 0.15;
+      tempData[i] = white * 0.15;
     }
     // Hard safety clamp: no generated sample may ever exceed the range the
     // destination can represent without hard-clipping into static.
-    if (data[i] > 1.0) data[i] = 1.0;
-    else if (data[i] < -1.0) data[i] = -1.0;
+    if (tempData[i] > 1.0) tempData[i] = 1.0;
+    else if (tempData[i] < -1.0) tempData[i] = -1.0;
   }
-  return buffer;
+  
+  // Create final buffer with exact duration and crossfade loop point
+  const finalSize = Math.floor(ctx.sampleRate * durationSec);
+  const finalBuffer = ctx.createBuffer(1, finalSize, ctx.sampleRate);
+  const finalData = finalBuffer.getChannelData(0);
+  
+  const xfadeSamples = Math.floor(ctx.sampleRate * extraSec);
+  // Copy main portion
+  finalData.set(tempData.subarray(0, finalSize));
+  // Crossfade loop point: blend end into start
+  for (let i = 0; i < xfadeSamples; i++) {
+    const t = i / xfadeSamples;
+    const endIdx = finalSize - xfadeSamples + i;
+    finalData[i] = (1 - t) * finalData[i] + t * tempData[endIdx];
+  }
+  
+  return finalBuffer;
 };
 
 window.dfPlayNatureSound = async function(soundType) {
@@ -37857,6 +37878,12 @@ window.dfPlayNatureSound = async function(soundType) {
   noiseSource.buffer = buffer;
   noiseSource.loop = true;
 
+  // DC-blocking high-pass filter (15Hz) to protect transducer coils from infrasonic content
+  const dcBlock = ctx.createBiquadFilter();
+  dcBlock.type = "highpass";
+  dcBlock.frequency.setValueAtTime(15, ctx.currentTime);
+  dcBlock.Q.setValueAtTime(0.707, ctx.currentTime); // Butterworth
+
   const filter = ctx.createBiquadFilter();
   if (soundType === "rain") { filter.type = "lowpass"; filter.frequency.value = 1000; }
   else if (soundType === "wind") { filter.type = "bandpass"; filter.frequency.value = 350; }
@@ -37866,7 +37893,8 @@ window.dfPlayNatureSound = async function(soundType) {
   const gain = ctx.createGain();
   gain.gain.value = 0.05;
 
-  noiseSource.connect(filter);
+  noiseSource.connect(dcBlock);
+  dcBlock.connect(filter);
   filter.connect(gain);
   // Route through the shared ear-safety limiter so stacked loops cannot
   // hard-clip the destination into static.
@@ -37874,7 +37902,7 @@ window.dfPlayNatureSound = async function(soundType) {
   gain.connect(masterDest || ctx.destination);
 
   noiseSource.start(0);
-  window.DF_ACTIVE_AUDIO_NODES.push(noiseSource, filter, gain);
+  window.DF_ACTIVE_AUDIO_NODES.push(noiseSource, dcBlock, filter, gain);
   console.log("[DEEP FOCUS DSP] Procedural soundscape active:", soundType);
 };
 
