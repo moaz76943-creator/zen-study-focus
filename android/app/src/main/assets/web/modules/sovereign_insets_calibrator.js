@@ -82,4 +82,15 @@
     module.exports = SovereignInsetsCalibrator;
   }
   global.SovereignInsetsCalibrator = SovereignInsetsCalibrator;
+
+  // Auto-initialize on DOM ready so CSS variables are ready before first paint
+  if (typeof document !== 'undefined') {
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', function () {
+        SovereignInsetsCalibrator.init();
+      }, { once: true });
+    } else {
+      SovereignInsetsCalibrator.init();
+    }
+  }
 })(typeof window !== 'undefined' ? window : (typeof global !== 'undefined' ? global : this));

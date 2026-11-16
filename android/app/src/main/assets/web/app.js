@@ -40734,11 +40734,17 @@ window.dfApplySafeAreaInsets = function() {
   if (document.getElementById(styleId)) return;
 
   const insetsCSS = `
+    :root {
+      --safe-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
+      --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));
+      --safe-left: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
+      --safe-right: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
+    }
     body {
-      padding-top: env(safe-area-inset-top, 0px) !important;
-      padding-bottom: env(safe-area-inset-bottom, 16px) !important;
-      padding-left: env(safe-area-inset-left, 0px) !important;
-      padding-right: env(safe-area-inset-right, 0px) !important;
+      padding-top: var(--safe-top) !important;
+      padding-bottom: var(--safe-bottom) !important;
+      padding-left: var(--safe-left) !important;
+      padding-right: var(--safe-right) !important;
       box-sizing: border-box !important;
     }
   `;
@@ -40747,7 +40753,7 @@ window.dfApplySafeAreaInsets = function() {
   styleEl.id = styleId;
   styleEl.textContent = insetsCSS;
   document.head.appendChild(styleEl);
-  console.log("[SYSTEM] Android 14/15 edge-to-edge safe area insets applied.");
+  console.log("[SYSTEM] Android 14/15 edge-to-edge safe area insets applied (calibrator fallback).");
 };
 
 if (typeof window !== "undefined") {
@@ -42175,10 +42181,10 @@ window.dfNormalizeSystemInsets = function() {
 
   const insetsCSS = `
     .df-header {
-      padding-top: max(12px, env(safe-area-inset-top, 0px)) !important;
+      padding-top: max(12px, env(safe-area-inset-top, 0px), var(--df-safe-top, 0px)) !important;
     }
     .df-nav-tabs, .df-footer-controls {
-      padding-bottom: max(16px, env(safe-area-inset-bottom, 0px)) !important;
+      padding-bottom: max(16px, env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px)) !important;
     }
   `;
 
@@ -42186,7 +42192,7 @@ window.dfNormalizeSystemInsets = function() {
   styleEl.id = styleId;
   styleEl.textContent = insetsCSS;
   document.head.appendChild(styleEl);
-  console.log("[SYSTEM] Dynamic edge-to-edge padding normalized.");
+  console.log("[SYSTEM] Dynamic edge-to-edge padding normalized (calibrator fallback).");
 };
 
 if (typeof window !== "undefined") {
@@ -47322,8 +47328,8 @@ window.dfApplySafeAreaInsets = function(rootEl) {
     styleEl.id = 'df-safe-area-style';
     styleEl.textContent = [
       ':root {',
-      '  --safe-top: env(safe-area-inset-top, 0px);',
-      '  --safe-bottom: env(safe-area-inset-bottom, 0px);',
+      '  --safe-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));',
+      '  --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));',
       '}',
       'body {',
       '  padding-top: var(--safe-top);',

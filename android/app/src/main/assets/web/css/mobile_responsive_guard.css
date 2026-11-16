@@ -5,8 +5,8 @@
  */
 
 :root {
-    --zen-safe-bottom: env(safe-area-inset-bottom, 16px);
-    --zen-safe-top: env(safe-area-inset-top, 0px);
+    --zen-safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 16px));
+    --zen-safe-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
 }
 
 /* Fluid responsive timer display: Never wraps or clips */

@@ -544,7 +544,8 @@
             pill.setAttribute("aria-label", (document.documentElement.lang || "").toLowerCase().indexOf("ar") === 0 ? "فتح لوحة الاستوديوهات والأدوات" : "Open studios and tools panel");
             pill.style.position = "fixed";
             // Docked to the bottom-right corner above the bottom nav capsule: never covers the FAB (left) or the centred nav tabs.
-            pill.style.bottom = "calc(108px + env(safe-area-inset-bottom, 0px))";
+            // Use calibrator CSS variable with env() fallback for Android 15 edge-to-edge
+            pill.style.bottom = "calc(108px + max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px)))";
             pill.style.right = "12px";
             pill.style.left = "auto";
             pill.style.transform = "none";

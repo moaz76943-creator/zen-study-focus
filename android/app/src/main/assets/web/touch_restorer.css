@@ -2,8 +2,8 @@
  * Deep Focus — Touch & Viewport Restoration Engine (Task #631)
  * ============================================================================== */
 :root {
-  --safe-top: max(env(safe-area-inset-top, 0px), 28px);
-  --safe-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+  --safe-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 28px));
+  --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 16px));
 }
 
 html, body {
@@ -146,7 +146,7 @@ button:active, .btn:active, [role="button"]:active {
   align-items: center;
   justify-content: space-around;
   z-index: 1000;
-  padding-bottom: max(env(safe-area-inset-bottom, 0px), 8px);
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 8px));
   box-shadow: 0 -4px 12px rgba(15, 23, 42, 0.04);
 }
 
