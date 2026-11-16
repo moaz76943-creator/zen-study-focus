@@ -5480,8 +5480,70 @@ function stopSoundTile(id) {
   const player = activePlayers[id];
   if (player) {
     delete activePlayers[id];
-    try { player.pause(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
+    try { player.stop(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   }
+}
+
+// Web Audio API based Ogg player for crisp, artifact-free looping
+const oggBufferCache = {};
+const oggLoadingPromises = {};
+
+async function getOggBuffer(src) {
+  if (oggBufferCache[src]) return oggBufferCache[src];
+  if (oggLoadingPromises[src]) return oggLoadingPromises[src];
+  const ctx = ensureProceduralAudioContext();
+  if (!ctx) return null;
+  const promise = fetch(src)
+    .then(r => r.arrayBuffer())
+    .then(buf => ctx.decodeAudioData(buf))
+    .then(buf => { oggBufferCache[src] = buf; return buf; })
+    .catch(e => { console.warn('[OggPlayer] Failed to load', src, e); delete oggLoadingPromises[src]; return null; });
+  oggLoadingPromises[src] = promise;
+  return promise;
+}
+
+function createOggPlayer(buffer, loop, volume) {
+  const ctx = ensureProceduralAudioContext();
+  if (!ctx || !buffer) return null;
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.loop = !!loop;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.001, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 1.2);
+  // DC-blocking high-pass filter (15Hz) to protect transducer coils
+  const dcBlock = ctx.createBiquadFilter();
+  dcBlock.type = 'highpass';
+  dcBlock.frequency.setValueAtTime(15, ctx.currentTime);
+  dcBlock.Q.setValueAtTime(0.707, ctx.currentTime);
+  source.connect(dcBlock);
+  dcBlock.connect(gain);
+  gain.connect(ctx.destination);
+  source.start();
+  return {
+    source,
+    gain,
+    dcBlock,
+    stop() {
+      try {
+        const now = ctx.currentTime;
+        const fadeOutSec = 0.06;
+        gain.gain.cancelScheduledValues(now);
+        gain.gain.setValueAtTime(gain.gain.value, now);
+        gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
+        source.stop(now + fadeOutSec + 0.01);
+      } catch (e) {
+        try { source.stop(); } catch (_) {}
+      }
+      try { source.disconnect(); dcBlock.disconnect(); gain.disconnect(); } catch (_) {}
+    },
+    setVol(v) {
+      if (ctx) {
+        gain.gain.cancelScheduledValues(ctx.currentTime);
+        gain.gain.setValueAtTime(v, ctx.currentTime);
+      }
+    }
+  };
 }
 
 function toggleSoundTile(id) {
@@ -5496,38 +5558,31 @@ function toggleSoundTile(id) {
   }
   const token = (soundGeneration[id] || 0) + 1;
   soundGeneration[id] = token;
-  if (typeof Audio !== 'function') { showToast(cfg.lang === 'ar' ? '⚠️ مشغل الصوت غير متاح' : '⚠️ Audio output unavailable'); return; }
-  const audio = new Audio();
-  audio.loop = true;
-  audio.volume = s.vol;
-  audio.src = s.src;
-  let fallbackUsed = false;
-  const player = {
-    pause() { audio.onerror = null; audio.pause(); },
-    setVol(v) { audio.volume = v; }
-  };
-  // Register synchronously before play() can reject or fire an error.
-  activePlayers[id] = player;
-  const activateFallback = () => {
-    if (fallbackUsed || soundGeneration[id] !== token || activePlayers[id] !== player) return;
-    fallbackUsed = true;
-    audio.onerror = null;
-    audio.pause();
-    stopSoundTile(id);
+  const ctx = ensureProceduralAudioContext();
+  if (!ctx) { showToast(cfg.lang === 'ar' ? '⚠️ مشغل الصوت غير متاح' : '⚠️ Audio output unavailable'); return Promise.resolve(); }
+  if (ctx.state === 'suspended') ctx.resume();
+  
+  return getOggBuffer(s.src).then(buffer => {
+    if (soundGeneration[id] !== token) return; // Stale request
+    if (!buffer) {
+      showToast(cfg.lang === 'ar' ? '⚠️ تعذّر تشغيل التسجيل المحلي' : '⚠️ Local recording could not be played');
+      renderSoundsStudio();
+      return;
+    }
+    const player = createOggPlayer(buffer, true, s.vol);
+    if (!player) {
+      showToast(cfg.lang === 'ar' ? '⚠️ تعذّر تشغيل التسجيل المحلي' : '⚠️ Local recording could not be played');
+      renderSoundsStudio();
+      return;
+    }
+    activePlayers[id] = player;
+    showToast(`🔊 ${sName}`);
+    renderSoundsStudio();
+  }).catch(e => {
+    if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e);
     showToast(cfg.lang === 'ar' ? '⚠️ تعذّر تشغيل التسجيل المحلي' : '⚠️ Local recording could not be played');
     renderSoundsStudio();
-  };
-  audio.onerror = activateFallback;
-  try {
-    const playing = audio.play();
-    if (playing && typeof playing.then === 'function') {
-      playing.then(() => {
-        if (soundGeneration[id] === token && activePlayers[id] === player && !fallbackUsed)
-          showToast(`🔊 ${sName}`);
-      }).catch(activateFallback);
-    }
-  } catch (e) { activateFallback(); }
-  renderSoundsStudio();
+  });
 }
 
 function setTileVolume(id, val) {
@@ -37631,6 +37686,41 @@ if (typeof document !== "undefined") {
 }
 
 /* ==========================================================
+   DEEP FOCUS: GLOBAL AUDIO VISIBILITY & GESTURE GUARD
+   Zero auto-play on tab switch, pauses audio when hidden,
+   requires explicit user gesture to (re)start any audio.
+   ========================================================== */
+if (typeof document !== "undefined") {
+  document.addEventListener("visibilitychange", () => {
+    if (document.hidden) {
+      // Pause all procedural audio when tab is hidden
+      if (typeof window.dfStopAllSounds === "function") {
+        try { window.dfStopAllSounds(); } catch (_) {}
+      }
+      // Pause all Ogg-based nature sound tiles
+      if (typeof window.activePlayers === "object") {
+        Object.values(window.activePlayers).forEach(p => {
+          try { if (p && p.stop) p.stop(); } catch (_) {}
+        });
+      }
+      // Pause Sovereign Audio singleton
+      if (window.SovereignAudioCues && typeof window.SovereignAudioCues.stopAmbient === "function") {
+        try { window.SovereignAudioCues.stopAmbient(); } catch (_) {}
+      }
+      if (window.SovereignAmbientDSP && typeof window.SovereignAmbientDSP.stopNoise === "function") {
+        try { window.SovereignAmbientDSP.stopNoise(); } catch (_) {}
+      }
+      // Pause Acoustic Studio
+      if (window.activeAcousticStudio && typeof window.activeAcousticStudio.stop === "function") {
+        try { window.activeAcousticStudio.stop(); } catch (_) {}
+      }
+    }
+    // Note: On visibility restored, we do NOT auto-resume audio.
+    // User must explicitly interact to restart (gesture requirement).
+  });
+}
+
+/* ==========================================================
    DEEP FOCUS: RESILIENT WEB AUDIO DSP & AUTO-RESUME SHIELD
    Eliminates autoplay blocks, clicking pops, and suspended audio states
    ========================================================== */
@@ -37834,11 +37924,13 @@ window.dfGenerateNoiseBuffer = function(ctx, type) {
   for (let i = 0; i < bufferSize; i++) {
     const white = Math.random() * 2 - 1;
     if (type === "brown") {
+      // 2-pole brown noise for cleaner spectral rolloff (Paul Kellet style)
       tempData[i] = (lastOut + (0.02 * white)) / 1.02;
       lastOut = tempData[i];
-      tempData[i] *= 1.2; // 3.5 clipped the sample above ±1.0 -> audible static
+      tempData[i] *= 0.35; // Reduced from 1.2 to eliminate static
     } else {
-      tempData[i] = white * 0.15;
+      // White noise at lower amplitude with spectral shaping
+      tempData[i] = white * 0.08; // Reduced from 0.15
     }
     // Hard safety clamp: no generated sample may ever exceed the range the
     // destination can represent without hard-clipping into static.
@@ -37884,18 +37976,34 @@ window.dfPlayNatureSound = async function(soundType) {
   dcBlock.frequency.setValueAtTime(15, ctx.currentTime);
   dcBlock.Q.setValueAtTime(0.707, ctx.currentTime); // Butterworth
 
+  // Primary spectral shaping filter
   const filter = ctx.createBiquadFilter();
-  if (soundType === "rain") { filter.type = "lowpass"; filter.frequency.value = 1000; }
-  else if (soundType === "wind") { filter.type = "bandpass"; filter.frequency.value = 350; }
-  else if (soundType === "sea") { filter.type = "lowpass"; filter.frequency.value = 450; }
-  else { filter.type = "lowpass"; filter.frequency.value = 800; }
+  if (soundType === "rain") { filter.type = "lowpass"; filter.frequency.value = 1000; filter.Q.value = 1.0; }
+  else if (soundType === "wind") { filter.type = "bandpass"; filter.frequency.value = 350; filter.Q.value = 2.0; }
+  else if (soundType === "sea") { filter.type = "lowpass"; filter.frequency.value = 450; filter.Q.value = 1.0; }
+  else { filter.type = "lowpass"; filter.frequency.value = 800; filter.Q.value = 1.0; }
+
+  // Secondary low-pass filter for white noise types to eliminate residual hiss
+  // Cascaded 2-pole = 4th order rolloff (24dB/oct) for crisp, hiss-free sound
+  let filter2 = null;
+  if (soundType !== "wind" && soundType !== "river") {
+    filter2 = ctx.createBiquadFilter();
+    filter2.type = "lowpass";
+    filter2.frequency.value = soundType === "rain" ? 1200 : (soundType === "sea" ? 600 : 1000);
+    filter2.Q.value = 0.707;
+  }
 
   const gain = ctx.createGain();
   gain.gain.value = 0.05;
 
   noiseSource.connect(dcBlock);
   dcBlock.connect(filter);
-  filter.connect(gain);
+  if (filter2) {
+    filter.connect(filter2);
+    filter2.connect(gain);
+  } else {
+    filter.connect(gain);
+  }
   // Route through the shared ear-safety limiter so stacked loops cannot
   // hard-clip the destination into static.
   const masterDest = window.dfGetSafeMasterDestination ? window.dfGetSafeMasterDestination(ctx) : null;
@@ -37903,6 +38011,7 @@ window.dfPlayNatureSound = async function(soundType) {
 
   noiseSource.start(0);
   window.DF_ACTIVE_AUDIO_NODES.push(noiseSource, dcBlock, filter, gain);
+  if (filter2) window.DF_ACTIVE_AUDIO_NODES.push(filter2);
   console.log("[DEEP FOCUS DSP] Procedural soundscape active:", soundType);
 };
 

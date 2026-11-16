@@ -210,7 +210,7 @@
 
     /**
      * Ocean: brownian rumble with the shoreline swell baked directly into the
-     * buffer, so no LFO node has to be kept alive.
+     * buffer, so no LFO node has to be kept alive. Zero-static version.
      */
     generateOceanBuffer(durationSec = 5) {
       const ctx = this.initAudioContext();
@@ -226,7 +226,8 @@
           const t = i / sampleRate;
           // 0.55..1.0 swell, keeps the noise well below the limiter ceiling.
           const swell = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(2 * Math.PI * swellHz * t));
-          data[i] = lastOut * 1.5 * swell;
+          // Reduced from 1.5 to 0.8 to eliminate static/clipping risk
+          data[i] = lastOut * 0.8 * swell;
         }
         // Hard safety clamp
         for (let i = 0; i < bufferSize; i++) {

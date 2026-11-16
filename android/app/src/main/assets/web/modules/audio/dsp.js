@@ -1,5 +1,5 @@
 // --- Modular Audio DSP Subsystem ---
-// v2.1: Zero-static brown noise, seamless looping, gesture-gated playback, instant stop.
+// v2.2: Zero-static brown noise (2-pole), seamless looping, gesture-gated playback, instant stop.
 (function() {
   if (typeof window === 'undefined') return;
 
@@ -76,16 +76,24 @@
       this.stop();
       if (ctx.state === 'suspended') ctx.resume();
 
-      const buffer = createSeamlessBuffer(ctx, 3, (data, sampleRate, durationSec) => {
+      const buffer = createSeamlessBuffer(ctx, 4, (data, sampleRate, durationSec) => {
         const len = Math.floor(sampleRate * durationSec);
-        let last = 0;
+        // 2-pole brown noise (Paul Kellet style) for cleaner spectral rolloff
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
         for (let i = 0; i < len; i++) {
-          const w = Math.random() * 2 - 1;
-          last = (last + (0.02 * w)) / 1.02;
-          // Reduced from 3.5 to 1.2 to eliminate static; final gain applies limiter
-          data[i] = last * 1.2;
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          const brown = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+          b6 = white * 0.115926;
+          // Amplitude well below limiter ceiling, no hard clipping needed
+          data[i] = brown * 0.08;
         }
-        // Hard safety clamp
+        // Hard safety clamp (defensive)
         for (let i = 0; i < len; i++) {
           if (data[i] > 1.0) data[i] = 1.0;
           else if (data[i] < -1.0) data[i] = -1.0;
@@ -97,9 +105,9 @@
       src.loop = true;
       const g = ctx.createGain();
       g.gain.setValueAtTime(0.001, ctx.currentTime);
-      const t = ctx.currentTime + 1.2;
-      // Target gain now respects -6dB ceiling: 0.25 * LIMITER_LINEAR ≈ 0.125
-      g.gain.linearRampToValueAtTime(0.25 * LIMITER_LINEAR, t);
+      const t = ctx.currentTime + 1.5;
+      // Target gain respects -6dB ceiling: 0.35 * LIMITER_LINEAR ≈ 0.175
+      g.gain.linearRampToValueAtTime(0.35 * LIMITER_LINEAR, t);
       
       // DC-blocking high-pass filter (15Hz) to protect transducer coils
       const dcBlock = ctx.createBiquadFilter();
@@ -107,11 +115,18 @@
       dcBlock.frequency.setValueAtTime(15, ctx.currentTime);
       dcBlock.Q.setValueAtTime(0.707, ctx.currentTime);
       
+      // Low-pass filter (200Hz) to remove residual high-frequency hiss from brown noise
+      const lowpass = ctx.createBiquadFilter();
+      lowpass.type = 'lowpass';
+      lowpass.frequency.setValueAtTime(200, ctx.currentTime);
+      lowpass.Q.setValueAtTime(0.707, ctx.currentTime);
+      
       src.connect(dcBlock);
-      dcBlock.connect(g);
+      dcBlock.connect(lowpass);
+      lowpass.connect(g);
       g.connect(ctx.destination);
       src.start();
-      this.nodes.push(src, dcBlock, g);
+      this.nodes.push(src, dcBlock, lowpass, g);
     },
 
     stop: function() {
