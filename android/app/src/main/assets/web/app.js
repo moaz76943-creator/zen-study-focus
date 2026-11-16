@@ -82371,10 +82371,10 @@ window.SovereignMaintenanceHub = (function() {
         report.storageQuotaUsedKb = (totalChars * 2 / 1024).toFixed(1);
 
         console.log("🩺 [MaintenanceHub] System Health Audit:", report);
-        alert(`🩺 تقرير الصيانة اللحظي:
-- استهلاك التخزين: ${report.storageQuotaUsedKb} KB / 5120 KB
-- حالة المؤقت الذري: نشط ومنيع
-- حالة الذاكرة: ممتازة وخالية من التسريبات`);
+        // Non-blocking summary: alert() freezes the WebView JS thread on mobile.
+        if (typeof window !== "undefined" && window.dfSafeNotify) {
+            window.dfSafeNotify("🩺 " + report.status + " · " + report.storageQuotaUsedKb + " KB / 5120 KB");
+        }
         return report;
     }
 

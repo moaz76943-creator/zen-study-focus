@@ -72,21 +72,31 @@ test('MutationObserver shield: batches, delivers once, and drops pending batch o
   const mo = new win.MutationObserver((recs) => { calls++; got += recs.length; });
   mo.observe({}, { childList: true });
   const native = live[live.length - 1];
+  // Poll rather than sleep: the shield's delivery chain is ~41ms by design, but a loaded
+  // CI runner can stretch timers past a fixed 120ms sleep and flake this assertion.
+  const waitFor = async (cond, ms) => {
+    const deadline = Date.now() + ms;
+    while (Date.now() < deadline) {
+      if (cond()) return true;
+      await new Promise((r) => setTimeout(r, 5));
+    }
+    return cond();
+  };
   native.cb([{ a: 1 }, { a: 2 }], native);
   native.cb([{ a: 3 }], native);
-  await new Promise((r) => setTimeout(r, 120));
+  await waitFor(() => calls === 1, 2000);
   assert.equal(calls, 1, 'three records in one window = one delivery');
   assert.equal(got, 3);
   // disconnect before the delayed flush: no stale callback
   native.cb([{ a: 4 }], native);
   mo.disconnect();
-  await new Promise((r) => setTimeout(r, 120));
+  await new Promise((r) => setTimeout(r, 250));
   assert.equal(calls, 1, 'no callback after disconnect');
   // takeRecords returns the queued batch and cancels the delivery
   native.cb([{ a: 5 }], native);
   const taken = mo.takeRecords();
   assert.equal(taken.length, 1);
-  await new Promise((r) => setTimeout(r, 120));
+  await new Promise((r) => setTimeout(r, 250));
   assert.equal(calls, 1);
   // attributeFilter (integrity) observers are delivered synchronously
   let sync = 0;

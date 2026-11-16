@@ -54,6 +54,9 @@
             pill.style.left = "auto";
             pill.style.transform = "none";
             // High contrast on AMOLED/dark content; WCAG-large text, 48px tap target.
+            // TASK #806 Fix 1 forces light-mode buttons to #1e293b with !important, which would
+            // make this dark pill's label unreadable — declare white with !important so it wins.
+            pill.style.setProperty("color", "#ffffff", "important");
             pill.style.width = "auto";
             pill.style.maxWidth = "min(320px, calc(100vw - 64px))";
             pill.style.minHeight = "48px";
@@ -62,7 +65,6 @@
             pill.style.border = "2px solid #22c55e";
             pill.style.borderRadius = "999px";
             pill.style.padding = "12px 16px";
-            pill.style.color = "#ffffff";
             pill.style.fontSize = "0.92rem";
             pill.style.fontWeight = "800";
             pill.style.letterSpacing = "0.3px";
@@ -182,7 +184,12 @@
             if (targetModal) {
                 targetModal.style.display = "flex";
             } else {
-                alert("تم تفعيل: " + studioId);
+                // Non-blocking notification: alert() freezes the WebView JS thread on mobile.
+                if (typeof window !== "undefined" && window.dfSafeNotify) {
+                    window.dfSafeNotify("تم تفعيل: " + studioId);
+                } else if (typeof console !== "undefined" && console.info) {
+                    console.info("[StudioNavigator] Activated:", studioId);
+                }
             }
         }
     };

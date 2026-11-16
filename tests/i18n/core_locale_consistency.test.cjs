@@ -56,7 +56,7 @@ test('Cornell notes core-shell label is native for each of the nine previously E
 test('Core starter examples and sound names stay complete and separate from data/storage identifiers', () => {
   assert.deepEqual(Object.keys(extras).sort(), expectedCore.slice().sort());
   for (const [code, pack] of Object.entries(extras)) {
-    assert.equal(pack.sounds.length, 12, code);
+    assert.equal(pack.sounds.length, 13, code);
     assert.equal(pack.tasks.length, 4, code);
     assert.equal(pack.notes.length, 3, code);
     for (const sample of [...pack.sounds, ...pack.tasks, ...pack.notes.flat()]) {

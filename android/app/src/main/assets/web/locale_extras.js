@@ -13,7 +13,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "Tonnerre lointain",
       "Vent des hauteurs",
       "Pluie à la fenêtre",
-      "Grondement de la terre"
+      "Grondement de la terre",
+      "Goutte d’eau"
     ],
     "tasks": [
       "Terminer le chapitre 1 et les notions clés",
@@ -49,7 +50,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "Fernes Gewitter",
       "Bergwind",
       "Regen am Fenster",
-      "Tiefes Erdrauschen"
+      "Tiefes Erdrauschen",
+      "Wassertropfen"
     ],
     "tasks": [
       "Kapitel 1 und Grundbegriffe wiederholen",
@@ -85,7 +87,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "Trovão distante",
       "Vento das montanhas",
       "Chuva na janela",
-      "Ruído profundo da terra"
+      "Ruído profundo da terra",
+      "Gota de água"
     ],
     "tasks": [
       "Concluir o capítulo 1 e os conceitos principais",
@@ -121,7 +124,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "Tuono lontano",
       "Vento d’alta quota",
       "Pioggia sulla finestra",
-      "Rombo profondo della terra"
+      "Rombo profondo della terra",
+      "Goccia d’acqua"
     ],
     "tasks": [
       "Completare il capitolo 1 e i concetti base",
@@ -157,7 +161,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "Verre donder",
       "Bergwind",
       "Regen op het raam",
-      "Diep aardgeruis"
+      "Diep aardgeruis",
+      "Waterdruppel"
     ],
     "tasks": [
       "Hoofdstuk 1 en de basisbegrippen afronden",
@@ -193,7 +198,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "Uzak gök gürültüsü",
       "Dağ rüzgârı",
       "Penceredeki yağmur",
-      "Derin yer uğultusu"
+      "Derin yer uğultusu",
+      "Su damlası"
     ],
     "tasks": [
       "Birinci bölümü ve temel kavramları bitir",
@@ -229,7 +235,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "Далёкий гром",
       "Горный ветер",
       "Дождь по стеклу",
-      "Глубокий гул земли"
+      "Глубокий гул земли",
+      "Капля воды"
     ],
     "tasks": [
       "Закончить первую главу и основные понятия",
@@ -265,7 +272,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "Guntur jauh",
       "Angin dataran tinggi",
       "Hujan di jendela",
-      "Gemuruh bumi"
+      "Gemuruh bumi",
+      "Tetesan air"
     ],
     "tasks": [
       "Selesaikan bab 1 dan konsep dasar",
@@ -301,7 +309,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "Sấm xa",
       "Gió vùng cao",
       "Mưa trên cửa kính",
-      "Tiếng rền của đất"
+      "Tiếng rền của đất",
+      "Giọt nước"
     ],
     "tasks": [
       "Hoàn thành chương 1 và kiến thức cốt lõi",
@@ -337,7 +346,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "Odległy grzmot",
       "Górski wiatr",
       "Deszcz na szybie",
-      "Głęboki pomruk ziemi"
+      "Głęboki pomruk ziemi",
+      "Kropla wody"
     ],
     "tasks": [
       "Ukończ rozdział 1 i podstawowe pojęcia",
@@ -373,7 +383,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "远处雷声",
       "高山风声",
       "窗边雨声",
-      "大地低鸣"
+      "大地低鸣",
+      "水滴声"
     ],
     "tasks": [
       "完成第一章和基本概念",
@@ -409,7 +420,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "दूर की गरज",
       "पहाड़ी हवा",
       "खिड़की पर बारिश",
-      "धरती की गूँज"
+      "धरती की गूँज",
+      "पानी की बूँद"
     ],
     "tasks": [
       "अध्याय 1 और मूल अवधारणाएँ पूरी करें",
@@ -445,7 +457,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "遠くの雷",
       "山の風",
       "窓に降る雨",
-      "大地の低い音"
+      "大地の低い音",
+      "水滴の音"
     ],
     "tasks": [
       "第1章と基本概念を終える",
@@ -481,7 +494,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "먼 천둥",
       "산바람",
       "창문에 내리는 비",
-      "땅의 낮은 울림"
+      "땅의 낮은 울림",
+      "물방울 소리"
     ],
     "tasks": [
       "1장과 핵심 개념 마치기",
@@ -517,7 +531,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "দূরের বজ্র",
       "পাহাড়ি বাতাস",
       "জানালায় বৃষ্টি",
-      "মাটির গর্জন"
+      "মাটির গর্জন",
+      "পানির ফোঁটা"
     ],
     "tasks": [
       "প্রথম অধ্যায় ও মূল ধারণা শেষ করুন",
@@ -553,7 +568,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "دور کی گرج",
       "پہاڑی ہوا",
       "کھڑکی پر بارش",
-      "زمین کی گونج"
+      "زمین کی گونج",
+      "آب کی قطرہ"
     ],
     "tasks": [
       "پہلا باب اور بنیادی تصورات مکمل کریں",
@@ -589,7 +605,8 @@ window.ZEN_LOCALE_EXTRAS = {
       "رعد دوردست",
       "باد کوهستان",
       "باران روی پنجره",
-      "غرش عمیق زمین"
+      "غرش عمیق زمین",
+      "قطره آب"
     ],
     "tasks": [
       "فصل اول و مفاهیم اصلی را تمام کنید",

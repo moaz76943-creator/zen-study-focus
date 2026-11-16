@@ -51,3 +51,11 @@ Official reference: Google Play Help, "Use Play App Signing" — https://support
 1. Which Case (A/B/C) — from the Play Console comparison above.
 2. Approve rotation and the Play upload-key reset request.
 3. Approve/decline any history rewrite.
+
+## 7. Re-verification 2026-11-15 (audit)
+
+- The Track 13 "history" failure is byte-identical to this exposure: the scanner reported commit evidence `0efc9c80f55144d2…`, which is `sha256("3a51d4a6fcc866f00b5d53a357713e0d30191295")` — the same `.github/workflows/build_release_aab.yml` blob at line 33. It fails on this one finding only; the current tree scan is `ZERO_FINDINGS PASS`.
+- Containment: `git branch -r --contains 3a51d4a6` lists 61 of 667 remote branches (including `origin/integration/all-fixes` and `origin/integration/fixes-api36`, plus dependabot, i18n-pack and feature branches) and 187 tags. Neither `main` nor `integration/master-qa-verified-v21` (the release lineage) contains it. The Track 13 workflow checks out with `fetch-depth: 0` — GitHub fetches the complete ref graph (all branches and tags) in that mode — so the history scan sees the leak even though no release-lineage commit carries it; the release tree was always clean (blob removed in `c81aee2e`). Branch/tag deletion is not viable: the repo rule forbids force-push/branch deletion, the commit is a strict ancestor of 61 branch tips, and a history rewrite would invalidate 187 tags and every commit SHA recorded in QA evidence (Rule: Tags stay pinned; build_apk.yml pins `01348f73`).
+- HEAD is clean: no blob containing the base64 keystore material or the plaintext password exists in the tracked tree (`grep` for the base64 signature across the working tree returns nothing; `build_release_aab.yml` was removed from the tree in `c81aee2e`).
+- Allowlist: none will be added. `tools/security/gitleaks_public_identifiers.toml` admits only reviewed public identifiers (exact value + exact path); this is a real private key, so suppression is not legitimate. The gate stays red by design until Section 4/6 close.
+- Remediation that actually helps remains Section 4 (owner rotates the upload key and re-registers its certificate). Everything else (branch/tag surgery, rewrites, allowlists) reduces auditability without removing the leak.
