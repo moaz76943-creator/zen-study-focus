@@ -992,13 +992,11 @@ function triggerHaptic(type) {
 
 function playPeacefulChime() {
   try {
-    let ctx = window.dfGetGlobalAudioContext ? window.dfGetGlobalAudioContext() : null;
-    if (!ctx) {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return;
-      ctx = new AudioCtx();
+    const ctx = ensureProceduralAudioContext();
+    // Zero-autoplay: only resume after explicit user gesture
+    if (ctx.state === 'suspended' && audioContextUserGestureReceived && typeof ctx.resume === 'function') {
+      ctx.resume();
     }
-    if (ctx.state === 'suspended') ctx.resume();
 
     // نغمة جرس التأمل الهادئة (528 Hz Harmonic)
     const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
@@ -4070,24 +4068,27 @@ async function shareAppWithFriends() {
 /* ========================================================
    4. GUARANTEED COMPLETION CHIME & BACKGROUND ALARM
    ======================================================== */
-let chimeCtx = null;
+// Use the single master AudioContext instead of a separate chimeCtx
 function playRichCompletionChime(titleText, skipNative = false) {
   if (!skipNative && window.ZenNative && window.ZenNative.triggerCompletionSound) {
     try { window.ZenNative.triggerCompletionSound(titleText || "Session Completed!"); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   }
   try {
-    if (!chimeCtx) chimeCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (chimeCtx.state === 'suspended') chimeCtx.resume();
+    const ctx = ensureProceduralAudioContext();
+    // Zero-autoplay: timer completion is user-initiated, gesture should be received
+    if (ctx.state === 'suspended' && audioContextUserGestureReceived && typeof ctx.resume === 'function') {
+      ctx.resume();
+    }
     [528, 660, 792].forEach((freq, idx) => {
-      const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = chimeCtx.createGain();
+      const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }), gain = ctx.createGain();
       osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, chimeCtx.currentTime + idx * 0.35);
-      gain.gain.setValueAtTime(0.001, chimeCtx.currentTime + idx * 0.35);
-      gain.gain.exponentialRampToValueAtTime(0.65, chimeCtx.currentTime + idx * 0.35 + 0.05);
-      gain.gain.exponentialRampToValueAtTime(0.001, chimeCtx.currentTime + idx * 0.35 + 1.6);
-      osc.connect(gain); gain.connect(chimeCtx.destination);
-      osc.start(chimeCtx.currentTime + idx * 0.35);
-      osc.stop(chimeCtx.currentTime + idx * 0.35 + 1.6);
+      osc.frequency.setValueAtTime(freq, ctx.currentTime + idx * 0.35);
+      gain.gain.setValueAtTime(0.001, ctx.currentTime + idx * 0.35);
+      gain.gain.exponentialRampToValueAtTime(0.65, ctx.currentTime + idx * 0.35 + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.35 + 1.6);
+      osc.connect(gain); gain.connect(ctx.destination);
+      osc.start(ctx.currentTime + idx * 0.35);
+      osc.stop(ctx.currentTime + idx * 0.35 + 1.6);
     });
   } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   if (navigator.vibrate) try { ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate([300, 150, 300, 150, 500]) : false); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
@@ -4917,8 +4918,11 @@ function toggleTimerPlay() {
       catch(_){showToast(L().saveFailed || 'Could not create session. Try again.');return false;}
     }
     try {
-      if (!chimeCtx) chimeCtx = new (window.AudioContext || window.webkitAudioContext)();
-      if (chimeCtx.state === 'suspended') chimeCtx.resume();
+      const ctx = ensureProceduralAudioContext();
+      // Zero-autoplay: timer start is user-initiated, gesture should be received
+      if (ctx.state === 'suspended' && audioContextUserGestureReceived && typeof ctx.resume === 'function') {
+        ctx.resume();
+      }
     } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 
     const oldSessionId = timerSessionId, oldTaskId = focusSessionTaskId;
@@ -5407,18 +5411,103 @@ const soundGeneration = Object.create(null);
 let webAudioCtx = null;
 const proceduralBufferCache = Object.create(null);
 
+// AudioContext user gesture gate — prevents auto-play on startup/tab switch
+let audioContextUserGestureReceived = false;
+function markAudioContextUserGesture() {
+  audioContextUserGestureReceived = true;
+}
+if (typeof document !== 'undefined' && document.addEventListener) {
+  ['click', 'touchstart', 'keydown', 'pointerdown'].forEach(evt => {
+    document.addEventListener(evt, markAudioContextUserGesture, { once: true, passive: true });
+  });
+}
+
 function ensureProceduralAudioContext() {
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   if (!AudioCtx) throw new Error('Web Audio is unavailable');
   if (!webAudioCtx || webAudioCtx.state === 'closed') {
     webAudioCtx = new AudioCtx();
   }
-  if (webAudioCtx.state === 'suspended' && typeof webAudioCtx.resume === 'function') {
+  // Zero-autoplay: only resume after explicit user gesture
+  if (webAudioCtx.state === 'suspended' && audioContextUserGestureReceived && typeof webAudioCtx.resume === 'function') {
     webAudioCtx.resume();
   }
   return webAudioCtx;
 }
 window.dfGetGlobalAudioContext = ensureProceduralAudioContext;
+
+// ============================================================
+// PROCEDURAL NOISE BUFFER GENERATION (Pink/Brown/White)
+// High-quality spectral shaping with DC blocking
+// ============================================================
+function generateNoiseBuffer(ctx, color, durationSec = 2.0) {
+  const cacheKey = `${color}_${ctx.sampleRate}_${durationSec}`;
+  if (proceduralBufferCache[cacheKey]) return proceduralBufferCache[cacheKey];
+
+  const sampleRate = ctx.sampleRate;
+  const length = Math.ceil(sampleRate * durationSec);
+  const buffer = ctx.createBuffer(1, length, sampleRate);
+  const data = buffer.getChannelData(0);
+
+  if (color === 'white') {
+    // White noise: flat spectral density
+    for (let i = 0; i < length; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.35;
+    }
+  } else if (color === 'pink') {
+    // Pink noise: -3 dB/octave (Paul Kellet's refined algorithm)
+    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+    for (let i = 0; i < length; i++) {
+      const white = Math.random() * 2 - 1;
+      b0 = 0.99886 * b0 + white * 0.0555179;
+      b1 = 0.99332 * b1 + white * 0.0750759;
+      b2 = 0.96900 * b2 + white * 0.1538520;
+      b3 = 0.86650 * b3 + white * 0.3104856;
+      b4 = 0.55000 * b4 + white * 0.5329522;
+      b5 = -0.7616 * b5 - white * 0.0168980;
+      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+      b6 = white * 0.115926;
+    }
+  } else if (color === 'brown') {
+    // Brown/Red noise: -6 dB/octave (leaky integration of white noise)
+    let lastOut = 0;
+    const alpha = 0.99; // Integration factor
+    for (let i = 0; i < length; i++) {
+      const white = Math.random() * 2 - 1;
+      lastOut = alpha * lastOut + (1 - alpha) * white;
+      data[i] = lastOut * 0.15;
+    }
+  }
+
+  proceduralBufferCache[cacheKey] = buffer;
+  return buffer;
+}
+
+function createNoiseSource(ctx, color, gainValue = 0.25) {
+  const buffer = generateNoiseBuffer(ctx, color);
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.loop = true;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(gainValue, ctx.currentTime + 0.05);
+  // DC-blocking high-pass filter (15 Hz) to protect transducer coils
+  const dcBlock = ctx.createBiquadFilter();
+  dcBlock.type = 'highpass';
+  dcBlock.frequency.setValueAtTime(15, ctx.currentTime);
+  dcBlock.Q.setValueAtTime(0.707, ctx.currentTime);
+  source.connect(dcBlock);
+  dcBlock.connect(gain);
+  const noiseSource = { source, gain, dcBlock, color };
+  activeNoiseSources.add(noiseSource);
+  // Auto-remove from tracking when stopped
+  const originalStop = source.stop.bind(source);
+  source.stop = function(...args) {
+    activeNoiseSources.delete(noiseSource);
+    return originalStop(...args);
+  };
+  return noiseSource;
+}
 
 
 function dfTriggerTibetanSingingBell(vol = 0.65) {
@@ -5607,8 +5696,25 @@ function playPresetRelaxMix() {
   toggleSoundTile('rain');
   toggleSoundTile('forest');
 }
+// Track active procedural noise sources for instant stop
+const activeNoiseSources = new Set();
+
 function stopAllAudio() {
   SOUNDS_DATA.forEach(s => stopSoundTile(s.id));
+  
+  // Stop all active procedural noise sources
+  activeNoiseSources.forEach(noiseSource => {
+    try {
+      if (noiseSource.source) {
+        noiseSource.source.stop();
+        noiseSource.source.disconnect();
+      }
+      if (noiseSource.gain) noiseSource.gain.disconnect();
+      if (noiseSource.dcBlock) noiseSource.dcBlock.disconnect();
+    } catch (_) {}
+  });
+  activeNoiseSources.clear();
+  
   // Unified instant stop: kill every engine family so no loop keeps playing
   // after the user hits Stop (ogg singleton, procedural DSP, binaural synth).
   try {
@@ -13645,6 +13751,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   var _leftOsc = null;
   var _rightOsc = null;
   var _binauralMasterGain = null;
+  var _binauralDcBlock = null;
 
   function dfIsBinauralGammaActive() {
     try {
@@ -13664,6 +13771,8 @@ window.FlashQuizEngine = FlashQuizEngine;
           try {
             if (_leftOsc) { _leftOsc.stop(); _leftOsc.disconnect(); _leftOsc = null; }
             if (_rightOsc) { _rightOsc.stop(); _rightOsc.disconnect(); _rightOsc = null; }
+            if (_binauralMasterGain) { _binauralMasterGain.disconnect(); _binauralMasterGain = null; }
+            if (_binauralDcBlock) { _binauralDcBlock.disconnect(); _binauralDcBlock = null; }
           } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
         }, 550);
       }
@@ -13681,15 +13790,20 @@ window.FlashQuizEngine = FlashQuizEngine;
 
     try {
       if (typeof window === "undefined") return { active: false, reason: "no_window" };
-      var AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return { active: false, reason: "no_audio_context" };
-
-      if (!_binauralCtx || _binauralCtx.state === "closed") {
-        _binauralCtx = new AudioCtx();
-      } else if (_binauralCtx.state === "suspended") {
-        _binauralCtx.resume();
+      
+      // Use the single master AudioContext
+      var ctx = window.dfGetGlobalAudioContext ? window.dfGetGlobalAudioContext() : null;
+      if (!ctx) return { active: false, reason: "no_audio_context" };
+      
+      // Zero-autoplay: only proceed if user gesture received
+      if (ctx.state === "suspended" && !audioContextUserGestureReceived) {
+        return { active: false, reason: "gesture_required" };
+      }
+      if (ctx.state === "suspended" && typeof ctx.resume === "function") {
+        ctx.resume();
       }
 
+      _binauralCtx = ctx;
       var carrier = Number(carrierFreq) || 216;
       var beat = 40;
 
@@ -13697,6 +13811,12 @@ window.FlashQuizEngine = FlashQuizEngine;
       _binauralMasterGain = _binauralCtx.createGain();
       _binauralMasterGain.gain.setValueAtTime(0.0001, _binauralCtx.currentTime);
       _binauralMasterGain.gain.exponentialRampToValueAtTime(0.08, _binauralCtx.currentTime + 1.5);
+
+      // DC-blocking high-pass filter (15 Hz) on master output
+      _binauralDcBlock = _binauralCtx.createBiquadFilter();
+      _binauralDcBlock.type = 'highpass';
+      _binauralDcBlock.frequency.setValueAtTime(15, _binauralCtx.currentTime);
+      _binauralDcBlock.Q.setValueAtTime(0.707, _binauralCtx.currentTime);
 
       _leftOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       _leftOsc.type = "sine";
@@ -13715,7 +13835,9 @@ window.FlashQuizEngine = FlashQuizEngine;
         _rightOsc.connect(_binauralMasterGain);
       }
 
-      _binauralMasterGain.connect(_binauralCtx.destination);
+      // Wire: MasterGain -> DC Block -> Destination
+      _binauralMasterGain.connect(_binauralDcBlock);
+      _binauralDcBlock.connect(_binauralCtx.destination);
 
       _leftOsc.start(0);
       _rightOsc.start(0);
@@ -21498,12 +21620,14 @@ window.dfTrackContextualReviewEnvironment = function(sessionStartTime, orientati
 };
 
 window.dfSynthesizeTatamiRainAcoustics = function(ctx) {
-  const bufferSize = ctx.sampleRate * 2, buf = ctx.createBuffer(1, bufferSize, ctx.sampleRate), data = buf.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) { data[i] = (Math.random() * 2 - 1) * 0.08; }
-  const noise = ctx.createBufferSource(); noise.buffer = buf; noise.loop = true;
+  // Use high-quality pink noise with proper spectral shaping
+  const noiseSource = createNoiseSource(ctx, 'pink', 0.08);
   const lpf = ctx.createBiquadFilter(); lpf.type = "lowpass"; lpf.frequency.value = 450;
-  noise.connect(lpf); noise.start();
-  return { output: lpf, pattern: "CONTINUOUS_SOFT_TATAMI" };
+  noiseSource.source.connect(noiseSource.dcBlock);
+  noiseSource.dcBlock.connect(noiseSource.gain);
+  noiseSource.gain.connect(lpf);
+  noiseSource.source.start();
+  return { output: lpf, pattern: "CONTINUOUS_SOFT_TATAMI", noiseSource: noiseSource };
 };
 
 window.dfComputeMicroRestRecoveryInterval = function(continuousFocusMinutes) {
@@ -21572,15 +21696,19 @@ window.dfEvaluateOverlearningThreshold = function(reviewRepetitionsToday, curren
 };
 
 window.dfSynthesizeSaunaSteamHearthAcoustics = function(ctx) {
-  const node = ctx.createBufferSource(), buf = ctx.createBuffer(1, ctx.sampleRate * 2.5, ctx.sampleRate), data = buf.getChannelData(0);
-  for (let i = 0; i < data.length; i++) {
-    const t = i / ctx.sampleRate, hiss = (Math.random() * 2 - 1) * Math.exp(-t * 1.4);
-    const crackle = Math.random() < 0.0008 ? (Math.random() * 2 - 1) * 0.8 : 0;
-    data[i] = hiss * 0.15 + crackle;
-  }
-  node.buffer = buf; const hpf = ctx.createBiquadFilter(); hpf.type = "highpass"; hpf.frequency.value = 1200;
-  node.connect(hpf); node.start();
-  return { output: hpf, duration: 2.5 };
+  // Use high-quality brown noise for steam hiss (no discrete oscillators per zero-music policy)
+  const noiseSource = createNoiseSource(ctx, 'brown', 0.15);
+  const hpf = ctx.createBiquadFilter(); hpf.type = "highpass"; hpf.frequency.value = 1200;
+  noiseSource.source.connect(noiseSource.dcBlock);
+  noiseSource.dcBlock.connect(noiseSource.gain);
+  noiseSource.gain.connect(hpf);
+  noiseSource.source.start();
+  
+  const masterGain = ctx.createGain();
+  masterGain.gain.value = 0.3;
+  hpf.connect(masterGain);
+  
+  return { output: masterGain, duration: 2.5, noiseSource: noiseSource };
 };
 
 window.dfAlignChronotypeFocusSchedule = function(chronotype, currentHour) {
@@ -21634,18 +21762,15 @@ window.dfIntegrateCentralAsianLangPack = function() {
 
 /* DEEP FOCUS MISSIONS M608-M617: MIST DRONE, FSRS FAILURE PENALTY & M610 SEAL */
 window.dfSynthesizeDeepForestMistAcoustics = function(ctx, dur) {
-  const d = dur || 12, buf = ctx.createBuffer(2, ctx.sampleRate * d, ctx.sampleRate);
-  for (let c = 0; c < 2; c++) {
-    const data = buf.getChannelData(c); let b0 = 0, b1 = 0;
-    for (let i = 0; i < data.length; i++) {
-      const white = Math.random() * 2 - 1;
-      b0 = 0.98 * b0 + white * 0.04; b1 = 0.95 * b1 + white * 0.08;
-      data[i] = (b0 + b1) * 0.12;
-    }
-  }
-  const src = ctx.createBufferSource(); src.buffer = buf;
+  const d = dur || 12;
+  // Use high-quality brown noise for deep forest mist
+  const noiseSource = createNoiseSource(ctx, 'brown', 0.12);
   const lpf = ctx.createBiquadFilter(); lpf.type = "lowpass"; lpf.frequency.value = 160;
-  src.connect(lpf); return { source: src, filter: lpf, duration: d };
+  noiseSource.source.connect(noiseSource.dcBlock);
+  noiseSource.dcBlock.connect(noiseSource.gain);
+  noiseSource.gain.connect(lpf);
+  noiseSource.source.start();
+  return { source: noiseSource.source, filter: lpf, duration: d, noiseSource: noiseSource };
 };
 
 window.dfSynthesizeIsochronicAlpha12Hz = function(ctx, dur, carrierFreq) {
@@ -21675,14 +21800,19 @@ window.dfThrottleLeitnerBoxCapacity = function(boxIndex, currentCardsCount, maxR
 };
 
 window.dfSynthesizeRiverbedPebblesAcoustics = function(ctx) {
-  const node = ctx.createBufferSource(), buf = ctx.createBuffer(1, ctx.sampleRate * 2.0, ctx.sampleRate), data = buf.getChannelData(0);
-  for (let i = 0; i < data.length; i++) {
-    const click = Math.random() < 0.0012 ? (Math.random() * 2 - 1) * 0.6 : 0;
-    data[i] = click;
-  }
-  node.buffer = buf; const bpf = ctx.createBiquadFilter(); bpf.type = "bandpass"; bpf.frequency.value = 1800; bpf.Q.value = 3.5;
-  node.connect(bpf); node.start();
-  return { output: bpf, duration: 2.0 };
+  // Use high-quality brown noise as base (no discrete oscillators per zero-music policy)
+  const noiseSource = createNoiseSource(ctx, 'brown', 0.05);
+  const bpf = ctx.createBiquadFilter(); bpf.type = "bandpass"; bpf.frequency.value = 1800; bpf.Q.value = 3.5;
+  noiseSource.source.connect(noiseSource.dcBlock);
+  noiseSource.dcBlock.connect(noiseSource.gain);
+  noiseSource.gain.connect(bpf);
+  noiseSource.source.start();
+  
+  const masterGain = ctx.createGain();
+  masterGain.gain.value = 0.3;
+  bpf.connect(masterGain);
+  
+  return { output: masterGain, duration: 2.0, noiseSource: noiseSource };
 };
 
 window.dfStepClozeProgressiveReveal = function(originalText, currentStep) {
@@ -21726,12 +21856,14 @@ window.dfIntegrateAustronesianLangPack = function() {
 
 /* DEEP FOCUS MISSIONS M618-M627: HIMALAYAN WIND, SEMANTIC GRAPH & M620 SEAL */
 window.dfSynthesizeHimalayanWindAcoustics = function(ctx) {
-  const bufferSize = ctx.sampleRate * 3.0, buf = ctx.createBuffer(1, bufferSize, ctx.sampleRate), data = buf.getChannelData(0);
-  for (let i = 0; i < bufferSize; i++) { data[i] = (Math.random() * 2 - 1) * 0.15; }
-  const src = ctx.createBufferSource(); src.buffer = buf; src.loop = true;
+  // Use high-quality pink noise for wind with bandpass filtering
+  const noiseSource = createNoiseSource(ctx, 'pink', 0.15);
   const bpf = ctx.createBiquadFilter(); bpf.type = "bandpass"; bpf.frequency.value = 320; bpf.Q.value = 5.0;
-  src.connect(bpf); src.start();
-  return { output: bpf, resonance: "HIMALAYAN_RIDGE" };
+  noiseSource.source.connect(noiseSource.dcBlock);
+  noiseSource.dcBlock.connect(noiseSource.gain);
+  noiseSource.gain.connect(bpf);
+  noiseSource.source.start();
+  return { output: bpf, resonance: "HIMALAYAN_RIDGE", noiseSource: noiseSource };
 };
 
 window.dfSynthesizeDeltaThetaConsolidation = function(ctx, dur) {
@@ -21756,15 +21888,25 @@ window.dfConfigureContrastInversionMasker = function(isInverted) {
 };
 
 window.dfSynthesizeZenGravelRakeAcoustics = function(ctx) {
-  const buf = ctx.createBuffer(1, ctx.sampleRate * 1.5, ctx.sampleRate), data = buf.getChannelData(0);
-  for (let i = 0; i < data.length; i++) {
-    const t = i / ctx.sampleRate, stroke = Math.sin(Math.PI * (t / 1.5));
-    data[i] = (Math.random() * 2 - 1) * stroke * 0.12;
-  }
-  const node = ctx.createBufferSource(); node.buffer = buf;
+  // Use high-quality brown noise for gravel texture
+  const noiseSource = createNoiseSource(ctx, 'brown', 0.12);
   const bpf = ctx.createBiquadFilter(); bpf.type = "bandpass"; bpf.frequency.value = 850; bpf.Q.value = 2.0;
-  node.connect(bpf); node.start();
-  return { output: bpf, duration: 1.5 };
+  noiseSource.source.connect(noiseSource.dcBlock);
+  noiseSource.dcBlock.connect(noiseSource.gain);
+  noiseSource.gain.connect(bpf);
+  
+  // Add stroke envelope
+  const env = ctx.createGain();
+  const now = ctx.currentTime;
+  env.gain.setValueAtTime(0.001, now);
+  env.gain.linearRampToValueAtTime(1.0, now + 0.1);
+  env.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
+  
+  noiseSource.gain.connect(env);
+  env.connect(bpf);
+  noiseSource.source.start();
+  
+  return { output: bpf, duration: 1.5, noiseSource: noiseSource };
 };
 
 window.dfApplyIntervalSpacingJitter = function(baseIntervalDays) {
@@ -21850,15 +21992,19 @@ window.dfComputeConfidenceCalibrationScore = function(predictedScore, actualScor
 };
 
 window.dfSynthesizeHearthEmbersAcoustics = function(ctx) {
-  const buf = ctx.createBuffer(1, ctx.sampleRate * 2.0, ctx.sampleRate), data = buf.getChannelData(0);
-  for (let i = 0; i < data.length; i++) {
-    const crackle = Math.random() < 0.0006 ? (Math.random() * 2 - 1) * 0.75 : 0;
-    data[i] = crackle;
-  }
-  const node = ctx.createBufferSource(); node.buffer = buf;
+  // Use high-quality brown noise as base (no discrete oscillators per zero-music policy)
+  const noiseSource = createNoiseSource(ctx, 'brown', 0.08);
   const lpf = ctx.createBiquadFilter(); lpf.type = "lowpass"; lpf.frequency.value = 600;
-  node.connect(lpf); node.start();
-  return { output: lpf, duration: 2.0 };
+  noiseSource.source.connect(noiseSource.dcBlock);
+  noiseSource.dcBlock.connect(noiseSource.gain);
+  noiseSource.gain.connect(lpf);
+  noiseSource.source.start();
+  
+  const masterGain = ctx.createGain();
+  masterGain.gain.value = 0.3;
+  lpf.connect(masterGain);
+  
+  return { output: masterGain, duration: 2.0, noiseSource: noiseSource };
 };
 
 window.dfEstimateContextSwitchLatency = function(switchCountThisSession) {
@@ -21944,15 +22090,32 @@ window.dfMinimizeLeitnerInterference = function(cardsList) {
 };
 
 window.dfSynthesizeAutumnCanopyRustle = function(ctx) {
-  const buf = ctx.createBuffer(1, ctx.sampleRate * 2.5, ctx.sampleRate), data = buf.getChannelData(0);
-  for (let i = 0; i < data.length; i++) {
-    const t = i / ctx.sampleRate, gust = Math.sin(Math.PI * (t / 2.5)) * (0.8 + 0.2 * Math.sin(6 * Math.PI * t));
-    data[i] = (Math.random() * 2 - 1) * gust * 0.14;
-  }
-  const node = ctx.createBufferSource(); node.buffer = buf;
+  // Use high-quality brown noise for leaf rustle with gust envelope
+  const noiseSource = createNoiseSource(ctx, 'brown', 0.14);
   const bpf = ctx.createBiquadFilter(); bpf.type = "bandpass"; bpf.frequency.value = 650; bpf.Q.value = 3.0;
-  node.connect(bpf); node.start();
-  return { output: bpf, duration: 2.5 };
+  noiseSource.source.connect(noiseSource.dcBlock);
+  noiseSource.dcBlock.connect(noiseSource.gain);
+  noiseSource.gain.connect(bpf);
+  
+  // Add gust envelope
+  const env = ctx.createGain();
+  const now = ctx.currentTime;
+  const dur = 2.5;
+  env.gain.setValueAtTime(0.001, now);
+  env.gain.linearRampToValueAtTime(1.0, now + 0.1);
+  // Modulated sustain
+  for (let i = 0; i < 5; i++) {
+    const t = now + (i / 5) * dur;
+    env.gain.linearRampToValueAtTime(0.7 + 0.3 * Math.sin(6 * Math.PI * t), t + 0.01);
+  }
+  env.gain.exponentialRampToValueAtTime(0.001, now + dur);
+  
+  noiseSource.gain.connect(env);
+  env.connect(bpf);
+  noiseSource.source.start();
+  noiseSource.source.stop(now + dur + 0.1);
+  
+  return { output: bpf, duration: 2.5, noiseSource: noiseSource };
 };
 
 window.dfConfigureDualColumnContrastPacer = function(columnWidthPx) {
@@ -26325,7 +26488,7 @@ window.dfVerifyLanguagePacksParity = function(localeCode) {
 
 /* DEEP FOCUS MISSIONS M1148-M1157: AUDIO RESUME ENGINE & GENUINE I18N UR/FA/RU/IT */
 window.dfEnsureAudioContextActive = function(ctx) {
-  if (ctx && ctx.state === "suspended") {
+  if (ctx && ctx.state === "suspended" && audioContextUserGestureReceived) {
     return ctx.resume().then(() => ({ status: "RESUMED", active: true }));
   }
   return Promise.resolve({ status: "ALREADY_ACTIVE", active: true });
@@ -27036,7 +27199,7 @@ window.dfValidateWesternNumeralsOnly = function(str) {
 };
 
 window.dfProtectAudioContextResume = function(ctx) {
-  if (ctx && ctx.state === "suspended") {
+  if (ctx && ctx.state === "suspended" && audioContextUserGestureReceived) {
     ctx.resume().catch(() => {});
   }
   return { state: (ctx && ctx.state) || "uninitialized" };
@@ -37724,21 +37887,15 @@ if (typeof document !== "undefined") {
    DEEP FOCUS: RESILIENT WEB AUDIO DSP & AUTO-RESUME SHIELD
    Eliminates autoplay blocks, clicking pops, and suspended audio states
    ========================================================== */
-window.DF_AUDIO_CTX = null;
-
+// Use the single master procedural AudioContext (dfGetGlobalAudioContext)
+// instead of creating a separate DF_AUDIO_CTX instance.
 window.dfGetSafeAudioContext = function() {
-  if (!window.DF_AUDIO_CTX && typeof window !== "undefined") {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (AudioContextClass) {
-      window.DF_AUDIO_CTX = new AudioContextClass();
-    }
-  }
-  return window.DF_AUDIO_CTX;
+  return window.dfGetGlobalAudioContext ? window.dfGetGlobalAudioContext() : null;
 };
 
 window.dfEnsureAudioActive = async function() {
   const ctx = window.dfGetSafeAudioContext();
-  if (ctx && ctx.state === "suspended") {
+  if (ctx && ctx.state === "suspended" && audioContextUserGestureReceived) {
     try {
       await ctx.resume();
     } catch (e) {
@@ -41619,8 +41776,10 @@ window.dfHandleBluetoothCodecSwitch = async function() {
   
   if (ctx.state === "interrupted" || ctx.state === "suspended") {
     try {
-      await ctx.resume();
-      console.log("[BLUETOOTH AUDIO] Context resumed after wireless handshake.");
+      if (audioContextUserGestureReceived) {
+        await ctx.resume();
+        console.log("[BLUETOOTH AUDIO] Context resumed after wireless handshake.");
+      }
     } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
   }
 };
@@ -48121,10 +48280,9 @@ window.dfSubmitFlashcardRating =
 window.dfStudioAudio = {
   ctx: null, nodes: [],
   getCtx: function() {
+    // Use the single master AudioContext
     if (!this.ctx) {
-      const A = window.AudioContext ||
-        window.webkitAudioContext;
-      if (A) this.ctx = new A();
+      this.ctx = window.dfGetGlobalAudioContext ? window.dfGetGlobalAudioContext() : null;
     }
     return this.ctx;
   },
@@ -48132,36 +48290,30 @@ window.dfStudioAudio = {
     const ctx = this.getCtx();
     if (!ctx) return;
     this.stop();
-    if (ctx.state === 'suspended') ctx.resume();
-    const len = Math.floor(ctx.sampleRate * 3);
-    const buf = ctx.createBuffer(
-      1, len, ctx.sampleRate
-    );
-    const d = buf.getChannelData(0);
-    let last = 0.0;
-    for (let i = 0; i < len; i++) {
-      const w = Math.random() * 2 - 1;
-      last = (last + (0.02 * w)) / 1.02;
-      d[i] = last * 3.5;
+    // Zero-autoplay: only resume after explicit user gesture
+    if (ctx.state === 'suspended' && audioContextUserGestureReceived && typeof ctx.resume === 'function') {
+      ctx.resume();
     }
-    const src = ctx.createBufferSource();
-    src.buffer = buf; src.loop = true;
+    // Use high-quality brown noise for ambience
+    const noiseSource = createNoiseSource(ctx, 'brown', 0.28);
     const f = ctx.createBiquadFilter();
     f.type = 'lowpass';
     f.frequency.value = isRain ? 800 : 380;
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0.001, ctx.currentTime);
-    const tE = ctx.currentTime + 1.2;
-    g.gain.linearRampToValueAtTime(0.28, tE);
-    src.connect(f); f.connect(g);
-    g.connect(ctx.destination);
-    src.start(); this.nodes.push(src, g);
+    noiseSource.source.connect(noiseSource.dcBlock);
+    noiseSource.dcBlock.connect(noiseSource.gain);
+    noiseSource.gain.connect(f);
+    f.connect(ctx.destination);
+    noiseSource.source.start();
+    this.nodes.push(noiseSource.source, noiseSource.gain, noiseSource.dcBlock, f);
   },
   playBinaural: function(diff) {
     const ctx = this.getCtx();
     if (!ctx) return;
     this.stop();
-    if (ctx.state === 'suspended') ctx.resume();
+    // Zero-autoplay: only resume after explicit user gesture
+    if (ctx.state === 'suspended' && audioContextUserGestureReceived && typeof ctx.resume === 'function') {
+      ctx.resume();
+    }
     const oL = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     const oR = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
     oL.type = 'sine'; oR.type = 'sine';
@@ -61960,19 +62112,16 @@ function() {
 
   function getSpatialAudioCtx() {
     if (typeof window === 'undefined') return null;
-    if (typeof window.dfGetGlobalAudioContext === 'function') {
-      try {
-        spatialAudioCtx = window.dfGetGlobalAudioContext();
-      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+    // Use the single master AudioContext
+    let ctx = window.dfGetGlobalAudioContext ? window.dfGetGlobalAudioContext() : null;
+    if (!ctx) return null;
+    
+    // Zero-autoplay: only resume after explicit user gesture
+    if (ctx.state === 'suspended' && audioContextUserGestureReceived && typeof ctx.resume === 'function') {
+      ctx.resume();
     }
-    if (!spatialAudioCtx || spatialAudioCtx.state === 'closed') {
-      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-      if (!AudioContextClass) return null;
-      spatialAudioCtx = new AudioContextClass();
-    }
-    if (spatialAudioCtx.state === 'suspended' && typeof spatialAudioCtx.resume === 'function') {
-      spatialAudioCtx.resume();
-    }
+    
+    spatialAudioCtx = ctx;
     initMasterAudioChain();
     return spatialAudioCtx;
   }
@@ -62968,7 +63117,7 @@ function() {
     if (spatialAudioCtx) {
       if (m && spatialAudioCtx.state === 'running') {
         spatialAudioCtx.suspend();
-      } else if (!m && spatialAudioCtx.state === 'suspended') {
+      } else if (!m && spatialAudioCtx.state === 'suspended' && audioContextUserGestureReceived) {
         spatialAudioCtx.resume();
       }
     }
@@ -62980,7 +63129,7 @@ function() {
   };
 
   window.dfRecoverAudioContextAfterPhoneCall = function() {
-    if (spatialAudioCtx && spatialAudioCtx.state === 'suspended') {
+    if (spatialAudioCtx && spatialAudioCtx.state === 'suspended' && audioContextUserGestureReceived) {
       spatialAudioCtx.resume();
     }
     return { audioResumed: true, smooth: true, contextState: spatialAudioCtx ? spatialAudioCtx.state : 'running' };
