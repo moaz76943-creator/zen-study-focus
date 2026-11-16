@@ -211,6 +211,7 @@
     /**
      * Ocean: brownian rumble with the shoreline swell baked directly into the
      * buffer, so no LFO node has to be kept alive. Zero-static version.
+     * Uses proper brown noise (integrated pink) for zero static/hiss.
      */
     generateOceanBuffer(durationSec = 5) {
       const ctx = this.initAudioContext();
@@ -219,15 +220,25 @@
         const bufferSize = Math.floor(sampleRate * totalSec);
 
         const swellHz = 0.08;
-        let lastOut = 0.0;
+        // Proper brown noise: integrate pink noise (Paul Kellet -6dB/oct)
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        let brownAccum = 0;
         for (let i = 0; i < bufferSize; i++) {
           const white = Math.random() * 2 - 1;
-          lastOut = (lastOut + (0.02 * white)) / 1.02;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+          b6 = white * 0.115926;
+          // Integrate pink to get brown
+          brownAccum = brownAccum + pink * 0.01;
           const t = i / sampleRate;
           // 0.55..1.0 swell, keeps the noise well below the limiter ceiling.
           const swell = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(2 * Math.PI * swellHz * t));
-          // Reduced from 1.5 to 0.8 to eliminate static/clipping risk
-          data[i] = lastOut * 0.8 * swell;
+          data[i] = brownAccum * 0.8 * swell;
         }
         // Hard safety clamp
         for (let i = 0; i < bufferSize; i++) {

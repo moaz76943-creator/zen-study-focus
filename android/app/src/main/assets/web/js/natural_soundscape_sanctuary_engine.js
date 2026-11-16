@@ -70,25 +70,40 @@
       if (!this.ctx) return null;
       return createSeamlessBuffer(this.ctx, 3, (data, sampleRate, durationSec) => {
         const bufferSize = Math.floor(sampleRate * durationSec);
-        let b0 = 0, b1 = 0, b2 = 0;
+        // Full Paul Kellet pink noise filter
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        // Brown noise accumulator
+        let brownAccum = 0;
 
         for (let i = 0; i < bufferSize; i++) {
           const white = Math.random() * 2 - 1;
           if (type === 'rain' || type === 'water') {
-            // محاكاة قطرات المطر (Pink Noise Filter)
+            // Pink Noise Filter (Paul Kellet -3dB/oct)
             b0 = 0.99886 * b0 + white * 0.0555179;
             b1 = 0.99332 * b1 + white * 0.0750759;
-            data[i] = (b0 + b1) * 0.5;
+            b2 = 0.96900 * b2 + white * 0.1538520;
+            b3 = 0.86650 * b3 + white * 0.3104856;
+            b4 = 0.55000 * b4 + white * 0.5329522;
+            b5 = -0.7616 * b5 - white * 0.0168980;
+            data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+            b6 = white * 0.115926;
           } else if (type === 'ocean' || type === 'wind') {
-            // محاكاة هدير الأمواج والرياح العميقة (Brownian Noise)
-            b0 = (b0 + (0.02 * white)) / 1.02;
-            // Reduced from 3.5 to 1.5 to eliminate static, filtered by bandpass
-            data[i] = b0 * 1.5;
+            // Brown Noise: integrate pink noise (-6dB/oct additional slope)
+            b0 = 0.99886 * b0 + white * 0.0555179;
+            b1 = 0.99332 * b1 + white * 0.0750759;
+            b2 = 0.96900 * b2 + white * 0.1538520;
+            b3 = 0.86650 * b3 + white * 0.3104856;
+            b4 = 0.55000 * b4 + white * 0.5329522;
+            b5 = -0.7616 * b5 - white * 0.0168980;
+            const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+            b6 = white * 0.115926;
+            brownAccum = brownAccum + pink * 0.01;
+            data[i] = brownAccum * 0.8;
           } else {
-            // محاكاة طقطقة حطب النار الهادئة (Campfire)
-            const pop = Math.random() > 0.9985 ? (Math.random() * 2 - 1) * 0.8 : 0; // Reduced from 2 to 0.8
+            // Campfire crackle: sparse pops on low noise floor
+            const pop = Math.random() > 0.9985 ? (Math.random() * 2 - 1) * 0.8 : 0;
             b0 = 0.99 * b0 + white * 0.02;
-            data[i] = b0 + pop;
+            data[i] = b0 * 0.1 + pop;
           }
         }
         // Hard safety clamp
@@ -151,9 +166,24 @@
     stop(soundKey) {
       if (this.activeTracks[soundKey]) {
         try {
-          this.activeTracks[soundKey].source.stop();
+          const track = this.activeTracks[soundKey];
+          const now = this.ctx ? this.ctx.currentTime : 0;
+          const fadeOutSec = 0.06;
+          if (track.gain) {
+            track.gain.gain.cancelScheduledValues(now);
+            track.gain.gain.setValueAtTime(track.gain.gain.value, now);
+            track.gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
+          }
+          track.source.stop(now + fadeOutSec + 0.01);
+        } catch (e) {
+          try { this.activeTracks[soundKey].source.stop(); } catch (_) {}
+        }
+        try {
           this.activeTracks[soundKey].source.disconnect();
-        } catch (e) {}
+          this.activeTracks[soundKey].dcBlock?.disconnect();
+          this.activeTracks[soundKey].gain?.disconnect();
+          this.activeTracks[soundKey].filter?.disconnect();
+        } catch (_) {}
         delete this.activeTracks[soundKey];
       }
     }

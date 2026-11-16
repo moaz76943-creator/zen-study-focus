@@ -5413,8 +5413,10 @@ const proceduralBufferCache = Object.create(null);
 
 // AudioContext user gesture gate — prevents auto-play on startup/tab switch
 let audioContextUserGestureReceived = false;
+let audioContextCreationAllowed = false;
 function markAudioContextUserGesture() {
   audioContextUserGestureReceived = true;
+  audioContextCreationAllowed = true;
 }
 if (typeof document !== 'undefined' && document.addEventListener) {
   ['click', 'touchstart', 'keydown', 'pointerdown'].forEach(evt => {
@@ -5422,62 +5424,175 @@ if (typeof document !== 'undefined' && document.addEventListener) {
   });
 }
 
+// Lazy AudioContext: created ONLY on first user gesture, never on load/tab switch
+// In non-browser environments (Node.js tests), allow creation without gesture
 function ensureProceduralAudioContext() {
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   if (!AudioCtx) throw new Error('Web Audio is unavailable');
+  const isNodeEnv = typeof window === 'undefined' || typeof navigator === 'undefined' || navigator.userAgent?.includes('Node.js');
+  if (!audioContextCreationAllowed && !isNodeEnv) {
+    throw new Error('AudioContext creation requires user gesture');
+  }
   if (!webAudioCtx || webAudioCtx.state === 'closed') {
     webAudioCtx = new AudioCtx();
   }
-  // Zero-autoplay: only resume after explicit user gesture
+  // Resume only after explicit user gesture (browser only)
   if (webAudioCtx.state === 'suspended' && audioContextUserGestureReceived && typeof webAudioCtx.resume === 'function') {
-    webAudioCtx.resume();
+    webAudioCtx.resume().catch(() => {});
   }
   return webAudioCtx;
 }
 window.dfGetGlobalAudioContext = ensureProceduralAudioContext;
 
 // ============================================================
-// PROCEDURAL NOISE BUFFER GENERATION (Pink/Brown/White)
-// High-quality spectral shaping with DC blocking
+// PRE-RENDERED BINAURAL BEAT BUFFERS (40Hz Gamma, 10Hz Alpha, 6Hz Theta, etc.)
+// Zero-static, zero-click, seamless looping — no live oscillators
 // ============================================================
-function generateNoiseBuffer(ctx, color, durationSec = 2.0) {
+const BINAURAL_PRESETS = {
+  gamma_40hz: { leftHz: 216, rightHz: 256, beatHz: 40, carrierHz: 236, durationSec: 5 },
+  alpha_10hz: { leftHz: 211, rightHz: 221, beatHz: 10, carrierHz: 216, durationSec: 5 },
+  theta_6hz: { leftHz: 191, rightHz: 197, beatHz: 6, carrierHz: 194, durationSec: 5 },
+  beta_15hz: { leftHz: 242.5, rightHz: 257.5, beatHz: 15, carrierHz: 250, durationSec: 5 },
+  delta_2_5hz: { leftHz: 106.75, rightHz: 109.25, beatHz: 2.5, carrierHz: 108, durationSec: 10 },
+  harmonic_432_8hz: { leftHz: 432, rightHz: 440, beatHz: 8, carrierHz: 436, durationSec: 5 }
+};
+
+const binauralBufferCache = Object.create(null);
+
+function generateBinauralBuffer(ctx, presetKey) {
+  const preset = BINAURAL_PRESETS[presetKey];
+  if (!preset) return null;
+  const cacheKey = `binaural_${presetKey}_${ctx.sampleRate}_${preset.durationSec}`;
+  if (binauralBufferCache[cacheKey]) return binauralBufferCache[cacheKey];
+
+  const buffer = createSeamlessBuffer(ctx, preset.durationSec, (channelData, sampleRate, totalSec) => {
+    const left = channelData[0];
+    const right = channelData[1];
+    const bufferSize = Math.floor(sampleRate * totalSec);
+    const TWO_PI = Math.PI * 2;
+    const amp = 0.18; // Well under -6dB limiter ceiling
+
+    for (let i = 0; i < bufferSize; i++) {
+      const t = i / sampleRate;
+      left[i] = Math.sin(TWO_PI * preset.leftHz * t) * amp;
+      right[i] = Math.sin(TWO_PI * preset.rightHz * t) * amp;
+    }
+    // Hard safety clamp
+    for (let i = 0; i < bufferSize; i++) {
+      if (left[i] > 1.0) left[i] = 1.0;
+      else if (left[i] < -1.0) left[i] = -1.0;
+      if (right[i] > 1.0) right[i] = 1.0;
+      else if (right[i] < -1.0) right[i] = -1.0;
+    }
+  }, 2);
+
+  binauralBufferCache[cacheKey] = buffer;
+  return buffer;
+}
+
+function createBinauralSource(ctx, presetKey, gainValue = 0.15) {
+  const buffer = generateBinauralBuffer(ctx, presetKey);
+  if (!buffer) return null;
+  const source = ctx.createBufferSource();
+  source.buffer = buffer;
+  source.loop = true;
+  const gain = ctx.createGain();
+  gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(gainValue, ctx.currentTime + 0.05);
+  // DC-blocking high-pass filter (15 Hz)
+  const dcBlock = ctx.createBiquadFilter();
+  dcBlock.type = 'highpass';
+  dcBlock.frequency.setValueAtTime(15, ctx.currentTime);
+  dcBlock.Q.setValueAtTime(0.707, ctx.currentTime);
+  source.connect(dcBlock);
+  dcBlock.connect(gain);
+  const binauralSource = { source, gain, dcBlock, presetKey };
+  activeNoiseSources.add(binauralSource);
+  const originalStop = source.stop.bind(source);
+  source.stop = function(...args) {
+    activeNoiseSources.delete(binauralSource);
+    return originalStop(...args);
+  };
+  return binauralSource;
+}
+const SEAMLESS_XFADE_MS = 20;
+
+function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
+  const extraSec = SEAMLESS_XFADE_MS / 1000;
+  const totalSec = durationSec + extraSec;
+  const bufferSize = Math.floor(ctx.sampleRate * totalSec);
+  const tempBuffer = ctx.createBuffer(numChannels, bufferSize, ctx.sampleRate);
+  const channelData = [];
+  for (let ch = 0; ch < numChannels; ch++) {
+    channelData.push(tempBuffer.getChannelData(ch));
+  }
+  generatorFn(channelData, ctx.sampleRate, totalSec);
+
+  const finalSize = Math.floor(ctx.sampleRate * durationSec);
+  const finalBuffer = ctx.createBuffer(numChannels, finalSize, ctx.sampleRate);
+  const xfadeSamples = Math.floor(ctx.sampleRate * extraSec);
+  for (let ch = 0; ch < numChannels; ch++) {
+    const finalData = finalBuffer.getChannelData(ch);
+    const tempChData = channelData[ch];
+    finalData.set(tempChData.subarray(0, finalSize));
+    for (let i = 0; i < xfadeSamples; i++) {
+      const t = i / xfadeSamples;
+      const endIdx = finalSize - xfadeSamples + i;
+      finalData[i] = (1 - t) * finalData[i] + t * tempChData[endIdx];
+    }
+  }
+  return finalBuffer;
+}
+
+function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
   const cacheKey = `${color}_${ctx.sampleRate}_${durationSec}`;
   if (proceduralBufferCache[cacheKey]) return proceduralBufferCache[cacheKey];
 
-  const sampleRate = ctx.sampleRate;
-  const length = Math.ceil(sampleRate * durationSec);
-  const buffer = ctx.createBuffer(1, length, sampleRate);
-  const data = buffer.getChannelData(0);
+  const buffer = createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+    const data = channelData[0];
+    const bufferSize = Math.floor(sampleRate * totalSec);
 
-  if (color === 'white') {
-    // White noise: flat spectral density
-    for (let i = 0; i < length; i++) {
-      data[i] = (Math.random() * 2 - 1) * 0.35;
+    if (color === 'white') {
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * 0.35;
+      }
+    } else if (color === 'pink') {
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+        b6 = white * 0.115926;
+      }
+    } else if (color === 'brown') {
+      // Brown noise: Paul Kellet -6dB/octave (no DC offset, no static)
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+        b6 = white * 0.115926;
+        // Integrate pink to get brown (-6dB/oct additional slope)
+        data[i] = (i === 0 ? pink : data[i - 1] + pink * 0.01) * 0.08;
+      }
     }
-  } else if (color === 'pink') {
-    // Pink noise: -3 dB/octave (Paul Kellet's refined algorithm)
-    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-    for (let i = 0; i < length; i++) {
-      const white = Math.random() * 2 - 1;
-      b0 = 0.99886 * b0 + white * 0.0555179;
-      b1 = 0.99332 * b1 + white * 0.0750759;
-      b2 = 0.96900 * b2 + white * 0.1538520;
-      b3 = 0.86650 * b3 + white * 0.3104856;
-      b4 = 0.55000 * b4 + white * 0.5329522;
-      b5 = -0.7616 * b5 - white * 0.0168980;
-      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
-      b6 = white * 0.115926;
+
+    // Hard safety clamp
+    for (let i = 0; i < bufferSize; i++) {
+      if (data[i] > 1.0) data[i] = 1.0;
+      else if (data[i] < -1.0) data[i] = -1.0;
     }
-  } else if (color === 'brown') {
-    // Brown/Red noise: -6 dB/octave (leaky integration of white noise)
-    let lastOut = 0;
-    const alpha = 0.99; // Integration factor
-    for (let i = 0; i < length; i++) {
-      const white = Math.random() * 2 - 1;
-      lastOut = alpha * lastOut + (1 - alpha) * white;
-      data[i] = lastOut * 0.15;
-    }
-  }
+  }, 1);
 
   proceduralBufferCache[cacheKey] = buffer;
   return buffer;
@@ -5577,15 +5692,60 @@ function stopSoundTile(id) {
 const oggBufferCache = {};
 const oggLoadingPromises = {};
 
+// Create seamless looping OGG buffer with crossfade
+function createSeamlessOggBuffer(ctx, buffer) {
+  const durationSec = buffer.duration;
+  const extraSec = SEAMLESS_XFADE_MS / 1000;
+  const totalSec = durationSec + extraSec;
+  const sampleRate = ctx.sampleRate;
+  const bufferSize = Math.floor(sampleRate * totalSec);
+  const finalSize = Math.floor(sampleRate * durationSec);
+  const numChannels = buffer.numberOfChannels;
+
+  const tempBuffer = ctx.createBuffer(numChannels, bufferSize, sampleRate);
+  for (let ch = 0; ch < numChannels; ch++) {
+    const srcData = buffer.getChannelData(ch);
+    const dstData = tempBuffer.getChannelData(ch);
+    // Fill extra portion with looped content
+    for (let i = 0; i < bufferSize; i++) {
+      dstData[i] = srcData[i % srcData.length];
+    }
+  }
+
+  const finalBuffer = ctx.createBuffer(numChannels, finalSize, sampleRate);
+  const xfadeSamples = Math.floor(sampleRate * extraSec);
+  for (let ch = 0; ch < numChannels; ch++) {
+    const finalData = finalBuffer.getChannelData(ch);
+    const tempChData = tempBuffer.getChannelData(ch);
+    finalData.set(tempChData.subarray(0, finalSize));
+    for (let i = 0; i < xfadeSamples; i++) {
+      const t = i / xfadeSamples;
+      const endIdx = finalSize - xfadeSamples + i;
+      finalData[i] = (1 - t) * finalData[i] + t * tempChData[endIdx];
+    }
+  }
+  return finalBuffer;
+}
+
 async function getOggBuffer(src) {
   if (oggBufferCache[src]) return oggBufferCache[src];
   if (oggLoadingPromises[src]) return oggLoadingPromises[src];
-  const ctx = ensureProceduralAudioContext();
+  let ctx;
+  try {
+    ctx = ensureProceduralAudioContext();
+  } catch {
+    return null;
+  }
   if (!ctx) return null;
   const promise = fetch(src)
     .then(r => r.arrayBuffer())
     .then(buf => ctx.decodeAudioData(buf))
-    .then(buf => { oggBufferCache[src] = buf; return buf; })
+    .then(buf => {
+      // Create seamless version for looping
+      const seamless = createSeamlessOggBuffer(ctx, buf);
+      oggBufferCache[src] = seamless;
+      return seamless;
+    })
     .catch(e => { console.warn('[OggPlayer] Failed to load', src, e); delete oggLoadingPromises[src]; return null; });
   oggLoadingPromises[src] = promise;
   return promise;
@@ -5598,8 +5758,9 @@ function createOggPlayer(buffer, loop, volume) {
   source.buffer = buffer;
   source.loop = !!loop;
   const gain = ctx.createGain();
-  gain.gain.setValueAtTime(0.001, ctx.currentTime);
-  gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 1.2);
+  // Fast fade-in: 50ms instead of 1.2s
+  gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+  gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.05);
   // DC-blocking high-pass filter (15Hz) to protect transducer coils
   const dcBlock = ctx.createBiquadFilter();
   dcBlock.type = 'highpass';
@@ -5609,7 +5770,7 @@ function createOggPlayer(buffer, loop, volume) {
   dcBlock.connect(gain);
   gain.connect(ctx.destination);
   source.start();
-  return {
+  const player = {
     source,
     gain,
     dcBlock,
@@ -5633,6 +5794,14 @@ function createOggPlayer(buffer, loop, volume) {
       }
     }
   };
+  // Track for instant stopAllAudio
+  activeNoiseSources.add(player);
+  const originalStop = player.stop.bind(player);
+  player.stop = function(...args) {
+    activeNoiseSources.delete(player);
+    return originalStop(...args);
+  };
+  return player;
 }
 
 function toggleSoundTile(id) {
@@ -5701,20 +5870,32 @@ const activeNoiseSources = new Set();
 
 function stopAllAudio() {
   SOUNDS_DATA.forEach(s => stopSoundTile(s.id));
-  
-  // Stop all active procedural noise sources
+
+  // Stop all active procedural noise sources with click-free 60ms fade
   activeNoiseSources.forEach(noiseSource => {
     try {
-      if (noiseSource.source) {
-        noiseSource.source.stop();
-        noiseSource.source.disconnect();
+      if (typeof noiseSource.stop === 'function') {
+        noiseSource.stop();
+      } else if (noiseSource.source) {
+        // Fallback for sources without custom stop method
+        const ctx = noiseSource.source.context || webAudioCtx;
+        if (ctx) {
+          const now = ctx.currentTime;
+          const fadeOutSec = 0.06;
+          if (noiseSource.gain) {
+            noiseSource.gain.gain.cancelScheduledValues(now);
+            noiseSource.gain.gain.setValueAtTime(noiseSource.gain.gain.value, now);
+            noiseSource.gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
+          }
+          noiseSource.source.stop(now + fadeOutSec + 0.01);
+        } else {
+          noiseSource.source.stop();
+        }
       }
-      if (noiseSource.gain) noiseSource.gain.disconnect();
-      if (noiseSource.dcBlock) noiseSource.dcBlock.disconnect();
     } catch (_) {}
   });
   activeNoiseSources.clear();
-  
+
   // Unified instant stop: kill every engine family so no loop keeps playing
   // after the user hits Stop (ogg singleton, procedural DSP, binaural synth).
   try {
@@ -20091,16 +20272,14 @@ window.dfConfigureCerebralFlowTimer = function(options) {
 };
 
 // --- MISSION M474: Harmonic 432Hz Natural Tuning & Alpha Relaxation Synthesizer ---
+// REFACTORED: Uses pre-rendered seamless buffer (zero live oscillators, zero static)
 window.dfSynthesizeHarmonic432TuningAcoustics = function(audioCtx, options) {
   const opts = options || {};
-  const rootFreq = 432.0; // Verdi / Pythagorean A=432Hz standard
-  const alphaBeat = Math.max(7.0, Math.min(13.0, parseFloat(opts.alphaBeatDelta) || 8.0)); // 8Hz calm Alpha anchor
+  const rootFreq = 432.0;
+  const alphaBeat = Math.max(7.0, Math.min(13.0, parseFloat(opts.alphaBeatDelta) || 8.0));
   const volume = Math.max(0.01, Math.min(0.40, parseFloat(opts.volume) || 0.16));
 
-  let oscLeft = null;
-  let oscRight = null;
-  let harmonicFifth = null;
-  let masterGain = null;
+  let binauralSource = null;
   let isRunning = false;
 
   return {
@@ -20111,61 +20290,34 @@ window.dfSynthesizeHarmonic432TuningAcoustics = function(audioCtx, options) {
     status: 'ready',
     start: function() {
       if (!audioCtx || isRunning) return false;
-      const now = audioCtx.currentTime || 0;
-
-      masterGain = audioCtx.createGain();
-      masterGain.gain.setValueAtTime(0.0001, now);
-      masterGain.gain.exponentialRampToValueAtTime(volume, now + 2.5);
-      masterGain.connect(audioCtx.destination);
-
-      // Left Channel: 432Hz
-      oscLeft = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-      oscLeft.type = 'sine';
-      oscLeft.frequency.setValueAtTime(rootFreq, now);
-
-      // Right Channel: 432Hz + Alpha Beat (440Hz when beat is 8Hz)
-      oscRight = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-      oscRight.type = 'sine';
-      oscRight.frequency.setValueAtTime(rootFreq + alphaBeat, now);
-
-      // Harmonic Fifth overtone (432 * 1.5 = 648Hz) for natural resonance
-      harmonicFifth = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-      harmonicFifth.type = 'sine';
-      harmonicFifth.frequency.setValueAtTime(rootFreq * 1.5, now);
-      const fifthGain = audioCtx.createGain();
-      fifthGain.gain.setValueAtTime(0.03, now);
-      harmonicFifth.connect(fifthGain);
-      fifthGain.connect(masterGain);
-
-      if (typeof audioCtx.createChannelMerger === 'function') {
-        const merger = audioCtx.createChannelMerger(2);
-        oscLeft.connect(merger, 0, 0);
-        oscRight.connect(merger, 0, 1);
-        merger.connect(masterGain);
-      } else {
-        oscLeft.connect(masterGain);
-        oscRight.connect(masterGain);
+      try {
+        binauralSource = createBinauralSource(audioCtx, 'harmonic_432_8hz', volume);
+        if (!binauralSource) return false;
+        binauralSource.source.connect(audioCtx.destination);
+        binauralSource.source.start();
+        isRunning = true;
+        return true;
+      } catch (e) {
+        return false;
       }
-
-      oscLeft.start(now);
-      oscRight.start(now);
-      harmonicFifth.start(now);
-      isRunning = true;
-      return true;
     },
     stop: function() {
       if (!isRunning || !audioCtx) return false;
-      const now = audioCtx.currentTime || 0;
-      if (masterGain) {
-        masterGain.gain.setValueAtTime(masterGain.gain.value, now);
-        masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.2);
+      if (binauralSource) {
+        try {
+          const now = audioCtx.currentTime;
+          const fadeOutSec = 0.06;
+          binauralSource.gain.gain.cancelScheduledValues(now);
+          binauralSource.gain.gain.setValueAtTime(binauralSource.gain.gain.value, now);
+          binauralSource.gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
+          binauralSource.source.stop(now + fadeOutSec + 0.01);
+        } catch (e) {
+          try { binauralSource.source.stop(); } catch (_) {}
+        }
+        try { binauralSource.source.disconnect(); binauralSource.dcBlock.disconnect(); binauralSource.gain.disconnect(); } catch (_) {}
+        binauralSource = null;
       }
-      setTimeout(function() {
-        try { if (oscLeft) oscLeft.stop(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
-        try { if (oscRight) oscRight.stop(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
-        try { if (harmonicFifth) harmonicFifth.stop(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
-        isRunning = false;
-      }, 1300);
+      isRunning = false;
       return true;
     },
     timestamp: new Date().toISOString()
@@ -20218,16 +20370,14 @@ window.dfAnalyzeCrossDeckRetentionMatrix = function(decksData) {
 };
 
 // --- MISSION M476: Gamma 40Hz Blitz Entrainment & Cognitive Binding Synthesizer ---
+// REFACTORED: Uses pre-rendered seamless buffer (zero live oscillators, zero static)
 window.dfSynthesizeGamma40HzBlitzEntrainment = function(audioCtx, options) {
   const opts = options || {};
   const carrierFreq = Math.max(200, Math.min(600, parseFloat(opts.carrierFrequency) || 440.0));
   const gammaRate = 40.0;
   const volume = Math.max(0.01, Math.min(0.35, parseFloat(opts.volume) || 0.15));
 
-  let osc = null;
-  let modulator = null;
-  let modGain = null;
-  let masterGain = null;
+  let binauralSource = null;
   let isRunning = false;
 
   return {
@@ -20238,45 +20388,34 @@ window.dfSynthesizeGamma40HzBlitzEntrainment = function(audioCtx, options) {
     status: 'ready',
     start: function() {
       if (!audioCtx || isRunning) return false;
-      const now = audioCtx.currentTime || 0;
-
-      masterGain = audioCtx.createGain();
-      masterGain.gain.setValueAtTime(0.0001, now);
-      masterGain.gain.exponentialRampToValueAtTime(volume, now + 1.5);
-      masterGain.connect(audioCtx.destination);
-
-      osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(carrierFreq, now);
-
-      modulator = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-      modulator.type = 'sine';
-      modulator.frequency.setValueAtTime(gammaRate, now);
-
-      modGain = audioCtx.createGain();
-      modGain.gain.setValueAtTime(0.5, now);
-      modulator.connect(modGain.gain);
-
-      osc.connect(modGain);
-      modGain.connect(masterGain);
-
-      osc.start(now);
-      modulator.start(now);
-      isRunning = true;
-      return true;
+      try {
+        binauralSource = createBinauralSource(audioCtx, 'gamma_40hz', volume);
+        if (!binauralSource) return false;
+        binauralSource.source.connect(audioCtx.destination);
+        binauralSource.source.start();
+        isRunning = true;
+        return true;
+      } catch (e) {
+        return false;
+      }
     },
     stop: function() {
       if (!isRunning || !audioCtx) return false;
-      const now = audioCtx.currentTime || 0;
-      if (masterGain) {
-        masterGain.gain.setValueAtTime(masterGain.gain.value, now);
-        masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 1.0);
+      if (binauralSource) {
+        try {
+          const now = audioCtx.currentTime;
+          const fadeOutSec = 0.06;
+          binauralSource.gain.gain.cancelScheduledValues(now);
+          binauralSource.gain.gain.setValueAtTime(binauralSource.gain.gain.value, now);
+          binauralSource.gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
+          binauralSource.source.stop(now + fadeOutSec + 0.01);
+        } catch (e) {
+          try { binauralSource.source.stop(); } catch (_) {}
+        }
+        try { binauralSource.source.disconnect(); binauralSource.dcBlock.disconnect(); binauralSource.gain.disconnect(); } catch (_) {}
+        binauralSource = null;
       }
-      setTimeout(function() {
-        try { if (osc) osc.stop(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
-        try { if (modulator) modulator.stop(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
-        isRunning = false;
-      }, 1100);
+      isRunning = false;
       return true;
     },
     timestamp: new Date().toISOString()
