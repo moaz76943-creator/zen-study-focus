@@ -301,6 +301,20 @@ body:not(.deep-lockdown) #sec-tasks .btn-task-plus,
 body:not(.deep-lockdown) #sec-notes .floating-plus-fab {
   background:var(--zen-rainbow);
   box-shadow:0 9px 23px -9px rgba(59,109,238,.42);
+  position: fixed;
+  left: 24px;
+  bottom: var(--df-bottom-nav-clearance, 88px);
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  border: none;
+  color: #ffffff;
+  font-size: 1.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 80;
 }
 body:not(.deep-lockdown) #sec-tasks .showcase-task-card,
 body:not(.deep-lockdown) #sec-notes .learning-rich-card {
@@ -427,7 +441,7 @@ body:not(.deep-lockdown) #sec-notes .ns-card{padding:15px;border:1px solid #e4ec
 @media(max-width:350px){.ns-template{flex-basis:91px}.ns-meta{grid-template-columns:1fr}}
 
 /* Seven evenly spaced navigation slots; timer is literally slot four. */
-body:not(.deep-lockdown) .bottom-nav-capsule{left:50%;transform:translateX(-50%);display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;width:calc(100% - 18px);max-width:480px;padding:7px 5px 5px;border-radius:25px}
+body:not(.deep-lockdown) .bottom-nav-capsule{left:50%;transform:translateX(-50%);display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;width:calc(100% - 18px);max-width:480px;padding:7px 5px 5px;border-radius:25px;position:fixed;bottom:0;left:50%;transform:translateX(-50%);padding-bottom:calc(5px + env(safe-area-inset-bottom, 0px));}
 body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn{min-width:0;padding:7px 1px 5px;gap:3px;border-radius:15px;font-size:clamp(.48rem,2vw,.63rem);line-height:1.1}
 body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn svg{width:19px;height:19px;flex-shrink:0}
 body:not(.deep-lockdown) .bottom-nav-capsule #navTimer{grid-column:4;background:linear-gradient(135deg,#eaf9ff,#f0eeff);color:#3174d8;border:1px solid #dbeafe;transform:translateY(-7px);box-shadow:0 8px 16px -11px #3372d3}

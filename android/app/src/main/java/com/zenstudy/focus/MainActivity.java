@@ -31,6 +31,7 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.core.graphics.Insets;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
@@ -85,6 +86,15 @@ public class MainActivity extends AppCompatActivity {
                     | WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.ime());
             v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
             webView.setClipToPadding(true);
+            // Push insets to JS calibrator so floating UI (FAB, bottom nav) stays clear
+            webView.post(() -> {
+                if (webView != null && !isDestroyed()) {
+                    String js = "if(window.SovereignInsetsCalibrator) "
+                            + "window.SovereignInsetsCalibrator.updateInsets("
+                            + bars.top + "," + bars.bottom + "," + bars.left + "," + bars.right + ");";
+                    webView.evaluateJavascript(js, null);
+                }
+            });
             return WindowInsetsCompat.CONSUMED;
         });
 
