@@ -63060,11 +63060,13 @@ function() {
       // If the studio is collapsed, expand it before scrolling so the user
       // actually sees the studio content.
       if (window.__dfSpatialCollapsed && mount) {
-        window.__dfSpatialCollapsed = false;
-        const bodyWrap = mount.querySelector('.df-spatial-body');
-        if (bodyWrap) bodyWrap.style.display = 'flex';
-        const toggle = document.getElementById('dfSpatialCollapseToggle');
-        if (toggle) toggle.textContent = 'Collapse 3D Spatial';
+        if (typeof window.__dfSpatialSetCollapsed === 'function') {
+          window.__dfSpatialSetCollapsed(false);
+        } else {
+          window.__dfSpatialCollapsed = false;
+          const bodyWrap = mount.querySelector('.df-spatial-body');
+          if (bodyWrap) bodyWrap.style.display = 'flex';
+        }
       }
       if (mount && typeof mount.scrollIntoView === 'function') {
         mount.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -63122,21 +63124,14 @@ function() {
     if (typeof window !== 'undefined') {
       if (window.__dfSpatialCollapsed === undefined) window.__dfSpatialCollapsed = true;
     }
-    
-    const collapseBtn = document.createElement('button');
-    collapseBtn.id = 'dfSpatialCollapseToggle';
-    collapseBtn.type = 'button';
-    collapseBtn.style.cssText = 'font-size:10px;font-weight:800;color:#475569;background:#f8fafc;border:1px solid #cbd5e1;border-radius:999px;padding:4px 8px;display:flex;align-items:center;gap:4px;cursor:pointer;transition:all 0.15s;';
-    collapseBtn.textContent = window.__dfSpatialCollapsed ? 'Expand 3D Spatial' : 'Collapse 3D Spatial';
-    collapseBtn.onclick = function() {
-      window.__dfSpatialCollapsed = !window.__dfSpatialCollapsed;
-      collapseBtn.textContent = window.__dfSpatialCollapsed ? 'Expand 3D Spatial' : 'Collapse 3D Spatial';
-      if (typeof bodyWrap !== 'undefined' && bodyWrap) {
-        bodyWrap.style.display = window.__dfSpatialCollapsed ? 'none' : 'flex';
-      }
-    };
-    titleBox.appendChild(collapseBtn);
-    
+
+    // Localised labels (English fallback). Kept inline so dynamically generated
+    // studio chrome never ships a hardcoded untranslated string to Arabic users.
+    const _dfSpatialIsAr = String((typeof cfg !== 'undefined' && cfg && cfg.lang) || '').toLowerCase().indexOf('ar') === 0;
+    const DF_SPATIAL_LBL_EXPAND = _dfSpatialIsAr ? 'توسيع الصوت المكاني 3D' : 'Expand 3D Spatial';
+    const DF_SPATIAL_LBL_COLLAPSE = _dfSpatialIsAr ? 'طيّ الصوت المكاني 3D' : 'Collapse 3D Spatial';
+    const DF_SPATIAL_LBL_HINT = _dfSpatialIsAr ? 'اضغط للتوسيع أو الطيّ' : 'Tap to expand or collapse';
+
     // Sub-Tab Navigation Bar
     const navBar = document.createElement('div');
     navBar.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;background:#f8fafc;padding:6px;border-radius:14px;border:1px solid #e2e8f0;';
@@ -63182,16 +63177,41 @@ function() {
     // Body container for collapsible content (navBar + tab content)
     const bodyWrap = document.createElement('div');
     bodyWrap.className = 'df-spatial-body';
+    bodyWrap.id = 'dfSpatialBody';
     bodyWrap.style.cssText = 'display:flex;flex-direction:column;gap:14px;';
     bodyWrap.appendChild(navBar);
     bodyWrap.appendChild(tabContainer);
 
-    // Respect collapsed-by-default so Nature Sounds stay front and center.
-    if (window.__dfSpatialCollapsed) {
-      bodyWrap.style.display = 'none';
-    } else {
-      bodyWrap.style.display = 'flex';
+    // Header expand/collapse control. A single setter drives the panel, the
+    // label, the chevron and the a11y attributes so they can never drift apart.
+    const collapseBtn = document.createElement('button');
+    collapseBtn.id = 'dfSpatialCollapseToggle';
+    collapseBtn.type = 'button';
+    collapseBtn.setAttribute('aria-controls', 'dfSpatialBody');
+    collapseBtn.style.cssText = 'font-size:11px;font-weight:800;color:#475569;background:#f8fafc;border:1px solid #cbd5e1;border-radius:999px;padding:6px 12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;';
+
+    const collapseChevron = document.createElement('span');
+    collapseChevron.setAttribute('aria-hidden', 'true');
+    collapseChevron.style.cssText = 'font-size:10px;line-height:1;transition:transform .18s;';
+    const collapseLabel = document.createElement('span');
+    collapseBtn.appendChild(collapseChevron);
+    collapseBtn.appendChild(collapseLabel);
+
+    function dfSpatialSetCollapsed(collapsed) {
+      window.__dfSpatialCollapsed = !!collapsed;
+      bodyWrap.style.display = window.__dfSpatialCollapsed ? 'none' : 'flex';
+      collapseBtn.setAttribute('aria-expanded', String(!window.__dfSpatialCollapsed));
+      const lbl = window.__dfSpatialCollapsed ? DF_SPATIAL_LBL_EXPAND : DF_SPATIAL_LBL_COLLAPSE;
+      collapseLabel.textContent = lbl;
+      collapseChevron.textContent = window.__dfSpatialCollapsed ? '▸' : '▾';
+      collapseBtn.setAttribute('aria-label', lbl + ' — ' + DF_SPATIAL_LBL_HINT);
     }
+    window.__dfSpatialSetCollapsed = dfSpatialSetCollapsed;
+    collapseBtn.onclick = function() { dfSpatialSetCollapsed(!window.__dfSpatialCollapsed); };
+    titleBox.appendChild(collapseBtn);
+
+    // Respect collapsed-by-default so Nature Sounds stay front and center.
+    dfSpatialSetCollapsed(!!window.__dfSpatialCollapsed);
 
     card.appendChild(bodyWrap);
     host.appendChild(card);

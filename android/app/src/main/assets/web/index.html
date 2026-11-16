@@ -356,6 +356,19 @@
       font-size: 0.74rem; font-weight: 800;
     }
     .sounds-photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+    /* STA-1 · Nature Sounds lead the Sounds tab.
+       The playable grid is the primary surface; the completion-tone picker and
+       the (collapsible) 3D Spatial studio follow it. Reordered visually with
+       flex order so the DOM order stays exactly as authored — the DF09
+       tone-picker regression pins #df-tone-picker-card before #soundsGridBox. */
+    #sec-sounds.active { display: flex; flex-direction: column; }
+    #sec-sounds > .mixer-status-bar { order: 1; }
+    #sec-sounds > .segmented-pills-bar { order: 2; }
+    #sec-sounds > #soundsGridBox { order: 3; }
+    #sec-sounds > #dfPillar5SpatialMount { order: 4; }
+    #sec-sounds > #df-tone-picker-card { order: 5; }
+
     .sound-Rich-tile {
       height: 132px; border-radius: 20px; position: relative; overflow: hidden;
       display: flex; flex-direction: column; justify-content: space-between; padding: 11px;
