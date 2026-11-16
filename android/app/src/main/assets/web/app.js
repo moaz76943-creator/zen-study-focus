@@ -62917,6 +62917,15 @@ function() {
         window.dfRenderMasterPillar5StudioDom('dfPillar5SpatialMount');
         mount = document.getElementById('dfPillar5SpatialMount');
       }
+      // If the studio is collapsed, expand it before scrolling so the user
+      // actually sees the studio content.
+      if (window.__dfSpatialCollapsed && mount) {
+        window.__dfSpatialCollapsed = false;
+        const bodyWrap = mount.querySelector('.df-spatial-body');
+        if (bodyWrap) bodyWrap.style.display = 'flex';
+        const toggle = document.getElementById('dfSpatialCollapseToggle');
+        if (toggle) toggle.textContent = 'Collapse 3D Spatial';
+      }
       if (mount && typeof mount.scrollIntoView === 'function') {
         mount.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
@@ -62967,7 +62976,27 @@ function() {
     hdr.appendChild(titleBox);
     hdr.appendChild(hrtfBadge);
     card.appendChild(hdr);
-
+    
+    // Collapsed by default: Nature Sounds stay front and center; the 3D Spatial
+    // studio remains one tap away and the choice persists for the session.
+    if (typeof window !== 'undefined') {
+      if (window.__dfSpatialCollapsed === undefined) window.__dfSpatialCollapsed = true;
+    }
+    
+    const collapseBtn = document.createElement('button');
+    collapseBtn.id = 'dfSpatialCollapseToggle';
+    collapseBtn.type = 'button';
+    collapseBtn.style.cssText = 'font-size:10px;font-weight:800;color:#475569;background:#f8fafc;border:1px solid #cbd5e1;border-radius:999px;padding:4px 8px;display:flex;align-items:center;gap:4px;cursor:pointer;transition:all 0.15s;';
+    collapseBtn.textContent = window.__dfSpatialCollapsed ? 'Expand 3D Spatial' : 'Collapse 3D Spatial';
+    collapseBtn.onclick = function() {
+      window.__dfSpatialCollapsed = !window.__dfSpatialCollapsed;
+      collapseBtn.textContent = window.__dfSpatialCollapsed ? 'Expand 3D Spatial' : 'Collapse 3D Spatial';
+      if (typeof bodyWrap !== 'undefined' && bodyWrap) {
+        bodyWrap.style.display = window.__dfSpatialCollapsed ? 'none' : 'flex';
+      }
+    };
+    titleBox.appendChild(collapseBtn);
+    
     // Sub-Tab Navigation Bar
     const navBar = document.createElement('div');
     navBar.style.cssText = 'display:flex;gap:6px;flex-wrap:wrap;background:#f8fafc;padding:6px;border-radius:14px;border:1px solid #e2e8f0;';
@@ -63010,8 +63039,21 @@ function() {
       navBar.appendChild(btn);
     });
 
-    card.appendChild(navBar);
-    card.appendChild(tabContainer);
+    // Body container for collapsible content (navBar + tab content)
+    const bodyWrap = document.createElement('div');
+    bodyWrap.className = 'df-spatial-body';
+    bodyWrap.style.cssText = 'display:flex;flex-direction:column;gap:14px;';
+    bodyWrap.appendChild(navBar);
+    bodyWrap.appendChild(tabContainer);
+
+    // Respect collapsed-by-default so Nature Sounds stay front and center.
+    if (window.__dfSpatialCollapsed) {
+      bodyWrap.style.display = 'none';
+    } else {
+      bodyWrap.style.display = 'flex';
+    }
+
+    card.appendChild(bodyWrap);
     host.appendChild(card);
 
     switchSubTab('spatial_radar');
@@ -76475,7 +76517,7 @@ window.dfRenderMasterPillar6StudioDom('dfPillar6SyllabusMount');
 if(typeof window!=='undefined'&&typeof window.dfRenderMasterPillar7StudioDom==='function')
 window.dfRenderMasterPillar7StudioDom('dfPillar7FeynmanMount');
 if(typeof window!=='undefined'&&typeof window.dfRenderMasterPillar8StudioDom==='function')
-window.dfRenderMasterPillar8StudioDom('dfPillar8LanMount');
+window.dfRenderMasterPillar8StudioDom('dfPillar8StudyPodMount');
 if(typeof window!=='undefined'&&typeof window.dfRenderMasterPillar9StudioDom==='function')
 window.dfRenderMasterPillar9StudioDom('dfPillar9BotanicalHeatmapMount');
 if(typeof window!=='undefined'&&typeof window.dfRenderMasterPillar10StudioDom==='function')
@@ -79779,78 +79821,43 @@ window.ZenNavigatorBridge = {
   }
 };
 
-// Auto-wire LocalStudyPodEngine into runtime
-if (typeof window !== 'undefined' && window.LocalStudyPodEngine) {
-  window.dfLocalStudyPodEngine = new window.LocalStudyPodEngine();
-  console.log('[Runtime] LocalStudyPodEngine successfully mounted.');
+// Auto-wire studio engines into runtime.
+// v21 fix: app.js executes BEFORE the studio engine <script> tags that define
+// these classes (they load after app.js in index.html), so wiring once here
+// left every instance undefined. dfAutoWireStudioEngines is idempotent and
+// re-runs on DOMContentLoaded, by which time all engine classes exist.
+function dfAutoWireStudioEngines() {
+  if (typeof window === 'undefined') return;
+  const wiring = [
+    ['LocalStudyPodEngine', 'dfLocalStudyPodEngine'],
+    ['FocusCommitmentContracts', 'dfFocusCommitmentContracts'],
+    ['PersonalBestLeaderboard', 'dfPersonalBestLeaderboard'],
+    ['ExamEveRescueProtocol', 'dfExamEveRescueProtocol'],
+    ['InteractiveSanctuaryCanvas', 'dfInteractiveSanctuaryCanvas'],
+    ['DesignCritiqueButtonAuditor', 'dfDesignCritiqueButtonAuditor'],
+    ['AmoledThemeStudio', 'dfAmoledThemeStudio'],
+    ['StudyWrappedStory', 'dfStudyWrappedStory'],
+    ['GlobalI18nEngine', 'dfGlobalI18nEngine'],
+    ['AntiClutterThumbZone', 'dfAntiClutterThumbZone'],
+    ['WebWorker120HzEngine', 'dfWebWorker120HzEngine'],
+    ['UniversalAccessibilityStudio', 'dfUniversalAccessibilityStudio']
+  ];
+  for (const [cls, alias] of wiring) {
+    if (window[cls] && !window[alias]) {
+      try {
+        window[alias] = new window[cls]();
+        console.log('[Runtime] ' + cls + ' successfully mounted.');
+      } catch (e) {
+        if (typeof window.__dfRecordError === 'function') window.__dfRecordError('autoWire.' + cls, e);
+      }
+    }
+  }
 }
-
-// Auto-wire FocusCommitmentContracts into runtime
-if (typeof window !== 'undefined' && window.FocusCommitmentContracts) {
-  window.dfFocusCommitmentContracts = new window.FocusCommitmentContracts();
-  console.log('[Runtime] FocusCommitmentContracts successfully mounted.');
+dfAutoWireStudioEngines();
+if (typeof document !== 'undefined') {
+  document.addEventListener('DOMContentLoaded', dfAutoWireStudioEngines);
+  window.addEventListener('load', dfAutoWireStudioEngines);
 }
-
-// Auto-wire PersonalBestLeaderboard into runtime
-if (typeof window !== 'undefined' && window.PersonalBestLeaderboard) {
-  window.dfPersonalBestLeaderboard = new window.PersonalBestLeaderboard();
-  console.log('[Runtime] PersonalBestLeaderboard successfully mounted.');
-}
-
-// Auto-wire ExamEveRescueProtocol into runtime
-if (typeof window !== 'undefined' && window.ExamEveRescueProtocol) {
-  window.dfExamEveRescueProtocol = new window.ExamEveRescueProtocol();
-  console.log('[Runtime] ExamEveRescueProtocol successfully mounted.');
-}
-
-// Auto-wire InteractiveSanctuaryCanvas into runtime
-if (typeof window !== 'undefined' && window.InteractiveSanctuaryCanvas) {
-  window.dfInteractiveSanctuaryCanvas = new window.InteractiveSanctuaryCanvas();
-  console.log('[Runtime] InteractiveSanctuaryCanvas successfully mounted.');
-}
-
-// Auto-wire DesignCritiqueButtonAuditor into runtime
-if (typeof window !== 'undefined' && window.DesignCritiqueButtonAuditor) {
-  window.dfDesignCritiqueButtonAuditor = new window.DesignCritiqueButtonAuditor();
-  console.log('[Runtime] DesignCritiqueButtonAuditor successfully mounted.');
-}
-
-// Auto-wire AmoledThemeStudio into runtime
-if (typeof window !== 'undefined' && window.AmoledThemeStudio) {
-  window.dfAmoledThemeStudio = new window.AmoledThemeStudio();
-  console.log('[Runtime] AmoledThemeStudio successfully mounted.');
-}
-
-// Auto-wire StudyWrappedStory into runtime
-if (typeof window !== 'undefined' && window.StudyWrappedStory) {
-  window.dfStudyWrappedStory = new window.StudyWrappedStory();
-  console.log('[Runtime] StudyWrappedStory successfully mounted.');
-}
-
-// Auto-wire GlobalI18nEngine into runtime
-if (typeof window !== 'undefined' && window.GlobalI18nEngine) {
-  window.dfGlobalI18nEngine = new window.GlobalI18nEngine();
-  console.log('[Runtime] GlobalI18nEngine successfully mounted.');
-}
-
-// Auto-wire AntiClutterThumbZone into runtime
-if (typeof window !== 'undefined' && window.AntiClutterThumbZone) {
-  window.dfAntiClutterThumbZone = new window.AntiClutterThumbZone();
-  console.log('[Runtime] AntiClutterThumbZone successfully mounted.');
-}
-
-// Auto-wire WebWorker120HzEngine into runtime
-if (typeof window !== 'undefined' && window.WebWorker120HzEngine) {
-  window.dfWebWorker120HzEngine = new window.WebWorker120HzEngine();
-  console.log('[Runtime] WebWorker120HzEngine successfully mounted.');
-}
-
-// Auto-wire UniversalAccessibilityStudio into runtime
-if (typeof window !== 'undefined' && window.UniversalAccessibilityStudio) {
-  window.dfUniversalAccessibilityStudio = new window.UniversalAccessibilityStudio();
-  console.log('[Runtime] UniversalAccessibilityStudio successfully mounted.');
-}
-
 
 // [Task #654] Core Action Dispatcher Initialization
 if (typeof ActionDispatcherEngine !== "undefined") {
