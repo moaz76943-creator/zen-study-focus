@@ -341,7 +341,7 @@
     .lcard-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.68rem; color: var(--text-light); }
 
     .floating-plus-fab {
-      position: fixed; bottom: 88px; left: 24px; width: 54px; height: 54px;
+      position: fixed; bottom: var(--df-bottom-nav-clearance, 88px); left: 24px; width: 54px; height: 54px;
       border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       border: none; color: #ffffff; font-size: 1.7rem; display: flex; align-items: center;
       justify-content: center; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
@@ -422,9 +422,10 @@
 
     /* 6-Tab Bottom Capsule */
     .bottom-nav-capsule {
-      position: fixed; bottom: 10px; width: calc(100% - 20px); max-width: 420px;
+      position: fixed; bottom: 0; width: calc(100% - 20px); max-width: 420px; left: 50%; transform: translateX(-50%);
       background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px);
       border: 1px solid var(--border-soft); border-radius: 26px; padding: 6px 6px;
+      padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
       display: flex; justify-content: space-around; align-items: center; z-index: 100;
       box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
     }
