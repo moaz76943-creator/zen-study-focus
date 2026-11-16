@@ -82,29 +82,32 @@ public class MainActivity extends AppCompatActivity {
         // display cutouts and the on-screen keyboard.
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         ViewCompat.setOnApplyWindowInsetsListener(webView, (v, windowInsets) -> {
-            // Robust Android 15 edge-to-edge: systemBars() combines status + navigation (including gesture handle).
-            // Use it as the primary source; navigationBars() alone can return 0 on Xiaomi gesture navigation.
+            // Android 15 (API 35) edge-to-edge: systemBars() returns status + navigation (including gesture handle).
+            // On Xiaomi gesture navigation, navigationBars() can return 0; systemBars() is authoritative.
+            // Also query mandatorySystemGestures for the gesture handle zone which may exceed navigationBars.
             Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()
                     | WindowInsetsCompat.Type.displayCutout());
             Insets navigationBars = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            Insets systemGestures = windowInsets.getInsets(WindowInsetsCompat.Type.systemGestures());
             Insets ime = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
 
-            // Apply padding: status bar top, nav bar bottom (fallback to systemBars for gesture nav), cutout sides, IME bottom when open
+            // Status bar top from systemBars (includes cutout top)
             int paddingTop = systemBars.top;
-            int paddingBottom = Math.max(Math.max(navigationBars.bottom, systemBars.bottom), ime.bottom);
+            // Navigation bottom: max of navigationBars, systemBars, systemGestures (gesture handle), IME
+            int navBottom = Math.max(Math.max(navigationBars.bottom, systemBars.bottom), systemGestures.bottom);
+            int paddingBottom = Math.max(navBottom, ime.bottom);
             int paddingLeft = systemBars.left;
             int paddingRight = systemBars.right;
 
             v.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
             webView.setClipToPadding(true);
 
-            // Push insets to JS calibrator so floating UI (FAB, bottom nav, Studios pill) stays clear.
-            // Use systemBars.bottom as authoritative for gesture/3-button nav height.
+            // Push insets to JS calibrator. navBottom is the true nav/gesture height for floating UI clearance.
             webView.post(() -> {
                 if (webView != null && !isDestroyed()) {
                     String js = "if(window.SovereignInsetsCalibrator) "
                             + "window.SovereignInsetsCalibrator.updateInsets("
-                            + paddingTop + "," + paddingBottom + "," + paddingLeft + "," + paddingRight + ");";
+                            + paddingTop + "," + navBottom + "," + paddingLeft + "," + paddingRight + ");";
                     webView.evaluateJavascript(js, null);
                 }
             });

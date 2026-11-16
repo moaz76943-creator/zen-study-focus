@@ -1,5 +1,5 @@
 /**
- * DEEP FOCUS — SovereignInsetsCalibrator (v604.0.0)
+ * DEEP FOCUS — SovereignInsetsCalibrator (v605.0.0)
  * Android 15 Edge-to-Edge & Gesture Navigation Insets Calibration Engine.
  * Dynamically updates CSS root variables for status bar, gesture navigation pill,
  * and camera cutouts on Xiaomi 17T Pro (AMOLED 120Hz/144Hz).
@@ -8,7 +8,7 @@
   'use strict';
 
   var SovereignInsetsCalibrator = {
-    version: '604.0.0',
+    version: '605.0.0',
     currentInsets: {
       top: 0,
       bottom: 0,
@@ -21,6 +21,7 @@
      */
     init: function () {
       // Apply safe fallbacks immediately before Android insets arrive
+      // Default: status bar ~24px, nav bar ~32px (gesture handle), 48dp touch clearance
       this.applyCSSVariables({
         top: 24,
         bottom: 32,
@@ -36,7 +37,7 @@
     /**
      * Updates insets received from Android WindowInsetsCompat listener via JavascriptInterface.
      * @param {number} top Top inset in px (status bar / punch hole)
-     * @param {number} bottom Bottom inset in px (gesture navigation pill / 3-button nav)
+     * @param {number} bottom Bottom inset in px (gesture navigation pill / 3-button nav bar height)
      * @param {number} left Left cutout in px
      * @param {number} right Right cutout in px
      */
@@ -61,19 +62,23 @@
 
     /**
      * Injects CSS variables onto documentElement with !important to override conflicting rules.
+     * --df-safe-top: status bar / cutout top inset
+     * --df-safe-bottom: navigation bar / gesture handle bottom inset (raw from Android)
+     * --df-bottom-nav-clearance: --df-safe-bottom + 48dp touch clearance for floating elements
      */
     applyCSSVariables: function (insets) {
       if (typeof document === 'undefined' || !document.documentElement) return;
 
       var root = document.documentElement;
-      // Use setProperty with 'important' flag (via CSSStyleDeclaration.setProperty third arg)
-      // Note: setProperty priority param not widely supported; use direct style.setProperty with !important in value
+      var navInset = insets.bottom; // raw nav/gesture height from Android
+      var clearance = navInset + 48; // 48dp touch clearance above nav bar
+
       root.style.setProperty('--df-safe-top', insets.top + 'px', 'important');
-      root.style.setProperty('--df-safe-bottom', insets.bottom + 'px', 'important');
+      root.style.setProperty('--df-safe-bottom', navInset + 'px', 'important');
       root.style.setProperty('--df-safe-left', insets.left + 'px', 'important');
       root.style.setProperty('--df-safe-right', insets.right + 'px', 'important');
-      // Enforce 48dp bottom clearance for floating action buttons (Studios pill, FAB)
-      root.style.setProperty('--df-bottom-nav-clearance', (insets.bottom + 48) + 'px', 'important');
+      // 48dp clearance above nav bar for floating action buttons (Studios pill, FAB)
+      root.style.setProperty('--df-bottom-nav-clearance', clearance + 'px', 'important');
     },
 
     onViewportChange: function () {
