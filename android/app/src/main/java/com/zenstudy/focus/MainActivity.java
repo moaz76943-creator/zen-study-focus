@@ -82,16 +82,29 @@ public class MainActivity extends AppCompatActivity {
         // display cutouts and the on-screen keyboard.
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         ViewCompat.setOnApplyWindowInsetsListener(webView, (v, windowInsets) -> {
-            Insets bars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()
-                    | WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.ime());
-            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            // Separate status bar and navigation bar insets for Android 15 edge-to-edge.
+            // systemBars() combines both; navigationBars() gives the 3-button or gesture bar height.
+            Insets statusBars = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars()
+                    | WindowInsetsCompat.Type.displayCutout());
+            Insets navigationBars = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars());
+            Insets ime = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
+
+            // Apply padding: status bar top, nav bar bottom, cutout sides, IME bottom when open
+            int paddingTop = statusBars.top;
+            int paddingBottom = Math.max(navigationBars.bottom, ime.bottom);
+            int paddingLeft = Math.max(statusBars.left, navigationBars.left);
+            int paddingRight = Math.max(statusBars.right, navigationBars.right);
+
+            v.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
             webView.setClipToPadding(true);
-            // Push insets to JS calibrator so floating UI (FAB, bottom nav) stays clear
+
+            // Push insets to JS calibrator so floating UI (FAB, bottom nav) stays clear.
+            // Pass nav bar bottom (not systemBars) so 3-button nav height is respected.
             webView.post(() -> {
                 if (webView != null && !isDestroyed()) {
                     String js = "if(window.SovereignInsetsCalibrator) "
                             + "window.SovereignInsetsCalibrator.updateInsets("
-                            + bars.top + "," + bars.bottom + "," + bars.left + "," + bars.right + ");";
+                            + paddingTop + "," + paddingBottom + "," + paddingLeft + "," + paddingRight + ");";
                     webView.evaluateJavascript(js, null);
                 }
             });

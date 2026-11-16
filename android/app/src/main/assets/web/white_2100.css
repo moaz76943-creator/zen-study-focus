@@ -621,7 +621,7 @@ body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
    Narrow navigation keeps inactive labels in the accessibility tree; no handlers change. */
 @media (max-width: 430px) {
   body:not(.deep-lockdown) {
-    padding-block-end: max(120px, calc(8rem + max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px))));
+    padding-block-end: max(120px, calc(8rem + var(--df-bottom-nav-clearance, 108px)));
   }
   body:not(.deep-lockdown) .bottom-nav-capsule {
     width: calc(100% - 4px);
