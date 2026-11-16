@@ -1,5 +1,5 @@
 /**
- * DEEP FOCUS — SovereignInsetsCalibrator (v603.0.0)
+ * DEEP FOCUS — SovereignInsetsCalibrator (v604.0.0)
  * Android 15 Edge-to-Edge & Gesture Navigation Insets Calibration Engine.
  * Dynamically updates CSS root variables for status bar, gesture navigation pill,
  * and camera cutouts on Xiaomi 17T Pro (AMOLED 120Hz/144Hz).
@@ -8,7 +8,7 @@
   'use strict';
 
   var SovereignInsetsCalibrator = {
-    version: '603.0.0',
+    version: '604.0.0',
     currentInsets: {
       top: 0,
       bottom: 0,
@@ -20,7 +20,13 @@
      * Initializes default safe-area fallback values and listener hooks.
      */
     init: function () {
-      this.applyCSSVariables(this.currentInsets);
+      // Apply safe fallbacks immediately before Android insets arrive
+      this.applyCSSVariables({
+        top: 24,
+        bottom: 32,
+        left: 0,
+        right: 0
+      });
       if (typeof window !== 'undefined') {
         window.addEventListener('resize', this.onViewportChange.bind(this));
       }
@@ -30,7 +36,7 @@
     /**
      * Updates insets received from Android WindowInsetsCompat listener via JavascriptInterface.
      * @param {number} top Top inset in px (status bar / punch hole)
-     * @param {number} bottom Bottom inset in px (gesture navigation pill)
+     * @param {number} bottom Bottom inset in px (gesture navigation pill / 3-button nav)
      * @param {number} left Left cutout in px
      * @param {number} right Right cutout in px
      */
@@ -54,18 +60,20 @@
     },
 
     /**
-     * Injects CSS variables onto documentElement.
+     * Injects CSS variables onto documentElement with !important to override conflicting rules.
      */
     applyCSSVariables: function (insets) {
       if (typeof document === 'undefined' || !document.documentElement) return;
 
       var root = document.documentElement;
-      root.style.setProperty('--df-safe-top', insets.top + 'px');
-      root.style.setProperty('--df-safe-bottom', insets.bottom + 'px');
-      root.style.setProperty('--df-safe-left', insets.left + 'px');
-      root.style.setProperty('--df-safe-right', insets.right + 'px');
-      // Enforce 48dp bottom clearance for floating action buttons
-      root.style.setProperty('--df-bottom-nav-clearance', (insets.bottom + 48) + 'px');
+      // Use setProperty with 'important' flag (via CSSStyleDeclaration.setProperty third arg)
+      // Note: setProperty priority param not widely supported; use direct style.setProperty with !important in value
+      root.style.setProperty('--df-safe-top', insets.top + 'px', 'important');
+      root.style.setProperty('--df-safe-bottom', insets.bottom + 'px', 'important');
+      root.style.setProperty('--df-safe-left', insets.left + 'px', 'important');
+      root.style.setProperty('--df-safe-right', insets.right + 'px', 'important');
+      // Enforce 48dp bottom clearance for floating action buttons (Studios pill, FAB)
+      root.style.setProperty('--df-bottom-nav-clearance', (insets.bottom + 48) + 'px', 'important');
     },
 
     onViewportChange: function () {
