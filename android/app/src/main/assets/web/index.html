@@ -422,11 +422,25 @@
 
     /* 6-Tab Bottom Capsule */
     .bottom-nav-capsule {
-      position: fixed; bottom: 0; width: calc(100% - 20px); max-width: 420px; left: 50%; transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px);
-      border: 1px solid var(--border-soft); border-radius: 26px; padding: 6px 6px;
-      padding-bottom: calc(6px + max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px)));
-      display: flex; justify-content: space-around; align-items: center; z-index: 100;
+      position: fixed;
+      /* Sit ON TOP of the system navigation bar (3-button or gesture handle).
+         --df-safe-bottom = raw nav bar inset from Android (0 for gesture handle, ~56px for 3-button). */
+      bottom: var(--df-safe-bottom, 0px);
+      width: calc(100% - 20px);
+      max-width: 420px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border-soft);
+      border-radius: 26px;
+      padding: 6px 6px;
+      /* Internal padding only; safe-area handled by bottom positioning */
+      padding-bottom: 6px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
       box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
     }
     .bnav-btn {
@@ -661,13 +675,18 @@ button, .btn, .nav-btn, .action-btn, [role="button"], .tab-btn {
     --sal: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
     --sar: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
 }
-body {
-    padding-top: max(16px, var(--sat)) !important;
-    padding-bottom: max(16px, var(--sab)) !important;
-    padding-left: var(--sal) !important;
-    padding-right: var(--sar) !important;
-    box-sizing: border-box !important;
+/* Top safe area for header/content */
+header, .app-header, .top-bar, .dynamic-hero-header {
+    padding-top: max(12px, var(--sat)) !important;
 }
+/* Side safe areas for content */
+.app-shell, main, .screen-section {
+    padding-left: var(--sal);
+    padding-right: var(--sar);
+}
+/* Bottom safe area for fixed bottom nav capsule positioning is handled separately.
+   Body content padding-bottom uses --df-bottom-nav-clearance (nav inset + 48dp clearance) 
+   set in the main body rule. Do NOT override with !important here. */
 
 /* SM-2 3D FLIP CARD & EBBINGHAUS STYLING */
 .srs-card-scene {
@@ -881,8 +900,10 @@ body {
         padding-bottom: 22px !important;
       }
       .bottom-nav-capsule {
-        bottom: max(10px, calc(var(--df-sab) + 3px)) !important;
+        /* Sit ON TOP of system nav bar */
+        bottom: var(--df-safe-bottom, 0px) !important;
         padding: 5px 3px !important;
+        padding-bottom: 5px !important;
       }
       .bnav-btn {
         padding: 5px 2px !important;
@@ -967,7 +988,9 @@ body {
     /* Bottom Navigation Capsule Universal Fluid Protection */
     .bottom-nav-capsule {
       position: fixed !important;
-      bottom: max(10px, calc(var(--df-sab) + var(--df-bottom-nav-clearance, 0px))) !important;
+      /* Sit ON TOP of the system navigation bar.
+         --df-safe-bottom = raw nav bar inset from Android. */
+      bottom: var(--df-safe-bottom, 0px) !important;
       left: 50% !important;
       transform: translateX(-50%) !important;
       width: min(calc(100% - 16px), 540px) !important;
@@ -978,6 +1001,8 @@ body {
       border: 1px solid var(--border-soft) !important;
       border-radius: 26px !important;
       padding: 6px 4px !important;
+      /* Internal padding only; safe-area handled by bottom positioning */
+      padding-bottom: 6px !important;
       display: flex !important;
       justify-content: space-around !important;
       align-items: center !important;
@@ -1321,7 +1346,9 @@ body {
     @media (max-width: 540px) and (min-aspect-ratio: 19/10) {
       body {
         padding-top: max(16px, max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px))) !important;
-        padding-bottom: calc(max(16px, max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px))) + var(--df-bottom-nav-clearance, 100px)) !important;
+        /* Body padding-bottom = clearance for floating elements (FAB, Studios pill).
+           --df-bottom-nav-clearance = --df-safe-bottom + 48px. */
+        padding-bottom: var(--df-bottom-nav-clearance, 100px) !important;
       }
       .app-shell {
         display: flex !important;
@@ -1338,7 +1365,8 @@ body {
         height: min(66vw, 252px) !important;
       }
       .bottom-nav-capsule {
-        bottom: max(12px, calc(max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px)) + var(--df-bottom-nav-clearance, 6px))) !important;
+        /* Sit ON TOP of system nav bar */
+        bottom: var(--df-safe-bottom, 0px) !important;
       }
     }
 
