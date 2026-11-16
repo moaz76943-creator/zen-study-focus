@@ -11,10 +11,10 @@
 html, body {
   background-color: var(--df-bg-oled);
   color: var(--df-text-primary);
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  padding-inline-start: env(safe-area-inset-left, 0px);
-  padding-inline-end: env(safe-area-inset-right, 0px);
+  padding-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
+  padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));
+  padding-inline-start: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
+  padding-inline-end: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: contain;
 }
@@ -39,8 +39,8 @@ button, [role="button"], .df-touch-target {
 
 /* Xiaomi 17T Pro Edge-to-Edge & Punch-Hole Calibration */
 :root {
-  --df-notch-top: max(env(safe-area-inset-top, 0px), 24px);
-  --df-nav-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
+  --df-notch-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 24px));
+  --df-nav-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 16px));
 }
 
 .df-safe-viewport {

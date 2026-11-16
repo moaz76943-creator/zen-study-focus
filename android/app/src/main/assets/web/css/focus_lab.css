@@ -48,8 +48,8 @@
   );
   --focuslab-leading: var(--df22-leading, 1.5);
   --focuslab-space: var(--df22-space-4, 1rem);
-  --focuslab-safe-bottom: env(safe-area-inset-bottom, 0px);
-  --focuslab-safe-top: env(safe-area-inset-top, 0px);
+  --focuslab-safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));
+  --focuslab-safe-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
 }
 
 /* ---------- Base (mobile-first: authored for 320px and up) ---------- */

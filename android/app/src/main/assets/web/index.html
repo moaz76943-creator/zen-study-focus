@@ -425,7 +425,7 @@
       position: fixed; bottom: 0; width: calc(100% - 20px); max-width: 420px; left: 50%; transform: translateX(-50%);
       background: rgba(255, 255, 255, 0.96); backdrop-filter: blur(20px);
       border: 1px solid var(--border-soft); border-radius: 26px; padding: 6px 6px;
-      padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+      padding-bottom: calc(6px + max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px)));
       display: flex; justify-content: space-around; align-items: center; z-index: 100;
       box-shadow: 0 10px 30px rgba(15, 23, 42, 0.12);
     }
@@ -656,16 +656,16 @@ button, .btn, .nav-btn, .action-btn, [role="button"], .tab-btn {
 
 /* ANDROID 15 SAFE-AREA & EDGE-TO-EDGE SYSTEM BAR SHIELD */
 :root {
-    --sat: env(safe-area-inset-top, 24px);
-    --sab: env(safe-area-inset-bottom, 16px);
-    --sal: env(safe-area-inset-left, 0px);
-    --sar: env(safe-area-inset-right, 0px);
+    --sat: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 24px));
+    --sab: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 16px));
+    --sal: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
+    --sar: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
 }
 body {
-    padding-top: max(16px, env(safe-area-inset-top, 24px)) !important;
-    padding-bottom: max(16px, env(safe-area-inset-bottom, 16px)) !important;
-    padding-left: env(safe-area-inset-left, 0px) !important;
-    padding-right: env(safe-area-inset-right, 0px) !important;
+    padding-top: max(16px, var(--sat)) !important;
+    padding-bottom: max(16px, var(--sab)) !important;
+    padding-left: var(--sal) !important;
+    padding-right: var(--sar) !important;
     box-sizing: border-box !important;
 }
 
@@ -837,19 +837,19 @@ body {
   </style>
   <style id="df-universal-fluid-viewport-pillar7">
     /* =========================================================================
-       MASTER PILLAR 7: UNIVERSAL FLUID RESPONSIVE VIEWPORT & ZEN PROGRESSIVE DISCLOSURE
-       - 100dvh dynamic viewport height with 100vh fallback
-       - safe-area-inset-top/bottom/left/right for notch & gesture bar compatibility
-       - Adaptive auto-centered containers for tall phones (Xiaomi 17T Pro), tablets, iPads & desktops
-       - Zero button-drop navigation capsule layout
-       ========================================================================= */
-    :root {
-      --df-sat: env(safe-area-inset-top, 0px);
-      --df-sab: env(safe-area-inset-bottom, 0px);
-      --df-sal: env(safe-area-inset-left, 0px);
-      --df-sar: env(safe-area-inset-right, 0px);
-      --df-app-fluid-max: 480px;
-    }
+       /* MASTER PILLAR 7: UNIVERSAL FLUID RESPONSIVE VIEWPORT & ZEN PROGRESSIVE DISCLOSURE
+              - 100dvh dynamic viewport height with 100vh fallback
+              - safe-area-inset-top/bottom/left/right for notch & gesture bar compatibility
+              - Adaptive auto-centered containers for tall phones (Xiaomi 17T Pro), tablets, iPads & desktops
+              - Zero button-drop navigation capsule layout
+              ========================================================================= */
+          :root {
+             --df-sat: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
+             --df-sab: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));
+             --df-sal: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
+             --df-sar: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
+             --df-app-fluid-max: 480px;
+           }
 
     html, body {
       min-height: 100vh;
@@ -1320,8 +1320,8 @@ body {
     /* Tall Aspect Ratio Resiliency (Xiaomi 17T Pro: 20.5:9, 1220x2712) */
     @media (max-width: 540px) and (min-aspect-ratio: 19/10) {
       body {
-        padding-top: max(16px, env(safe-area-inset-top, 0px)) !important;
-        padding-bottom: calc(max(16px, env(safe-area-inset-bottom, 0px)) + 100px) !important;
+        padding-top: max(16px, max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px))) !important;
+        padding-bottom: calc(max(16px, max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px))) + 100px) !important;
       }
       .app-shell {
         display: flex !important;
@@ -1338,7 +1338,7 @@ body {
         height: min(66vw, 252px) !important;
       }
       .bottom-nav-capsule {
-        bottom: max(12px, calc(env(safe-area-inset-bottom, 0px) + 6px)) !important;
+        bottom: max(12px, calc(max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px)) + 6px)) !important;
       }
     }
 
@@ -1389,10 +1389,10 @@ body {
     }
     /* Edge-to-Edge Safe Area Insets for Android 15 / Xiaomi 17T Pro */
     body {
-        padding-top: env(safe-area-inset-top, 0px);
-        padding-bottom: env(safe-area-inset-bottom, 0px);
-        padding-left: env(safe-area-inset-left, 0px);
-        padding-right: env(safe-area-inset-right, 0px);
+        padding-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
+        padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));
+        padding-left: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
+        padding-right: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
     }
     </style>
 
@@ -1617,10 +1617,10 @@ body {
 <!-- TASK #828: Android 15 (SDK 35) Edge-to-Edge Safe Area Insets -->
 <style id="task-828-edge-insets">
   header, .app-header, .top-bar {
-    padding-top: max(12px, env(safe-area-inset-top)) !important;
+    padding-top: max(12px, env(safe-area-inset-top, 0px), var(--df-safe-top, 0px)) !important;
   }
   nav.bottom-nav, .bottom-nav, #bottomNav {
-    padding-bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px)) !important;
   }
 </style>
 <!-- TASK #834: 412px Task Input Full-Width & Date Input Western Digits -->

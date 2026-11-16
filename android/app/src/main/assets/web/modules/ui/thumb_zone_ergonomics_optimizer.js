@@ -42,7 +42,7 @@
                 }
                 /* Thumb-Zone Bottom Third Anchoring */
                 .bottom-controls, #zenStudioTriggerPill, .timer-presets {
-                    padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+                    padding-bottom: max(16px, env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px)) !important;
                 }
                 /* High Tactile Feedback Animation */
                 button:active, [role=button]:active {
