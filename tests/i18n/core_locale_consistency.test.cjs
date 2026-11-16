@@ -31,8 +31,8 @@ const localizedCornell = Object.freeze({
   pl: 'Notatki Cornella 📋'
 });
 
-test('17 Core row dictionaries exactly match the declared 47 fields, without empty entries', () => {
-  assert.equal(fields.length, 47);
+test('17 Core row dictionaries exactly match the declared 48 fields, without empty entries', () => {
+  assert.equal(fields.length, 48);
   assert.equal(new Set(fields).size, fields.length);
   assert.deepEqual(Object.keys(rows).sort(), expectedCore.slice().sort());
   for (const [code, values] of Object.entries(rows)) {

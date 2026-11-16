@@ -38,7 +38,7 @@ function fixture(save=()=>true){
 }
 test('language switch updates the actual button accessible name along with the visible label',()=>{
  const f=fixture();
- for(const [code,expected] of [['ar','AR Arabic • العربية'],['de','DE German • Deutsch'],['en','EN English • English']]){
+ for(const [code,expected] of [['ar','AR Arabic • العربية'],['de','DE German • Deutsch'],['en','EN English'],['fil','FIL Filipino']]){
   f.apply(code);
   assert.equal(f.button.attributes['aria-label'],expected);
   assert.equal(f.get('currentLangIso').textContent,expected.split(' ')[0]);

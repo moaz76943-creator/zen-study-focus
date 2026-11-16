@@ -2267,6 +2267,7 @@ const DICT = {
     waveFlowTitle: 'Índice de Flujo Semanal', peakPerfBadge: 'Flujo Máximo',
     calcHeading: '🎓 Calculadora de Metas y Temario',
     calcOutTpl: '📅 ¡A este ritmo completarás tu meta en {d} días!',
+    btnBotanicalGarden: '🌿 Santuario Zen & Heatmap 365 ↗',
     btnSave: 'Guardar y Aplicar', btnCancel: 'Cancelar',
     weekdays: ['Dom', 'Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb'],
     months: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
@@ -3468,6 +3469,8 @@ function renderLanguageList() {
     const native = document.createElement('div');
     native.className = 'lang-native-sub';
     native.textContent = toWest(l.nativeName);
+    // Identical English and native names (e.g. "English") would render twice in a row.
+    if (String(l.enName).trim().toLowerCase() === String(l.nativeName).trim().toLowerCase()) native.style.display = 'none';
     names.appendChild(english);
     names.appendChild(native);
     const mark = document.createElement('span');
@@ -3620,11 +3623,14 @@ function applyLanguage(code) {
 
   const isoEl = document.getElementById('currentLangIso');
   if (isoEl) isoEl.textContent = toWest(meta.iso);
+  // Identical English and native names (e.g. "English") must not repeat as "English • English".
+  const labelEn = String(meta.enName).trim();
+  const labelNative = String(meta.nativeName).trim();
+  const labelText = labelEn.toLowerCase() === labelNative.toLowerCase() ? labelEn : `${labelEn} • ${labelNative}`;
   const languageLabel = document.getElementById('currentLangLabel');
   if (languageLabel) {
-    languageLabel.textContent = toWest(`${meta.enName} • ${meta.nativeName}`);
-    languageLabel.parentElement?.setAttribute('aria-label',
-      toWest(`${meta.iso} ${meta.enName} • ${meta.nativeName}`));
+    languageLabel.textContent = toWest(labelText);
+    languageLabel.parentElement?.setAttribute('aria-label', toWest(`${meta.iso} ${labelText}`));
   }
   const hdrMain = document.getElementById('hdrMainTitle');
   if (hdrMain) hdrMain.textContent = 'Deep Focus';

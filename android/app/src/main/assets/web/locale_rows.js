@@ -1,5 +1,5 @@
 // Localized Deep Focus interface text, part 1. Kept separate for independent language QA.
-window.ZEN_LOCALE_FIELD_KEYS = ["pillCloud","pillSound","pillShare","pillSecure","sportSetsTitle","readTrackerTitle","totalFocusToday","minsUnit","daysUnit","waterWord","orbDump","orbCloud","orbDesk","modeCustom","startFocusAchieve","filterAll","filterToday","filterDone","phAddTask","phSearchNotes","catStudy","catSport","catReview","catExam","tagCornell","tagFlash","tagQuick","btnAddCalNote","lblBlurAnswer","mixerReady","btnMyMix","btnStopAll","sndCatWater","sndCatForest","sndCatWarm","kpiMinutes","kpiSessions","kpiTrendWeek","kpiTrendGreat","overviewTitle","badgeThisWeek","waveFlowTitle","peakPerfBadge","calcHeading","calcOutTpl","btnSave","btnCancel"];
+window.ZEN_LOCALE_FIELD_KEYS = ["pillCloud","pillSound","pillShare","pillSecure","sportSetsTitle","readTrackerTitle","totalFocusToday","minsUnit","daysUnit","waterWord","orbDump","orbCloud","orbDesk","modeCustom","startFocusAchieve","filterAll","filterToday","filterDone","phAddTask","phSearchNotes","catStudy","catSport","catReview","catExam","tagCornell","tagFlash","tagQuick","btnAddCalNote","lblBlurAnswer","mixerReady","btnMyMix","btnStopAll","sndCatWater","sndCatForest","sndCatWarm","kpiMinutes","kpiSessions","kpiTrendWeek","kpiTrendGreat","overviewTitle","badgeThisWeek","waveFlowTitle","peakPerfBadge","calcHeading","calcOutTpl","btnSave","btnCancel","btnBotanicalGarden"];
 window.ZEN_LOCALE_ROWS = {
   "fr": [
     "Sauvegarde manuelle",
@@ -48,7 +48,8 @@ window.ZEN_LOCALE_ROWS = {
     "🎓 Calculateur d’objectifs et de programme",
     "📅 À ce rythme, vous terminerez votre objectif dans {d} jours !",
     "Enregistrer et appliquer",
-    "Annuler"
+    "Annuler",
+    "🌿 Sanctuaire Zen & Heatmap 365 ↗"
   ],
   "de": [
     "Manuelle Sicherung",
@@ -97,7 +98,8 @@ window.ZEN_LOCALE_ROWS = {
     "🎓 Ziel- und Lernplanrechner",
     "📅 Bei diesem Tempo erreichst du dein Ziel in {d} Tagen!",
     "Speichern und anwenden",
-    "Abbrechen"
+    "Abbrechen",
+    "🌿 Zen-Zuflucht & 365-Heatmap ↗"
   ],
   "pt": [
     "Backup manual",
@@ -146,7 +148,8 @@ window.ZEN_LOCALE_ROWS = {
     "🎓 Calculadora de metas e estudos",
     "📅 Nesse ritmo você concluirá a meta em {d} dias!",
     "Salvar e aplicar",
-    "Cancelar"
+    "Cancelar",
+    "🌿 Santuário Zen & Heatmap 365 ↗"
   ],
   "it": [
     "Backup manuale",
@@ -195,7 +198,8 @@ window.ZEN_LOCALE_ROWS = {
     "🎓 Calcolatore di obiettivi e programma",
     "📅 Di questo passo finirai l’obiettivo in {d} giorni!",
     "Salva e applica",
-    "Annulla"
+    "Annulla",
+    "🌿 Santuario Zen & Heatmap 365 ↗"
   ],
   "nl": [
     "Handmatige back-up",
@@ -244,7 +248,8 @@ window.ZEN_LOCALE_ROWS = {
     "🎓 Rekenhulp voor doelen en planning",
     "📅 Met dit tempo bereik je je doel in {d} dagen!",
     "Opslaan en toepassen",
-    "Annuleren"
+    "Annuleren",
+    "🌿 Zen-heiligdom & 365-heatmap ↗"
   ]
 };
 
@@ -296,7 +301,8 @@ Object.assign(window.ZEN_LOCALE_ROWS, {
     "🎓 Hedef ve müfredat hesaplayıcısı",
     "📅 Bu hızla hedefini {d} günde tamamlayacaksın!",
     "Kaydet ve uygula",
-    "İptal"
+    "İptal",
+    "🌿 Zen Sığınağı & Isı Haritası 365 ↗"
   ],
   "ru": [
     "Резервная копия вручную",
@@ -345,7 +351,8 @@ Object.assign(window.ZEN_LOCALE_ROWS, {
     "🎓 Калькулятор целей и плана",
     "📅 В таком темпе вы достигнете цели за {d} дней!",
     "Сохранить и применить",
-    "Отмена"
+    "Отмена",
+    "🌿 Дзен-убежище & Тепловая карта 365 ↗"
   ],
   "id": [
     "Cadangan manual",
@@ -394,7 +401,8 @@ Object.assign(window.ZEN_LOCALE_ROWS, {
     "🎓 Kalkulator target dan materi",
     "📅 Dengan kecepatan ini, target selesai dalam {d} hari!",
     "Simpan dan terapkan",
-    "Batal"
+    "Batal",
+    "🌿 Suaka Zen & Heatmap 365 ↗"
   ],
   "vi": [
     "Sao lưu thủ công",
@@ -443,7 +451,8 @@ Object.assign(window.ZEN_LOCALE_ROWS, {
     "🎓 Máy tính mục tiêu và kế hoạch",
     "📅 Với tốc độ này, bạn sẽ hoàn thành mục tiêu sau {d} ngày!",
     "Lưu và áp dụng",
-    "Hủy"
+    "Hủy",
+    "🌿 Thiền Viên & Bản đồ nhiệt 365 ↗"
   ],
   "pl": [
     "Ręczna kopia zapasowa",
@@ -492,7 +501,8 @@ Object.assign(window.ZEN_LOCALE_ROWS, {
     "🎓 Kalkulator celów i planu nauki",
     "📅 W tym tempie ukończysz cel za {d} dni!",
     "Zapisz i zastosuj",
-    "Anuluj"
+    "Anuluj",
+    "🌿 Azyl Zen & Mapa ciepła 365 ↗"
   ]
 });
 
@@ -544,7 +554,8 @@ Object.assign(window.ZEN_LOCALE_ROWS, {
     "🎓 目标与进度计算器",
     "📅 按当前速度，你将在 {d} 天内完成目标！",
     "保存并应用",
-    "取消"
+    "取消",
+    "🌿 禅意避静所 & 365 热力图 ↗"
   ],
   "hi": [
     "मैनुअल बैकअप",
@@ -593,7 +604,8 @@ Object.assign(window.ZEN_LOCALE_ROWS, {
     "🎓 लक्ष्य और पाठ्यक्रम कैलकुलेटर",
     "📅 इस गति से आप {d} दिनों में लक्ष्य पूरा कर लेंगे!",
     "सहेजें और लागू करें",
-    "रद्द करें"
+    "रद्द करें",
+    "🌿 ज़ेन आश्रय & 365 हीटमैप ↗"
   ],
   "ja": [
     "手動バックアップ",
@@ -642,7 +654,8 @@ Object.assign(window.ZEN_LOCALE_ROWS, {
     "🎓 目標・学習計画の計算",
     "📅 このペースなら {d} 日で目標を達成できます！",
     "保存して適用",
-    "キャンセル"
+    "キャンセル",
+    "🌿 禅の聖域 & 365ヒートマップ ↗"
   ],
   "ko": [
     "수동 백업",
@@ -691,7 +704,8 @@ Object.assign(window.ZEN_LOCALE_ROWS, {
     "🎓 목표 및 학습 계획 계산기",
     "📅 이 속도라면 {d}일 안에 목표를 달성합니다!",
     "저장하고 적용",
-    "취소"
+    "취소",
+    "🌿 젠 성역 & 365 히트맵 ↗"
   ],
   "bn": [
     "ম্যানুয়াল ব্যাকআপ",
@@ -740,7 +754,8 @@ Object.assign(window.ZEN_LOCALE_ROWS, {
     "🎓 লক্ষ্য ও পাঠ্যসূচি হিসাব",
     "📅 এই গতিতে {d} দিনে লক্ষ্য পূরণ হবে!",
     "সংরক্ষণ ও প্রয়োগ",
-    "বাতিল"
+    "বাতিল",
+    "🌿 জেন আশ্রয় & 365 হিটম্যাপ ↗"
   ],
   "ur": [
     "دستی بیک اپ",
@@ -789,7 +804,8 @@ Object.assign(window.ZEN_LOCALE_ROWS, {
     "🎓 ہدف اور نصاب کا حساب",
     "📅 اس رفتار سے آپ {d} دن میں ہدف مکمل کریں گے!",
     "محفوظ کریں اور لاگو کریں",
-    "منسوخ"
+    "منسوخ",
+    "🌿 زن پناہ گاہ & 365 ہیٹ میپ ↗"
   ],
   "fa": [
     "پشتیبان‌گیری دستی",
@@ -838,6 +854,7 @@ Object.assign(window.ZEN_LOCALE_ROWS, {
     "🎓 محاسبه‌گر هدف و برنامه",
     "📅 با این روند، هدف شما در {d} روز کامل می‌شود!",
     "ذخیره و اعمال",
-    "لغو"
+    "لغو",
+    "🌿 پناهگاه زن & نقشه‌ی گرمایی 365 ↗"
   ]
 });
