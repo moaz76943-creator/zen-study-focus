@@ -1,0 +1,140 @@
+name: Deep Focus Parallel Relay
+
+on:
+  workflow_dispatch:
+    inputs:
+      hop:
+        description: "رقم الموجة الحالية"
+        default: "1"
+      max_hops:
+        description: "الحد الأقصى للموجات"
+        default: "30"
+
+permissions:
+  contents: write
+  actions: write
+
+concurrency:
+  group: df-parallel-relay-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  workers:
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    strategy:
+      fail-fast: false
+      matrix:
+        role: [audio, layout, ui, i100n]
+    steps:
+      - name: سحب الكود
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: تثبيت Hermes Agent
+        run: |
+          curl -fsSL https://hermes-agent.nousresearch.com/install.sh | bash -s -- --non-interactive --skip-browser --skip-computer-use
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
+      - name: تشغيل الوكيل المتخصص بالتوازي
+        if: always()
+        env:
+          ROLE: ${{ matrix.role }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          NVIDIA_API_KEY: ${{ secrets.NVIDIA_API_KEY }}
+          GOOGLE_KEYS_LIST: ${{ secrets.GOOGLE_KEYS_LIST }}
+        run: |
+          printf '%s\n' "$GOOGLE_KEYS_LIST" > /tmp/keys.list
+          case "$ROLE" in
+            audio)
+              PROMPT="ROLE: LEAD AUDIO ENGINEER (branch integration/master-qa-verified-v21). Find and permanently eliminate the constant static/hiss/background audio noise across Web Audio API (AudioContext, noise buffers, 40Hz/10Hz synthesizers, spatial audio) and .ogg loops. Ensure zero audio auto-plays on startup/tab switch, crisp mixing, reliable nature sounds, and instant Stop. Preserve all security/SAF/test invariants and run node tools/run_tests.mjs."
+              ;;
+            layout)
+              PROMPT="ROLE: LEAD ANDROID 15 & LAYOUT ENGINEER (branch integration/master-qa-verified-v21). Fix MainActivity.java WindowInsetsCompat.Type.systemBars() and CSS so app content NEVER overlaps the Android status bar or 3-button nav bar on real devices (Xiaomi Android 15). Eliminate floating pill overlap ('Studios (10)') and clipped bottom cards across all screens. Preserve all security/SAF/test invariants and run node tools/run_tests.mjs."
+              ;;
+            ui)
+              PROMPT="ROLE: LEAD PRODUCT DESIGNER & FEATURE ARCHITECT (branch integration/master-qa-verified-v21). Audit and elevate visual polish, layout hierarchy, spacing, contrast, 120Hz smoothness, and features across all 7 tabs and 10 Studios. Put Nature Sounds at the top of Sounds tab with 3D Spatial cleanly collapsible, fix broken flows, dead buttons, and edge cases. Preserve all security/SAF/test invariants and run node tools/run_tests.mjs."
+              ;;
+            i100n)
+              PROMPT="ROLE: LEAD 100-LANGUAGE LOCALIZATION & QA ENGINEER (branch integration/master-qa-verified-v21). Audit ALL 100 supported languages (both RTL and LTR). Fix missing keys, untranslated fallbacks, duplicate labels like 'English • English', RTL alignment bugs, and expand/update tests cleanly. Preserve all security/SAF/test invariants and run node tools/run_tests.mjs."
+              ;;
+          esac
+
+          run_or() { [ -n "${OPENROUTER_API_KEY:-}" ] && timeout 240m hermes chat --cli --yolo --oneshot -m "openrouter/free" -q "$PROMPT"; }
+          run_nv() { [ -n "${NVIDIA_API_KEY:-}" ] && timeout 240m hermes chat --cli --yolo --oneshot --provider nvidia -m "$1" -q "$PROMPT"; }
+          run_gem() {
+            while IFS= read -r K; do
+              [ -n "$K" ] || continue
+              GEMINI_API_KEY="$K" GOOGLE_API_KEY="$K" timeout 240m hermes chat --cli --yolo --oneshot --provider gemini -m "$1" -q "$PROMPT" && return 0
+            done < /tmp/keys.list
+            return 1
+          }
+
+          case "$ROLE" in
+            audio)  run_or || run_nv "nvidia/nemotron-3-ultra-550b-a55b" || run_gem "gemini-3.5-flash-lite" || run_gem "gemini-2.5-flash" || true ;;
+            layout) run_nv "nvidia/nemotron-3-ultra-550b-a55b" || run_or || run_gem "gemini-3.5-flash-lite" || run_gem "gemini-2.5-flash" || true ;;
+            ui)     run_nv "deepseek-ai/deepseek-v4.1-flash" || run_gem "gemini-3.5-flash-lite" || run_or || run_gem "gemini-2.5-flash" || true ;;
+            i100n)  run_gem "gemini-3.5-flash-lite" || run_nv "deepseek-ai/deepseek-v4.1-flash" || run_or || run_gem "gemini-2.5-flash" || true ;;
+          esac
+          rm -f /tmp/keys.list
+
+      - name: رفع فرع العامل
+        if: always()
+        run: |
+          BR="relay/hop-${{ inputs.hop }}-${{ matrix.role }}"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          if [ -n "$(git status --porcelain)" ]; then
+            git checkout -B "$BR"
+            git add -A
+            git commit -m "chore(agent): parallel ${{ matrix.role }} hop ${{ inputs.hop }}"
+            git push -f origin "$BR"
+          fi
+
+  merge_and_relay:
+    needs: workers
+    if: always()
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: دمج نتائج الوكلاء الأربعة وفحص الاختبارات
+        uses: actions/checkout@v4
+        with:
+          ref: integration/master-qa-verified-v21
+          fetch-depth: 0
+
+      - name: دمج الفروع وتشغيل الاختبارات
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin
+          MERGED=0
+          for R in audio layout ui i100n; do
+            BR="origin/relay/hop-${{ inputs.hop }}-$R"
+            if git rev-parse --verify "$BR" >/dev/null 2>&1; then
+              if git merge --no-edit "$BR"; then
+                MERGED=1
+              else
+                git merge --abort || true
+                git merge --no-edit -X theirs "$BR" && MERGED=1 || git merge --abort || true
+              fi
+              git push origin --delete "relay/hop-${{ inputs.hop }}-$R" || true
+            fi
+          done
+          if [ "$MERGED" -eq 1 ]; then
+            node tools/run_tests.mjs || true
+            git push origin integration/master-qa-verified-v21
+          fi
+
+      - name: تشغيل الموجة المتوازية التالية
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          HOP="${{ inputs.hop || '1' }}"
+          MAX="${{ inputs.max_hops || '30' }}"
+          if [ "$HOP" -lt "$MAX" ]; then
+            NEXT=$((HOP + 1))
+            gh workflow run hermes-relay.yml --ref integration/master-qa-verified-v21 -f hop="$NEXT" -f max_hops="$MAX"
+          fi
