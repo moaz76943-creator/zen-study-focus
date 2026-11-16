@@ -13226,9 +13226,10 @@ window.FlashQuizEngine = FlashQuizEngine;
       var lastOut = 0.0;
       for (var i = 0; i < bufferSize; i++) {
         var white = Math.random() * 2 - 1;
-        output[i] = (lastOut + (0.02 * white)) / 1.02;
-        lastOut = output[i];
-        output[i] *= 3.5;
+        // Reduced from 3.5 to 1.2 to eliminate static
+        var brown = (lastOut + (0.02 * white)) / 1.02;
+        lastOut = brown;
+        output[i] = brown * 1.2;
       }
 
       var whiteNoise = _soundscapeCtx.createBufferSource();

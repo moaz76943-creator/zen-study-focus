@@ -41,10 +41,11 @@
         } else if (type === 'ocean' || type === 'wind') {
           // محاكاة هدير الأمواج والرياح العميقة (Brownian Noise)
           b0 = (b0 + (0.02 * white)) / 1.02;
-          data[i] = b0 * 3.5;
+          // Reduced from 3.5 to 1.5 to eliminate static, filtered by bandpass
+          data[i] = b0 * 1.5;
         } else {
           // محاكاة طقطقة حطب النار الهادئة (Campfire)
-          const pop = Math.random() > 0.9985 ? (Math.random() * 2 - 1) * 2 : 0;
+          const pop = Math.random() > 0.9985 ? (Math.random() * 2 - 1) * 0.8 : 0; // Reduced from 2 to 0.8
           b0 = 0.99 * b0 + white * 0.02;
           data[i] = b0 + pop;
         }
@@ -80,7 +81,8 @@
       }
 
       const gain = this.ctx.createGain();
-      gain.gain.value = volume;
+      // Reduced gain with -6dB ear-safety ceiling (0.7 → 0.35)
+      gain.gain.value = volume * 0.5;
 
       source.connect(filter);
       filter.connect(gain);
