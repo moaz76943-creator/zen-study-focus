@@ -859,7 +859,7 @@ body {
 
     body {
       padding-top: var(--df-sat);
-      padding-bottom: calc(var(--df-sab) + 94px) !important;
+      padding-bottom: calc(var(--df-sab) + var(--df-bottom-nav-clearance, 94px)) !important;
       padding-left: var(--df-sal);
       padding-right: var(--df-sar);
     }
@@ -967,7 +967,7 @@ body {
     /* Bottom Navigation Capsule Universal Fluid Protection */
     .bottom-nav-capsule {
       position: fixed !important;
-      bottom: max(10px, var(--df-sab)) !important;
+      bottom: max(10px, calc(var(--df-sab) + var(--df-bottom-nav-clearance, 0px))) !important;
       left: 50% !important;
       transform: translateX(-50%) !important;
       width: min(calc(100% - 16px), 540px) !important;
@@ -1321,7 +1321,7 @@ body {
     @media (max-width: 540px) and (min-aspect-ratio: 19/10) {
       body {
         padding-top: max(16px, max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px))) !important;
-        padding-bottom: calc(max(16px, max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px))) + 100px) !important;
+        padding-bottom: calc(max(16px, max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px))) + var(--df-bottom-nav-clearance, 100px)) !important;
       }
       .app-shell {
         display: flex !important;
@@ -1338,7 +1338,7 @@ body {
         height: min(66vw, 252px) !important;
       }
       .bottom-nav-capsule {
-        bottom: max(12px, calc(max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px)) + 6px)) !important;
+        bottom: max(12px, calc(max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px)) + var(--df-bottom-nav-clearance, 6px))) !important;
       }
     }
 
@@ -1647,7 +1647,7 @@ body {
     align-self: center !important;
   }
   main, .tab-content, .tab-panel {
-    padding-bottom: 120px !important;
+    padding-bottom: var(--df-bottom-nav-clearance, 120px) !important;
   }
   [data-i18n="ui_local_data"], [data-i18n="ui_local_data"] *,
   #localDataBadge, #localDataBadge * {

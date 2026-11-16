@@ -48,7 +48,7 @@
 .bottom-nav,
 nav.bottom-navigation,
 #main-bottom-nav {
-    padding-bottom: calc(var(--zen-safe-bottom) + 8px) !important;
+    padding-bottom: calc(var(--zen-safe-bottom) + var(--df-bottom-nav-clearance, 8px)) !important;
     min-height: calc(56px + var(--zen-safe-bottom));
 }
 
