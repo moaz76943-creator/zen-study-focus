@@ -29,6 +29,7 @@
     global.__ZEN_AUDIO_SINGLETON__ = {
       players: [],
       fadeTimer: null,
+      fadeTimers: new Set(),
       volume: 0.7,
       muted: false,
       userInteracted: false
@@ -50,11 +51,16 @@
       clearInterval(S.fadeTimer);
       S.fadeTimer = null;
     }
+    if (S.fadeTimers && S.fadeTimers.size) {
+      S.fadeTimers.forEach(function (t) { clearInterval(t); });
+      S.fadeTimers.clear();
+    }
     for (var i = 0; i < S.players.length; i++) {
       try {
         S.players[i].pause();
         S.players[i].currentTime = 0;
-        S.players[i].src = '';
+        if (typeof S.players[i].removeAttribute === "function") S.players[i].removeAttribute("src");
+        try { if (typeof S.players[i].load === "function") S.players[i].load(); } catch (e2) {}
       } catch (e) {}
     }
     S.players = [];
@@ -80,14 +86,17 @@
       p.then(function () {
         var step = 0;
         var steps = 10;
-        S.fadeTimer = setInterval(function () {
+        var fadeInterval = setInterval(function () {
           step++;
           try { a.volume = S.muted ? 0 : finalVol * (step / steps); } catch (e) {}
-          if (step >= steps) {
-            clearInterval(S.fadeTimer);
-            S.fadeTimer = null;
+          if (step >= steps || a.paused) {
+            clearInterval(fadeInterval);
+            if (S.fadeTimers) S.fadeTimers.delete(fadeInterval);
+            if (S.fadeTimer === fadeInterval) S.fadeTimer = null;
           }
         }, 100);
+        if (S.fadeTimers) S.fadeTimers.add(fadeInterval);
+        S.fadeTimer = fadeInterval;
       }).catch(function () {});
     }
     return a;

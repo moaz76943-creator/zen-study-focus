@@ -992,9 +992,12 @@ function triggerHaptic(type) {
 
 function playPeacefulChime() {
   try {
-    const AudioCtx = window.AudioContext || window.webkitAudioContext;
-    if (!AudioCtx) return;
-    const ctx = new AudioCtx();
+    let ctx = window.dfGetGlobalAudioContext ? window.dfGetGlobalAudioContext() : null;
+    if (!ctx) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      ctx = new AudioCtx();
+    }
     if (ctx.state === 'suspended') ctx.resume();
 
     // نغمة جرس التأمل الهادئة (528 Hz Harmonic)
@@ -5388,13 +5391,13 @@ function saveQuickDump(toTasks) {
 // Ids that used to reuse another file (ocean, fire, leaves, waterfall, night, winrain, earth)
 // were removed: showing twelve names over five recordings was misleading.
 const SOUNDS_DATA = [
-  { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.65, src: "audio/rain_window.ogg", url: "audio/rain_window.ogg" },
-  { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.7, src: "audio/flowing_water.ogg", url: "audio/flowing_water.ogg" },
-  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.65, src: "audio/forest_birds.ogg", url: "audio/forest_birds.ogg" },
-  { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.55, src: "audio/wind_breeze.ogg", url: "audio/wind_breeze.ogg" },
-  { id: 'thunder', cat: 'warm', cls: 'sbg-thunder', vol: 0.6, src: "audio/rain_thunder.ogg", url: "audio/rain_thunder.ogg" },
-  { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.62, src: "audio/campfire_embers.ogg", url: "audio/campfire_embers.ogg" },
-  { id: 'drip', cat: 'water', cls: 'sbg-drip', vol: 0.5, src: "audio/water_drop.ogg", url: "audio/water_drop.ogg" }
+  { id: 'rain', cat: 'water', cls: 'sbg-rain', vol: 0.45, src: "audio/rain_window.ogg", url: "audio/rain_window.ogg" },
+  { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.5, src: "audio/flowing_water.ogg", url: "audio/flowing_water.ogg" },
+  { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.45, src: "audio/forest_birds.ogg", url: "audio/forest_birds.ogg" },
+  { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.35, src: "audio/wind_breeze.ogg", url: "audio/wind_breeze.ogg" },
+  { id: 'thunder', cat: 'warm', cls: 'sbg-thunder', vol: 0.42, src: "audio/rain_thunder.ogg", url: "audio/rain_thunder.ogg" },
+  { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.45, src: "audio/campfire_embers.ogg", url: "audio/campfire_embers.ogg" },
+  { id: 'drip', cat: 'water', cls: 'sbg-drip', vol: 0.35, src: "audio/water_drop.ogg", url: "audio/water_drop.ogg" }
 ];
 
 let soundCat = 'all';
@@ -5551,6 +5554,18 @@ function playPresetRelaxMix() {
 }
 function stopAllAudio() {
   SOUNDS_DATA.forEach(s => stopSoundTile(s.id));
+  // Unified instant stop: kill every engine family so no loop keeps playing
+  // after the user hits Stop (ogg singleton, procedural DSP, binaural synth).
+  try {
+    if (window.SovereignAudioCues && typeof window.SovereignAudioCues.stopAmbient === "function") {
+      window.SovereignAudioCues.stopAmbient();
+    }
+  } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
+  if (typeof window !== "undefined") {
+    if (typeof window.dfStopAllSounds === "function") { try { window.dfStopAllSounds(); } catch (_) {} }
+    if (typeof window.dfStopAmbientSoundscape === "function") { try { window.dfStopAmbientSoundscape(); } catch (_) {} }
+    if (typeof window.dfStopBinauralGamma === "function") { try { window.dfStopBinauralGamma(); } catch (_) {} }
+  }
   renderSoundsStudio();
 }
 
@@ -10838,9 +10853,12 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfPlayZenGoalCompletionChime() {
     try {
       if (typeof window === 'undefined') return false;
-      var AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return false;
-      var ctx = new AudioCtx();
+      var ctx = window.dfGetGlobalAudioContext ? window.dfGetGlobalAudioContext() : null;
+      if (!ctx) {
+        var AudioCtx2 = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx2) return false;
+        ctx = new AudioCtx2();
+      }
       var osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       var gain = ctx.createGain();
 
@@ -12417,9 +12435,12 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfPlayHalfwayZenChime() {
     try {
       if (typeof window === "undefined") return false;
-      var AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return false;
-      var ctx = new AudioCtx();
+      var ctx = window.dfGetGlobalAudioContext ? window.dfGetGlobalAudioContext() : null;
+      if (!ctx) {
+        var AudioCtx3 = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx3) return false;
+        ctx = new AudioCtx3();
+      }
 
       var osc1 = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       var gain1 = ctx.createGain();
@@ -13163,14 +13184,22 @@ window.FlashQuizEngine = FlashQuizEngine;
   function dfStopAmbientSoundscape() {
     try {
       if (_soundscapeGain && _soundscapeCtx) {
+        _soundscapeGain.gain.cancelScheduledValues(_soundscapeCtx.currentTime);
         _soundscapeGain.gain.setValueAtTime(_soundscapeGain.gain.value, _soundscapeCtx.currentTime);
-        _soundscapeGain.gain.exponentialRampToValueAtTime(0.0001, _soundscapeCtx.currentTime + 0.3);
+        _soundscapeGain.gain.exponentialRampToValueAtTime(0.0001, _soundscapeCtx.currentTime + 0.08);
         setTimeout(function() {
           if (_soundscapeNode) {
             try { _soundscapeNode.stop(); _soundscapeNode.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
             _soundscapeNode = null;
           }
-        }, 350);
+        }, 100);
+      }
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+
+    // Instantly halt the CC0 .ogg singleton too — Stop must silence everything.
+    try {
+      if (typeof window !== "undefined" && window.SovereignAudioCues && typeof window.SovereignAudioCues.stopAmbient === "function") {
+        window.SovereignAudioCues.stopAmbient();
       }
     } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
@@ -13196,81 +13225,6 @@ window.FlashQuizEngine = FlashQuizEngine;
       } catch (_) {}
     }
     return { active: false, reason: "no_harsh_whitenoise" }; // Delegated to CC0 .ogg SovereignAudioCues
-
-    try {
-      if (typeof window === "undefined") return { active: false, reason: "no_window" };
-      var AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return { active: false, reason: "no_audio_context" };
-
-      if (!_soundscapeCtx || _soundscapeCtx.state === "closed") {
-        _soundscapeCtx = new AudioCtx();
-      } else if (_soundscapeCtx.state === "suspended") {
-        _soundscapeCtx.resume();
-      }
-
-      var bufferSize = 2 * _soundscapeCtx.sampleRate;
-      var noiseBuffer = _soundscapeCtx.createBuffer(1, bufferSize, _soundscapeCtx.sampleRate);
-      var output = noiseBuffer.getChannelData(0);
-
-      var filterFreq = 800;
-      var gainVal = 0.15;
-
-      if (type === "rain") {
-        filterFreq = 750;
-        gainVal = 0.12;
-      } else if (type === "stream") {
-        filterFreq = 1200;
-        gainVal = 0.10;
-      } else if (type === "forest") {
-        filterFreq = 450;
-        gainVal = 0.14;
-      } else if (type === "white_noise") {
-        filterFreq = 1500;
-        gainVal = 0.08;
-      }
-
-      var lastOut = 0.0;
-      for (var i = 0; i < bufferSize; i++) {
-        var white = Math.random() * 2 - 1;
-        // Reduced from 3.5 to 1.2 to eliminate static
-        var brown = (lastOut + (0.02 * white)) / 1.02;
-        lastOut = brown;
-        output[i] = brown * 1.2;
-      }
-
-      var whiteNoise = _soundscapeCtx.createBufferSource();
-      whiteNoise.buffer = noiseBuffer;
-      whiteNoise.loop = true;
-
-      var filter = _soundscapeCtx.createBiquadFilter();
-      filter.type = "lowpass";
-      filter.frequency.setValueAtTime(filterFreq, _soundscapeCtx.currentTime);
-
-      _soundscapeGain = _soundscapeCtx.createGain();
-      _soundscapeGain.gain.setValueAtTime(0.001, _soundscapeCtx.currentTime);
-      _soundscapeGain.gain.exponentialRampToValueAtTime(gainVal, _soundscapeCtx.currentTime + 1.0);
-
-      whiteNoise.connect(filter);
-      filter.connect(_soundscapeGain);
-      _soundscapeGain.connect(_soundscapeCtx.destination);
-
-      whiteNoise.start(0);
-      _soundscapeNode = whiteNoise;
-
-      try {
-        localStorage.setItem("df_active_soundscape_v1", type);
-      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-
-      try {
-        if (typeof window.dfVocabHapticPulse === "function") {
-          window.dfVocabHapticPulse(15);
-        }
-      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-
-      return { active: true, type: type };
-    } catch (_) {
-      return { active: false, reason: "audio_init_failed" };
-    }
   }
 
   function dfRenderSoundscapeSelectorHtml() {
@@ -13561,8 +13515,23 @@ window.FlashQuizEngine = FlashQuizEngine;
       if (status.remainingSeconds <= 120 && !_isTapering) {
         _isTapering = true;
         try {
-          if (typeof window !== "undefined" && typeof window.dfApplySmoothAudioFade === "function" && window._soundscapeGain && window._soundscapeCtx) {
-            window.dfApplySmoothAudioFade(window._soundscapeGain, 0.0001, status.remainingSeconds, window._soundscapeCtx);
+          // Fade the live CC0 .ogg singleton out over the remaining window
+          // (the procedural gain vars above are no longer assigned, so the
+          // taper drives SovereignAudioCues directly).
+          var cues = window.SovereignAudioCues;
+          if (cues && typeof cues.getVolume === "function" && typeof cues.setVolume === "function") {
+            var baseVol = cues.getVolume();
+            var taperStart = Date.now();
+            var taperMs = Math.max(1000, status.remainingSeconds * 1000);
+            var taperStep = function() {
+              try {
+                var left = taperMs - (Date.now() - taperStart);
+                if (left <= 0) return;
+                cues.setVolume(Math.max(0, baseVol * (left / taperMs)));
+                setTimeout(taperStep, 1000);
+              } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+            };
+            setTimeout(taperStep, 1000);
           }
         } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
       }
@@ -37862,10 +37831,14 @@ window.dfGenerateNoiseBuffer = function(ctx, type) {
     if (type === "brown") {
       data[i] = (lastOut + (0.02 * white)) / 1.02;
       lastOut = data[i];
-      data[i] *= 3.5;
+      data[i] *= 1.2; // 3.5 clipped the sample above ±1.0 -> audible static
     } else {
       data[i] = white * 0.15;
     }
+    // Hard safety clamp: no generated sample may ever exceed the range the
+    // destination can represent without hard-clipping into static.
+    if (data[i] > 1.0) data[i] = 1.0;
+    else if (data[i] < -1.0) data[i] = -1.0;
   }
   return buffer;
 };
@@ -37873,6 +37846,8 @@ window.dfGenerateNoiseBuffer = function(ctx, type) {
 window.dfPlayNatureSound = async function(soundType) {
   window.dfStopAllSounds();
   if (!soundType || soundType === "none") return;
+  // Zero-autoplay invariant: never start a procedural loop while the tab is hidden.
+  if (typeof document !== "undefined" && document.hidden) return;
   const ctx = window.dfGetSafeAudioContext ? window.dfGetSafeAudioContext() : null;
   if (!ctx) return;
   if (window.dfEnsureAudioActive) await window.dfEnsureAudioActive();
@@ -37893,7 +37868,10 @@ window.dfPlayNatureSound = async function(soundType) {
 
   noiseSource.connect(filter);
   filter.connect(gain);
-  gain.connect(ctx.destination);
+  // Route through the shared ear-safety limiter so stacked loops cannot
+  // hard-clip the destination into static.
+  const masterDest = window.dfGetSafeMasterDestination ? window.dfGetSafeMasterDestination(ctx) : null;
+  gain.connect(masterDest || ctx.destination);
 
   noiseSource.start(0);
   window.DF_ACTIVE_AUDIO_NODES.push(noiseSource, filter, gain);
@@ -40779,8 +40757,24 @@ window.dfGetHistoricCoronationSealV50 = function() {
    Explicitly severs all audio node connections to prevent memory accumulation
    ========================================================== */
 window.dfDeepCleanAudioGraph = function() {
-  if (Array.isArray(window.DF_ACTIVE_AUDIO_NODES)) {
-    window.DF_ACTIVE_AUDIO_NODES.forEach(node => {
+  const nodes = Array.isArray(window.DF_ACTIVE_AUDIO_NODES) ? window.DF_ACTIVE_AUDIO_NODES.slice() : [];
+  // Silence intent is registered synchronously so stop is effectively instant;
+  // the actual graph teardown happens after a 60ms anti-click fade.
+  window.DF_ACTIVE_AUDIO_NODES = [];
+  let faded = 0;
+  nodes.forEach(node => {
+    try {
+      if (node && node.gain && typeof node.gain.cancelScheduledValues === "function") {
+        const t = node.context ? node.context.currentTime : 0;
+        node.gain.cancelScheduledValues(t);
+        node.gain.setValueAtTime(Math.max(0.0001, node.gain.value), t);
+        node.gain.exponentialRampToValueAtTime(0.0001, t + 0.06);
+        faded++;
+      }
+    } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
+  });
+  setTimeout(function() {
+    nodes.forEach(node => {
       try {
         if (typeof node.stop === "function") node.stop();
       } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
@@ -40788,10 +40782,7 @@ window.dfDeepCleanAudioGraph = function() {
         if (typeof node.disconnect === "function") node.disconnect();
       } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
     });
-    window.DF_ACTIVE_AUDIO_NODES.length = 0;
-  }
-  // Reset audio master compressor references if context is recycled
-  window.DF_ACTIVE_AUDIO_NODES = [];
+  }, faded ? 80 : 0);
   console.log("[AUDIO PURGE] Complete WebAudio node graph severed and garbage-collected.");
 };
 
@@ -41491,11 +41482,11 @@ window.dfHandleBluetoothCodecSwitch = async function() {
   }
 };
 
-if (typeof window !== "undefined") {
-  const ctx = window.dfGetSafeAudioContext ? window.dfGetSafeAudioContext() : null;
-  if (ctx && ctx.addEventListener) {
-    ctx.addEventListener("statechange", window.dfHandleBluetoothCodecSwitch);
-  }
+// Zero-autoplay invariant: never pre-create the AudioContext at boot.
+// dfGetSafeAudioContext lazily creates it on the first user-initiated play,
+// so the page stays 100% silent until the user actually presses something.
+if (typeof window !== "undefined" && window.DF_AUDIO_CTX && typeof window.DF_AUDIO_CTX.addEventListener === "function") {
+  window.DF_AUDIO_CTX.addEventListener("statechange", window.dfHandleBluetoothCodecSwitch);
 }
 
 /* ==========================================================
@@ -68276,9 +68267,12 @@ const StudyPodEngine = (function() {
   // Web Audio Tibetan Singing Bell Synthesizer (Harmonic Acoustic Chime)
   function playSynchronizedBellChime(volume) {
     try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (!AudioCtx) return false;
-      const ctx = new AudioCtx();
+      let ctx = window.dfGetGlobalAudioContext ? window.dfGetGlobalAudioContext() : null;
+      if (!ctx) {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return false;
+        ctx = new AudioCtx();
+      }
       const now = ctx.currentTime;
       const v = Math.min(1, Math.max(0.05, Number(volume) || 0.85));
 
