@@ -619,11 +619,11 @@
     .mbtn-pri { flex: 1; background: var(--primary); color: #fff; border: none; padding: 11px; border-radius: 12px; font-size: 0.8rem; font-weight: 800; cursor: pointer; }
     .mbtn-sec { flex: 1; background: #f1f5f9; color: var(--text-main); border: none; padding: 11px; border-radius: 12px; font-size: 0.8rem; font-weight: 800; cursor: pointer; }
 
-    .lang-list-scroll { display: flex; flex-direction: column; gap: 7px; max-height: 55vh; overflow-y: auto; padding-right: 2px; }
+    .lang-list-scroll { display: flex; flex-direction: column; gap: 7px; max-height: 55vh; overflow-y: auto; padding-inline-end: 2px; }
     .lang-row-btn {
       background: #f8fafc; border: 1.5px solid #e2e8f0; border-radius: 14px;
       padding: 10px 12px; display: flex; align-items: center; justify-content: space-between;
-      cursor: pointer; transition: 0.15s; text-align: left;
+      cursor: pointer; transition: 0.15s; text-align: start;
     }
     .lang-row-btn.active { border-color: var(--primary); background: var(--primary-soft); }
     .lang-code-monogram {
@@ -1205,7 +1205,7 @@ body {
       margin-top: 14px !important;
       max-height: min(65vh, 65dvh) !important;
       overflow-y: auto !important;
-      padding-right: 2px !important;
+      padding-inline-end: 2px !important;
     }
     .zen-suite-card-btn {
       min-height: 56px !important;
@@ -1216,7 +1216,7 @@ body {
       display: flex !important;
       align-items: center !important;
       gap: 12px !important;
-      text-align: left !important;
+      text-align: start !important;
       cursor: pointer !important;
       transition: all 0.18s cubic-bezier(0.16, 1, 0.3, 1) !important;
       width: 100% !important;

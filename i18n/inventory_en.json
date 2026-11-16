@@ -24,7 +24,7 @@
  },
  {
   "kind": "text",
-  "text": "English • English",
+  "text": "English",
   "where": "currentLangLabel",
   "screens": [
    "sec-timer",
