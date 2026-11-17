@@ -2743,11 +2743,11 @@
   "ctx": "sec-notes#dfPillar3StemMount",
   "kind": "text"
  },
- "＋ New note": {
+ "+ New note": {
   "ctx": "sec-notes#nsNewButton",
   "kind": "text"
  },
- "＋ New task": {
+ "+ New task": {
   "ctx": "sec-tasks#df22TasksHost",
   "kind": "text"
  }

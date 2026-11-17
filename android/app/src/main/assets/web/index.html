@@ -65,10 +65,7 @@
       font-variant-numeric: tabular-nums lining-nums;
       -webkit-tap-highlight-color: transparent;
     }
-    /* Reserve clears the docked bottom stack: capsule (12 gap + 70 capsule), then the
-       8px dock gap above it, then the fixed FAB / Studios pill row (54px), plus 12px
-       so the last in-flow card can never sit under a floating layer. */
-    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px + 54px + 12px); overflow-x: hidden; user-select: none; }
+    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 76px); overflow-x: hidden; user-select: none; }
     input, textarea { user-select: text; text-align: start; }
 
     body.deep-lockdown .dynamic-hero-header,
@@ -459,7 +456,7 @@
       box-shadow: 0 12px 28px rgba(30, 27, 75, 0.25); margin-bottom: 14px; position: relative; overflow: hidden;
     }
 
-    /* 6-Tab Bottom Capsule */
+    /* 7-Tab Bottom Capsule */
     .bottom-nav-capsule {
       position: fixed;
       /* Docked just above the WebView content-area bottom, which MainActivity already
@@ -490,6 +487,7 @@
       transition: 0.15s; flex: 1;
     }
     .bnav-btn svg { width: 19px; height: 19px; fill: currentColor; }
+    .bnav-btn span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
     .bnav-btn.active { color: var(--primary); background: var(--primary-soft); }
 
     /* Accessibility, readable saved notes, and compact phones */
@@ -2062,7 +2060,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         <section class="notes-studio-hero">
           <div class="notes-studio-heading"><small id="nsEyebrow" data-i18n="nsEyebrow">✦ Notes Studio</small><h2 id="nsTitle" data-i18n="nsTitle">Your ideas, organized</h2><p id="nsSubtitle" data-i18n="nsSubtitle">Write, revisit and develop your thoughts.</p></div>
           <div class="notes-studio-stats"><div><strong id="nsTotal">0</strong><span id="nsTotalLabel" data-i18n="nsTotalLabel">My notes</span></div><div><strong id="nsPinned">0</strong><span id="nsPinnedLabel" data-i18n="nsPinnedLabel">Pinned</span></div></div>
-          <button type="button" id="nsNewButton" class="ns-new" onclick="openNoteModal()" data-i18n="nsNewButton">＋ New note</button>
+          <button type="button" id="nsNewButton" class="ns-new" onclick="openNoteModal()" data-i18n="nsNewButton">+ New note</button>
         </section>
         <button type="button" class="fc-btn primary" id="flashcardsEntry" data-fc-open="1" aria-label="Flashcards"><span id="flashcardsEntryLabel">Flashcards</span></button>
         <div class="ns-section-title"><strong id="nsTemplatesTitle" data-i18n="nsTemplatesTitle">Ready-to-use templates</strong><span id="nsTemplatesHint" data-i18n="nsTemplatesHint">Tap to start</span></div>

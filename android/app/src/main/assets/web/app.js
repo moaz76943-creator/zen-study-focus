@@ -80553,7 +80553,9 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
         bind("qtResetButton", () => window.ActionDispatcherEngine?.dispatch("reset-timer"));
 
         // Modals & Triggers
-        bind("zenStudioTriggerPill", () => window.StudioNavigatorDrawer?.toggleDrawer?.());
+        // zenStudioTriggerPill is toggled by StudioNavigatorDrawer's own
+        // pill.onclick; a second listener here double-toggled the drawer
+        // (open→close per click), leaving it visually hidden while open.
         bind("goalsEditButton", () => window.ActionDispatcherEngine?.dispatch("open-goals"));
         bind("zenExamEveBtn", () => window.ActionDispatcherEngine?.dispatch("toggle-rescue"));
         bind("zenLanguageFloatingTrigger", () => window.MassivePolyglotCatalog?.openModal?.());
