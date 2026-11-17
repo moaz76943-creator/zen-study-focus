@@ -303,7 +303,7 @@ body:not(.deep-lockdown) #sec-notes .floating-plus-fab {
   box-shadow:0 9px 23px -9px rgba(59,109,238,.42);
   position: fixed;
   left: 24px;
-  bottom: var(--df-bottom-nav-clearance, 88px);
+  bottom: var(--df-bottom-nav-clearance, 104px);
   width: 54px;
   height: 54px;
   border-radius: 50%;
@@ -454,7 +454,7 @@ body:not(.deep-lockdown) .bottom-nav-capsule {
   position: fixed;
   /* Sit ABOVE the system navigation bar with 48dp touch clearance.
      --df-bottom-nav-clearance = nav inset + 48dp clearance (gesture handle or 3-button nav). */
-  bottom: var(--df-bottom-nav-clearance, 108px);
+  bottom: var(--df-bottom-nav-clearance, 104px);
   /* Internal padding only; safe-area handled by bottom positioning */
   padding-bottom: 5px;
 }
@@ -639,7 +639,7 @@ body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
   body:not(.deep-lockdown) {
     /* Body content padding clears floating elements (FAB, Studios pill).
        --df-bottom-nav-clearance = nav inset + 48dp touch clearance. */
-    padding-bottom: var(--df-bottom-nav-clearance, 108px) !important;
+    padding-bottom: var(--df-bottom-nav-clearance, 104px) !important;
   }
   body:not(.deep-lockdown) .bottom-nav-capsule {
     width: calc(100% - 4px);

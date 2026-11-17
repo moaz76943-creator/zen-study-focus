@@ -4,7 +4,7 @@
 :root {
   --safe-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 28px));
   --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 16px));
-  --safe-bottom-clearance: var(--df-bottom-nav-clearance, 108px);
+  --safe-bottom-clearance: var(--df-bottom-nav-clearance, 104px);
 }
 
 html, body {

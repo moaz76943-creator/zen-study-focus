@@ -12,7 +12,7 @@ html, body {
   background-color: var(--df-bg-oled);
   color: var(--df-text-primary);
   padding-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
-  padding-bottom: var(--df-bottom-nav-clearance, 108px);
+  padding-bottom: var(--df-bottom-nav-clearance, 104px);
   padding-inline-start: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
   padding-inline-end: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
   -webkit-tap-highlight-color: transparent;
