@@ -5578,8 +5578,8 @@ function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
         b3 = 0.86650 * b3 + white * 0.3104856;
         b4 = 0.55000 * b4 + white * 0.5329522;
         b5 = -0.7616 * b5 - white * 0.0168980;
-        data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
         b6 = white * 0.115926;
+        data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
       }
     } else if (color === 'brown') {
       // Brown noise: leaky-integrator of Paul Kellet pink noise.
@@ -5598,8 +5598,8 @@ function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
         b3 = 0.86650 * b3 + white * 0.3104856;
         b4 = 0.55000 * b4 + white * 0.5329522;
         b5 = -0.7616 * b5 - white * 0.0168980;
-        const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
         b6 = white * 0.115926;
+        const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
         // Leaky integrator: bounded DC, no drift, peak-normalized below
         brown = 0.9985 * brown + pink * 0.5;
         data[i] = brown;
@@ -40325,8 +40325,8 @@ window.dfGeneratePinkNoiseBuffer = function(ctx) {
     b3 = 0.86650 * b3 + white * 0.3104856;
     b4 = 0.55000 * b4 + white * 0.5329522;
     b5 = -0.7616 * b5 - white * 0.0168980;
-    data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
     b6 = white * 0.115926;
+    data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
   }
   return buffer;
 };
@@ -73495,8 +73495,8 @@ const ZeroGcAudioNodePool = (function() {
         b3 = 0.86650 * b3 + white * 0.3104856;
         b4 = 0.55000 * b4 + white * 0.5329522;
         b5 = -0.7616 * b5 - white * 0.0168980;
-        channelData[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
         b6 = white * 0.115926;
+        channelData[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
       }
     } else if (key === 'brown') {
       let lastOut = 0.0;
@@ -80779,8 +80779,8 @@ window.SovereignAudioPrewarmer = (function() {
                 b3 = 0.86650 * b3 + white * 0.3104856;
                 b4 = 0.55000 * b4 + white * 0.5329522;
                 b5 = -0.7616 * b5 - white * 0.0168980;
-                output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
                 b6 = white * 0.115926;
+                output[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
             }
             ctx._prewarmedNoiseBuffer = noiseBuffer;
             isPrewarmed = true;
