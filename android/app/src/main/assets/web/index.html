@@ -42,14 +42,12 @@
       --radius-lg: 18px;
       --radius-pill: 9999px;
       --header-grad: linear-gradient(135deg, #091326 0%, #1d3b8b 55%, #0284c7 100%);
-      /* Floating layers dock above the Android 15 system bars. The native WebView
-         padding insets the painted content but NOT the CSS viewport, so dock offsets
-         must include the pushed --df-webview-padding-bottom value. */
-      /* CSS viewport on the full-screen Android 15 WebView is NOT inset by the native
-         setPadding() insets (fixed/docked elements anchored to the layout bottom render
-         underneath the status / 3-button nav bar). Every bottom-anchored fixed element
-         and every in-flow body reserve must therefore add --df-webview-padding-bottom
-         (pushed by MainActivity via SovereignInsetsCalibrator) itself.
+      /* Floating layers dock above the Android 15 system bars. The native shell
+         (MainActivity) pads the WebView's parent FrameLayout, so the WebView's
+         layout viewport already ends above the status / 3-button nav bar.
+         --df-safe-* and --df-webview-padding-bottom are pinned to 0px by
+         SovereignInsetsCalibrator (single owner = native padding), so every
+         calc() below that references them resolves to the safe content edge.
          --df-bottom-nav-clearance is the dock reserve ABOVE the native inset only
          (capsule + FAB zone, 86px); it never includes the nav inset. */
       --df-dock-gap: 12px;
@@ -730,7 +728,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     padding-left: var(--sal);
     padding-right: var(--sar);
 }
-/* Bottom safe area: in-flow body padding reserves the native WebView bottom inset
+/* Bottom safe area: in-flow body padding reserves a fixed clearance for the floating
    (--df-webview-padding-bottom) plus --df-bottom-nav-clearance (dock reserve for the
    capsule + FAB). Do NOT override with !important here. */
 
@@ -924,7 +922,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
 
     body {
       padding-top: var(--df-sat);
-      /* Body content padding clears the native bottom inset plus the floating
+      /* Body content padding clears the floating
          elements (FAB, Studios pill) above the capsule. */
       padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px)) !important;
       padding-left: var(--df-sal);
@@ -951,7 +949,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         padding-bottom: 22px !important;
       }
       .bottom-nav-capsule {
-        /* Docked above the native WebView bottom inset plus a fixed dock gap. */
+        /* Docked a fixed gap above the safe content edge (native parent padding owns the nav bar). */
         bottom: var(--df-dock-bottom, calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px))) !important;
         padding: 5px 3px !important;
         padding-bottom: 5px !important;
@@ -1039,8 +1037,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     /* Bottom Navigation Capsule Universal Fluid Protection */
     .bottom-nav-capsule {
       position: fixed !important;
-      /* Docked above the native WebView bottom inset (--df-webview-padding-bottom)
-         plus a fixed gap; never inside the system nav bar. */
+      /* Docked a fixed gap above the safe content edge (--df-webview-padding-bottom is pinned
+         0px by the calibrator); never inside the system nav bar. */
       bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px)) !important;
       left: 50% !important;
       transform: translateX(-50%) !important;
@@ -1397,7 +1395,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     @media (max-width: 540px) and (min-aspect-ratio: 19/10) {
       body {
         padding-top: max(16px, max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px))) !important;
-        /* Body padding-bottom = native bottom inset + clearance for floating
+        /* Body padding-bottom = fixed clearance for floating
            elements (FAB, Studios pill). */
         padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px)) !important;
       }
@@ -1416,7 +1414,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         height: min(66vw, 252px) !important;
       }
       .bottom-nav-capsule {
-        /* Docked above the native WebView bottom inset plus a fixed dock gap. */
+        /* Docked a fixed gap above the safe content edge (native parent padding owns the nav bar). */
         bottom: var(--df-dock-bottom, calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px))) !important;
       }
     }
@@ -1469,7 +1467,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     /* Edge-to-Edge Safe Area Insets for Android 15 / Xiaomi 17T Pro */
     body {
         padding-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
-        /* Body content padding clears the native bottom inset plus floating
+        /* Body content padding clears the floating
            elements (FAB, Studios pill). */
         padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px));
         padding-left: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));

@@ -3,10 +3,11 @@
  * Android 15 Edge-to-Edge & Gesture Navigation Insets Calibration Engine.
  * Dynamically updates CSS root variables for status bar, gesture navigation pill,
  * and camera cutouts on Xiaomi 17T Pro (AMOLED 120Hz/144Hz).
- * Insets arrive as DP (CSS px) from MainActivity; MainActivity applies the physical-px
- * padding to the WebView itself, so this engine only feeds CSS with density-independent
- * values. Floating layers dock against the WebView content area, which already ends
- * above the system nav bar — clearance is therefore a fixed reserve, not nav-inset + gap.
+ * Insets arrive as DP (CSS px) from MainActivity. MainActivity pads the WebView's
+ * parent FrameLayout with the physical-px insets, so the WebView layout viewport
+ * already ends above the system nav bar: this engine pins the safe-area CSS
+ * variables to 0px (single owner = native padding) and only publishes the fixed
+ * dock reserves the floating layers need above the reduced viewport.
  */
 (function (global) {
   'use strict';
@@ -24,13 +25,11 @@
     _hasRealInsets: false,
 
     /**
-     * Initializes default safe-area fallback values and listener hooks.
-     * Fallbacks are DP (CSS px): status bar ~24dp, 3-button nav bar ~56dp.
-     * This ensures 3-button nav never overlaps on first paint before Android callback fires.
-     * Only apply fallbacks if we haven't already received real insets from Android.
+     * Initializes the calibrator and listener hooks. The native parent padding owns the
+     * insets before Android's callback fires, so no CSS fallback inset is needed;
+     * the pre-insets CSS is already valid with the 0px-pinned variables.
      */
     init: function () {
-      // Apply safe fallbacks immediately before Android insets arrive
       if (!this._hasRealInsets) {
         this.applyCSSVariables({
           top: 24,
@@ -79,25 +78,28 @@
 
     /**
      * Injects CSS variables onto documentElement with !important to override conflicting rules.
-     * --df-safe-top: status bar / cutout top inset (dp)
-     * --df-safe-bottom: navigation bar / gesture handle bottom inset (dp)
-     * --df-webview-padding-bottom: WebView padding-bottom in DP (max of navBottom and IME)
-     * --df-bottom-nav-clearance: fixed reserve (dp) that clears the docked bottom capsule plus
-     *   FAB / Studios pill for in-flow content. The WebView itself is padded above the
-     *   system nav bar in MainActivity, so this must NOT include the nav inset again.
+     * Design (Android 15 / Xiaomi edge-to-edge): MainActivity pads the WebView's PARENT
+     * FrameLayout with the real system-bar insets, so the WebView's layout viewport
+     * already ends above the status bar, cutout and 3-button nav bar. Native padding
+     * is the single owner of the insets — if CSS re-added them (via --df-safe-top /
+     * --df-safe-bottom / --df-webview-padding-bottom) every dock offset and body
+     * reserve would double-count, pushing the Studios pill over content and leaving
+     * a thick empty band above the nav bar. These variables are therefore pinned to 0px;
+     * raw device values remain available to JS via getInsets().
+     * --df-bottom-nav-clearance: fixed reserve (dp) that clears the docked bottom capsule
+     * plus FAB / Studios pill for in-flow content, measured from the safe content edge.
      */
     applyCSSVariables: function (insets) {
       if (typeof document === 'undefined' || !document.documentElement) return;
 
       var root = document.documentElement;
-      var navInset = insets.bottom; // nav/gesture height in dp (from Android via MainActivity)
-      var paddingBottom = insets.paddingBottom; // WebView padding-bottom in dp
 
-      root.style.setProperty('--df-safe-top', insets.top + 'px', 'important');
-      root.style.setProperty('--df-safe-bottom', navInset + 'px', 'important');
-      root.style.setProperty('--df-safe-left', insets.left + 'px', 'important');
-      root.style.setProperty('--df-safe-right', insets.right + 'px', 'important');
-      root.style.setProperty('--df-webview-padding-bottom', paddingBottom + 'px', 'important');
+      // 0px: the native parent padding already keeps content clear of every bar.
+      root.style.setProperty('--df-safe-top', '0px', 'important');
+      root.style.setProperty('--df-safe-bottom', '0px', 'important');
+      root.style.setProperty('--df-safe-left', '0px', 'important');
+      root.style.setProperty('--df-safe-right', '0px', 'important');
+      root.style.setProperty('--df-webview-padding-bottom', '0px', 'important');
       // Fixed dock reserve: 12px dock gap + ~62px capsule + 12px card clearance = 86px.
       // Kept constant so floating layers never cover each other or the last card.
       root.style.setProperty('--df-bottom-nav-clearance', '86px', 'important');
