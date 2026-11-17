@@ -709,12 +709,14 @@ button, .btn, .nav-btn, .action-btn, [role="button"], .tab-btn {
     -webkit-user-select: none !important;
 }
 
-/* ANDROID 15 SAFE-AREA & EDGE-TO-EDGE SYSTEM BAR SHIELD */
+/* ANDROID 15 SAFE-AREA & EDGE-TO-EDGE SYSTEM BAR SHIELD
+   Native parent padding owns all system-bar insets; CSS env() must not re-add them.
+   --df-safe-* are pinned to 0px by SovereignInsetsCalibrator. */
 :root {
-    --sat: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
-    --sab: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));
-    --sal: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
-    --sar: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
+    --sat: var(--df-safe-top, 0px);
+    --sab: var(--df-safe-bottom, 0px);
+    --sal: var(--df-safe-left, 0px);
+    --sar: var(--df-safe-right, 0px);
 }
 /* Top safe area for header/content */
 header, .app-header, .top-bar, .dynamic-hero-header {
@@ -899,15 +901,15 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     /* =========================================================================
        /* MASTER PILLAR 7: UNIVERSAL FLUID RESPONSIVE VIEWPORT & ZEN PROGRESSIVE DISCLOSURE
               - 100dvh dynamic viewport height with 100vh fallback
-              - safe-area-inset-top/bottom/left/right for notch & gesture bar compatibility
+              - Native parent padding owns system-bar insets; CSS env() must not re-add them.
               - Adaptive auto-centered containers for tall phones (Xiaomi 17T Pro), tablets, iPads & desktops
               - Zero button-drop navigation capsule layout
               ========================================================================= */
           :root {
-             --df-sat: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
-             --df-sab: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));
-             --df-sal: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
-             --df-sar: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
+             --df-sat: var(--df-safe-top, 0px);
+             --df-sab: var(--df-safe-bottom, 0px);
+             --df-sal: var(--df-safe-left, 0px);
+             --df-sar: var(--df-safe-right, 0px);
              --df-app-fluid-max: 480px;
            }
 
@@ -1463,14 +1465,15 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         transform: translateZ(0);
         will-change: transform;
     }
-    /* Edge-to-Edge Safe Area Insets for Android 15 / Xiaomi 17T Pro */
+    /* Edge-to-Edge Safe Area Insets for Android 15 / Xiaomi 17T Pro
+       Native parent padding owns all system-bar insets; CSS env() must not re-add them. */
     body {
-        padding-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
+        padding-top: var(--df-safe-top, 0px);
         /* Body content padding clears the floating
            elements (FAB, Studios pill). */
         padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px));
-        padding-left: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
-        padding-right: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
+        padding-left: var(--df-safe-left, 0px);
+        padding-right: var(--df-safe-right, 0px);
     }
     </style>
 
@@ -1691,13 +1694,14 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     font-variant-numeric: tabular-nums !important;
   }
 </style>
-<!-- TASK #828: Android 15 (SDK 35) Edge-to-Edge Safe Area Insets -->
+<!-- TASK #828: Android 15 (SDK 35) Edge-to-Edge Safe Area Insets
+   Native parent padding owns all system-bar insets; CSS env() must not re-add them. -->
 <style id="task-828-edge-insets">
   header, .app-header, .top-bar {
-    padding-top: max(12px, env(safe-area-inset-top, 0px), var(--df-safe-top, 0px)) !important;
+    padding-top: max(12px, var(--df-safe-top, 0px)) !important;
   }
   nav.bottom-nav, .bottom-nav, #bottomNav {
-    padding-bottom: max(10px, env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px)) !important;
+    padding-bottom: max(10px, var(--df-safe-bottom, 0px)) !important;
   }
 </style>
 <!-- TASK #834: 412px Task Input Full-Width & Date Input Western Digits -->

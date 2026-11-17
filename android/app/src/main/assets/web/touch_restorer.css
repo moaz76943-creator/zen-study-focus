@@ -1,9 +1,10 @@
 /* ==============================================================================
  * Deep Focus — Touch & Viewport Restoration Engine (Task #631)
+ * Native parent padding owns all system-bar insets; CSS env() must not re-add them.
  * ============================================================================== */
 :root {
-  --safe-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
-  --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));
+  --safe-top: var(--df-safe-top, 0px);
+  --safe-bottom: var(--df-safe-bottom, 0px);
   --safe-bottom-clearance: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px));
 }
 
