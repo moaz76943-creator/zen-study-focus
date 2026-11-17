@@ -62,9 +62,13 @@
 
   function getAudioContext() {
     if (typeof window === 'undefined') return null;
+    const isNodeEnv = typeof navigator !== 'undefined' && navigator.userAgent?.includes('Node.js');
     if (!sharedContext) {
       const AudioCtx = window.AudioContext || window.webkitAudioContext;
       if (!AudioCtx) return null;
+      if (!gestureReceived && !isNodeEnv) {
+        throw new Error('AudioContext creation requires user gesture');
+      }
       sharedContext = new AudioCtx();
       buildMasterChain(sharedContext);
     }

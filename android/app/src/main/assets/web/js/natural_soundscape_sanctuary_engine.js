@@ -9,61 +9,6 @@
 
   const audioCore = typeof window !== 'undefined' ? window.AudioCore : null;
 
-  // Generate a seamlessly looping buffer by crossfading end to start
-  // Delegates to AudioCore for the actual implementation
-  function createSeamlessBuffer(ctx, durationSec, generatorFn) {
-    if (audioCore && audioCore.createSeamlessBuffer) {
-      return audioCore.createSeamlessBuffer(ctx, durationSec, generatorFn, 1);
-    }
-    // Fallback (should never be used)
-    const XFADE_MS = 20;
-    const extraSec = XFADE_MS / 1000;
-    const finalSize = Math.floor(ctx.sampleRate * durationSec);
-    const xfadeSamples = Math.max(1, Math.floor(ctx.sampleRate * extraSec));
-    const bufferSize = finalSize + xfadeSamples;
-    const totalSec = bufferSize / ctx.sampleRate;
-    const tempBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-    const tempData = tempBuffer.getChannelData(0);
-
-    generatorFn(tempData, ctx.sampleRate, totalSec);
-
-    // DC-removal pass: kill residual sample-average hum before crossfade
-    let mean = 0;
-    for (let i = 0; i < bufferSize; i++) mean += tempData[i];
-    mean /= bufferSize;
-    for (let i = 0; i < bufferSize; i++) tempData[i] -= mean;
-
-    // Peak-normalize to 0.9 (full scale minus headroom): guarantees no clipping
-    // and identical loudness across loop restarts.
-    let peak = 0;
-    for (let i = 0; i < bufferSize; i++) {
-      const absV = Math.abs(tempData[i]);
-      if (absV > peak) peak = absV;
-    }
-    const norm = peak > 0 ? 0.9 / peak : 1;
-    for (let i = 0; i < bufferSize; i++) tempData[i] *= norm;
-
-    // Hard safety clamp (defensive, should never trigger after normalization)
-    for (let i = 0; i < bufferSize; i++) {
-      if (tempData[i] > 1.0) tempData[i] = 1.0;
-      else if (tempData[i] < -1.0) tempData[i] = -1.0;
-    }
-
-    const finalBuffer = ctx.createBuffer(1, finalSize, ctx.sampleRate);
-    const finalData = finalBuffer.getChannelData(0);
-    // Copy the main body; the tail samples remain as-is.
-    finalData.set(tempData.subarray(0, finalSize));
-    // Crossfade the genuine tail continuation into the head so the loop wrap
-    // is click-free. Weighting makes final[0] == tail-start and
-    // final[xfade-1] == head, which is continuous with the generator output
-    // across the loop boundary (temp[finalSize-1] -> temp[finalSize]).
-    for (let i = 0; i < xfadeSamples; i++) {
-      const t = i / xfadeSamples;
-      finalData[i] = (1 - t) * tempData[finalSize + i] + t * tempData[i];
-    }
-    return finalBuffer;
-  }
-
   // Get the single shared master AudioContext (created only on user gesture)
   function getSharedContext() {
     if (audioCore) {
@@ -124,59 +69,50 @@
     // إنشاء مخزن صوتي للضوضاء الوردية/البنية فائقة النقاء للمطر والأمواج
     createNaturalNoiseBuffer(type) {
       if (!this.ctx) return null;
-      return createSeamlessBuffer(this.ctx, 3, (data, sampleRate, durationSec) => {
-        const bufferSize = Math.floor(sampleRate * durationSec);
-        // Full Paul Kellet pink noise filter
-        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-        // Brown noise accumulator with leak to prevent DC drift (bounded random walk)
-        let brownAccum = 0;
-        let peak = 0;
+      // Delegate to AudioCore for zero-static seamless buffer creation
+      if (audioCore && audioCore.createSeamlessBuffer) {
+        return audioCore.createSeamlessBuffer(this.ctx, 3, (channelData, sampleRate, durationSec) => {
+          const data = channelData[0];
+          const bufferSize = Math.floor(sampleRate * durationSec);
+          // Full Paul Kellet pink noise filter
+          let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+          // Brown noise accumulator with leak to prevent DC drift (bounded random walk)
+          let brownAccum = 0;
+          let peak = 0;
 
-        for (let i = 0; i < bufferSize; i++) {
-          const white = Math.random() * 2 - 1;
-          if (type === 'rain' || type === 'water') {
-            // Pink Noise Filter (Paul Kellet -3dB/oct)
-            b0 = 0.99886 * b0 + white * 0.0555179;
-            b1 = 0.99332 * b1 + white * 0.0750759;
-            b2 = 0.96900 * b2 + white * 0.1538520;
-            b3 = 0.86650 * b3 + white * 0.3104856;
-            b4 = 0.55000 * b4 + white * 0.5329522;
-            b5 = -0.7616 * b5 - white * 0.0168980;
-            b6 = white * 0.115926;
-            data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
-          } else if (type === 'ocean' || type === 'wind') {
-            // Brown Noise: leaky integrator of WHITE noise (-6dB/oct slope).
-            // Using AudioCore's BROWN_POLE (0.997) and BROWN_GAIN (0.4) for bounded DC.
-            brownAccum = 0.997 * brownAccum + white * 0.4;
-            data[i] = brownAccum;
-          } else {
-            // Campfire crackle: sparse pops on low noise floor
-            const pop = Math.random() > 0.9985 ? (Math.random() * 2 - 1) * 0.8 : 0;
-            b0 = 0.99 * b0 + white * 0.02;
-            data[i] = b0 * 0.1 + pop;
+          for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            if (type === 'rain' || type === 'water') {
+              // Pink Noise Filter (Paul Kellet -3dB/oct)
+              b0 = 0.99886 * b0 + white * 0.0555179;
+              b1 = 0.99332 * b1 + white * 0.0750759;
+              b2 = 0.96900 * b2 + white * 0.1538520;
+              b3 = 0.86650 * b3 + white * 0.3104856;
+              b4 = 0.55000 * b4 + white * 0.5329522;
+              b5 = -0.7616 * b5 - white * 0.0168980;
+              b6 = white * 0.115926;
+              data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+            } else if (type === 'ocean' || type === 'wind') {
+              // Brown Noise: leaky integrator of WHITE noise (-6dB/oct slope).
+              // Using AudioCore's BROWN_POLE (0.997) and BROWN_GAIN (0.4) for bounded DC.
+              brownAccum = 0.997 * brownAccum + white * 0.4;
+              data[i] = brownAccum;
+            } else {
+              // Campfire crackle: sparse pops on low noise floor
+              const pop = Math.random() > 0.9985 ? (Math.random() * 2 - 1) * 0.8 : 0;
+              b0 = 0.99 * b0 + white * 0.02;
+              data[i] = b0 * 0.1 + pop;
+            }
+            // Peak tracked for EVERY noise family so rain/fire normalize to the
+            // same 0.9 ceiling as ocean — rain/fire previously never normalized,
+            // so loudness and loop-restart consistency varied by sound type.
+            const absV = Math.abs(data[i]);
+            if (absV > peak) peak = absV;
           }
-          // Peak tracked for EVERY noise family so rain/fire normalize to the
-          // same 0.9 ceiling as ocean — rain/fire previously never normalized,
-          // so loudness and loop-restart consistency varied by sound type.
-          const absV = Math.abs(data[i]);
-          if (absV > peak) peak = absV;
-        }
-        // DC-removal pass: kill residual sample-average hum (constant static)
-        // before the buffer reaches a gain node.
-        let mean = 0;
-        for (let i = 0; i < bufferSize; i++) mean += data[i];
-        mean /= bufferSize;
-        for (let i = 0; i < bufferSize; i++) data[i] -= mean;
-        // Peak-normalize to 0.9 (full scale minus headroom): guarantees no clipping
-        // and identical loudness across loop restarts.
-        const norm = peak > 0 ? 0.9 / peak : 1;
-        for (let i = 0; i < bufferSize; i++) data[i] *= norm;
-        // Hard safety clamp (defensive, should never trigger after normalization)
-        for (let i = 0; i < bufferSize; i++) {
-          if (data[i] > 1.0) data[i] = 1.0;
-          else if (data[i] < -1.0) data[i] = -1.0;
-        }
-      });
+          // AudioCore's createSeamlessBuffer handles DC removal, normalization, clamp
+        }, 1);
+      }
+      return null;
     }
 
     play(soundKey, volume = 0.7) {

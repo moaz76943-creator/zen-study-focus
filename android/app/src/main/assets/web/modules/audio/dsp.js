@@ -34,8 +34,12 @@
 
       const voice = audioCore.createVoice(buffer, true);
       if (voice) {
-        // Scale voice gain to respect limiter ceiling
-        voice.gain.gain.setValueAtTime(0.35 * audioCore.LIMITER_LINEAR, ctx.currentTime);
+        // Scale voice gain to respect limiter ceiling — use proper fade-in from 0.0001
+        const targetGain = 0.35 * audioCore.LIMITER_LINEAR;
+        const now = ctx.currentTime;
+        voice.gain.gain.cancelScheduledValues(now);
+        voice.gain.gain.setValueAtTime(0.0001, now);
+        voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.03);
         this.activeVoices.push(voice);
       }
     },
@@ -51,7 +55,11 @@
       const buffer = audioCore.createSeamlessBuffer(ctx, 4, audioCore.generatePinkNoise, 1);
       const voice = audioCore.createVoice(buffer, true);
       if (voice) {
-        voice.gain.gain.setValueAtTime(0.3 * audioCore.LIMITER_LINEAR, ctx.currentTime);
+        const targetGain = 0.3 * audioCore.LIMITER_LINEAR;
+        const now = ctx.currentTime;
+        voice.gain.gain.cancelScheduledValues(now);
+        voice.gain.gain.setValueAtTime(0.0001, now);
+        voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.03);
         this.activeVoices.push(voice);
       }
     },
@@ -67,7 +75,11 @@
       const buffer = audioCore.createSeamlessBuffer(ctx, 3, audioCore.generateWhiteNoise, 1);
       const voice = audioCore.createVoice(buffer, true);
       if (voice) {
-        voice.gain.gain.setValueAtTime(0.2 * audioCore.LIMITER_LINEAR, ctx.currentTime);
+        const targetGain = 0.2 * audioCore.LIMITER_LINEAR;
+        const now = ctx.currentTime;
+        voice.gain.gain.cancelScheduledValues(now);
+        voice.gain.gain.setValueAtTime(0.0001, now);
+        voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.03);
         this.activeVoices.push(voice);
       }
     },

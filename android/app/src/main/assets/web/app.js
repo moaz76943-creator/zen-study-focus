@@ -5516,8 +5516,13 @@ function createBinauralSource(ctx, presetKey, gainValue = 0.15) {
   if (window.AudioCore && window.AudioCore.createVoice) {
     const voice = window.AudioCore.createVoice(buffer, true);
     if (voice) {
-      // Scale voice gain to respect limiter ceiling
-      voice.gain.gain.setValueAtTime(gainValue * (window.AudioCore.LIMITER_LINEAR || 0.5), ctx.currentTime);
+      // Scale voice gain to respect limiter ceiling — use proper fade-in from 0.0001
+      const targetGain = gainValue * (window.AudioCore.LIMITER_LINEAR || 0.5);
+      const now = ctx.currentTime;
+      voice.gain.gain.cancelScheduledValues(now);
+      voice.gain.gain.setValueAtTime(0.0001, now);
+      voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.03);
+      // AudioCore tracks this voice internally — no need to add to activeNoiseSources
       return voice;
     }
   }
@@ -5665,8 +5670,13 @@ function createNoiseSource(ctx, color, gainValue = 0.25) {
   if (window.AudioCore && window.AudioCore.createVoice) {
     const voice = window.AudioCore.createVoice(buffer, true);
     if (voice) {
-      // Scale voice gain to respect limiter ceiling
-      voice.gain.gain.setValueAtTime(gainValue * (window.AudioCore.LIMITER_LINEAR || 0.5), ctx.currentTime);
+      // Scale voice gain to respect limiter ceiling — use proper fade-in from 0.0001
+      const targetGain = gainValue * (window.AudioCore.LIMITER_LINEAR || 0.5);
+      const now = ctx.currentTime;
+      voice.gain.gain.cancelScheduledValues(now);
+      voice.gain.gain.setValueAtTime(0.0001, now);
+      voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.03);
+      // AudioCore tracks this voice internally — no need to add to activeNoiseSources
       return voice;
     }
   }
@@ -5857,6 +5867,7 @@ function createOggPlayer(buffer, loop, volume) {
       voice.gain.gain.cancelScheduledValues(now);
       voice.gain.gain.setValueAtTime(0.0001, now);
       voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.03);
+      // AudioCore tracks this voice internally — return minimal wrapper
       return {
         source: voice.source,
         gain: voice.gain,
@@ -5914,7 +5925,7 @@ function createOggPlayer(buffer, loop, volume) {
       }
     }
   };
-  // Track for instant stopAllAudio
+  // Track legacy players for instant stopAllAudio
   activeNoiseSources.add(player);
   const originalStop = player.stop.bind(player);
   player.stop = function(...args) {
@@ -6006,7 +6017,7 @@ function stopAllAudio() {
   // Instant master kill — cuts all output immediately via AudioCore
   if (window.AudioCore) {
     window.AudioCore.muteMaster(true);
-    window.AudioCore.stopAllVoices();
+    window.AudioCore.stopAllVoices(); // Stops all AudioCore-tracked voices
     // Unmute after brief moment to allow next sound
     setTimeout(() => window.AudioCore.muteMaster(false), 50);
   } else if (typeof window !== 'undefined' && typeof window.dfMasterAudioMute === 'function') {
@@ -6015,7 +6026,7 @@ function stopAllAudio() {
 
   SOUNDS_DATA.forEach(s => stopSoundTile(s.id));
 
-  // Stop all active procedural noise sources with click-free 30ms fade
+  // Stop legacy procedural noise sources tracked locally (non-AudioCore paths)
   activeNoiseSources.forEach(noiseSource => {
     try {
       if (typeof noiseSource.stop === 'function') {

@@ -40,69 +40,6 @@
   const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
   const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
 
-  // Generate a seamlessly looping buffer by crossfading end to start
-  // Delegates to AudioCore for the actual implementation
-  function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
-    if (audioCore && audioCore.createSeamlessBuffer) {
-      return audioCore.createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels);
-    }
-    // Fallback (should never be used) - matches AudioCore's full processing
-    const extraSec = XFADE_MS / 1000;
-    const finalSize = Math.floor(ctx.sampleRate * durationSec);
-    const xfadeSamples = Math.max(1, Math.floor(ctx.sampleRate * extraSec));
-    const bufferSize = finalSize + xfadeSamples;
-    const totalSec = bufferSize / ctx.sampleRate;
-    const tempBuffer = ctx.createBuffer(numChannels, bufferSize, ctx.sampleRate);
-    const channelData = [];
-    for (let ch = 0; ch < numChannels; ch++) {
-      channelData.push(tempBuffer.getChannelData(ch));
-    }
-    generatorFn(channelData, ctx.sampleRate, totalSec);
-
-    // Post-process each channel: DC removal → peak norm → hard clamp
-    for (let ch = 0; ch < numChannels; ch++) {
-      const data = channelData[ch];
-
-      // 1. DC removal (entire buffer including xfade tail)
-      let mean = 0;
-      for (let i = 0; i < bufferSize; i++) mean += data[i];
-      mean /= bufferSize;
-      for (let i = 0; i < bufferSize; i++) data[i] -= mean;
-
-      // 2. Peak normalize to 0.9 (leaves headroom for master limiter)
-      let peak = 0;
-      for (let i = 0; i < bufferSize; i++) {
-        const a = Math.abs(data[i]);
-        if (a > peak) peak = a;
-      }
-      const norm = peak > 0 ? 0.9 / peak : 1;
-      for (let i = 0; i < bufferSize; i++) data[i] *= norm;
-
-      // 3. Hard safety clamp
-      for (let i = 0; i < bufferSize; i++) {
-        if (data[i] > 1.0) data[i] = 1.0;
-        else if (data[i] < -1.0) data[i] = -1.0;
-      }
-    }
-
-    // 4. Crossfade tail into head for seamless loop
-    const finalBuffer = ctx.createBuffer(numChannels, finalSize, ctx.sampleRate);
-    for (let ch = 0; ch < numChannels; ch++) {
-      const finalData = finalBuffer.getChannelData(ch);
-      const tempData = channelData[ch];
-
-      // Body: copy main segment unchanged
-      finalData.set(tempData.subarray(0, finalSize));
-
-      // Head crossfade: blend natural tail continuation into head
-      for (let i = 0; i < xfadeSamples; i++) {
-        const t = i / xfadeSamples;
-        finalData[i] = (1 - t) * tempData[finalSize + i] + t * tempData[i];
-      }
-    }
-    return finalBuffer;
-  }
-
   class AcousticStudio {
     constructor(options = {}) {
       this.options = Object.assign({
@@ -191,100 +128,104 @@
     }
 
     /** Paul Kellet pink-noise, pre-rendered, bounded well under the limiter. */
-      generatePinkNoiseBuffer(durationSec = 5) {
-        const ctx = this.initAudioContext();
-        return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
-          const data = channelData[0];
-          const bufferSize = Math.floor(sampleRate * totalSec);
+  generatePinkNoiseBuffer(durationSec = 5) {
+    const ctx = this.initAudioContext();
+    if (!audioCore || !audioCore.createSeamlessBuffer) return null;
+    return audioCore.createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+      const data = channelData[0];
+      const bufferSize = Math.floor(sampleRate * totalSec);
 
-          let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-          for (let i = 0; i < bufferSize; i++) {
-            const white = Math.random() * 2 - 1;
-            b0 = 0.99886 * b0 + white * 0.0555179;
-            b1 = 0.99332 * b1 + white * 0.0750759;
-            b2 = 0.96900 * b2 + white * 0.1538520;
-            b3 = 0.86650 * b3 + white * 0.3104856;
-            b4 = 0.55000 * b4 + white * 0.5329522;
-            b5 = -0.7616 * b5 - white * 0.0168980;
-            b6 = white * 0.115926;
-            const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-            data[i] = pink * PINK_NOISE_AMP;
-          }
-          // AudioCore's createSeamlessBuffer handles DC removal, normalization, clamp
-        }, 1);
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        b6 = white * 0.115926;
+        const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+        data[i] = pink * PINK_NOISE_AMP;
       }
+      // AudioCore's createSeamlessBuffer handles DC removal, normalization, clamp
+    }, 1);
+  }
 
-      /** Rain: quiet white bed, all spectral shaping done by the biquad chain. */
-      generateRainBuffer(durationSec = 5) {
-        const ctx = this.initAudioContext();
-        return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
-          const data = channelData[0];
-          const bufferSize = Math.floor(sampleRate * totalSec);
-          let peak = 0;
-          for (let i = 0; i < bufferSize; i++) {
-            data[i] = (Math.random() * 2 - 1) * WHITE_NOISE_AMP;
-            const absV = Math.abs(data[i]);
-            if (absV > peak) peak = absV;
-          }
-          // AudioCore's createSeamlessBuffer handles DC removal, normalization, clamp
-        }, 1);
+  /** Rain: quiet white bed, all spectral shaping done by the biquad chain. */
+  generateRainBuffer(durationSec = 5) {
+    const ctx = this.initAudioContext();
+    if (!audioCore || !audioCore.createSeamlessBuffer) return null;
+    return audioCore.createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+      const data = channelData[0];
+      const bufferSize = Math.floor(sampleRate * totalSec);
+      let peak = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        data[i] = (Math.random() * 2 - 1) * WHITE_NOISE_AMP;
+        const absV = Math.abs(data[i]);
+        if (absV > peak) peak = absV;
       }
+      // AudioCore's createSeamlessBuffer handles DC removal, normalization, clamp
+    }, 1);
+  }
 
-    /**
-     * Ocean: brownian rumble with the shoreline swell baked directly into the
-     * buffer, so no LFO node has to be kept alive. Zero-static version.
-     * Uses a bounded leaky-integrator of white noise: no DC drift,
-     * no clipping static, peak-normalized below the limiter ceiling.
-     */
-    generateOceanBuffer(durationSec = 5) {
-      const ctx = this.initAudioContext();
-      return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
-        const data = channelData[0];
-        const bufferSize = Math.floor(sampleRate * totalSec);
+  /**
+   * Ocean: brownian rumble with the shoreline swell baked directly into the
+   * buffer, so no LFO node has to be kept alive. Zero-static version.
+   * Uses a bounded leaky-integrator of white noise: no DC drift,
+   * no clipping static, peak-normalized below the limiter ceiling.
+   */
+  generateOceanBuffer(durationSec = 5) {
+    const ctx = this.initAudioContext();
+    if (!audioCore || !audioCore.createSeamlessBuffer) return null;
+    return audioCore.createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+      const data = channelData[0];
+      const bufferSize = Math.floor(sampleRate * totalSec);
 
-        const swellHz = 0.08;
-        // Brown noise: leaky integrator of WHITE noise (-6dB/oct slope).
-        // Integrating the Kellet pink signal doubled the infrasonic weight
-        // into a constant pressure rumble that bled through the loop as hiss.
-        let brownAccum = 0;
-        let peak = 0;
-        for (let i = 0; i < bufferSize; i++) {
-          const white = Math.random() * 2 - 1;
-          // Leaky integrator: bounded DC, no drift
-          brownAccum = BROWN_POLE * brownAccum + white * BROWN_GAIN; // AudioCore's BROWN_POLE & BROWN_GAIN
-          const t = i / sampleRate;
-          // 0.55..1.0 swell, keeps the noise well below the limiter ceiling.
-          const swell = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(2 * Math.PI * swellHz * t));
-          const v = brownAccum * 0.8 * swell;
-          data[i] = v;
-          if (Math.abs(v) > peak) peak = Math.abs(v);
-        }
-        // Peak normalize handled by createSeamlessBuffer
-      }, 1);
-    }
+      const swellHz = 0.08;
+      // Brown noise: leaky integrator of WHITE noise (-6dB/oct slope).
+      // Integrating the Kellet pink signal doubled the infrasonic weight
+      // into a constant pressure rumble that bled through the loop as hiss.
+      let brownAccum = 0;
+      let peak = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        // Leaky integrator: bounded DC, no drift
+        brownAccum = BROWN_POLE * brownAccum + white * BROWN_GAIN; // AudioCore's BROWN_POLE & BROWN_GAIN
+        const t = i / sampleRate;
+        // 0.55..1.0 swell, keeps the noise well below the limiter ceiling.
+        const swell = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(2 * Math.PI * swellHz * t));
+        const v = brownAccum * 0.8 * swell;
+        data[i] = v;
+        if (Math.abs(v) > peak) peak = Math.abs(v);
+      }
+      // Peak normalize handled by createSeamlessBuffer
+    }, 1);
+  }
 
-    /** 40Hz gamma binaural beat baked into a stereo buffer (216Hz L, 256Hz R). */
-    generateBinaural40HzBuffer(durationSec = 5) {
-      const ctx = this.initAudioContext();
-      // Ensure duration contains integer cycles of both 216Hz and 256Hz
-      // LCM of periods: 216 and 256 -> 216=2^3*3^3, 256=2^8 -> LCM=2^8*3^3=6912
-      // Fundamental period = 6912/216 = 32 seconds for 216Hz, 6912/256 = 27 seconds for 256Hz
-      // For 5 seconds: 216*5=1080 cycles (integer), 256*5=1280 cycles (integer) - perfect!
-      return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
-        const left = channelData[0];
-        const right = channelData[1];
-        const bufferSize = Math.floor(sampleRate * totalSec);
+  /** 40Hz gamma binaural beat baked into a stereo buffer (216Hz L, 256Hz R). */
+  generateBinaural40HzBuffer(durationSec = 5) {
+    const ctx = this.initAudioContext();
+    if (!audioCore || !audioCore.createSeamlessBuffer) return null;
+    // Ensure duration contains integer cycles of both 216Hz and 256Hz
+    // LCM of periods: 216 and 256 -> 216=2^3*3^3, 256=2^8 -> LCM=2^8*3^3=6912
+    // Fundamental period = 6912/216 = 32 seconds for 216Hz, 6912/256 = 27 seconds for 256Hz
+    // For 5 seconds: 216*5=1080 cycles (integer), 256*5=1280 cycles (integer) - perfect!
+    return audioCore.createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+      const left = channelData[0];
+      const right = channelData[1];
+      const bufferSize = Math.floor(sampleRate * totalSec);
 
-        const amp = 0.18;
-        const TWO_PI = Math.PI * 2;
-        for (let i = 0; i < bufferSize; i++) {
-          const t = i / sampleRate;
-          left[i] = Math.sin(TWO_PI * 216 * t) * amp;
-          right[i] = Math.sin(TWO_PI * 256 * t) * amp;
-        }
-        // AudioCore's createSeamlessBuffer handles clamp
-      }, 2);
-    }
+      const amp = 0.18;
+      const TWO_PI = Math.PI * 2;
+      for (let i = 0; i < bufferSize; i++) {
+        const t = i / sampleRate;
+        left[i] = Math.sin(TWO_PI * 216 * t) * amp;
+        right[i] = Math.sin(TWO_PI * 256 * t) * amp;
+      }
+      // AudioCore's createSeamlessBuffer handles clamp
+    }, 2);
+  }
 
     startPreset(presetName = 'pink_noise') {
       if (!audioCore || !audioCore.isGestureReceived()) {
