@@ -93,8 +93,23 @@ public class MainActivity extends AppCompatActivity {
 
             // Status bar top from systemBars (includes cutout top)
             int paddingTop = systemBars.top;
-            // Navigation bottom: max of navigationBars (3-button), systemBars.bottom (3-button), mandatorySystemGestures (gesture handle), IME
+            // Navigation bottom: max of navigationBars (3-button), systemBars.bottom (3-button), mandatorySystemGestures (gesture handle)
             int navBottom = Math.max(Math.max(navigationBars.bottom, systemBars.bottom), mandatorySystemGestures.bottom);
+
+            // Detect gesture navigation: mandatorySystemGestures has horizontal insets (back gesture) on Android 15+,
+            // or bottom inset > 0 while navigationBars and systemBars bottom are 0.
+            // On Android 15, systemGestures (non-mandatory) may be non-zero even in 3-button mode, so use mandatorySystemGestures.
+            boolean isGestureNav = (mandatorySystemGestures.left > 0 || mandatorySystemGestures.right > 0)
+                    || (mandatorySystemGestures.bottom > 0 && navigationBars.bottom == 0 && systemBars.bottom == 0);
+
+            // Apply minimum nav bar height fallback (Material spec: 56dp 3-button, 32dp gesture handle)
+            // This ensures WebView padding and JS calibrator both have safe minimums even if insets report 0.
+            float density = getResources().getDisplayMetrics().density;
+            int minNavDp = isGestureNav ? 32 : 56;
+            int minNavPx = Math.round(minNavDp * density);
+            if (navBottom < minNavPx) navBottom = minNavPx;
+
+            // IME can be taller than nav bar; use max for WebView padding so content stays above keyboard.
             int paddingBottom = Math.max(navBottom, ime.bottom);
             int paddingLeft = systemBars.left;
             int paddingRight = systemBars.right;
@@ -103,20 +118,11 @@ public class MainActivity extends AppCompatActivity {
             webView.setClipToPadding(true);
 
             // Convert physical pixels to dp for JS calibrator (CSS variables use dp/CSS px).
-            // WebView padding above is correctly in physical pixels; calibrator needs dp for CSS.
-            float density = getResources().getDisplayMetrics().density;
+            // navBottom already includes minimum fallback; paddingBottom may be larger due to IME.
             int paddingTopDp = Math.round(paddingTop / density);
             int navBottomDp = Math.round(navBottom / density);
             int paddingLeftDp = Math.round(paddingLeft / density);
             int paddingRightDp = Math.round(paddingRight / density);
-
-            // Safety net: if navBottomDp is 0 or too small for 3-button nav, assume 56dp minimum (Material spec).
-            // Detect gesture nav: mandatorySystemGestures.bottom > 0 while others are 0.
-            boolean isGestureNav = mandatorySystemGestures.bottom > 0
-                    && navigationBars.bottom == 0
-                    && systemBars.bottom == 0;
-            int minNavDp = isGestureNav ? 32 : 56; // 32dp gesture handle, 56dp 3-button nav bar
-            if (navBottomDp < minNavDp) navBottomDp = minNavDp;
 
             // Push insets (in dp) to JS calibrator for CSS variable injection.
             webView.post(() -> {
