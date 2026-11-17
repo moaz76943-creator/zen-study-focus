@@ -79,21 +79,24 @@
 
       const buffer = createSeamlessBuffer(ctx, 4, (data, sampleRate, durationSec) => {
         const len = Math.floor(sampleRate * durationSec);
-        // 2-pole brown noise (Paul Kellet style) for cleaner spectral rolloff
-        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        // True brown noise: leaky integrator of WHITE noise (-6dB/oct),
+        // peak-normalized below the limiter ceiling + DC removal. The old
+        // Kellet-pink generator was mislabeled "brown" and left a rumble
+        // bias that bled as a constant background hum.
+        let brown = 0;
+        let peak = 0;
         for (let i = 0; i < len; i++) {
           const white = Math.random() * 2 - 1;
-          b0 = 0.99886 * b0 + white * 0.0555179;
-          b1 = 0.99332 * b1 + white * 0.0750759;
-          b2 = 0.96900 * b2 + white * 0.1538520;
-          b3 = 0.86650 * b3 + white * 0.3104856;
-          b4 = 0.55000 * b4 + white * 0.5329522;
-          b5 = -0.7616 * b5 - white * 0.0168980;
-          b6 = white * 0.115926;
-          const brown = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-          // Amplitude well below limiter ceiling, no hard clipping needed
-          data[i] = brown * 0.08;
+          brown = 0.9985 * brown + white * 0.5;
+          data[i] = brown;
+          if (Math.abs(brown) > peak) peak = Math.abs(brown);
         }
+        let mean = 0;
+        for (let i = 0; i < len; i++) mean += data[i];
+        mean /= len;
+        for (let i = 0; i < len; i++) data[i] -= mean;
+        const norm = peak > 0 ? 0.9 / peak : 1;
+        for (let i = 0; i < len; i++) data[i] *= norm;
         // Hard safety clamp (defensive)
         for (let i = 0; i < len; i++) {
           if (data[i] > 1.0) data[i] = 1.0;

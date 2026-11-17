@@ -5568,8 +5568,10 @@ function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
     const bufferSize = Math.floor(sampleRate * totalSec);
 
     if (color === 'white') {
+      // Full-band white at low amplitude — 0.35 was audible static hiss;
+      // 0.08 is a clean air-tone through the 15Hz DC blockers downstream.
       for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * 0.35;
+        data[i] = (Math.random() * 2 - 1) * 0.08;
       }
     } else if (color === 'pink') {
       let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
@@ -5585,26 +5587,15 @@ function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
         data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
       }
     } else if (color === 'brown') {
-      // Brown noise: leaky-integrator of Paul Kellet pink noise.
-      //   * A simple pink->integrator random walk accumulates DC drift across
-      //     the whole buffer, clipping into static on loop restart.
-      //   * The leak factor (-6dB/oct brown slope, bounded) keeps DC centered
-      //     so no clipping static can appear.
-      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      // True brown noise: leaky integrator of white noise (0.9985 pole keeps
+      // DC bounded), peak-normalized below the limiter ceiling. The old
+      // pink->integrator random walk doubled infrasonic weight and clipped
+      // into static on loop restarts.
       let brown = 0;
       let peak = 0;
       for (let i = 0; i < bufferSize; i++) {
         const white = Math.random() * 2 - 1;
-        b0 = 0.99886 * b0 + white * 0.0555179;
-        b1 = 0.99332 * b1 + white * 0.0750759;
-        b2 = 0.96900 * b2 + white * 0.1538520;
-        b3 = 0.86650 * b3 + white * 0.3104856;
-        b4 = 0.55000 * b4 + white * 0.5329522;
-        b5 = -0.7616 * b5 - white * 0.0168980;
-        b6 = white * 0.115926;
-        const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-        // Leaky integrator: bounded DC, no drift, peak-normalized below
-        brown = 0.9985 * brown + pink * 0.5;
+        brown = 0.9985 * brown + white * 0.5;
         data[i] = brown;
         if (Math.abs(brown) > peak) peak = Math.abs(brown);
       }
@@ -5613,6 +5604,13 @@ function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
       const norm = peak > 0 ? 0.9 / peak : 1;
       for (let i = 0; i < bufferSize; i++) data[i] *= norm;
     }
+
+    // DC-removal pass: kill any residual sample-average hum (the "constant
+    // hiss" artifact) before the buffer ever reaches a gain node.
+    let mean = 0;
+    for (let i = 0; i < bufferSize; i++) mean += data[i];
+    mean /= bufferSize;
+    for (let i = 0; i < bufferSize; i++) data[i] -= mean;
 
     // Hard safety clamp
     for (let i = 0; i < bufferSize; i++) {
@@ -5815,8 +5813,11 @@ function createOggPlayer(buffer, loop, volume) {
     },
     setVol(v) {
       if (ctx) {
+        // Smooth ramp instead of an instantaneous jump: a raw setValueAtTime
+        // while a fade is running leaves the ramp cancelled at full scale and
+        // clicks through the DC-blocker as static on every slider move.
         gain.gain.cancelScheduledValues(ctx.currentTime);
-        gain.gain.setValueAtTime(v, ctx.currentTime);
+        gain.gain.setTargetAtTime(v, ctx.currentTime, 0.03);
       }
     }
   };

@@ -90,19 +90,12 @@
             b6 = white * 0.115926;
             data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
           } else if (type === 'ocean' || type === 'wind') {
-            // Brown Noise: integrate pink noise (-6dB/oct additional slope)
-            // With leak factor to prevent unbounded DC drift → no static/clipping on loop
-            b0 = 0.99886 * b0 + white * 0.0555179;
-            b1 = 0.99332 * b1 + white * 0.0750759;
-            b2 = 0.96900 * b2 + white * 0.1538520;
-            b3 = 0.86650 * b3 + white * 0.3104856;
-            b4 = 0.55000 * b4 + white * 0.5329522;
-            b5 = -0.7616 * b5 - white * 0.0168980;
-            b6 = white * 0.115926;
-            const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-            // Leaky integrator: bounded DC, no drift across buffer restarts
-            brownAccum = 0.9985 * brownAccum + pink * 0.5;
-            data[i] = brownAccum * 0.8;
+            // Brown Noise: leaky integrator of WHITE noise (-6dB/oct slope).
+            // Integrating the pink signal doubled the infrasonic weight into a
+            // constant pressure rumble that bled through the loop as hiss.
+            // The 0.9985 leak keeps DC bounded across buffer restarts.
+            brownAccum = 0.9985 * brownAccum + white * 0.5;
+            data[i] = brownAccum;
             if (Math.abs(data[i]) > peak) peak = Math.abs(data[i]);
           } else {
             // Campfire crackle: sparse pops on low noise floor
@@ -111,6 +104,12 @@
             data[i] = b0 * 0.1 + pop;
           }
         }
+        // DC-removal pass: kill residual sample-average hum (constant static)
+        // before the buffer reaches a gain node.
+        let mean = 0;
+        for (let i = 0; i < bufferSize; i++) mean += data[i];
+        mean /= bufferSize;
+        for (let i = 0; i < bufferSize; i++) data[i] -= mean;
         // Peak-normalize to 0.9 (full scale minus headroom): guarantees no clipping
         // and identical loudness across loop restarts.
         const norm = peak > 0 ? 0.9 / peak : 1;
@@ -154,8 +153,10 @@
       }
 
       const gain = this.ctx.createGain();
-      // Reduced gain with -6dB ear-safety ceiling (0.7 → 0.35)
-      gain.gain.value = volume * 0.5;
+      // Reduced gain with -6dB ear-safety ceiling (0.7 → 0.35).
+      // Click-free onset: ramp from silence so source.start() never pops.
+      gain.gain.setValueAtTime(0.0001, this.ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, volume * 0.5), this.ctx.currentTime + 0.05);
 
       source.connect(dcBlock);
       dcBlock.connect(filter);
@@ -176,7 +177,9 @@
 
     setVolume(soundKey, volume) {
       if (this.activeTracks[soundKey] && this.activeTracks[soundKey].gain) {
-        this.activeTracks[soundKey].gain.gain.setValueAtTime(volume, this.ctx ? this.ctx.currentTime : 0);
+        // Smooth ramp (not a raw setValueAtTime) — click-free slider moves
+        const t0 = this.ctx ? this.ctx.currentTime : 0;
+        this.activeTracks[soundKey].gain.gain.setTargetAtTime(volume, t0, 0.03);
       }
     }
 
@@ -195,12 +198,17 @@
         } catch (e) {
           try { this.activeTracks[soundKey].source.stop(); } catch (_) {}
         }
-        try {
-          this.activeTracks[soundKey].source.disconnect();
-          this.activeTracks[soundKey].dcBlock?.disconnect();
-          this.activeTracks[soundKey].gain?.disconnect();
-          this.activeTracks[soundKey].filter?.disconnect();
-        } catch (_) {}
+        // Defer disconnects until the fade has played out — disconnecting now
+        // severs the ramp and ends the track in a click/static pop.
+        const trackRef = this.activeTracks[soundKey];
+        setTimeout(() => {
+          try {
+            trackRef.source.disconnect();
+            trackRef.dcBlock?.disconnect();
+            trackRef.gain?.disconnect();
+            trackRef.filter?.disconnect();
+          } catch (_) {}
+        }, 90);
         delete this.activeTracks[soundKey];
       }
     }

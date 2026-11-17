@@ -69,7 +69,7 @@ function rigTile(playPromises=[]){
         createBuffer: (ch,len,sr) => ({getChannelData:()=>new Float32Array(len)}),
         createBufferSource: () => ({loop:false,buffer:null,connect(){},start(){},stop(){},disconnect(){}}),
         createBiquadFilter: () => ({type:'',frequency:{value:0},connect(){},disconnect(){}}),
-        createGain: () => ({connect(){},disconnect(){},gain:{value:1,setValueAtTime(){},cancelScheduledValues(){},linearRampToValueAtTime(){}}}),
+        createGain: () => ({connect(){},disconnect(){},gain:{value:1,setValueAtTime(){},cancelScheduledValues(){},setTargetAtTime(){},linearRampToValueAtTime(){}}}),
         decodeAudioData: (buf) => Promise.resolve({duration:1,sampleRate:8000,getChannelData:()=>new Float32Array(8000)})
       };
     },
@@ -79,7 +79,7 @@ function rigTile(playPromises=[]){
       createBuffer(ch,len,sr){return{getChannelData:()=>new Float32Array(len)};}
       createBufferSource(){return{loop:false,buffer:null,connect(){},start(){},stop(){},disconnect(){}};}
       createBiquadFilter(){return{type:'',frequency:{value:0,setValueAtTime(){}},Q:{value:0,setValueAtTime(){}},connect(){},disconnect(){}};}
-      createGain(){return{connect(){},disconnect(){},gain:{value:1,setValueAtTime(){},cancelScheduledValues(){},linearRampToValueAtTime(){}}};}
+      createGain(){return{connect(){},disconnect(){},gain:{value:1,setValueAtTime(){},cancelScheduledValues(){},setTargetAtTime(){},linearRampToValueAtTime(){}}};}
       decodeAudioData(buf){return Promise.resolve({duration:1,sampleRate:8000,getChannelData:()=>new Float32Array(8000)});}
     },
     window:{},

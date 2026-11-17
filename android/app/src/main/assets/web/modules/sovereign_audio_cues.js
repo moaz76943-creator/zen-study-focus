@@ -176,12 +176,19 @@
       var buf = new Float32Array(len);
       var t = (type || "white").toLowerCase();
       if (t === "brown") {
+        // Leaky integrator of WHITE noise (true brown slope). Integrating the
+        // old random walk without a peak clamp blew up to ±3.5 and clipped
+        // into static on every loop restart.
         var last = 0;
+        var peak = 0;
         for (var i = 0; i < len; i++) {
           var white = Math.random() * 2 - 1;
-          last = (last + (0.02 * white)) / 1.02;
-          buf[i] = last * 3.5; // normalize brown noise
+          last = 0.9985 * last + white * 0.5;
+          buf[i] = last;
+          if (Math.abs(last) > peak) peak = Math.abs(last);
         }
+        var norm = peak > 0 ? 0.9 / peak : 1;
+        for (var n = 0; n < len; n++) buf[n] *= norm;
       } else if (t === "pink") {
         // Paul Kellet pink noise approximation
         var b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
@@ -193,16 +200,23 @@
           b3 = 0.86650 * b3 + w * 0.3104856;
           b4 = 0.55000 * b4 + w * 0.5329522;
           b5 = -0.7616 * b5 - w * 0.0168980;
-          var pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362;
           b6 = w * 0.115926;
+          var pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362;
           buf[j] = pink * 0.11;
         }
       } else {
-        // white noise — properly filled buffer (never a silent zero buffer)
+        // white noise — properly filled buffer (never a silent zero buffer);
+        // 0.5 was audible static hiss, 0.08 matches the other engines.
         for (var k = 0; k < len; k++) {
-          buf[k] = (Math.random() * 2 - 1) * 0.5;
+          buf[k] = (Math.random() * 2 - 1) * 0.08;
         }
       }
+      // DC-removal pass: kill residual sample-average hum (constant static)
+      // before the buffer reaches a gain node.
+      var mean = 0;
+      for (var m = 0; m < len; m++) mean += buf[m];
+      mean /= len;
+      for (var d = 0; d < len; d++) buf[d] -= mean;
       return buf;
     },
     playNoise: function (type, vol) { this.activeNoiseType = type || "rain"; return SovereignRealAudio.playAmbient(type, vol); },

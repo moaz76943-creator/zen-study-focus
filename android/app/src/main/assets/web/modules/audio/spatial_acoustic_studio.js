@@ -229,7 +229,7 @@
     /**
      * Ocean: brownian rumble with the shoreline swell baked directly into the
      * buffer, so no LFO node has to be kept alive. Zero-static version.
-     * Uses a bounded leaky-integrator of Paul Kellet pink noise: no DC drift,
+     * Uses a bounded leaky-integrator of white noise: no DC drift,
      * no clipping static, peak-normalized below the limiter ceiling.
      */
     generateOceanBuffer(durationSec = 5) {
@@ -239,22 +239,15 @@
         const bufferSize = Math.floor(sampleRate * totalSec);
 
         const swellHz = 0.08;
-        // Bounded brown noise: leaky integrator (no unbounded random walk)
-        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        // Brown noise: leaky integrator of WHITE noise (-6dB/oct slope).
+        // Integrating the Kellet pink signal doubled the infrasonic weight
+        // into a constant pressure rumble that bled through the loop as hiss.
         let brownAccum = 0;
         let peak = 0;
         for (let i = 0; i < bufferSize; i++) {
           const white = Math.random() * 2 - 1;
-          b0 = 0.99886 * b0 + white * 0.0555179;
-          b1 = 0.99332 * b1 + white * 0.0750759;
-          b2 = 0.96900 * b2 + white * 0.1538520;
-          b3 = 0.86650 * b3 + white * 0.3104856;
-          b4 = 0.55000 * b4 + white * 0.5329522;
-          b5 = -0.7616 * b5 - white * 0.0168980;
-          b6 = white * 0.115926;
-          const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
           // Leaky integrator: bounded DC, no drift
-          brownAccum = 0.9985 * brownAccum + pink * 0.5;
+          brownAccum = 0.9985 * brownAccum + white * 0.5;
           const t = i / sampleRate;
           // 0.55..1.0 swell, keeps the noise well below the limiter ceiling.
           const swell = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(2 * Math.PI * swellHz * t));
@@ -262,10 +255,18 @@
           data[i] = v;
           if (Math.abs(v) > peak) peak = Math.abs(v);
         }
+        // DC-removal pass: kill residual sample-average hum before normalize.
+        let mean = 0;
+        for (let i = 0; i < bufferSize; i++) mean += data[i];
+        mean /= bufferSize;
+        for (let i = 0; i < bufferSize; i++) data[i] -= mean;
         // Peak-normalize to 0.9 (full scale minus headroom): guarantees no
         // clipping and identical loudness across loop restarts.
-        const norm = peak > 0 ? 0.9 / peak : 1;
-        for (let i = 0; i < bufferSize; i++) data[i] *= norm;
+        // NOTE: peak must be re-measured after DC removal to stay honest.
+        let peak2 = 0;
+        for (let i = 0; i < bufferSize; i++) { const a = Math.abs(data[i]); if (a > peak2) peak2 = a; }
+        const norm2 = peak2 > 0 ? 0.9 / peak2 : 1;
+        for (let i = 0; i < bufferSize; i++) data[i] *= norm2;
       }, 1);
     }
 
