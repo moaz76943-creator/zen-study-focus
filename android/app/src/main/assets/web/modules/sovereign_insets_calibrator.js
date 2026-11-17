@@ -16,6 +16,8 @@
       right: 0
     },
 
+    _hasRealInsets: false,
+
     /**
      * Initializes default safe-area fallback values and listener hooks.
      */
@@ -23,12 +25,15 @@
       // Apply safe fallbacks immediately before Android insets arrive
       // Default: status bar ~24dp, nav bar 56dp (3-button) for safety, 48dp touch clearance
       // This ensures 3-button nav never overlaps on first paint before Android callback fires.
-      this.applyCSSVariables({
-        top: 24,
-        bottom: 56,
-        left: 0,
-        right: 0
-      });
+      // Only apply fallbacks if we haven't already received real insets from Android.
+      if (!this._hasRealInsets) {
+        this.applyCSSVariables({
+          top: 24,
+          bottom: 56,
+          left: 0,
+          right: 0
+        });
+      }
       if (typeof window !== 'undefined') {
         window.addEventListener('resize', this.onViewportChange.bind(this));
       }
@@ -47,6 +52,9 @@
       this.currentInsets.bottom = Math.max(0, parseInt(bottom, 10) || 0);
       this.currentInsets.left = Math.max(0, parseInt(left, 10) || 0);
       this.currentInsets.right = Math.max(0, parseInt(right, 10) || 0);
+
+      // Mark that we've received real insets from Android; prevents init() from overwriting with fallbacks.
+      this._hasRealInsets = true;
 
       this.applyCSSVariables(this.currentInsets);
 
