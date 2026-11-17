@@ -420,7 +420,15 @@
     .donut-center-txt { position: absolute; font-size: 1.05rem; font-weight: 900; color: var(--text-main); }
     .mini-bars-box { flex: 1; display: flex; align-items: flex-end; justify-content: space-around; height: 95px; padding-top: 16px; border-bottom: 1px solid #f1f5f9; }
     .mbar-col { display: flex; flex-direction: column; align-items: center; gap: 4px; cursor: pointer; }
-    .mbar-fill { width: 12px; border-radius: 5px; background: #38bdf8; transition: height 0.3s; }
+    .mbar-fill {
+      width: 12px;
+      border-radius: 5px;
+      background: #38bdf8;
+      transition: height 0.3s;
+      will-change: height;
+      transform: translateZ(0);
+      backface-visibility: hidden;
+    }
     .mbar-fill.peak { background: #6366f1; }
 
     .legend-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 12px; font-size: 0.72rem; font-weight: 700; color: var(--text-muted); }
@@ -535,7 +543,7 @@
     #sec-timer .domain-pedestal-grid {margin-bottom:12px;}
     #sec-timer .domain-card {border:1px solid #e6edfb;padding:11px 3px 10px;border-radius:20px;background:linear-gradient(150deg,#ffffff,#f9fbff);box-shadow:0 5px 16px -10px rgba(24,66,131,.18);}
     #sec-timer .domain-card.active {border-color:#72c2ff;background:linear-gradient(140deg,#eafaff,#f7f5ff);box-shadow:0 0 0 2px rgba(83,168,252,.11),0 7px 22px -11px rgba(52,105,220,.34);transform:none;}
-    #sec-timer .domain-squircle {width:39px;height:39px;border-radius:14px;font-size:1.15rem;}
+    #sec-timer .domain-squircle {width:48px;height:48px;border-radius:16px;font-size:1.25rem;display:grid;place-items:center;}
     #sec-timer .domain-title {font-size:.73rem;font-weight:650;}
     #sec-timer .domain-context-bar {background:#fff;border-color:#e6ecfa;}
     .quick-training-card {padding:0 !important;overflow:hidden;}
@@ -904,6 +912,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
       min-height: 100dvh !important;
       position: relative;
       transition: max-width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      will-change: max-width;
+      transform: translateZ(0);
+      backface-visibility: hidden;
     }
 
     /* Tall Aspect Ratio Phones (Xiaomi 17T Pro, Galaxy Ultra, Sony Xperia - 19.5:9 to 21:9) */
@@ -2003,9 +2014,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
       <main class="screen-section" id="sec-calendar">
         <div class="pure-white-card">
           <div class="cal-header-nav">
-            <button class="btn-round-sec" style="width:36px;height:36px;" onclick="changeCalendarMonth(-1)" data-i18n-aria="prevMonth">❮</button>
+            <button class="btn-round-sec" style="width:44px;height:44px;" onclick="changeCalendarMonth(-1)" data-i18n-aria="prevMonth">❮</button>
             <div class="cal-month-title" id="calMonthYearTitle">October 2026</div>
-            <button class="btn-round-sec" style="width:36px;height:36px;" onclick="changeCalendarMonth(1)" data-i18n-aria="nextMonth">❯</button>
+            <button class="btn-round-sec" style="width:44px;height:44px;" onclick="changeCalendarMonth(1)" data-i18n-aria="nextMonth">❯</button>
           </div>
           <div class="cal-weekdays-grid" id="calWeekdaysRow"></div>
           <div class="cal-days-grid" id="calDaysGrid"></div>
