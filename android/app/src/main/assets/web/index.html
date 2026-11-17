@@ -363,9 +363,9 @@
        flex `order` keeps DOM order intact for the DF09 tone-picker regression
        (tone-picker before grid in source) while elevating Nature Sounds to top. */
        #sec-sounds.active { display: flex; flex-direction: column; }
-       #sec-sounds > .mixer-status-bar { order: 1; }
+       #sec-sounds > #soundsGridBox { order: 1; }
        #sec-sounds > .segmented-pills-bar { order: 2; }
-       #sec-sounds > #soundsGridBox { order: 3; }
+       #sec-sounds > .mixer-status-bar { order: 3; }
        #sec-sounds > #dfPillar5SpatialMount { order: 4; }
        #sec-sounds > #df-tone-picker-card { order: 5; }
 
