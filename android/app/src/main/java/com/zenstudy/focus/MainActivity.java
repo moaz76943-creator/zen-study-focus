@@ -102,12 +102,28 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
             webView.setClipToPadding(true);
 
-            // Push insets to JS calibrator. navBottom is the true nav/gesture height for floating UI clearance.
+            // Convert physical pixels to dp for JS calibrator (CSS variables use dp/CSS px).
+            // WebView padding above is correctly in physical pixels; calibrator needs dp for CSS.
+            float density = getResources().getDisplayMetrics().density;
+            int paddingTopDp = Math.round(paddingTop / density);
+            int navBottomDp = Math.round(navBottom / density);
+            int paddingLeftDp = Math.round(paddingLeft / density);
+            int paddingRightDp = Math.round(paddingRight / density);
+
+            // Safety net: if navBottomDp is 0 or too small for 3-button nav, assume 56dp minimum (Material spec).
+            // Detect gesture nav: mandatorySystemGestures.bottom > 0 while others are 0.
+            boolean isGestureNav = mandatorySystemGestures.bottom > 0
+                    && navigationBars.bottom == 0
+                    && systemBars.bottom == 0;
+            int minNavDp = isGestureNav ? 32 : 56; // 32dp gesture handle, 56dp 3-button nav bar
+            if (navBottomDp < minNavDp) navBottomDp = minNavDp;
+
+            // Push insets (in dp) to JS calibrator for CSS variable injection.
             webView.post(() -> {
                 if (webView != null && !isDestroyed()) {
                     String js = "if(window.SovereignInsetsCalibrator) "
                             + "window.SovereignInsetsCalibrator.updateInsets("
-                            + paddingTop + "," + navBottom + "," + paddingLeft + "," + paddingRight + ");";
+                            + paddingTopDp + "," + navBottomDp + "," + paddingLeftDp + "," + paddingRightDp + ");";
                     webView.evaluateJavascript(js, null);
                 }
             });
