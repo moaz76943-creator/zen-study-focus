@@ -160,7 +160,15 @@
       source.connect(dcBlock);
       dcBlock.connect(filter);
       filter.connect(gain);
-      gain.connect(this.ctx.destination);
+      // Route through the shared ear-safety destination so the master kill
+      // switch / Stop / tab-hide mutes this track too (never raw destination).
+      let out = this.ctx.destination;
+      try {
+        if (typeof window !== "undefined" && typeof window.getSafeAudioDestination === "function") {
+          out = window.getSafeAudioDestination(this.ctx) || this.ctx.destination;
+        }
+      } catch (_) { out = this.ctx.destination; }
+      gain.connect(out);
 
       source.start();
       this.activeTracks[soundKey] = { source, dcBlock, gain, filter };

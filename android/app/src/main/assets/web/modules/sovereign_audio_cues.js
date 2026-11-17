@@ -171,7 +171,39 @@
     version: "629.0.0",
     activeNoiseType: null,
     generateNoiseBuffer: function (type, durationSec, sampleRate) {
-      return new Float32Array(Math.floor(Math.max(1, durationSec || 1) * (sampleRate || 44100)));
+      var sr = sampleRate || 44100;
+      var len = Math.floor(Math.max(1, durationSec || 1) * sr);
+      var buf = new Float32Array(len);
+      var t = (type || "white").toLowerCase();
+      if (t === "brown") {
+        var last = 0;
+        for (var i = 0; i < len; i++) {
+          var white = Math.random() * 2 - 1;
+          last = (last + (0.02 * white)) / 1.02;
+          buf[i] = last * 3.5; // normalize brown noise
+        }
+      } else if (t === "pink") {
+        // Paul Kellet pink noise approximation
+        var b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        for (var j = 0; j < len; j++) {
+          var w = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + w * 0.0555179;
+          b1 = 0.99332 * b1 + w * 0.0750759;
+          b2 = 0.96900 * b2 + w * 0.1538520;
+          b3 = 0.86650 * b3 + w * 0.3104856;
+          b4 = 0.55000 * b4 + w * 0.5329522;
+          b5 = -0.7616 * b5 - w * 0.0168980;
+          var pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362;
+          b6 = w * 0.115926;
+          buf[j] = pink * 0.11;
+        }
+      } else {
+        // white noise — properly filled buffer (never a silent zero buffer)
+        for (var k = 0; k < len; k++) {
+          buf[k] = (Math.random() * 2 - 1) * 0.5;
+        }
+      }
+      return buf;
     },
     playNoise: function (type, vol) { this.activeNoiseType = type || "rain"; return SovereignRealAudio.playAmbient(type, vol); },
     stopNoise: function () { this.activeNoiseType = null; return SovereignRealAudio.stopAmbient(); },

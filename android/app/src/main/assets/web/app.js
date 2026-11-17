@@ -5938,6 +5938,8 @@ function stopAllAudio() {
     if (typeof window.dfStopAllSounds === "function") { try { window.dfStopAllSounds(); } catch (_) {} }
     if (typeof window.dfStopAmbientSoundscape === "function") { try { window.dfStopAmbientSoundscape(); } catch (_) {} }
     if (typeof window.dfStopBinauralGamma === "function") { try { window.dfStopBinauralGamma(); } catch (_) {} }
+    if (typeof window.dfStopBioFrequencyTone === "function") { try { window.dfStopBioFrequencyTone(); } catch (_) {} }
+    if (typeof window.dfStopSpatialMixer === "function") { try { window.dfStopSpatialMixer(); } catch (_) {} }
     // Instant-stop coverage for every other engine family — otherwise these
     // loops/tones keep sounding after Stop (constant background noise).
     if (window.SovereignAmbientDSP && typeof window.SovereignAmbientDSP.stopNoise === "function") { try { window.SovereignAmbientDSP.stopNoise(); } catch (_) {} }
@@ -5946,6 +5948,11 @@ function stopAllAudio() {
   }
   renderSoundsStudio();
 }
+// Explicitly expose the instant-stop API + live player registry (const-declared
+// globals are not on window by default) so visibility/pagehide handlers and
+// other modules can always reach the same stop path.
+window.stopAllAudio = stopAllAudio;
+window.activePlayers = activePlayers;
 
 function filterSoundsByCat(cat, btn) {
   soundCat = cat;
@@ -38026,33 +38033,33 @@ if (typeof document !== "undefined") {
    requires explicit user gesture to (re)start any audio.
    ========================================================== */
 if (typeof document !== "undefined") {
+  // Unified instant stop on background (same path as the Stop button): zero
+  // audio leaks to the background, and no stale activePlayers entries survive
+  // to swallow the next user gesture. Audio only returns via explicit Play.
+  const dfHardStopAll = function () {
+    try { if (typeof window.stopAllAudio === "function") { window.stopAllAudio(); return; } } catch (_) {}
+    // Fallback if stopAllAudio is unavailable for any reason
+    try {
+      if (typeof window.dfStopAllSounds === "function") window.dfStopAllSounds();
+      if (typeof window.stopSoundTile === "function") {
+        Object.keys(window.activePlayers || {}).forEach(k => { try { window.stopSoundTile(k); } catch (_) {} });
+      }
+      if (typeof window.dfStopBioFrequencyTone === "function") window.dfStopBioFrequencyTone();
+      if (typeof window.dfStopSpatialMixer === "function") window.dfStopSpatialMixer();
+      if (window.SovereignAudioCues && typeof window.SovereignAudioCues.stopAmbient === "function") window.SovereignAudioCues.stopAmbient();
+      if (window.SovereignAmbientDSP && typeof window.SovereignAmbientDSP.stopNoise === "function") window.SovereignAmbientDSP.stopNoise();
+      if (window.activeAcousticStudio && typeof window.activeAcousticStudio.stop === "function") window.activeAcousticStudio.stop();
+      if (typeof window.dfMasterAudioMute === "function") window.dfMasterAudioMute();
+    } catch (_) {}
+  };
   document.addEventListener("visibilitychange", () => {
     if (document.hidden) {
-      // Pause all procedural audio when tab is hidden
-      if (typeof window.dfStopAllSounds === "function") {
-        try { window.dfStopAllSounds(); } catch (_) {}
-      }
-      // Pause all Ogg-based nature sound tiles
-      if (typeof window.activePlayers === "object") {
-        Object.values(window.activePlayers).forEach(p => {
-          try { if (p && p.stop) p.stop(); } catch (_) {}
-        });
-      }
-      // Pause Sovereign Audio singleton
-      if (window.SovereignAudioCues && typeof window.SovereignAudioCues.stopAmbient === "function") {
-        try { window.SovereignAudioCues.stopAmbient(); } catch (_) {}
-      }
-      if (window.SovereignAmbientDSP && typeof window.SovereignAmbientDSP.stopNoise === "function") {
-        try { window.SovereignAmbientDSP.stopNoise(); } catch (_) {}
-      }
-      // Pause Acoustic Studio
-      if (window.activeAcousticStudio && typeof window.activeAcousticStudio.stop === "function") {
-        try { window.activeAcousticStudio.stop(); } catch (_) {}
-      }
+      dfHardStopAll();
     }
     // Note: On visibility restored, we do NOT auto-resume audio.
     // User must explicitly interact to restart (gesture requirement).
   });
+  window.addEventListener("pagehide", dfHardStopAll);
 }
 
 /* ==========================================================
@@ -62387,7 +62394,18 @@ function() {
 
     prevNode.connect(masterSpatialGain);
     masterSpatialGain.connect(spatialAnalyserNode);
-    spatialAnalyserNode.connect(spatialAudioCtx.destination);
+    // Route the spatial master chain through the shared ear-safety destination so the
+    // master kill switch / instant Stop silences spatial audio exactly like every other
+    // engine family (never bypass to the raw ctx.destination).
+    if (typeof window.getSafeAudioDestination === "function") {
+      try {
+        spatialAnalyserNode.connect(window.getSafeAudioDestination(spatialAudioCtx));
+      } catch (_) {
+        spatialAnalyserNode.connect(spatialAudioCtx.destination);
+      }
+    } else {
+      spatialAnalyserNode.connect(spatialAudioCtx.destination);
+    }
 
     // Initialize 3D Listener Orientation (Center: x=0, y=0, z=0 looking forward down -Z)
     initSpatialListener(spatialAudioCtx);
@@ -63196,6 +63214,21 @@ function() {
       stopped: true,
       active: false
     };
+  };
+
+  // Hard stop for every spatial-mixer-side source that the global Stop path used to miss:
+  // 40Hz/10Hz bio-frequency tones and the breeze orbit interval. Panner chains are
+  // signal-less once their sources stop, but the orbit timer previously kept ticking.
+  window.dfStopSpatialMixer = function() {
+    isBreezeOrbiting = false;
+    if (breezeOrbitTimer) {
+      try { clearInterval(breezeOrbitTimer); } catch (_) {}
+      breezeOrbitTimer = null;
+    }
+    try {
+      if (typeof window.dfStopBioFrequencyTone === "function") window.dfStopBioFrequencyTone();
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+    return { stopped: true, orbitStopped: true, bioToneStopped: true };
   };
 
   window.dfGetActiveBioFrequencyStatus = function() {

@@ -125,7 +125,17 @@
       src.connect(dcBlock);
       dcBlock.connect(lowpass);
       lowpass.connect(g);
-      g.connect(ctx.destination);
+      // Route through the shared ear-safety destination so the master kill
+      // switch / Stop / tab-hide mutes this source too (never raw destination).
+      let out = ctx.destination;
+      try {
+        if (typeof globalThis !== "undefined" && typeof globalThis.getSafeAudioDestination === "function") {
+          out = globalThis.getSafeAudioDestination(ctx) || ctx.destination;
+        } else if (typeof window !== "undefined" && typeof window.getSafeAudioDestination === "function") {
+          out = window.getSafeAudioDestination(ctx) || ctx.destination;
+        }
+      } catch (_) { out = ctx.destination; }
+      g.connect(out);
       src.start();
       this.nodes.push(src, dcBlock, lowpass, g);
     },
