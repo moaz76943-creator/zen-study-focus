@@ -452,9 +452,9 @@ body:not(.deep-lockdown) .bottom-nav-capsule {
   padding: 7px 5px 5px;
   border-radius: 25px;
   position: fixed;
-  /* Sit ON TOP of the system navigation bar.
-     --df-safe-bottom = raw nav bar inset from Android. */
-  bottom: var(--df-safe-bottom, 0px);
+  /* Sit ABOVE the system navigation bar with 48dp touch clearance.
+     --df-bottom-nav-clearance = nav inset + 48dp clearance (gesture handle or 3-button nav). */
+  bottom: var(--df-bottom-nav-clearance, 108px);
   /* Internal padding only; safe-area handled by bottom positioning */
   padding-bottom: 5px;
 }
