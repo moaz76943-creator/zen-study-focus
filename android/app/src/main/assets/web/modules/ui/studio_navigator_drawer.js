@@ -546,8 +546,8 @@
             // Docked to the bottom-right corner above the bottom nav capsule: never covers the FAB (left) or the centred nav tabs.
             // Use calibrator CSS variable with env() fallback for Android 15 edge-to-edge.
             // --df-bottom-nav-clearance = nav bar bottom inset + 48dp touch clearance.
-            // Pill sits at clearance + 12px so it hovers above the bottom nav capsule.
-            pill.style.bottom = "calc(var(--df-bottom-nav-clearance, 108px) + 12px)";
+            // Pill sits at clearance + 70px (capsule min-height 58px + 12px gap) so it hovers above the bottom nav capsule.
+            pill.style.bottom = "calc(var(--df-bottom-nav-clearance, 104px) + 70px)";
             pill.style.right = "12px";
             pill.style.left = "auto";
             pill.style.transform = "none";

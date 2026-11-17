@@ -31,7 +31,6 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.core.graphics.Insets;
 
 public class MainActivity extends AppCompatActivity {
     private WebView webView;
@@ -96,11 +95,14 @@ public class MainActivity extends AppCompatActivity {
             // Navigation bottom: max of navigationBars (3-button), systemBars.bottom (3-button), mandatorySystemGestures (gesture handle)
             int navBottom = Math.max(Math.max(navigationBars.bottom, systemBars.bottom), mandatorySystemGestures.bottom);
 
-            // Detect gesture navigation: mandatorySystemGestures has horizontal insets (back gesture) on Android 15+,
-            // or bottom inset > 0 while navigationBars and systemBars bottom are 0.
-            // On Android 15, systemGestures (non-mandatory) may be non-zero even in 3-button mode, so use mandatorySystemGestures.
-            boolean isGestureNav = (mandatorySystemGestures.left > 0 || mandatorySystemGestures.right > 0)
-                    || (mandatorySystemGestures.bottom > 0 && navigationBars.bottom == 0 && systemBars.bottom == 0);
+            // Detect gesture navigation robustly for Xiaomi Android 15:
+            // - Gesture nav: mandatorySystemGestures.bottom > 0 (gesture handle) AND no visible nav bar
+            // - 3-button nav: navigationBars.bottom > 0 OR systemBarsOnly.bottom > 0
+            // Do NOT use mandatorySystemGestures.left/right (back gesture areas) as Xiaomi reports them even in 3-button mode.
+            Insets systemBarsOnly = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            boolean hasGestureHandle = mandatorySystemGestures.bottom > 0;
+            boolean hasVisibleNavBar = navigationBars.bottom > 0 || systemBarsOnly.bottom > 0;
+            boolean isGestureNav = hasGestureHandle && !hasVisibleNavBar;
 
             // Apply minimum nav bar height fallback (Material spec: 56dp 3-button, 32dp gesture handle)
             // This ensures WebView padding and JS calibrator both have safe minimums even if insets report 0.

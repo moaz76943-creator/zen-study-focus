@@ -341,7 +341,7 @@
     .lcard-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.68rem; color: var(--text-light); }
 
     .floating-plus-fab {
-      position: fixed; bottom: var(--df-bottom-nav-clearance, 88px); left: 24px; width: 54px; height: 54px;
+      position: fixed; bottom: var(--df-bottom-nav-clearance, 104px); left: 24px; width: 54px; height: 54px;
       border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       border: none; color: #ffffff; font-size: 1.7rem; display: flex; align-items: center;
       justify-content: center; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
@@ -453,7 +453,7 @@
       position: fixed;
       /* Sit ABOVE the system navigation bar with 48dp touch clearance.
          --df-bottom-nav-clearance = nav inset + 48dp clearance (gesture handle or 3-button nav). */
-      bottom: var(--df-bottom-nav-clearance, 108px);
+      bottom: var(--df-bottom-nav-clearance, 104px);
       width: calc(100% - 20px);
       max-width: 420px;
       left: 50%;
@@ -908,7 +908,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
       padding-top: var(--df-sat);
       /* Body content padding clears floating elements (FAB, Studios pill).
          --df-bottom-nav-clearance = nav inset + 48dp touch clearance. */
-      padding-bottom: var(--df-bottom-nav-clearance, 94px) !important;
+      padding-bottom: var(--df-bottom-nav-clearance, 104px) !important;
       padding-left: var(--df-sal);
       padding-right: var(--df-sar);
     }
@@ -934,7 +934,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
       }
       .bottom-nav-capsule {
         /* Sit ABOVE system nav bar with clearance */
-        bottom: var(--df-bottom-nav-clearance, 108px) !important;
+        bottom: var(--df-bottom-nav-clearance, 104px) !important;
         padding: 5px 3px !important;
         padding-bottom: 5px !important;
       }
@@ -1023,7 +1023,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
       position: fixed !important;
       /* Sit ABOVE the system navigation bar with 48dp touch clearance.
          --df-bottom-nav-clearance = nav inset + 48dp clearance. */
-      bottom: var(--df-bottom-nav-clearance, 108px) !important;
+      bottom: var(--df-bottom-nav-clearance, 104px) !important;
       left: 50% !important;
       transform: translateX(-50%) !important;
       width: min(calc(100% - 16px), 540px) !important;
@@ -1381,7 +1381,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         padding-top: max(16px, max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px))) !important;
         /* Body padding-bottom = clearance for floating elements (FAB, Studios pill).
            --df-bottom-nav-clearance = --df-safe-bottom + 48px. */
-        padding-bottom: var(--df-bottom-nav-clearance, 100px) !important;
+        padding-bottom: var(--df-bottom-nav-clearance, 104px) !important;
       }
       .app-shell {
         display: flex !important;
@@ -1399,7 +1399,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
       }
       .bottom-nav-capsule {
         /* Sit ABOVE system nav bar with clearance */
-        bottom: var(--df-bottom-nav-clearance, 108px) !important;
+        bottom: var(--df-bottom-nav-clearance, 104px) !important;
       }
     }
 
@@ -1453,7 +1453,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         padding-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
         /* Body content padding clears floating elements (FAB, Studios pill).
            --df-bottom-nav-clearance = nav inset + 48dp touch clearance. */
-        padding-bottom: var(--df-bottom-nav-clearance, 108px);
+        padding-bottom: var(--df-bottom-nav-clearance, 104px);
         padding-left: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
         padding-right: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
     }
@@ -1533,7 +1533,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
 <!-- TASK #811: Bottom Nav Clearance & Long-Language Button Wrap -->
 <style id="task-811-layout-fix">
   main, .tab-content, .view-section, section[id*="view"], div[id*="view"], #app {
-    padding-bottom: 108px !important;
+    padding-bottom: var(--df-bottom-nav-clearance, 104px) !important;
   }
   button, .pill, .chip, .tab-btn {
     white-space: normal !important;
@@ -1551,7 +1551,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     border: 1px solid #CBD5E1 !important;
   }
   .fab, #addNoteFab, button[class*="fab"] {
-    bottom: 96px !important;
+    bottom: var(--df-bottom-nav-clearance, 104px) !important;
     z-index: 40 !important;
   }
   nav button, .bottom-nav button, .nav-bar button {
@@ -1710,7 +1710,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     align-self: center !important;
   }
   main, .tab-content, .tab-panel {
-    padding-bottom: var(--df-bottom-nav-clearance, 120px) !important;
+    padding-bottom: var(--df-bottom-nav-clearance, 104px) !important;
   }
   [data-i18n="ui_local_data"], [data-i18n="ui_local_data"] *,
   #localDataBadge, #localDataBadge * {

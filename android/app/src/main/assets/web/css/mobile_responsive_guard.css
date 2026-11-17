@@ -49,7 +49,7 @@
 nav.bottom-navigation,
 #main-bottom-nav {
     /* Sit ABOVE system nav bar with 48dp clearance; internal padding only */
-    bottom: var(--df-bottom-nav-clearance, 108px) !important;
+    bottom: var(--df-bottom-nav-clearance, 104px) !important;
     padding-bottom: 8px !important;
     min-height: 56px !important;
 }
