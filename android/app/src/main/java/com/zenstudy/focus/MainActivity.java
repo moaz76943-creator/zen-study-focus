@@ -74,13 +74,23 @@ public class MainActivity extends AppCompatActivity {
         }
 
         webView = new WebView(this);
-        // AMOLED black behind the inset padding strips so white status-bar icons stay visible.
         webView.setBackgroundColor(0xFF000000);
-        setContentView(webView);
         // targetSdk 35+ enforces edge-to-edge: keep web content clear of system bars,
         // display cutouts and the on-screen keyboard.
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
-        ViewCompat.setOnApplyWindowInsetsListener(webView, (v, windowInsets) -> {
+        // The insets are applied as padding on the WebView's PARENT, never on the WebView
+        // itself: WebView does not lay web content out inside its own padding (it only
+        // clips drawing), so setPadding() here would clip bottom cards while leaving
+        // position:fixed layers anchored to the full, un-inset layout viewport.
+        // Padding the parent shrinks the WebView bounds instead, so the CSS layout
+        // viewport already ends above the status bar / 3-button nav bar and every
+        // fixed dock offset in CSS can be measured from the safe content edge.
+        // AMOLED black behind the inset strips so white status-bar icons stay visible.
+        android.widget.FrameLayout insetFrame = new android.widget.FrameLayout(this);
+        insetFrame.setBackgroundColor(0xFF000000);
+        insetFrame.addView(webView);
+        setContentView(insetFrame);
+        ViewCompat.setOnApplyWindowInsetsListener(insetFrame, (v, windowInsets) -> {
             // Android 15 (API 35) edge-to-edge: systemBars() returns status + navigation bars (3-button).
             // On Xiaomi gesture navigation, navigationBars() returns 0; mandatorySystemGestures() provides the gesture handle height.
             // systemBars() on gesture nav returns only status bar (bottom = 0). Combine all three for true bar height.
@@ -119,7 +129,7 @@ public class MainActivity extends AppCompatActivity {
             int paddingRight = systemBars.right;
 
             v.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
-            webView.setClipToPadding(true);
+            // Parent FrameLayout padding shrinks the WebView; nothing to clip inside it.
 
             // Convert physical pixels to dp for JS calibrator (CSS px == Android dp in WebView).
             // navBottom already includes minimum fallback; paddingBottom may be larger due to IME.
@@ -129,8 +139,9 @@ public class MainActivity extends AppCompatActivity {
             int paddingRightDp = Math.round(paddingRight / density);
             int paddingBottomDp = Math.round(paddingBottom / density);
 
-            // Push insets (in dp) to JS calibrator for CSS variable injection.
-            // Includes paddingBottomDp so CSS can position fixed elements relative to WebView content bottom.
+            // Push insets (in dp) to JS calibrator. The WebView itself is now bounded
+            // by the parent padding, so CSS dock formulas only need a fallback floor;
+            // the values stay available to JS for any reserve math that wants them.
             webView.post(() -> {
                 if (webView != null && !isDestroyed()) {
                     String js = "if(window.SovereignInsetsCalibrator) "
@@ -140,9 +151,11 @@ public class MainActivity extends AppCompatActivity {
                     webView.evaluateJavascript(js, null);
                 }
             });
-            // WebView must not re-apply the insets we already handled as native padding:
-            // zeroing (not CONSUMED) keeps the WebView's internal state in sync when the
-            // keyboard opens/hides, preventing ghost padding after IME dismissal.
+            // The parent padding already keeps content clear of every bar, so the
+            // WebView must not ALSO inject the same insets via safe-area-inset-*
+            // (env() is zero here and must stay zero to avoid double padding).
+            // Zeroing (not CONSUMED) keeps the WebView's internal state in sync when
+            // the keyboard opens/hides, preventing ghost padding after IME dismissal.
             return new WindowInsetsCompat.Builder(windowInsets)
                     .setInsets(WindowInsetsCompat.Type.systemBars()
                             | WindowInsetsCompat.Type.displayCutout()
