@@ -181,49 +181,71 @@
     }
 
     /** Paul Kellet pink-noise, pre-rendered, bounded well under the limiter. */
-    generatePinkNoiseBuffer(durationSec = 5) {
-      const ctx = this.initAudioContext();
-      return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
-        const data = channelData[0];
-        const bufferSize = Math.floor(sampleRate * totalSec);
+      generatePinkNoiseBuffer(durationSec = 5) {
+        const ctx = this.initAudioContext();
+        return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+          const data = channelData[0];
+          const bufferSize = Math.floor(sampleRate * totalSec);
 
-        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-        for (let i = 0; i < bufferSize; i++) {
-          const white = Math.random() * 2 - 1;
-          b0 = 0.99886 * b0 + white * 0.0555179;
-          b1 = 0.99332 * b1 + white * 0.0750759;
-          b2 = 0.96900 * b2 + white * 0.1538520;
-          b3 = 0.86650 * b3 + white * 0.3104856;
-          b4 = 0.55000 * b4 + white * 0.5329522;
-          b5 = -0.7616 * b5 - white * 0.0168980;
-          b6 = white * 0.115926;
-          const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-          data[i] = pink * 0.06;
-        }
-        // Hard safety clamp
-        for (let i = 0; i < bufferSize; i++) {
-          if (data[i] > 1.0) data[i] = 1.0;
-          else if (data[i] < -1.0) data[i] = -1.0;
-        }
-      }, 1);
-    }
+          let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+          for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            b0 = 0.99886 * b0 + white * 0.0555179;
+            b1 = 0.99332 * b1 + white * 0.0750759;
+            b2 = 0.96900 * b2 + white * 0.1538520;
+            b3 = 0.86650 * b3 + white * 0.3104856;
+            b4 = 0.55000 * b4 + white * 0.5329522;
+            b5 = -0.7616 * b5 - white * 0.0168980;
+            b6 = white * 0.115926;
+            const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+            data[i] = pink * 0.06;
+          }
+          // DC-removal pass: kill residual sample-average hum before normalize.
+          let mean = 0;
+          for (let i = 0; i < bufferSize; i++) mean += data[i];
+          mean /= bufferSize;
+          for (let i = 0; i < bufferSize; i++) data[i] -= mean;
+          // Peak-normalize to 0.9 (full scale minus headroom): guarantees no
+          // clipping and identical loudness across loop restarts.
+          let peak = 0;
+          for (let i = 0; i < bufferSize; i++) { const a = Math.abs(data[i]); if (a > peak) peak = a; }
+          const norm = peak > 0 ? 0.9 / peak : 1;
+          for (let i = 0; i < bufferSize; i++) data[i] *= norm;
+          // Hard safety clamp
+          for (let i = 0; i < bufferSize; i++) {
+            if (data[i] > 1.0) data[i] = 1.0;
+            else if (data[i] < -1.0) data[i] = -1.0;
+          }
+        }, 1);
+      }
 
-    /** Rain: quiet white bed, all spectral shaping done by the biquad chain. */
-    generateRainBuffer(durationSec = 5) {
-      const ctx = this.initAudioContext();
-      return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
-        const data = channelData[0];
-        const bufferSize = Math.floor(sampleRate * totalSec);
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = (Math.random() * 2 - 1) * 0.08;
-        }
-        // Hard safety clamp
-        for (let i = 0; i < bufferSize; i++) {
-          if (data[i] > 1.0) data[i] = 1.0;
-          else if (data[i] < -1.0) data[i] = -1.0;
-        }
-      }, 1);
-    }
+      /** Rain: quiet white bed, all spectral shaping done by the biquad chain. */
+      generateRainBuffer(durationSec = 5) {
+        const ctx = this.initAudioContext();
+        return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+          const data = channelData[0];
+          const bufferSize = Math.floor(sampleRate * totalSec);
+          let peak = 0;
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * 0.08;
+            const absV = Math.abs(data[i]);
+            if (absV > peak) peak = absV;
+          }
+          // DC-removal pass
+          let mean = 0;
+          for (let i = 0; i < bufferSize; i++) mean += data[i];
+          mean /= bufferSize;
+          for (let i = 0; i < bufferSize; i++) data[i] -= mean;
+          // Peak-normalize to 0.9
+          const norm = peak > 0 ? 0.9 / peak : 1;
+          for (let i = 0; i < bufferSize; i++) data[i] *= norm;
+          // Hard safety clamp
+          for (let i = 0; i < bufferSize; i++) {
+            if (data[i] > 1.0) data[i] = 1.0;
+            else if (data[i] < -1.0) data[i] = -1.0;
+          }
+        }, 1);
+      }
 
     /**
     /**

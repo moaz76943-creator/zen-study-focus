@@ -1,13 +1,27 @@
 // --- Modular Audio DSP Subsystem ---
-// v2.2: Zero-static brown noise (2-pole), seamless looping, gesture-gated playback, instant stop.
+// v2.3: Single shared AudioContext, zero-static brown noise (2-pole), seamless looping, gesture-gated playback, instant stop.
 (function() {
   if (typeof window === 'undefined') return;
 
   const MAX_MASTER_HEADROOM = 0.85;
   const LIMITER_LINEAR = Math.pow(10, -6.0 / 20); // -6.0 dB ear-safety ceiling
   const XFADE_MS = 20; // Crossfade duration for seamless looping
+  const FADE_OUT_SEC = 0.06; // Click-free fade duration
+
+  // Get the single shared master AudioContext (created only on user gesture)
+  function getSharedContext() {
+    if (typeof window !== 'undefined' && typeof window.dfGetGlobalAudioContext === 'function') {
+      try {
+        return window.dfGetGlobalAudioContext();
+      } catch (e) {
+        // Gesture not yet granted
+      }
+    }
+    return null;
+  }
 
   // Generate a seamlessly looping buffer by crossfading end to start
+  // Includes DC removal, peak normalization, and hard safety clamp
   function createSeamlessBuffer(ctx, durationSec, generatorFn) {
     const extraSec = XFADE_MS / 1000;
     const finalSize = Math.floor(ctx.sampleRate * durationSec);
@@ -20,6 +34,28 @@
     const tempData = tempBuffer.getChannelData(0);
 
     generatorFn(tempData, ctx.sampleRate, totalSec);
+
+    // DC-removal pass: kill residual sample-average hum before crossfade
+    let mean = 0;
+    for (let i = 0; i < bufferSize; i++) mean += tempData[i];
+    mean /= bufferSize;
+    for (let i = 0; i < bufferSize; i++) tempData[i] -= mean;
+
+    // Peak-normalize to 0.9 (full scale minus headroom): guarantees no clipping
+    // and identical loudness across loop restarts.
+    let peak = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const absV = Math.abs(tempData[i]);
+      if (absV > peak) peak = absV;
+    }
+    const norm = peak > 0 ? 0.9 / peak : 1;
+    for (let i = 0; i < bufferSize; i++) tempData[i] *= norm;
+
+    // Hard safety clamp (defensive)
+    for (let i = 0; i < bufferSize; i++) {
+      if (tempData[i] > 1.0) tempData[i] = 1.0;
+      else if (tempData[i] < -1.0) tempData[i] = -1.0;
+    }
 
     const finalBuffer = ctx.createBuffer(1, finalSize, ctx.sampleRate);
     const finalData = finalBuffer.getChannelData(0);
@@ -59,11 +95,8 @@
     },
 
     getCtx: function() {
-      if (!this.ctx) {
-        const AC = window.AudioContext ||
-          window.webkitAudioContext;
-        if (AC) this.ctx = new AC();
-      }
+      // Use the single shared master AudioContext
+      this.ctx = getSharedContext();
       return this.ctx;
     },
 
@@ -144,9 +177,20 @@
     },
 
     stop: function() {
+      const now = this.ctx ? this.ctx.currentTime : 0;
       for (const n of this.nodes) {
         try {
-          if (n.stop) n.stop();
+          if (n.stop) {
+            // Use click-free fade for source nodes
+            if (n.gain && typeof n.gain.gain !== 'undefined') {
+              n.gain.gain.cancelScheduledValues(now);
+              n.gain.gain.setValueAtTime(n.gain.gain.value, now);
+              n.gain.gain.linearRampToValueAtTime(0, now + FADE_OUT_SEC);
+              n.stop(now + FADE_OUT_SEC + 0.01);
+            } else {
+              n.stop();
+            }
+          }
           if (n.disconnect) n.disconnect();
         } catch(e) {}
       }

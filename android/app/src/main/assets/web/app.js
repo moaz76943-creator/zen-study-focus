@@ -5496,13 +5496,8 @@ function generateBinauralBuffer(ctx, presetKey) {
       left[i] = Math.sin(TWO_PI * preset.leftHz * t) * amp;
       right[i] = Math.sin(TWO_PI * preset.rightHz * t) * amp;
     }
-    // Hard safety clamp
-    for (let i = 0; i < bufferSize; i++) {
-      if (left[i] > 1.0) left[i] = 1.0;
-      else if (left[i] < -1.0) left[i] = -1.0;
-      if (right[i] > 1.0) right[i] = 1.0;
-      else if (right[i] < -1.0) right[i] = -1.0;
-    }
+    // DC-removal, peak-normalization, and hard clamp now handled by
+    // createSeamlessBuffer for all channels.
   }, 2);
 
   binauralBufferCache[cacheKey] = buffer;
@@ -5550,6 +5545,33 @@ function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
     channelData.push(tempBuffer.getChannelData(ch));
   }
   generatorFn(channelData, ctx.sampleRate, totalSec);
+
+  // Post-generation processing for ALL channels:
+  // 1. DC-removal pass: kill residual sample-average hum (constant static)
+  // 2. Peak-normalize to 0.9 (full scale minus headroom): guarantees no clipping
+  //    and identical loudness across loop restarts.
+  // 3. Hard safety clamp (defensive)
+  for (let ch = 0; ch < numChannels; ch++) {
+    const tempChData = channelData[ch];
+    // DC removal
+    let mean = 0;
+    for (let i = 0; i < bufferSize; i++) mean += tempChData[i];
+    mean /= bufferSize;
+    for (let i = 0; i < bufferSize; i++) tempChData[i] -= mean;
+    // Peak normalization
+    let peak = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const absV = Math.abs(tempChData[i]);
+      if (absV > peak) peak = absV;
+    }
+    const norm = peak > 0 ? 0.9 / peak : 1;
+    for (let i = 0; i < bufferSize; i++) tempChData[i] *= norm;
+    // Hard safety clamp
+    for (let i = 0; i < bufferSize; i++) {
+      if (tempChData[i] > 1.0) tempChData[i] = 1.0;
+      else if (tempChData[i] < -1.0) tempChData[i] = -1.0;
+    }
+  }
 
   const finalBuffer = ctx.createBuffer(numChannels, finalSize, ctx.sampleRate);
   for (let ch = 0; ch < numChannels; ch++) {
@@ -5602,31 +5624,14 @@ function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
       // pink->integrator random walk doubled infrasonic weight and clipped
       // into static on loop restarts.
       let brown = 0;
-      let peak = 0;
       for (let i = 0; i < bufferSize; i++) {
         const white = Math.random() * 2 - 1;
         brown = 0.9985 * brown + white * 0.5;
         data[i] = brown;
-        if (Math.abs(brown) > peak) peak = Math.abs(brown);
       }
-      // Normalize peak to 0.9 (full scale minus headroom): guarantees no
-      // clipping and identical loudness across loop restarts.
-      const norm = peak > 0 ? 0.9 / peak : 1;
-      for (let i = 0; i < bufferSize; i++) data[i] *= norm;
     }
-
-    // DC-removal pass: kill any residual sample-average hum (the "constant
-    // hiss" artifact) before the buffer ever reaches a gain node.
-    let mean = 0;
-    for (let i = 0; i < bufferSize; i++) mean += data[i];
-    mean /= bufferSize;
-    for (let i = 0; i < bufferSize; i++) data[i] -= mean;
-
-    // Hard safety clamp
-    for (let i = 0; i < bufferSize; i++) {
-      if (data[i] > 1.0) data[i] = 1.0;
-      else if (data[i] < -1.0) data[i] = -1.0;
-    }
+    // DC-removal, peak-normalization, and hard clamp now handled by
+    // createSeamlessBuffer for all buffer types.
   }, 1);
 
   proceduralBufferCache[cacheKey] = buffer;
@@ -13978,10 +13983,7 @@ window.FlashQuizEngine = FlashQuizEngine;
   'use strict';
 
   var _binauralCtx = null;
-  var _leftOsc = null;
-  var _rightOsc = null;
-  var _binauralMasterGain = null;
-  var _binauralDcBlock = null;
+  var _binauralSource = null; // Replaces _leftOsc, _rightOsc, _binauralMasterGain, _binauralDcBlock
 
   function dfIsBinauralGammaActive() {
     try {
@@ -13992,28 +13994,32 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 
   function dfStopBinauralGamma() {
-      try {
-        if (_binauralMasterGain && _binauralCtx) {
-          _binauralMasterGain.gain.setValueAtTime(_binauralMasterGain.gain.value, _binauralCtx.currentTime);
-          _binauralMasterGain.gain.exponentialRampToValueAtTime(0.0001, _binauralCtx.currentTime + 0.06);
-
-          setTimeout(function() {
-            try {
-              if (_leftOsc) { _leftOsc.stop(); _leftOsc.disconnect(); _leftOsc = null; }
-              if (_rightOsc) { _rightOsc.stop(); _rightOsc.disconnect(); _rightOsc = null; }
-              if (_binauralMasterGain) { _binauralMasterGain.disconnect(); _binauralMasterGain = null; }
-              if (_binauralDcBlock) { _binauralDcBlock.disconnect(); _binauralDcBlock = null; }
-            } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-          }, 100);
+    try {
+      if (_binauralSource && _binauralSource.source) {
+        const ctx = _binauralSource.source.context || _binauralCtx;
+        if (ctx) {
+          const now = ctx.currentTime;
+          const fadeOutSec = 0.06;
+          if (_binauralSource.gain) {
+            _binauralSource.gain.gain.cancelScheduledValues(now);
+            _binauralSource.gain.gain.setValueAtTime(_binauralSource.gain.gain.value, now);
+            _binauralSource.gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
+          }
+          _binauralSource.source.stop(now + fadeOutSec + 0.01);
+        } else {
+          _binauralSource.source.stop();
         }
-      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+      }
+      // Clean up reference
+      _binauralSource = null;
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
-      try {
-        localStorage.setItem("df_binaural_gamma_active_v1", "false");
-      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+    try {
+      localStorage.setItem("df_binaural_gamma_active_v1", "false");
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
-      return { active: false };
-    }
+    return { active: false };
+  }
 
   function dfStartBinauralGamma(carrierFreq) {
     dfStopBinauralGamma();
@@ -14033,49 +14039,32 @@ window.FlashQuizEngine = FlashQuizEngine;
         ctx.resume();
       }
 
-      _binauralCtx = ctx;
+      // Map carrier frequency to preset key
       var carrier = Number(carrierFreq) || 216;
-      var beat = 40;
-
-      var merger = _binauralCtx.createChannelMerger ? _binauralCtx.createChannelMerger(2) : null;
-      _binauralMasterGain = _binauralCtx.createGain();
-      _binauralMasterGain.gain.setValueAtTime(0.0001, _binauralCtx.currentTime);
-      _binauralMasterGain.gain.exponentialRampToValueAtTime(0.08, _binauralCtx.currentTime + 1.5);
-
-      // DC-blocking high-pass filter (15 Hz) on master output
-      _binauralDcBlock = _binauralCtx.createBiquadFilter();
-      _binauralDcBlock.type = 'highpass';
-      _binauralDcBlock.frequency.setValueAtTime(15, _binauralCtx.currentTime);
-      _binauralDcBlock.Q.setValueAtTime(0.707, _binauralCtx.currentTime);
-
-      _leftOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-      _leftOsc.type = "sine";
-      _leftOsc.frequency.setValueAtTime(carrier, _binauralCtx.currentTime);
-
-      _rightOsc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-      _rightOsc.type = "sine";
-      _rightOsc.frequency.setValueAtTime(carrier + beat, _binauralCtx.currentTime);
-
-      if (merger) {
-        _leftOsc.connect(merger, 0, 0);
-        _rightOsc.connect(merger, 0, 1);
-        merger.connect(_binauralMasterGain);
-      } else {
-        _leftOsc.connect(_binauralMasterGain);
-        _rightOsc.connect(_binauralMasterGain);
+      var presetKey = 'gamma_40hz'; // Default 40Hz gamma (216/256 Hz carrier)
+      // Allow custom carrier frequencies by finding closest preset
+      if (carrier !== 216) {
+        // For custom carriers, we still use the gamma preset but note the frequency
+        presetKey = 'gamma_40hz';
       }
 
-      // Wire: MasterGain -> DC Block -> shared ear-safety master chain.
-      // NEVER route straight to ctx.destination: that bypasses the master
-      // kill switch and limiter, so the 40Hz tone survived Stop/mute/tab-hide.
-      var gammaDest = (typeof window.getSafeAudioDestination === "function")
-        ? window.getSafeAudioDestination(_binauralCtx)
-        : _binauralCtx.destination;
-      _binauralMasterGain.connect(_binauralDcBlock);
-      _binauralDcBlock.connect(gammaDest);
+      // Use pre-rendered binaural buffer (zero-static, zero-click, seamless loop)
+      _binauralSource = createBinauralSource(ctx, presetKey, 0.15);
+      if (!_binauralSource) {
+        return { active: false, reason: "buffer_generation_failed" };
+      }
 
-      _leftOsc.start(0);
-      _rightOsc.start(0);
+      _binauralCtx = ctx;
+
+      // Route through the shared ear-safety master chain (never raw destination)
+      // createBinauralSource already connects to activeNoiseSources set for instant stop
+      var gammaDest = (typeof window.getSafeAudioDestination === "function")
+        ? window.getSafeAudioDestination(ctx)
+        : ctx.destination;
+      _binauralSource.gain.disconnect();
+      _binauralSource.gain.connect(gammaDest);
+
+      _binauralSource.source.start();
 
       try {
         localStorage.setItem("df_binaural_gamma_active_v1", "true");
@@ -14089,7 +14078,7 @@ window.FlashQuizEngine = FlashQuizEngine;
 
       return {
         active: true,
-        beatFrequency: beat,
+        beatFrequency: 40,
         carrierFrequency: carrier
       };
     } catch (_) {

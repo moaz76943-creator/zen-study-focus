@@ -2,15 +2,17 @@
  * DEEP FOCUS — High-Fidelity Natural Soundscape Sanctuary Engine (Mission #180)
  * Realistic Brownian/Pink noise filtering for Rain, Waves, Wind, Campfire, and Streams.
  * CC0 offline buffer preference with instantaneous synthetic fallback. Zero music.
- * v2.1: Seamless looping, DC-blocking, hard clamp safety.
+ * v2.2: Single shared AudioContext, zero static/hiss, instant stop, gesture-gated.
  */
 (function(root) {
   'use strict';
 
   const XFADE_MS = 20;
   const DC_BLOCK_HZ = 15;
+  const LIMITER_LINEAR = Math.pow(10, -6.0 / 20); // -6dB ear-safety ceiling
 
   // Generate a seamlessly looping buffer by crossfading end to start
+  // Includes DC removal, peak normalization, and hard safety clamp
   function createSeamlessBuffer(ctx, durationSec, generatorFn) {
     const extraSec = XFADE_MS / 1000;
     const finalSize = Math.floor(ctx.sampleRate * durationSec);
@@ -23,6 +25,28 @@
     const tempData = tempBuffer.getChannelData(0);
 
     generatorFn(tempData, ctx.sampleRate, totalSec);
+
+    // DC-removal pass: kill residual sample-average hum before crossfade
+    let mean = 0;
+    for (let i = 0; i < bufferSize; i++) mean += tempData[i];
+    mean /= bufferSize;
+    for (let i = 0; i < bufferSize; i++) tempData[i] -= mean;
+
+    // Peak-normalize to 0.9 (full scale minus headroom): guarantees no clipping
+    // and identical loudness across loop restarts.
+    let peak = 0;
+    for (let i = 0; i < bufferSize; i++) {
+      const absV = Math.abs(tempData[i]);
+      if (absV > peak) peak = absV;
+    }
+    const norm = peak > 0 ? 0.9 / peak : 1;
+    for (let i = 0; i < bufferSize; i++) tempData[i] *= norm;
+
+    // Hard safety clamp (defensive, should never trigger after normalization)
+    for (let i = 0; i < bufferSize; i++) {
+      if (tempData[i] > 1.0) tempData[i] = 1.0;
+      else if (tempData[i] < -1.0) tempData[i] = -1.0;
+    }
 
     const finalBuffer = ctx.createBuffer(1, finalSize, ctx.sampleRate);
     const finalData = finalBuffer.getChannelData(0);
@@ -39,21 +63,57 @@
     return finalBuffer;
   }
 
+  // Get the single shared master AudioContext (created only on user gesture)
+  function getSharedContext() {
+    if (typeof window !== 'undefined' && typeof window.dfGetGlobalAudioContext === 'function') {
+      try {
+        return window.dfGetGlobalAudioContext();
+      } catch (e) {
+        // Gesture not yet granted - will be handled by caller
+      }
+    }
+    return null;
+  }
+
   class SoundscapeSanctuary {
     constructor() {
       this.ctx = null;
       this.activeTracks = {};
       this.isMuted = false;
+      this.userInteracted = false;
+      this.bindGestureUnlock();
+    }
+
+    bindGestureUnlock() {
+      if (typeof document === 'undefined' || this._gestureBound) return;
+      this._gestureBound = true;
+      const unlock = () => {
+        this.userInteracted = true;
+        // Resume shared context if available
+        const sharedCtx = getSharedContext();
+        if (sharedCtx && sharedCtx.state === 'suspended') {
+          sharedCtx.resume().catch(() => {});
+        }
+        document.removeEventListener('pointerdown', unlock);
+        document.removeEventListener('touchstart', unlock);
+        document.removeEventListener('keydown', unlock);
+      };
+      document.addEventListener('pointerdown', unlock, { passive: true });
+      document.addEventListener('touchstart', unlock, { passive: true });
+      document.addEventListener('keydown', unlock, { passive: true });
     }
 
     initContext() {
+      // Use the single shared master AudioContext
+      this.ctx = getSharedContext();
       if (!this.ctx) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (AudioCtx) this.ctx = new AudioCtx();
+        // Context not yet available (no user gesture) - caller must handle
+        return false;
       }
-      if (this.ctx && this.ctx.state === 'suspended') {
-        this.ctx.resume();
+      if (this.ctx.state === 'suspended') {
+        this.ctx.resume().catch(() => {});
       }
+      return true;
     }
 
     // Create a DC-blocking high-pass filter
