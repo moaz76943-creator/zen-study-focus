@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
             webView.setClipToPadding(true);
 
-            // Convert physical pixels to dp for JS calibrator (CSS variables use dp/CSS px).
+            // Convert physical pixels to dp for JS calibrator (CSS px == Android dp in WebView).
             // navBottom already includes minimum fallback; paddingBottom may be larger due to IME.
             int paddingTopDp = Math.round(paddingTop / density);
             int navBottomDp = Math.round(navBottom / density);

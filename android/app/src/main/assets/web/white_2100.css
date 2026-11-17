@@ -303,7 +303,7 @@ body:not(.deep-lockdown) #sec-notes .floating-plus-fab {
   box-shadow:0 9px 23px -9px rgba(59,109,238,.42);
   position: fixed;
   left: 24px;
-  bottom: var(--df-bottom-nav-clearance, 104px);
+  bottom: calc(var(--df-bottom-nav-clearance, 86px) + 8px);
   width: 54px;
   height: 54px;
   border-radius: 50%;
@@ -452,9 +452,9 @@ body:not(.deep-lockdown) .bottom-nav-capsule {
   padding: 7px 5px 5px;
   border-radius: 25px;
   position: fixed;
-  /* Sit ABOVE the system navigation bar with 48dp touch clearance.
-     --df-bottom-nav-clearance = nav inset + 48dp clearance (gesture handle or 3-button nav). */
-  bottom: var(--df-bottom-nav-clearance, 104px);
+  /* Docked just above the WebView content-area bottom, which MainActivity already
+     pads clear of the 3-button nav bar. Fixed dock gap — no nav-inset double count. */
+  bottom: var(--df-dock-gap, 12px);
   /* Internal padding only; safe-area handled by bottom positioning */
   padding-bottom: 5px;
 }
@@ -638,8 +638,8 @@ body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
 @media (max-width: 430px) {
   body:not(.deep-lockdown) {
     /* Body content padding clears floating elements (FAB, Studios pill).
-       --df-bottom-nav-clearance = nav inset + 48dp touch clearance. */
-    padding-bottom: var(--df-bottom-nav-clearance, 104px) !important;
+       --df-bottom-nav-clearance = fixed dock reserve (capsule + card clearance). */
+    padding-bottom: var(--df-bottom-nav-clearance, 86px) !important;
   }
   body:not(.deep-lockdown) .bottom-nav-capsule {
     width: calc(100% - 4px);

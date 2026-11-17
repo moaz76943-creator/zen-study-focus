@@ -544,10 +544,11 @@
             pill.setAttribute("aria-label", (document.documentElement.lang || "").toLowerCase().indexOf("ar") === 0 ? "فتح لوحة الاستوديوهات والأدوات" : "Open studios and tools panel");
             pill.style.position = "fixed";
             // Docked to the bottom-right corner above the bottom nav capsule: never covers the FAB (left) or the centred nav tabs.
-            // Use calibrator CSS variable with env() fallback for Android 15 edge-to-edge.
-            // --df-bottom-nav-clearance = nav bar bottom inset + 48dp touch clearance.
-            // Pill sits at clearance + 70px (capsule min-height 58px + 12px gap) so it hovers above the bottom nav capsule.
-            pill.style.bottom = "calc(var(--df-bottom-nav-clearance, 104px) + 70px)";
+            // Use calibrator CSS variable for Android 15 edge-to-edge.
+            // WebView viewport already ends above the system nav bar (MainActivity setPadding).
+            // Pill docks 8px above the fixed bottom reserve: clear of the nav capsule,
+            // never overlapping it or the FAB.
+            pill.style.bottom = "calc(var(--df-bottom-nav-clearance, 86px) + 8px)";
             pill.style.right = "12px";
             pill.style.left = "auto";
             pill.style.transform = "none";

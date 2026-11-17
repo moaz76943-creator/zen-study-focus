@@ -1,14 +1,18 @@
 /**
- * DEEP FOCUS — SovereignInsetsCalibrator (v605.0.0)
+ * DEEP FOCUS — SovereignInsetsCalibrator (v606.0.0)
  * Android 15 Edge-to-Edge & Gesture Navigation Insets Calibration Engine.
  * Dynamically updates CSS root variables for status bar, gesture navigation pill,
  * and camera cutouts on Xiaomi 17T Pro (AMOLED 120Hz/144Hz).
+ * Insets arrive as DP (CSS px) from MainActivity; MainActivity applies the physical-px
+ * padding to the WebView itself, so this engine only feeds CSS with density-independent
+ * values. Floating layers dock against the WebView content area, which already ends
+ * above the system nav bar — clearance is therefore a fixed reserve, not nav-inset + gap.
  */
 (function (global) {
   'use strict';
 
   var SovereignInsetsCalibrator = {
-    version: '605.0.0',
+    version: '606.0.0',
     currentInsets: {
       top: 0,
       bottom: 0,
@@ -20,12 +24,12 @@
 
     /**
      * Initializes default safe-area fallback values and listener hooks.
+     * Fallbacks are DP (CSS px): status bar ~24dp, 3-button nav bar ~56dp.
+     * This ensures 3-button nav never overlaps on first paint before Android callback fires.
+     * Only apply fallbacks if we haven't already received real insets from Android.
      */
     init: function () {
       // Apply safe fallbacks immediately before Android insets arrive
-      // Default: status bar ~24dp, nav bar 56dp (3-button) for safety, 48dp touch clearance
-      // This ensures 3-button nav never overlaps on first paint before Android callback fires.
-      // Only apply fallbacks if we haven't already received real insets from Android.
       if (!this._hasRealInsets) {
         this.applyCSSVariables({
           top: 24,
@@ -42,10 +46,10 @@
 
     /**
      * Updates insets received from Android WindowInsetsCompat listener via JavascriptInterface.
-     * @param {number} top Top inset in dp (status bar / punch hole)
-     * @param {number} bottom Bottom inset in dp (gesture navigation pill / 3-button nav bar height)
-     * @param {number} left Left cutout in dp
-     * @param {number} right Right cutout in dp
+     * @param {number} top Top inset in DP (status bar / punch hole)
+     * @param {number} bottom Bottom inset in DP (gesture navigation pill / 3-button nav bar height)
+     * @param {number} left Left cutout in DP
+     * @param {number} right Right cutout in DP
      */
     updateInsets: function (top, bottom, left, right) {
       this.currentInsets.top = Math.max(0, parseInt(top, 10) || 0);
@@ -73,21 +77,23 @@
      * Injects CSS variables onto documentElement with !important to override conflicting rules.
      * --df-safe-top: status bar / cutout top inset (dp)
      * --df-safe-bottom: navigation bar / gesture handle bottom inset (dp)
-     * --df-bottom-nav-clearance: --df-safe-bottom + 48dp touch clearance for floating elements
+     * --df-bottom-nav-clearance: fixed reserve (dp) that clears the docked bottom capsule plus
+     *   FAB / Studios pill for in-flow content. The WebView itself is padded above the
+     *   system nav bar in MainActivity, so this must NOT include the nav inset again.
      */
     applyCSSVariables: function (insets) {
       if (typeof document === 'undefined' || !document.documentElement) return;
 
       var root = document.documentElement;
       var navInset = insets.bottom; // nav/gesture height in dp (from Android via MainActivity)
-      var clearance = navInset + 48; // 48dp touch clearance above nav bar
 
       root.style.setProperty('--df-safe-top', insets.top + 'px', 'important');
       root.style.setProperty('--df-safe-bottom', navInset + 'px', 'important');
       root.style.setProperty('--df-safe-left', insets.left + 'px', 'important');
       root.style.setProperty('--df-safe-right', insets.right + 'px', 'important');
-      // 48dp clearance above nav bar for floating action buttons (Studios pill, FAB)
-      root.style.setProperty('--df-bottom-nav-clearance', clearance + 'px', 'important');
+      // Fixed dock reserve: 12px dock gap + ~62px capsule + 12px card clearance = 86px.
+      // Kept constant so floating layers never cover each other or the last card.
+      root.style.setProperty('--df-bottom-nav-clearance', '86px', 'important');
     },
 
     onViewportChange: function () {

@@ -48,8 +48,8 @@
 .bottom-nav,
 nav.bottom-navigation,
 #main-bottom-nav {
-    /* Sit ABOVE system nav bar with 48dp clearance; internal padding only */
-    bottom: var(--df-bottom-nav-clearance, 104px) !important;
+    /* Docked just above the WebView content-area bottom (already clear of the system nav bar) */
+    bottom: var(--df-dock-gap, 12px) !important;
     padding-bottom: 8px !important;
     min-height: 56px !important;
 }
