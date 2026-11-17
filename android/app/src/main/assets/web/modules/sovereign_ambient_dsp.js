@@ -35,9 +35,13 @@
     pink: 'audio/flowing_water.ogg'
   };
 
-  const XFADE_SEC = 0.02;
-  const FADE_IN_SEC = 0.03;  // AudioCore's 30ms
-  const FADE_OUT_SEC = 0.03; // AudioCore's 30ms
+  const XFADE_SEC = audioCore ? audioCore.XFADE_MS / 1000 : 0.02;
+  const FADE_IN_SEC = audioCore ? audioCore.FADE_IN_MS / 1000 : 0.03;
+  const FADE_OUT_SEC = audioCore ? audioCore.FADE_OUT_MS / 1000 : 0.03;
+  const BROWN_POLE = audioCore ? audioCore.BROWN_POLE : 0.997;
+  const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
+  const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
+  const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
 
   if (!global.__ZEN_AUDIO_SINGLETON__) {
     global.__ZEN_AUDIO_SINGLETON__ = {
@@ -45,7 +49,7 @@
       fadeTimers: new Set(),
       volume: 0.7,
       muted: false,
-      userInteracted: false,
+      // userInteracted: false - DELEGATED to AudioCore
       dspContext: null,
       bufferCache: {},
       bufferLoading: {},
@@ -59,65 +63,25 @@
   }
   const S = global.__ZEN_AUDIO_SINGLETON__;
 
-  if (typeof document !== 'undefined' && !S.gestureBound) {
-    S.gestureBound = true;
-    const markGesture = function () { S.userInteracted = true; };
-    document.addEventListener('pointerdown', markGesture, { passive: true, once: true });
-    document.addEventListener('touchstart', markGesture, { passive: true, once: true });
-    document.addEventListener('keydown', markGesture, { passive: true, once: true });
-  }
+  // Gesture detection delegated to AudioCore - no local binding
 
   function clamp01(v) { return Math.max(0, Math.min(1, v)); }
   function finalVol(targetVol) { return S.muted ? 0 : clamp01(targetVol); }
 
   function getCtx() {
+    // AudioCore is the ONLY path - no fallback
     if (audioCore) {
       return audioCore.getContext();
     }
-    // Legacy fallback
-    try {
-      if (typeof global.dfGetGlobalAudioContext === 'function') {
-        const shared = global.dfGetGlobalAudioContext();
-        if (shared && typeof shared.createBufferSource === 'function') return shared;
-      }
-    } catch (e) { /* gesture not yet granted */ }
-    if (typeof global.AudioContext === 'undefined' && typeof global.webkitAudioContext === 'undefined') {
-      return null;
-    }
-    const AC = global.AudioContext || global.webkitAudioContext;
-    if (!S.dspContext || S.dspContext.state === 'closed') {
-      try { S.dspContext = new AC(); } catch (e) { return null; }
-    }
-    if (S.dspContext.state === 'suspended' && S.userInteracted && typeof S.dspContext.resume === 'function') {
-      S.dspContext.resume().catch(function () {});
-    }
-    return S.dspContext;
+    return null;
   }
 
   function getSafeDestination(ctx) {
+    // AudioCore master output is the ONLY path
     if (audioCore) {
       return audioCore.getMasterOutput();
     }
-    // Legacy fallback
-    try {
-      if (typeof global.getSafeAudioDestination === 'function') {
-        const d = global.getSafeAudioDestination(ctx);
-        if (d) return d;
-      }
-    } catch (e) {}
-    if (!ctx._zenDspLimiter) {
-      try {
-        const comp = ctx.createDynamicsCompressor();
-        comp.threshold.setValueAtTime(-14, ctx.currentTime);
-        comp.knee.setValueAtTime(35, ctx.currentTime);
-        comp.ratio.setValueAtTime(12, ctx.currentTime);
-        comp.attack.setValueAtTime(0.003, ctx.currentTime);
-        comp.release.setValueAtTime(0.25, ctx.currentTime);
-        comp.connect(ctx.destination);
-        ctx._zenDspLimiter = comp;
-      } catch (e) { return ctx.destination; }
-    }
-    return ctx._zenDspLimiter;
+    return ctx.destination; // Should not happen if AudioCore loaded
   }
 
   function makeSeamlessLoop(ctx, buffer) {
@@ -167,7 +131,7 @@
     if (color === 'white') {
       // Full-band white at low amplitude — 0.3 was audible hiss; 0.08 is a
       // clean air-tone through the 15Hz DC blockers downstream.
-      for (let i = 0; i < n; i++) data[i] = (Math.random() * 2 - 1) * 0.08;
+      for (let i = 0; i < n; i++) data[i] = (Math.random() * 2 - 1) * WHITE_NOISE_AMP;
       return;
     }
     let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
@@ -183,13 +147,13 @@
       b6 = white * 0.115926;
       const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
       if (color === 'pink') {
-        data[i] = pink * 0.11;
+        data[i] = pink * PINK_NOISE_AMP;
       } else { // brown
         // Leaky integrator of WHITE noise (the true brown slope). Integrating
         // the pink signal doubled the low-frequency weight into infrasonic
         // rumble that bleeds as a constant pressure hiss on loops.
         // Use AudioCore's BROWN_POLE (0.997) and BROWN_GAIN (0.4)
-        brown = 0.997 * brown + white * 0.4;
+        brown = BROWN_POLE * brown + white * BROWN_GAIN;
         data[i] = brown;
         if (Math.abs(brown) > peak) peak = Math.abs(brown);
       }
@@ -299,10 +263,13 @@
   function stopAllGlobal() {
     S.noiseGeneration = (S.noiseGeneration || 0) + 1;
     clearFadeTimers();
-    // Web Audio ambient sources: click-free 30ms linear ramp, then stop.
-    // Track every concurrent layer (mixAmbient stacks rain+forest); the old
-    // code only faded S.activeGain, so the first layer kept playing at full
-    // volume after Stop — a permanent background loop.
+
+    // Use AudioCore's stopAllVoices for all Web Audio voices (instant, reliable)
+    if (audioCore) {
+      audioCore.stopAllVoices();
+    }
+
+    // Legacy Web Audio sources (for backwards compat during transition)
     const ctx = S.activeCtx || S.dspContext;
     const sources = (S.activeSources && S.activeSources.length)
       ? S.activeSources.slice()
@@ -323,21 +290,18 @@
         else entry.source.stop();
       } catch (e) {}
     });
-    // Capture refs so the timer tears down exactly these nodes, never a newer
-    // source that started after this stop.
-    const killList = sources;
-    setTimeout(function () {
-      killList.forEach(function (entry) {
-        try { if (entry.source) entry.source.disconnect(); } catch (e) {}
-        try { if (entry.gain) entry.gain.disconnect(); } catch (e) {}
-        try { if (entry.dc) entry.dc.disconnect(); } catch (e) {}
-      });
-    }, 70); // 30ms fade + 5ms buffer + margin
+    // Disconnect immediately after scheduling stop (no setTimeout)
+    sources.forEach(function (entry) {
+      try { if (entry.source) entry.source.disconnect(); } catch (e) {}
+      try { if (entry.gain) entry.gain.disconnect(); } catch (e) {}
+      try { if (entry.dc) entry.dc.disconnect(); } catch (e) {}
+    });
     S.activeSources = [];
     S.activeSource = null;
     S.activeGain = null;
     S.activeDC = null;
     S.activeCtx = null;
+
     // HTML fallback players: same click-free ramp.
     if (S.activeHTML && S.activeHTML.length) {
       S.activeHTML.forEach(function (a) { fadeStopHTML(a); });
@@ -356,8 +320,8 @@
   }
 
   function playSingleClean(srcKey, loop, targetVol) {
-    if (!S.userInteracted) return null; // BLOCKED: user gesture required (zero autoplay)
-    if (audioCore && !audioCore.isGestureReceived()) return null; // Hard gate via AudioCore
+    // Gesture gate via AudioCore (single source of truth)
+    if (!audioCore || !audioCore.isGestureReceived()) return null;
     const ctx = getCtx();
     if (!ctx) {
       if (typeof global.Audio === 'undefined') return null;
@@ -452,8 +416,9 @@
       return true;
     },
     playBell: function () {
-      if (S.muted || !S.userInteracted) return false; // gesture gate: zero autoplay
-      if (audioCore && !audioCore.isGestureReceived()) return false; // Hard gate
+      if (S.muted) return false;
+      // Gesture gate via AudioCore (single source of truth)
+      if (!audioCore || !audioCore.isGestureReceived()) return false;
       if (typeof global.Audio === 'undefined') return false;
       const ctx = getCtx();
       if (ctx && typeof ctx.createBufferSource === 'function') {

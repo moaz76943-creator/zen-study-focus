@@ -8,7 +8,10 @@
 (function (global) {
   "use strict";
 
-  var SOUND_FILES = {
+  // Uses AudioCore for all Web Audio operations.
+  const audioCore = global.AudioCore;
+
+  const SOUND_FILES = {
     rain: "audio/rain_window.ogg",
     thunder: "audio/rain_thunder.ogg",
     forest: "audio/forest_birds.ogg",
@@ -23,6 +26,11 @@
     pink: "audio/flowing_water.ogg"
   };
 
+  const BROWN_POLE = audioCore ? audioCore.BROWN_POLE : 0.997;
+  const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
+  const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
+  const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
+
   if (!global.__ZEN_AUDIO_SINGLETON__) {
     global.__ZEN_AUDIO_SINGLETON__ = {
       players: [],
@@ -30,18 +38,21 @@
       fadeTimers: new Set(),
       volume: 0.7,
       muted: false,
-      userInteracted: false
+      // userInteracted: false - DELEGATED to AudioCore
+      dspContext: null,
+      bufferCache: {},
+      bufferLoading: {},
+      noiseGeneration: 0,
+      activeSource: null,
+      activeGain: null,
+      activeDC: null,
+      activeHTML: [],
+      activeSources: []
     };
   }
   var S = global.__ZEN_AUDIO_SINGLETON__;
 
-  if (typeof document !== "undefined" && !S.gestureBound) {
-    S.gestureBound = true;
-    var markGesture = function () { S.userInteracted = true; };
-    document.addEventListener("pointerdown", markGesture, { passive: true });
-    document.addEventListener("touchstart", markGesture, { passive: true });
-    document.addEventListener("keydown", markGesture, { passive: true });
-  }
+  // Gesture detection delegated to AudioCore - no local binding
 
   function stopAllGlobal() {
     if (S.fadeTimer) {
@@ -131,6 +142,8 @@
     },
     playBell: function () {
       if (S.muted || typeof Audio === "undefined") return false;
+      // Gesture gate via AudioCore (single source of truth)
+      if (!audioCore || !audioCore.isGestureReceived()) return false;
       var p = new Audio(SOUND_FILES.cue);
       p.volume = S.volume;
       p.play().catch(function () {});
@@ -183,7 +196,7 @@
         var peak = 0;
         for (var i = 0; i < len; i++) {
           var white = Math.random() * 2 - 1;
-          last = 0.9985 * last + white * 0.5;
+          last = BROWN_POLE * last + white * BROWN_GAIN;
           buf[i] = last;
           if (Math.abs(last) > peak) peak = Math.abs(last);
         }
@@ -203,7 +216,7 @@
           b5 = -0.7616 * b5 - w * 0.0168980;
           b6 = w * 0.115926;
           var pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362;
-          buf[j] = pink * 0.11;
+          buf[j] = pink * PINK_NOISE_AMP;
           var a = Math.abs(buf[j]);
           if (a > peak) peak = a;
         }
@@ -212,10 +225,10 @@
         for (var n = 0; n < len; n++) buf[n] *= norm;
       } else {
         // white noise — properly filled buffer (never a silent zero buffer);
-        // 0.5 was audible static hiss, 0.08 matches the other engines.
+        // 0.5 was audible static hiss, 0.06 matches the other engines.
         var peak = 0;
         for (var k = 0; k < len; k++) {
-          buf[k] = (Math.random() * 2 - 1) * 0.08;
+          buf[k] = (Math.random() * 2 - 1) * WHITE_NOISE_AMP;
           var a = Math.abs(buf[k]);
           if (a > peak) peak = a;
         }

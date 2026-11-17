@@ -35,6 +35,10 @@
   const FADE_OUT_SEC = audioCore ? audioCore.FADE_OUT_MS / 1000 : 0.03;
   const XFADE_MS = audioCore ? audioCore.XFADE_MS : 20;
   const DC_BLOCK_HZ = audioCore ? audioCore.DC_BLOCK_HZ : 15;
+  const BROWN_POLE = audioCore ? audioCore.BROWN_POLE : 0.997;
+  const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
+  const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
+  const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
 
   // Generate a seamlessly looping buffer by crossfading end to start
   // Delegates to AudioCore for the actual implementation
@@ -113,35 +117,21 @@
       this.eqFilters = [];
       this.sourceNode = null;
       this.analyser = null;
-      this.userInteracted = false;
+      // Gesture detection is handled by AudioCore - no local binding needed
 
       this.eqGains = new Array(EQ_FREQUENCIES.length).fill(0);
       this.loadSavedEq();
-      this.bindGestureUnlock();
     }
 
     /** Audio may only begin after a real user gesture (no autoplay on load/tab switch). */
     bindGestureUnlock() {
-      if (typeof document === 'undefined' || this._gestureBound) return;
-      this._gestureBound = true;
-      const unlock = () => {
-        this.userInteracted = true;
-        if (this.audioCtx && this.audioCtx.state === 'suspended') {
-          this.audioCtx.resume().catch(() => {});
-        }
-        document.removeEventListener('pointerdown', unlock);
-        document.removeEventListener('touchstart', unlock);
-        document.removeEventListener('keydown', unlock);
-      };
-      document.addEventListener('pointerdown', unlock, { passive: true });
-      document.addEventListener('touchstart', unlock, { passive: true });
-      document.addEventListener('keydown', unlock, { passive: true });
+      // Delegated to AudioCore.bindGesture() - no-op here
     }
 
     initAudioContext() {
       if (this.audioCtx) return this.audioCtx;
 
-      // Use AudioCore's shared context
+      // Use AudioCore's shared context - this is the ONLY path
       if (audioCore) {
         this.audioCtx = audioCore.getContext();
         if (this.audioCtx) {
@@ -151,15 +141,8 @@
         }
       }
 
-      // Fallback (should not happen if AudioCore loaded)
-      const AudioContextClass = typeof window !== 'undefined' &&
-        (window.AudioContext || window.webkitAudioContext);
-      if (!AudioContextClass) {
-        throw new Error('Web Audio API is not supported in this environment');
-      }
-      this.audioCtx = new AudioContextClass();
-      this.buildEqChain(this.audioCtx);
-      return this.audioCtx;
+      // If AudioCore is not available, audio cannot work
+      throw new Error('AudioCore not available - Web Audio requires AudioCore singleton');
     }
 
     buildEqChain(ctx) {
@@ -208,44 +191,44 @@
     }
 
     /** Paul Kellet pink-noise, pre-rendered, bounded well under the limiter. */
-    generatePinkNoiseBuffer(durationSec = 5) {
-      const ctx = this.initAudioContext();
-      return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
-        const data = channelData[0];
-        const bufferSize = Math.floor(sampleRate * totalSec);
+      generatePinkNoiseBuffer(durationSec = 5) {
+        const ctx = this.initAudioContext();
+        return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+          const data = channelData[0];
+          const bufferSize = Math.floor(sampleRate * totalSec);
 
-        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-        for (let i = 0; i < bufferSize; i++) {
-          const white = Math.random() * 2 - 1;
-          b0 = 0.99886 * b0 + white * 0.0555179;
-          b1 = 0.99332 * b1 + white * 0.0750759;
-          b2 = 0.96900 * b2 + white * 0.1538520;
-          b3 = 0.86650 * b3 + white * 0.3104856;
-          b4 = 0.55000 * b4 + white * 0.5329522;
-          b5 = -0.7616 * b5 - white * 0.0168980;
-          b6 = white * 0.115926;
-          const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-          data[i] = pink * 0.06;
-        }
-        // AudioCore's createSeamlessBuffer handles DC removal, normalization, clamp
-      }, 1);
-    }
+          let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+          for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            b0 = 0.99886 * b0 + white * 0.0555179;
+            b1 = 0.99332 * b1 + white * 0.0750759;
+            b2 = 0.96900 * b2 + white * 0.1538520;
+            b3 = 0.86650 * b3 + white * 0.3104856;
+            b4 = 0.55000 * b4 + white * 0.5329522;
+            b5 = -0.7616 * b5 - white * 0.0168980;
+            b6 = white * 0.115926;
+            const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+            data[i] = pink * PINK_NOISE_AMP;
+          }
+          // AudioCore's createSeamlessBuffer handles DC removal, normalization, clamp
+        }, 1);
+      }
 
-    /** Rain: quiet white bed, all spectral shaping done by the biquad chain. */
-    generateRainBuffer(durationSec = 5) {
-      const ctx = this.initAudioContext();
-      return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
-        const data = channelData[0];
-        const bufferSize = Math.floor(sampleRate * totalSec);
-        let peak = 0;
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = (Math.random() * 2 - 1) * 0.08;
-          const absV = Math.abs(data[i]);
-          if (absV > peak) peak = absV;
-        }
-        // AudioCore's createSeamlessBuffer handles DC removal, normalization, clamp
-      }, 1);
-    }
+      /** Rain: quiet white bed, all spectral shaping done by the biquad chain. */
+      generateRainBuffer(durationSec = 5) {
+        const ctx = this.initAudioContext();
+        return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+          const data = channelData[0];
+          const bufferSize = Math.floor(sampleRate * totalSec);
+          let peak = 0;
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * WHITE_NOISE_AMP;
+            const absV = Math.abs(data[i]);
+            if (absV > peak) peak = absV;
+          }
+          // AudioCore's createSeamlessBuffer handles DC removal, normalization, clamp
+        }, 1);
+      }
 
     /**
      * Ocean: brownian rumble with the shoreline swell baked directly into the
@@ -268,7 +251,7 @@
         for (let i = 0; i < bufferSize; i++) {
           const white = Math.random() * 2 - 1;
           // Leaky integrator: bounded DC, no drift
-          brownAccum = 0.997 * brownAccum + white * 0.4; // AudioCore's BROWN_POLE & BROWN_GAIN
+          brownAccum = BROWN_POLE * brownAccum + white * BROWN_GAIN; // AudioCore's BROWN_POLE & BROWN_GAIN
           const t = i / sampleRate;
           // 0.55..1.0 swell, keeps the noise well below the limiter ceiling.
           const swell = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(2 * Math.PI * swellHz * t));
@@ -304,7 +287,7 @@
     }
 
     startPreset(presetName = 'pink_noise') {
-      if (!this.userInteracted) {
+      if (!audioCore || !audioCore.isGestureReceived()) {
         return { preset: this.activePreset, isPlaying: false, reason: 'user_gesture_required' };
       }
 

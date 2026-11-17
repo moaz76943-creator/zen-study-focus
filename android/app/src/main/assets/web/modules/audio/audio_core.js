@@ -23,6 +23,8 @@
   const DC_BLOCK_HZ = 15;                                      // protects transducer coils
   const BROWN_POLE = 0.997;                                    // leakier = less DC drift
   const BROWN_GAIN = 0.4;                                      // input gain for brown noise
+  const WHITE_NOISE_AMP = 0.06;                                // consistent across all modules
+  const PINK_NOISE_AMP = 0.08;                                 // consistent across all modules
 
   // ── AudioContext Singleton ────────────────────────────────────────
   let sharedContext = null;
@@ -33,7 +35,7 @@
   let analyser = null;
   const activeVoices = new Set();        // { source, gain, dcBlock, stopFn }
 
-  // Gesture detection (once per session)
+  // Gesture detection (once per session) + visibility change handling
   function bindGesture() {
     if (typeof document === 'undefined' || global.__dfAudioGestureBound) return;
     global.__dfAudioGestureBound = true;
@@ -47,6 +49,15 @@
     document.addEventListener('pointerdown', unlock, { passive: true, once: true });
     document.addEventListener('touchstart', unlock, { passive: true, once: true });
     document.addEventListener('keydown', unlock, { passive: true, once: true });
+
+    // Handle tab switch / visibility change: suspend on hidden, require gesture on visible
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden && sharedContext && sharedContext.state === 'running') {
+        sharedContext.suspend().catch(() => {});
+      } else if (!document.hidden && gestureReceived) {
+        resumeContext();
+      }
+    }, { passive: true });
   }
 
   function getAudioContext() {
@@ -176,7 +187,7 @@
     const len = data.length;
     // Low amplitude — 15Hz DC block downstream removes any residual
     for (let i = 0; i < len; i++) {
-      data[i] = (Math.random() * 2 - 1) * 0.06;
+      data[i] = (Math.random() * 2 - 1) * WHITE_NOISE_AMP;
     }
   }
 
@@ -192,7 +203,7 @@
       b4 = 0.55000 * b4 + white * 0.5329522;
       b5 = -0.7616 * b5 - white * 0.0168980;
       b6 = white * 0.115926;
-      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.08;
+      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * PINK_NOISE_AMP;
     }
   }
 
@@ -392,13 +403,17 @@
     // OGG
     loadOggBuffer,
 
-    // Constants
+    // Constants (for other modules to use consistently)
     LIMITER_LINEAR,
     MASTER_HEADROOM,
     DC_BLOCK_HZ,
     XFADE_MS,
     FADE_IN_MS,
     FADE_OUT_MS,
+    BROWN_POLE,
+    BROWN_GAIN,
+    WHITE_NOISE_AMP,
+    PINK_NOISE_AMP,
   };
 
   // Initialize gesture binding immediately
