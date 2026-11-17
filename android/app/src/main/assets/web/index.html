@@ -42,11 +42,21 @@
       --radius-lg: 18px;
       --radius-pill: 9999px;
       --header-grad: linear-gradient(135deg, #091326 0%, #1d3b8b 55%, #0284c7 100%);
-      /* Floating layers dock against the WebView content area, which MainActivity
-         already pads clear of the status bar and 3-button nav bar (Android 15
-         edge-to-edge). The dock reserve is therefore a fixed gap, never the nav
-         inset again (double-counting would clip bottom cards). */
+      /* Floating layers dock above the Android 15 system bars. The native WebView
+         padding insets the painted content but NOT the CSS viewport, so dock offsets
+         must include the pushed --df-webview-padding-bottom value. */
+      /* CSS viewport on the full-screen Android 15 WebView is NOT inset by the native
+         setPadding() insets (fixed/docked elements anchored to the layout bottom render
+         underneath the status / 3-button nav bar). Every bottom-anchored fixed element
+         and every in-flow body reserve must therefore add --df-webview-padding-bottom
+         (pushed by MainActivity via SovereignInsetsCalibrator) itself.
+         --df-bottom-nav-clearance is the dock reserve ABOVE the native inset only
+         (capsule + FAB zone, 86px); it never includes the nav inset. */
       --df-dock-gap: 12px;
+      --df-capsule-height: 70px;
+      --df-dock-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px));
+      --df-float-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px);
+      --df-inflow-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px));
       --df-dock-reserve: calc(var(--df-dock-gap, 12px) + 74px);
       --df-bottom-nav-clearance: var(--df-dock-reserve, 86px);
     }
@@ -57,7 +67,7 @@
       font-variant-numeric: tabular-nums lining-nums;
       -webkit-tap-highlight-color: transparent;
     }
-    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: var(--df-bottom-nav-clearance, 86px); overflow-x: hidden; user-select: none; }
+    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 20px); overflow-x: hidden; user-select: none; }
     input, textarea { user-select: text; text-align: start; }
 
     body.deep-lockdown .dynamic-hero-header,
@@ -348,7 +358,7 @@
     .lcard-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.68rem; color: var(--text-light); }
 
     .floating-plus-fab {
-      position: fixed; bottom: calc(var(--df-bottom-nav-clearance, 86px) + 8px); left: 24px; width: 54px; height: 54px;
+      position: fixed; bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px); left: 24px; width: 54px; height: 54px;
       border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       border: none; color: #ffffff; font-size: 1.7rem; display: flex; align-items: center;
       justify-content: center; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
@@ -459,8 +469,9 @@
     .bottom-nav-capsule {
       position: fixed;
       /* Docked just above the WebView content-area bottom, which MainActivity already
-         pads clear of the 3-button nav bar. Fixed dock gap — no nav-inset double count. */
-      bottom: var(--df-dock-gap, 12px);
+         pads clear of the 3-button nav bar. Uses --df-webview-padding-bottom (actual
+         WebView padding) + dock gap so capsule sits just above content, never in system bars. */
+      bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px));
       width: calc(100% - 20px);
       max-width: 420px;
       left: 50%;
@@ -719,9 +730,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     padding-left: var(--sal);
     padding-right: var(--sar);
 }
-/* Bottom safe area for fixed bottom nav capsule positioning is handled separately.
-   Body content padding-bottom uses --df-bottom-nav-clearance (fixed dock reserve: clears capsule + FAB) 
-   set in the main body rule. Do NOT override with !important here. */
+/* Bottom safe area: in-flow body padding reserves the native WebView bottom inset
+   (--df-webview-padding-bottom) plus --df-bottom-nav-clearance (dock reserve for the
+   capsule + FAB). Do NOT override with !important here. */
 
 /* SM-2 3D FLIP CARD & EBBINGHAUS STYLING */
 .srs-card-scene {
@@ -913,9 +924,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
 
     body {
       padding-top: var(--df-sat);
-      /* Body content padding clears floating elements (FAB, Studios pill).
-         --df-bottom-nav-clearance = fixed dock reserve (capsule + card clearance). */
-      padding-bottom: var(--df-bottom-nav-clearance, 86px) !important;
+      /* Body content padding clears the native bottom inset plus the floating
+         elements (FAB, Studios pill) above the capsule. */
+      padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px)) !important;
       padding-left: var(--df-sal);
       padding-right: var(--df-sar);
     }
@@ -940,8 +951,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         padding-bottom: 22px !important;
       }
       .bottom-nav-capsule {
-        /* Docked just above the WebView content-area bottom (no nav-inset double count) */
-        bottom: var(--df-dock-gap, 12px) !important;
+        /* Docked above the native WebView bottom inset plus a fixed dock gap. */
+        bottom: var(--df-dock-bottom, calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px))) !important;
         padding: 5px 3px !important;
         padding-bottom: 5px !important;
       }
@@ -1028,9 +1039,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     /* Bottom Navigation Capsule Universal Fluid Protection */
     .bottom-nav-capsule {
       position: fixed !important;
-      /* Docked just above the WebView content-area bottom, which MainActivity already
-         pads clear of the 3-button nav bar. Fixed dock gap — no nav-inset double count. */
-      bottom: var(--df-dock-gap, 12px) !important;
+      /* Docked above the native WebView bottom inset (--df-webview-padding-bottom)
+         plus a fixed gap; never inside the system nav bar. */
+      bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px)) !important;
       left: 50% !important;
       transform: translateX(-50%) !important;
       width: min(calc(100% - 16px), 540px) !important;
@@ -1386,9 +1397,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     @media (max-width: 540px) and (min-aspect-ratio: 19/10) {
       body {
         padding-top: max(16px, max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px))) !important;
-        /* Body padding-bottom = clearance for floating elements (FAB, Studios pill).
-           --df-bottom-nav-clearance = fixed dock reserve (capsule + card clearance). */
-        padding-bottom: var(--df-bottom-nav-clearance, 86px) !important;
+        /* Body padding-bottom = native bottom inset + clearance for floating
+           elements (FAB, Studios pill). */
+        padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px)) !important;
       }
       .app-shell {
         display: flex !important;
@@ -1405,8 +1416,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         height: min(66vw, 252px) !important;
       }
       .bottom-nav-capsule {
-        /* Docked just above the WebView content-area bottom (no nav-inset double count) */
-        bottom: var(--df-dock-gap, 12px) !important;
+        /* Docked above the native WebView bottom inset plus a fixed dock gap. */
+        bottom: var(--df-dock-bottom, calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px))) !important;
       }
     }
 
@@ -1458,9 +1469,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     /* Edge-to-Edge Safe Area Insets for Android 15 / Xiaomi 17T Pro */
     body {
         padding-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
-        /* Body content padding clears floating elements (FAB, Studios pill).
-           --df-bottom-nav-clearance = fixed dock reserve (capsule + card clearance). */
-        padding-bottom: var(--df-bottom-nav-clearance, 86px);
+        /* Body content padding clears the native bottom inset plus floating
+           elements (FAB, Studios pill). */
+        padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px));
         padding-left: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
         padding-right: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
     }
@@ -1540,7 +1551,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
 <!-- TASK #811: Bottom Nav Clearance & Long-Language Button Wrap -->
 <style id="task-811-layout-fix">
   main, .tab-content, .view-section, section[id*="view"], div[id*="view"], #app {
-    padding-bottom: var(--df-bottom-nav-clearance, 86px) !important;
+    padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px)) !important;
   }
   button, .pill, .chip, .tab-btn {
     white-space: normal !important;
@@ -1558,7 +1569,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     border: 1px solid #CBD5E1 !important;
   }
   .fab, #addNoteFab, button[class*="fab"] {
-    bottom: calc(var(--df-bottom-nav-clearance, 86px) + 8px) !important;
+    bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px) + 8px) !important;
     z-index: 40 !important;
   }
   nav button, .bottom-nav button, .nav-bar button {
@@ -1717,7 +1728,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     align-self: center !important;
   }
   main, .tab-content, .tab-panel {
-    padding-bottom: var(--df-bottom-nav-clearance, 86px) !important;
+    padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px)) !important;
   }
   [data-i18n="ui_local_data"], [data-i18n="ui_local_data"] *,
   #localDataBadge, #localDataBadge * {

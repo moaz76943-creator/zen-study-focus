@@ -299,11 +299,11 @@ body:not(.deep-lockdown) #sec-tasks .task-creator-inp {min-height:36px;font-weig
 body:not(.deep-lockdown) #sec-tasks .task-mini-sel {max-width:100%;min-width:0;}
 body:not(.deep-lockdown) #sec-tasks .btn-task-plus,
 body:not(.deep-lockdown) #sec-notes .floating-plus-fab {
-  background:var(--zen-rainbow);
-  box-shadow:0 9px 23px -9px rgba(59,109,238,.42);
+  background: var(--zen-rainbow);
+  box-shadow: 0 9px 23px -9px rgba(59, 109, 238, .42);
   position: fixed;
   left: 24px;
-  bottom: calc(var(--df-bottom-nav-clearance, 86px) + 8px);
+  bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px);
   width: 54px;
   height: 54px;
   border-radius: 50%;
@@ -453,8 +453,8 @@ body:not(.deep-lockdown) .bottom-nav-capsule {
   border-radius: 25px;
   position: fixed;
   /* Docked just above the WebView content-area bottom, which MainActivity already
-     pads clear of the 3-button nav bar. Fixed dock gap — no nav-inset double count. */
-  bottom: var(--df-dock-gap, 12px);
+     pads clear of the 3-button nav bar. Uses --df-webview-padding-bottom + dock gap. */
+  bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px));
   /* Internal padding only; safe-area handled by bottom positioning */
   padding-bottom: 5px;
 }
@@ -638,8 +638,8 @@ body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
 @media (max-width: 430px) {
   body:not(.deep-lockdown) {
     /* Body content padding clears floating elements (FAB, Studios pill).
-       --df-bottom-nav-clearance = fixed dock reserve (capsule + card clearance). */
-    padding-bottom: var(--df-bottom-nav-clearance, 86px) !important;
+       Uses actual WebView padding-bottom + dock gap + capsule height + card clearance. */
+    padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 20px) !important;
   }
   body:not(.deep-lockdown) .bottom-nav-capsule {
     width: calc(100% - 4px);

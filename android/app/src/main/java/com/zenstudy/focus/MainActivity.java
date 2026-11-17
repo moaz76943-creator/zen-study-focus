@@ -92,16 +92,18 @@ public class MainActivity extends AppCompatActivity {
 
             // Status bar top from systemBars (includes cutout top)
             int paddingTop = systemBars.top;
+
             // Navigation bottom: max of navigationBars (3-button), systemBars.bottom (3-button), mandatorySystemGestures (gesture handle)
+            // On Xiaomi 3-button: navigationBars.bottom > 0 AND systemBars.bottom > 0 (both report nav bar)
+            // On Xiaomi gesture: navigationBars.bottom == 0, systemBars.bottom == 0, mandatorySystemGestures.bottom > 0 (gesture handle)
             int navBottom = Math.max(Math.max(navigationBars.bottom, systemBars.bottom), mandatorySystemGestures.bottom);
 
             // Detect gesture navigation robustly for Xiaomi Android 15:
-            // - Gesture nav: mandatorySystemGestures.bottom > 0 (gesture handle) AND no visible nav bar
-            // - 3-button nav: navigationBars.bottom > 0 OR systemBarsOnly.bottom > 0
+            // - Gesture nav: mandatorySystemGestures.bottom > 0 (gesture handle) AND no visible 3-button bar
+            // - 3-button nav: navigationBars.bottom > 0 OR systemBars.bottom > 0 (both report nav bar height)
             // Do NOT use mandatorySystemGestures.left/right (back gesture areas) as Xiaomi reports them even in 3-button mode.
-            Insets systemBarsOnly = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             boolean hasGestureHandle = mandatorySystemGestures.bottom > 0;
-            boolean hasVisibleNavBar = navigationBars.bottom > 0 || systemBarsOnly.bottom > 0;
+            boolean hasVisibleNavBar = navigationBars.bottom > 0 || systemBars.bottom > 0;
             boolean isGestureNav = hasGestureHandle && !hasVisibleNavBar;
 
             // Apply minimum nav bar height fallback (Material spec: 56dp 3-button, 32dp gesture handle)
@@ -125,17 +127,30 @@ public class MainActivity extends AppCompatActivity {
             int navBottomDp = Math.round(navBottom / density);
             int paddingLeftDp = Math.round(paddingLeft / density);
             int paddingRightDp = Math.round(paddingRight / density);
+            int paddingBottomDp = Math.round(paddingBottom / density);
 
             // Push insets (in dp) to JS calibrator for CSS variable injection.
+            // Includes paddingBottomDp so CSS can position fixed elements relative to WebView content bottom.
             webView.post(() -> {
                 if (webView != null && !isDestroyed()) {
                     String js = "if(window.SovereignInsetsCalibrator) "
                             + "window.SovereignInsetsCalibrator.updateInsets("
-                            + paddingTopDp + "," + navBottomDp + "," + paddingLeftDp + "," + paddingRightDp + ");";
+                            + paddingTopDp + "," + navBottomDp + "," + paddingLeftDp + "," + paddingRightDp + ","
+                            + paddingBottomDp + ");";
                     webView.evaluateJavascript(js, null);
                 }
             });
-            return WindowInsetsCompat.CONSUMED;
+            // WebView must not re-apply the insets we already handled as native padding:
+            // zeroing (not CONSUMED) keeps the WebView's internal state in sync when the
+            // keyboard opens/hides, preventing ghost padding after IME dismissal.
+            return new WindowInsetsCompat.Builder(windowInsets)
+                    .setInsets(WindowInsetsCompat.Type.systemBars()
+                            | WindowInsetsCompat.Type.displayCutout()
+                            | WindowInsetsCompat.Type.navigationBars()
+                            | WindowInsetsCompat.Type.mandatorySystemGestures()
+                            | WindowInsetsCompat.Type.ime(),
+                            Insets.NONE)
+                    .build();
         });
 
         WebSettings settings = webView.getSettings();
