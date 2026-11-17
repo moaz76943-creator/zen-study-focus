@@ -1539,7 +1539,7 @@
  },
  {
   "kind": "text",
-  "text": "＋ New task",
+  "text": "+ New task",
   "where": "df22TasksHost",
   "screens": [
    "sec-tasks"
@@ -1872,7 +1872,7 @@
  },
  {
   "kind": "text",
-  "text": "＋ New note",
+  "text": "+ New note",
   "where": "nsNewButton",
   "screens": [
    "sec-notes"

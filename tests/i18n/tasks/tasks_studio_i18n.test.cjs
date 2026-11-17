@@ -99,7 +99,7 @@ test('cancelled editor cannot change stored task and no locale value is persiste
 });
 test('new task stores category, priority and repeat as stable machine keys',()=>{
  const f=fixture([]);
- f.button('＋ New task').dispatch('click');
+ f.button('+ New task').dispatch('click');
  f.byLabel('Task title').value='New task';
  f.byLabel('Category').value='sport';f.byLabel('Priority').value='urgent';f.byLabel('Repeat').value='daily';
  f.editor().dispatch('submit');
@@ -112,7 +112,7 @@ test('new task stores category, priority and repeat as stable machine keys',()=>
  assert.equal(f.get().tasksList[0].priority,'urgent');
 });
 test('localized numeric note error does not expose hard-coded English and does not commit',()=>{
- const f=fixture([],'ar');f.button('＋ إضافة مهمة').dispatch('click');
+ const f=fixture([],'ar');f.button('+ إضافة مهمة').dispatch('click');
  f.byLabel('عنوان المهمة').value='اختبار';
  f.byLabel('أرقام الملاحظات').value='١٢';
  f.editor().dispatch('submit');
@@ -166,8 +166,8 @@ test('timer linking failure is displayed in selected language rather than generi
 });
 test('empty new task title reports a localized validation reason without a commit',()=>{
  for(const [locale,caption,expected] of [
-  ['en','＋ New task','Task title is required'],
-  ['ar','＋ إضافة مهمة','عنوان المهمة مطلوب']
+  ['en','+ New task','Task title is required'],
+  ['ar','+ إضافة مهمة','عنوان المهمة مطلوب']
  ]){
   const f=fixture([],locale);f.button(caption).dispatch('click');
   f.editor().dispatch('submit');

@@ -513,17 +513,23 @@
     // =====================================================================
 
     const studiosList = [
-        { id: "sanctuary", name: "المحمية التفاعلية", desc: "Sanctuary Garden & Starlight", icon: "🌌" },
-        { id: "theme", name: "استوديو الثيمات AMOLED", desc: "True Black & Sunset Auto", icon: "🎨" },
-        { id: "wrapped", name: "قصة المذاكرة السنوية", desc: "Study Wrapped & Stats", icon: "📊" },
-        { id: "pods", name: "غرف المذاكرة المحلية", desc: "Local Serverless Pods", icon: "👥" },
-        { id: "rescue", name: "بروتوكول ليلة الامتحان", desc: "Exam-Eve Rescue & Sleep Cutoff", icon: "🛡️" },
-        { id: "leaderboard", name: "لوحة الأرقام القياسية", desc: "Personal Best & Ghost Pacer", icon: "🏆" },
-        { id: "contracts", name: "عقود الالتزام بالتركيز", desc: "Cryptographic Commitment", icon: "📜" },
-        { id: "i18n", name: "محرك اللغات العالمي", desc: "10 Languages Safe i18n", icon: "🌐" },
-        { id: "accessibility", name: "إمكانية الوصول الشاملة", desc: "TalkBack AAA & Colorblind", icon: "♿" },
-        { id: "performance", name: "محرك الأداء 120Hz", desc: "WebWorkers & 8.3ms Frames", icon: "⚡" }
+        { id: "sanctuary",    name: "المحمية التفاعلية",     nameEn: "Interactive Sanctuary",   desc: "Sanctuary Garden & Starlight",      icon: "🌌" },
+        { id: "theme",        name: "استوديو الثيمات AMOLED", nameEn: "AMOLED Theme Studio",     desc: "True Black & Sunset Auto",          icon: "🎨" },
+        { id: "wrapped",      name: "قصة المذاكرة السنوية",  nameEn: "Annual Study Wrapped",    desc: "Study Wrapped & Stats",             icon: "📊" },
+        { id: "pods",         name: "غرف المذاكرة المحلية",  nameEn: "Local Study Pods",        desc: "Local Serverless Pods",             icon: "👥" },
+        { id: "rescue",       name: "بروتوكول ليلة الامتحان", nameEn: "Exam-Eve Rescue",         desc: "Exam-Eve Rescue & Sleep Cutoff",    icon: "🛡️" },
+        { id: "leaderboard",  name: "لوحة الأرقام القياسية", nameEn: "Records Leaderboard",     desc: "Personal Best & Ghost Pacer",       icon: "🏆" },
+        { id: "contracts",    name: "عقود الالتزام بالتركيز", nameEn: "Focus Contracts",         desc: "Cryptographic Commitment",          icon: "📜" },
+        { id: "i18n",         name: "محرك اللغات العالمي",   nameEn: "World Language Engine",   desc: "10 Languages Safe i18n",            icon: "🌐" },
+        { id: "accessibility",name: "إمكانية الوصول الشاملة", nameEn: "Universal Accessibility", desc: "TalkBack AAA & Colorblind",         icon: "♿" },
+        { id: "performance",  name: "محرك الأداء 120Hz",     nameEn: "120Hz Performance Engine",desc: "WebWorkers & 8.3ms Frames",         icon: "⚡" }
     ];
+    // Arabic studio names only for Arabic UI; every other language gets English.
+    // Computed lazily at render time so requiring this module in Node is safe.
+    function studioIsAr() {
+        return typeof document !== "undefined" &&
+            (document.documentElement.lang || "en").toLowerCase().indexOf("ar") === 0;
+    }
 
     const StudioNavigatorDrawer = {
         isOpen: false,
@@ -628,10 +634,12 @@
 
             let itemsHtml = "";
             studiosList.forEach(s => {
-                itemsHtml += '<div class="studio-card interactive-action" data-studio="' + s.id + '" style="display: flex; align-items: center; gap: 14px; background: #121212; border: 1px solid #222; border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer;"><span style="font-size: 1.6rem;">' + s.icon + '</span><div style="flex: 1;"><div style="font-weight: 600; font-size: 0.98rem;">' + s.name + '</div><div style="font-size: 0.8rem; color: #888;">' + s.desc + '</div></div><span style="color: #555; font-size: 1.1rem;">›</span></div>';
+                const label = studioIsAr() ? s.name : s.nameEn;
+                itemsHtml += '<div class="studio-card interactive-action" data-studio="' + s.id + '" style="display: flex; align-items: center; gap: 14px; background: #121212; border: 1px solid #222; border-radius: 14px; padding: 14px 16px; margin-bottom: 10px; cursor: pointer;"><span style="font-size: 1.6rem;">' + s.icon + '</span><div style="flex: 1;"><div style="font-weight: 600; font-size: 0.98rem;">' + label + '</div><div style="font-size: 0.8rem; color: #888;">' + s.desc + '</div></div><span style="color: #555; font-size: 1.1rem;">›</span></div>';
             });
 
-            sheet.innerHTML = '<div style="width: 40px; height: 4px; background: #333; border-radius: 2px; margin: 0 auto 18px;"></div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;"><h3 style="margin: 0; font-size: 1.2rem;">✨ استوديوهات DEEP FOCUS</h3><button id="zenCloseDrawerBtn" style="background: transparent; border: none; color: #888; font-size: 1.2rem; cursor: pointer;">✕</button></div><div>' + itemsHtml + '</div>';
+            const drawerTitle = studioIsAr() ? "✨ استوديوهات DEEP FOCUS" : "✨ DEEP FOCUS Studios";
+            sheet.innerHTML = '<div style="width: 40px; height: 4px; background: #333; border-radius: 2px; margin: 0 auto 18px;"></div><div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;"><h3 style="margin: 0; font-size: 1.2rem;">' + drawerTitle + '</h3><button id="zenCloseDrawerBtn" style="background: transparent; border: none; color: #888; font-size: 1.2rem; cursor: pointer;">✕</button></div><div>' + itemsHtml + '</div>';
 
             overlay.appendChild(sheet);
             document.body.appendChild(overlay);

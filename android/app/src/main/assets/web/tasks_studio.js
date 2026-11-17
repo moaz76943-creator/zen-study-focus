@@ -131,7 +131,7 @@
     }));
     if(C.statusOf(t)!=='archived')actions.appendChild(btn(l.archive,()=>apply(s=>C.setStatus(s,t.id,'archived'))));
     append(actions,btn(l.remove,()=>apply(s=>C.trashTask(s,t.id)),'df-danger'));
-    for(const kind of ['checklist','subtasks'])actions.appendChild(btn('＋ '+l[kind==='checklist'?'check':'sub'],()=>{
+    for(const kind of ['checklist','subtasks'])actions.appendChild(btn('+ '+l[kind==='checklist'?'check':'sub'],()=>{
      const title=typeof adapter.requestText==='function'?adapter.requestText(l.addCheck):null;
      if(title)apply(s=>C.addItem(s,t.id,kind,title));
     }));
@@ -208,7 +208,7 @@
    resolveLocale();
    content.replaceChildren();message.textContent='';
    const head=el('div','df-head'),titleWrap=el('div');append(titleWrap,el('h2','',l.title),el('p','df-muted',l.subtitle));head.appendChild(titleWrap);
-   const buttons=el('div','df-toolbar');append(buttons,btn('＋ '+l.add,()=>{editing='new';render();},'df-primary'),btn(l.project,()=>{
+   const buttons=el('div','df-toolbar');append(buttons,btn('+ '+l.add,()=>{editing='new';render();},'df-primary'),btn(l.project,()=>{
     const name=typeof adapter.requestText==='function'?adapter.requestText(l.project):null;
     if(name)apply(s=>C.createProject(s,{name},{noteIds:adapter.noteIds?.()}));
    }),btn(l.undo,undo),btn(l.redo,redo));
