@@ -38584,8 +38584,11 @@ window.dfInitKeyboardShortcuts = function() {
       const resetBtn = document.getElementById("df-timer-reset") || document.querySelector("[data-action='reset']");
       if (resetBtn) resetBtn.click();
     } else if (e.key === "m" || e.key === "M") {
-      const soundBtn = document.getElementById("df-sound-toggle") || document.querySelector("[data-action='sound']");
-      if (soundBtn) soundBtn.click();
+      // The Sound tab uses per-tile play buttons (data-sound-toggle) and a
+      // Mix / Stop bar. There is no single df-sound-toggle element; map the
+      // shortcut to the Mix button so it actually does something.
+      const mixBtn = document.querySelector("[data-i18n='btnMyMix']") || document.querySelector("#btnLaunch3DSpatialStudio");
+      if (mixBtn) mixBtn.click();
     } else if (e.code === "Escape") {
       if (window.dfHandleHardwareBack) window.dfHandleHardwareBack();
     } else if (["1", "2", "3", "4"].includes(e.key)) {

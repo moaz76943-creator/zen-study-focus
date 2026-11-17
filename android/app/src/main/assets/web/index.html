@@ -362,12 +362,12 @@
        3D Spatial studio, and completion-tone picker follow it. Visual order via
        flex `order` keeps DOM order intact for the DF09 tone-picker regression
        (tone-picker before grid in source) while elevating Nature Sounds to top. */
-    #sec-sounds.active { display: flex; flex-direction: column; }
-    #sec-sounds > .mixer-status-bar { order: 1; }
-    #sec-sounds > #soundsGridBox { order: 2; }
-    #sec-sounds > .segmented-pills-bar { order: 3; }
-    #sec-sounds > #dfPillar5SpatialMount { order: 4; }
-    #sec-sounds > #df-tone-picker-card { order: 5; }
+       #sec-sounds.active { display: flex; flex-direction: column; }
+       #sec-sounds > .mixer-status-bar { order: 1; }
+       #sec-sounds > .segmented-pills-bar { order: 2; }
+       #sec-sounds > #soundsGridBox { order: 3; }
+       #sec-sounds > #dfPillar5SpatialMount { order: 4; }
+       #sec-sounds > #df-tone-picker-card { order: 5; }
 
     .sound-Rich-tile {
       height: 132px; border-radius: 20px; position: relative; overflow: hidden;
@@ -393,14 +393,21 @@
 
     .stile-top { display: flex; justify-content: space-between; align-items: center; }
     .stile-play-btn {
-      width: 28px; height: 28px; border-radius: 50%; background: rgba(15,23,42,0.55);
+      width: 48px; height: 48px; border-radius: 50%; background: rgba(15,23,42,0.55);
       backdrop-filter: blur(8px); display: flex; align-items: center; justify-content: center;
-      font-size: 0.75rem; border: 1px solid rgba(255,255,255,0.3);
+      font-size: 1.1rem; border: 2px solid rgba(255,255,255,0.4); min-width: 48px; min-height: 48px;
     }
-    .stile-switch { width: 32px; height: 18px; border-radius: var(--radius-pill); background: rgba(255,255,255,0.35); position: relative; }
+    .sound-Rich-tile {
+      height: 132px; border-radius: 20px; position: relative; overflow: hidden;
+      display: flex; flex-direction: column; justify-content: space-between; padding: 11px;
+      color: #ffffff; box-shadow: var(--shadow-card); border: 2.5px solid transparent;
+      cursor: pointer; transition: 0.2s; background-size: cover; background-position: center;
+    }
+    .sound-Rich-tile.playing { border-color: #00d2ff; box-shadow: 0 8px 25px rgba(0, 210, 255, 0.45); }
+    .stile-switch { width: 48px; height: 32px; border-radius: var(--radius-pill); background: rgba(255,255,255,0.35); position: relative; min-width: 48px; min-height: 32px; }
     .sound-Rich-tile.playing .stile-switch { background: #00d2ff; }
-    .stile-knob { width: 14px; height: 14px; border-radius: 50%; background: #ffffff; position: absolute; top: 2px; right: 2px; transition: 0.2s; }
-    .sound-Rich-tile.playing .stile-knob { transform: translateX(-14px); }
+    .stile-knob { width: 18px; height: 18px; border-radius: 50%; background: #ffffff; position: absolute; top: 7px; right: 7px; transition: 0.2s; }
+    .sound-Rich-tile.playing .stile-knob { transform: translateX(-18px); }
     .stile-name { font-size: 0.82rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.85); }
     .stile-vol { width: 100%; -webkit-appearance: none; background: rgba(255,255,255,0.4); height: 3.5px; border-radius: 2px; outline: none; margin-top: 6px; }
     .stile-vol::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: #ffffff; cursor: pointer; }
