@@ -49,14 +49,14 @@
          SovereignInsetsCalibrator (single owner = native padding), so every
          calc() below that references them resolves to the safe content edge.
          --df-bottom-nav-clearance is the dock reserve ABOVE the native inset only
-         (capsule + FAB zone, 86px); it never includes the nav inset. */
+         (capsule + FAB zone + Studios pill, 144px); it never includes the nav inset. */
       --df-dock-gap: 12px;
       --df-capsule-height: 70px;
       --df-dock-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px));
       --df-float-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px);
-      --df-inflow-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px));
+      --df-inflow-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px));
       --df-dock-reserve: calc(var(--df-dock-gap, 12px) + 74px);
-      --df-bottom-nav-clearance: var(--df-dock-reserve, 86px);
+      --df-bottom-nav-clearance: var(--df-dock-reserve, 144px);
     }
 
     * {
@@ -68,7 +68,7 @@
     /* Reserve clears the docked bottom stack; the pillar7 body rule (later, !important)
        computes the same reserve. Keep both identical: a flat dock-gap+capsule+float sum here
        (e.g. 76px) is BELOW the ~82px capsule footprint and would clip the last card. */
-    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px)); overflow-x: hidden; user-select: none; }
+    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px)); overflow-x: hidden; user-select: none; }
     input, textarea { user-select: text; text-align: start; }
 
     body.deep-lockdown .dynamic-hero-header,
@@ -921,7 +921,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
       padding-top: var(--df-sat);
       /* Body content padding clears the floating
          elements (FAB, Studios pill) above the capsule. */
-      padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px)) !important;
+      padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px)) !important;
       padding-left: var(--df-sal);
       padding-right: var(--df-sar);
     }
@@ -1396,7 +1396,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         padding-top: max(16px, max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px))) !important;
         /* Body padding-bottom = fixed clearance for floating
            elements (FAB, Studios pill). */
-        padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px)) !important;
+        padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px)) !important;
       }
       .app-shell {
         display: flex !important;
@@ -1468,7 +1468,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         padding-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
         /* Body content padding clears the floating
            elements (FAB, Studios pill). */
-        padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px));
+        padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px));
         padding-left: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
         padding-right: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
     }
@@ -1547,7 +1547,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
 <!-- TASK #811: Bottom Nav Clearance & Long-Language Button Wrap -->
 <style id="task-811-layout-fix">
   main, .tab-content, .view-section, section[id*="view"], div[id*="view"], #app {
-    padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px)) !important;
+    padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px)) !important;
   }
   button, .pill, .chip, .tab-btn {
     white-space: normal !important;
@@ -1565,7 +1565,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     border: 1px solid #CBD5E1 !important;
   }
   .fab, #addNoteFab, button[class*="fab"] {
-    bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px) + 8px) !important;
+    bottom: var(--df-float-bottom, calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px)) !important;
     z-index: 40 !important;
   }
   nav button, .bottom-nav button, .nav-bar button {
@@ -1724,7 +1724,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     align-self: center !important;
   }
   main, .tab-content, .tab-panel {
-    padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px)) !important;
+    padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px)) !important;
   }
   [data-i18n="ui_local_data"], [data-i18n="ui_local_data"] *,
   #localDataBadge, #localDataBadge * {

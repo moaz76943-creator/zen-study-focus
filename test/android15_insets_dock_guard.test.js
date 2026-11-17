@@ -83,7 +83,7 @@ console.log('✔ Calibrator pins safe-area variables to 0px and publishes the do
 }
 // Body must reserve clearance above the native inset edge. The pillar7 rule (later, !important)
 // and the weak rule up top must both stay on the same formula.
-const bodyReserve = /padding-bottom:\s*calc\(var\(--df-webview-padding-bottom, 56px\) \+ var\(--df-bottom-nav-clearance, 86px\)\)/g;
+const bodyReserve = /padding-bottom:\s*calc\(var\(--df-webview-padding-bottom, 56px\) \+ var\(--df-bottom-nav-clearance, 144px\)\)/g;
 assert.ok((html.match(bodyReserve) || []).length >= 2,
   'body must reserve --df-bottom-nav-clearance above the native inset edge (all body rules)');
 console.log('✔ index.html body reserves clearance via calibrated variables.');
