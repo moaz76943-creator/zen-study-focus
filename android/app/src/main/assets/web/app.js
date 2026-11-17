@@ -1010,7 +1010,7 @@ function playPeacefulChime() {
     gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 3.2);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
 
     osc.start();
     osc.stop(ctx.currentTime + 3.2);
@@ -4086,7 +4086,7 @@ function playRichCompletionChime(titleText, skipNative = false) {
       gain.gain.setValueAtTime(0.001, ctx.currentTime + idx * 0.35);
       gain.gain.exponentialRampToValueAtTime(0.65, ctx.currentTime + idx * 0.35 + 0.05);
       gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + idx * 0.35 + 1.6);
-      osc.connect(gain); gain.connect(ctx.destination);
+      osc.connect(gain); gain.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
       osc.start(ctx.currentTime + idx * 0.35);
       osc.stop(ctx.currentTime + idx * 0.35 + 1.6);
     });
@@ -5440,6 +5440,12 @@ function ensureProceduralAudioContext() {
   if (webAudioCtx.state === 'suspended' && audioContextUserGestureReceived && typeof webAudioCtx.resume === 'function') {
     webAudioCtx.resume().catch(() => {});
   }
+  // Restore master bus after an instant Stop so the next sound is audible again
+  try {
+    if (typeof window !== 'undefined' && typeof window.dfMasterAudioUnmute === 'function') {
+      window.dfMasterAudioUnmute();
+    }
+  } catch (_) {}
   return webAudioCtx;
 }
 window.dfGetGlobalAudioContext = ensureProceduralAudioContext;
@@ -5667,7 +5673,7 @@ function dfTriggerTibetanSingingBell(vol = 0.65) {
     masterBellGain.gain.exponentialRampToValueAtTime(0.0001, now + 4.3);
 
     bellFilter.connect(masterBellGain);
-    masterBellGain.connect(ctx.destination);
+    masterBellGain.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
 
     partials.forEach(p => {
       const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
@@ -5781,7 +5787,7 @@ function createOggPlayer(buffer, loop, volume) {
   dcBlock.Q.setValueAtTime(0.707, ctx.currentTime);
   source.connect(dcBlock);
   dcBlock.connect(gain);
-  gain.connect(ctx.destination);
+  gain.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
   source.start();
   const player = {
     source,
@@ -5882,6 +5888,11 @@ function playPresetRelaxMix() {
 const activeNoiseSources = new Set();
 
 function stopAllAudio() {
+  // Instant master kill — cuts all output immediately, sources then fade out individually
+  if (typeof window !== 'undefined' && typeof window.dfMasterAudioMute === 'function') {
+    try { window.dfMasterAudioMute(); } catch (_) {}
+  }
+
   SOUNDS_DATA.forEach(s => stopSoundTile(s.id));
 
   // Stop all active procedural noise sources with click-free 60ms fade
@@ -11225,7 +11236,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.8);
 
       osc.connect(gain);
-      gain.connect(ctx.destination);
+      gain.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
 
       osc.start(ctx.currentTime);
       osc.stop(ctx.currentTime + 1.8);
@@ -12805,7 +12816,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       gain1.gain.exponentialRampToValueAtTime(0.2, ctx.currentTime + 0.04);
       gain1.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.4);
       osc1.connect(gain1);
-      gain1.connect(ctx.destination);
+      gain1.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
       osc1.start(ctx.currentTime);
       osc1.stop(ctx.currentTime + 1.4);
 
@@ -12817,7 +12828,7 @@ window.FlashQuizEngine = FlashQuizEngine;
       gain2.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.3);
       gain2.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.8);
       osc2.connect(gain2);
-      gain2.connect(ctx.destination);
+      gain2.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
       osc2.start(ctx.currentTime + 0.25);
       osc2.stop(ctx.currentTime + 1.8);
 
@@ -38501,7 +38512,7 @@ window.dfPlaySessionCompletionChime = async function() {
     gain.gain.exponentialRampToValueAtTime(0.0001, now + (idx * 0.15) + 1.2);
 
     osc.connect(gain);
-    gain.connect(ctx.destination);
+    gain.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
 
     osc.start(now + (idx * 0.15));
     osc.stop(now + (idx * 0.15) + 1.3);
@@ -42044,7 +42055,7 @@ window.dfTriggerDewDroplet = function(ctx) {
   if (window.dfGetSafeMasterDestination) {
     gain.connect(window.dfGetSafeMasterDestination(ctx));
   } else {
-    gain.connect(ctx.destination);
+    gain.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
   }
 
   osc.start(now);
@@ -48456,7 +48467,7 @@ window.dfStudioAudio = {
     noiseSource.source.connect(noiseSource.dcBlock);
     noiseSource.dcBlock.connect(noiseSource.gain);
     noiseSource.gain.connect(f);
-    f.connect(ctx.destination);
+    f.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
     noiseSource.source.start();
     this.nodes.push(noiseSource.source, noiseSource.gain, noiseSource.dcBlock, f);
   },
@@ -48479,7 +48490,7 @@ window.dfStudioAudio = {
     const tE2 = ctx.currentTime + 1.5;
     g.gain.linearRampToValueAtTime(0.18, tE2);
     oL.connect(m, 0, 0); oR.connect(m, 0, 1);
-    m.connect(g); g.connect(ctx.destination);
+    m.connect(g); g.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
     oL.start(); oR.start();
     this.nodes.push(oL, oR, g);
   },
@@ -68745,7 +68756,7 @@ const StudyPodEngine = (function() {
       const masterGain = ctx.createGain();
       masterGain.gain.setValueAtTime(v, now);
       masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 3.8);
-      masterGain.connect(ctx.destination);
+      masterGain.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
 
       const harmonics = [
         { f: 432, g: 0.65 },
@@ -80546,6 +80557,7 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
     if (typeof window !== "undefined") {
         window.getSafeAudioDestination = function(ctx) {
             if (!ctx) return null;
+            window.__dfLastAudioCtx = ctx;
             if (!ctx._masterCompressor) {
                 try {
                     const comp = ctx.createDynamicsCompressor();
@@ -80554,18 +80566,50 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
                     comp.ratio.setValueAtTime(12, ctx.currentTime);
                     comp.attack.setValueAtTime(0.003, ctx.currentTime);
                     comp.release.setValueAtTime(0.25, ctx.currentTime);
+                    // Master gain node for instant kill switch
+                    ctx._masterGain = ctx.createGain();
+                    ctx._masterGain.gain.setValueAtTime(1, ctx.currentTime);
+                    ctx._masterGain.connect(comp);
                     comp.connect(ctx.destination);
                     ctx._masterCompressor = comp;
-                    console.log("🛡️ [WebAudio] Master DynamicsCompressor attached to prevent digital clipping.");
+                    console.log("🛡️ [WebAudio] Master DynamicsCompressor with instant kill attached.");
                 } catch(e) {
                     console.warn("⚠️ [WebAudio] DynamicsCompressor initialization fallback:", e);
                     return ctx.destination;
                 }
             }
-            return ctx._masterCompressor;
+            return ctx._masterGain || ctx._masterCompressor;
+        };
+        // Helpers for instant stop / restore
+        function dfActiveAudioCtx() {
+            return (typeof window !== "undefined" && (window.__dfLastAudioCtx || window.audioContext)) || null;
+        }
+        window.dfMasterAudioMute = function() {
+            const ctx = dfActiveAudioCtx();
+            if (ctx && ctx._masterGain) ctx._masterGain.gain.setValueAtTime(0, ctx.currentTime);
+        };
+        window.dfMasterAudioUnmute = function() {
+            const ctx = dfActiveAudioCtx();
+            if (ctx && ctx._masterGain) ctx._masterGain.gain.setValueAtTime(1, ctx.currentTime);
         };
         if (window.audioContext) {
             window.getSafeAudioDestination(window.audioContext);
+        }
+        // Zero-autoplay / zero-ambient-leak on tab switch: mute when hidden, restore on visible
+        if (typeof document !== 'undefined') {
+            document.addEventListener('visibilitychange', function () {
+                if (document.hidden) {
+                    try { window.dfMasterAudioMute && window.dfMasterAudioMute(); } catch (_) {}
+                } else {
+                    try { window.dfMasterAudioUnmute && window.dfMasterAudioUnmute(); } catch (_) {}
+                }
+            });
+            window.addEventListener('pageshow', function () {
+                try { window.dfMasterAudioUnmute && window.dfMasterAudioUnmute(); } catch (_) {}
+            });
+            window.addEventListener('pagehide', function () {
+                try { window.dfMasterAudioMute && window.dfMasterAudioMute(); } catch (_) {}
+            });
         }
     }
 })();
