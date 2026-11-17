@@ -135,7 +135,10 @@ button:active, .btn:active, [role="button"]:active {
 
 .bottom-nav-bar {
   position: fixed;
-  bottom: 0;
+  /* Docked above the 3-button nav bar via the calibrator's single-owner variables
+     (native parent padding owns the inset); bottom: 0 parked this bar under the
+     nav bar / gesture handle on real Xiaomi Android 15 devices. */
+  bottom: calc(var(--df-webview-padding-bottom, 0px) + var(--df-dock-gap, 12px));
   left: 0;
   right: 0;
   height: 64px;

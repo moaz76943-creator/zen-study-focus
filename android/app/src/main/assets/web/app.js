@@ -50974,15 +50974,19 @@ window.dfScratchpadModal = {
       btn.id = 'df-float-scratch-btn';
       btn.textContent = '+ Note Idea';
       btn.style.position = 'fixed';
-      btn.style.bottom = '24px';
-      btn.style.right = '24px';
+      // Dock above the bottom capsule via the calibrator's single-owner variables:
+      // native parent padding owns the 3-button nav bar, so a hardcoded bottom: 24px
+      // parked this trigger inside the capsule's footprint (overlap on every screen).
+      btn.style.bottom = "calc(var(--df-webview-padding-bottom, 0px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px)";
+      btn.style.right = '12px';
       btn.style.minHeight = '48px';
       btn.style.padding = '0 16px';
       btn.style.borderRadius = '24px';
       btn.style.backgroundColor = '#18181b';
       btn.style.color = '#10b981';
       btn.style.border = '1px solid #27272a';
-      btn.style.zIndex = '999';
+      // 150 = same dock layer as the Studios pill / FAB; below modal overlays (250+).
+      btn.style.zIndex = '150';
       const self = this;
       btn.onclick = function() {
         self.openModal();
