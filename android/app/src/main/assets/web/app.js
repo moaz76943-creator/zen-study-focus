@@ -5422,11 +5422,14 @@ let webAudioCtx = null;
 const proceduralBufferCache = Object.create(null);
 
 // AudioContext user gesture gate — prevents auto-play on startup/tab switch
+// Delegates to AudioCore for unified context management
 let audioContextUserGestureReceived = false;
 let audioContextCreationAllowed = false;
 function markAudioContextUserGesture() {
   audioContextUserGestureReceived = true;
   audioContextCreationAllowed = true;
+  // Also notify AudioCore
+  if (window.AudioCore) window.AudioCore.bindGesture();
 }
 if (typeof document !== 'undefined' && document.addEventListener) {
   ['click', 'touchstart', 'keydown', 'pointerdown'].forEach(evt => {
@@ -5438,8 +5441,12 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 window.__dfAudioGestureReceived = function () { return audioContextUserGestureReceived; };
 
 // Lazy AudioContext: created ONLY on first user gesture, never on load/tab switch
-// In non-browser environments (Node.js tests), allow creation without gesture
+// Delegates to AudioCore for single shared context
 function ensureProceduralAudioContext() {
+  if (window.AudioCore) {
+    return window.AudioCore.getContext();
+  }
+  // Fallback for environments without AudioCore
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   if (!AudioCtx) throw new Error('Web Audio is unavailable');
   const isNodeEnv = typeof window === 'undefined' || typeof navigator === 'undefined' || navigator.userAgent?.includes('Node.js');
@@ -5449,11 +5456,9 @@ function ensureProceduralAudioContext() {
   if (!webAudioCtx || webAudioCtx.state === 'closed') {
     webAudioCtx = new AudioCtx();
   }
-  // Resume only after explicit user gesture (browser only)
   if (webAudioCtx.state === 'suspended' && audioContextUserGestureReceived && typeof webAudioCtx.resume === 'function') {
     webAudioCtx.resume().catch(() => {});
   }
-  // Restore master bus after an instant Stop so the next sound is audible again
   try {
     if (typeof window !== 'undefined' && typeof window.dfMasterAudioUnmute === 'function') {
       window.dfMasterAudioUnmute();
@@ -5507,6 +5512,16 @@ function generateBinauralBuffer(ctx, presetKey) {
 function createBinauralSource(ctx, presetKey, gainValue = 0.15) {
   const buffer = generateBinauralBuffer(ctx, presetKey);
   if (!buffer) return null;
+  // Use AudioCore's voice management for consistent behavior
+  if (window.AudioCore && window.AudioCore.createVoice) {
+    const voice = window.AudioCore.createVoice(buffer, true);
+    if (voice) {
+      // Scale voice gain to respect limiter ceiling
+      voice.gain.gain.setValueAtTime(gainValue * (window.AudioCore.LIMITER_LINEAR || 0.5), ctx.currentTime);
+      return voice;
+    }
+  }
+  // Fallback (legacy path)
   const source = ctx.createBufferSource();
   source.buffer = buffer;
   source.loop = true;
@@ -5531,12 +5546,15 @@ function createBinauralSource(ctx, presetKey, gainValue = 0.15) {
 }
 const SEAMLESS_XFADE_MS = 20;
 
+// Delegates to AudioCore for zero-static seamless buffer creation
 function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
+  if (window.AudioCore && window.AudioCore.createSeamlessBuffer) {
+    return window.AudioCore.createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels);
+  }
+  // Fallback (should never be used when AudioCore is loaded)
   const extraSec = SEAMLESS_XFADE_MS / 1000;
   const finalSize = Math.floor(ctx.sampleRate * durationSec);
   const xfadeSamples = Math.max(1, Math.floor(ctx.sampleRate * extraSec));
-  // Generate exactly finalSize + xfadeSamples so the generator emits a genuine
-  // tail continuation past the loop point for the crossfade to consume.
   const bufferSize = finalSize + xfadeSamples;
   const totalSec = bufferSize / ctx.sampleRate;
   const tempBuffer = ctx.createBuffer(numChannels, bufferSize, ctx.sampleRate);
@@ -5595,51 +5613,64 @@ function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
   const cacheKey = `${color}_${ctx.sampleRate}_${durationSec}`;
   if (proceduralBufferCache[cacheKey]) return proceduralBufferCache[cacheKey];
 
-  const buffer = createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
-    const data = channelData[0];
-    const bufferSize = Math.floor(sampleRate * totalSec);
-
-    if (color === 'white') {
-      // Full-band white at low amplitude — 0.35 was audible static hiss;
-      // 0.08 is a clean air-tone through the 15Hz DC blockers downstream.
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = (Math.random() * 2 - 1) * 0.08;
-      }
-    } else if (color === 'pink') {
-      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        b0 = 0.99886 * b0 + white * 0.0555179;
-        b1 = 0.99332 * b1 + white * 0.0750759;
-        b2 = 0.96900 * b2 + white * 0.1538520;
-        b3 = 0.86650 * b3 + white * 0.3104856;
-        b4 = 0.55000 * b4 + white * 0.5329522;
-        b5 = -0.7616 * b5 - white * 0.0168980;
-        b6 = white * 0.115926;
-        data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
-      }
-    } else if (color === 'brown') {
-      // True brown noise: leaky integrator of white noise (0.9985 pole keeps
-      // DC bounded), peak-normalized below the limiter ceiling. The old
-      // pink->integrator random walk doubled infrasonic weight and clipped
-      // into static on loop restarts.
-      let brown = 0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        brown = 0.9985 * brown + white * 0.5;
-        data[i] = brown;
-      }
+  // Delegate to AudioCore's noise generators for zero-static output
+  let generatorFn;
+  if (window.AudioCore) {
+    switch (color) {
+      case 'white': generatorFn = window.AudioCore.generateWhiteNoise; break;
+      case 'pink': generatorFn = window.AudioCore.generatePinkNoise; break;
+      case 'brown': generatorFn = window.AudioCore.generateBrownNoise; break;
     }
-    // DC-removal, peak-normalization, and hard clamp now handled by
-    // createSeamlessBuffer for all buffer types.
-  }, 1);
+  }
+  if (!generatorFn) {
+    // Fallback generators (matching AudioCore's implementation)
+    generatorFn = (data, sampleRate, totalSec) => {
+      const bufferSize = Math.floor(sampleRate * totalSec);
+      if (color === 'white') {
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * 0.06;
+        }
+      } else if (color === 'pink') {
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          b6 = white * 0.115926;
+          data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.08;
+        }
+      } else if (color === 'brown') {
+        let brown = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          brown = 0.997 * brown + white * 0.4; // AudioCore's BROWN_POLE & BROWN_GAIN
+          data[i] = brown;
+        }
+      }
+    };
+  }
 
+  const buffer = createSeamlessBuffer(ctx, durationSec, generatorFn, 1);
   proceduralBufferCache[cacheKey] = buffer;
   return buffer;
 }
 
 function createNoiseSource(ctx, color, gainValue = 0.25) {
   const buffer = generateNoiseBuffer(ctx, color);
+  // Use AudioCore's voice management for consistent behavior
+  if (window.AudioCore && window.AudioCore.createVoice) {
+    const voice = window.AudioCore.createVoice(buffer, true);
+    if (voice) {
+      // Scale voice gain to respect limiter ceiling
+      voice.gain.gain.setValueAtTime(gainValue * (window.AudioCore.LIMITER_LINEAR || 0.5), ctx.currentTime);
+      return voice;
+    }
+  }
+  // Fallback (legacy path)
   const source = ctx.createBufferSource();
   source.buffer = buffer;
   source.loop = true;
@@ -5732,7 +5763,7 @@ function stopSoundTile(id) {
 const oggBufferCache = {};
 const oggLoadingPromises = {};
 
-// Create seamless looping OGG buffer with crossfade
+// Create seamless looping OGG buffer with crossfade (fallback for non-AudioCore environments)
 function createSeamlessOggBuffer(ctx, buffer) {
   const sampleRate = ctx.sampleRate;
   const xfadeSamples = Math.max(1, Math.floor(sampleRate * (SEAMLESS_XFADE_MS / 1000)));
@@ -5762,7 +5793,12 @@ function createSeamlessOggBuffer(ctx, buffer) {
   return finalBuffer;
 }
 
+// Delegates to AudioCore for OGG loading with procedural fallback
 async function getOggBuffer(src) {
+  if (window.AudioCore && window.AudioCore.loadOggBuffer) {
+    return window.AudioCore.loadOggBuffer(src);
+  }
+  // Fallback (legacy path)
   if (oggBufferCache[src]) return oggBufferCache[src];
   if (oggLoadingPromises[src]) return oggLoadingPromises[src];
   let ctx;
@@ -5789,13 +5825,38 @@ async function getOggBuffer(src) {
 function createOggPlayer(buffer, loop, volume) {
   const ctx = ensureProceduralAudioContext();
   if (!ctx || !buffer) return null;
+  // Use AudioCore's voice management for consistent behavior
+  if (window.AudioCore && window.AudioCore.createVoice) {
+    const voice = window.AudioCore.createVoice(buffer, !!loop);
+    if (voice) {
+      // Apply volume (voice gain ramps from 0.0001 to 1 in 30ms)
+      const targetGain = volume * (window.AudioCore.LIMITER_LINEAR || 0.5);
+      const now = ctx.currentTime;
+      voice.gain.gain.cancelScheduledValues(now);
+      voice.gain.gain.setValueAtTime(0.0001, now);
+      voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.03);
+      return {
+        source: voice.source,
+        gain: voice.gain,
+        dcBlock: voice.dcBlock,
+        stop() { voice.stop(); },
+        setVol(v) {
+          if (ctx) {
+            voice.gain.gain.cancelScheduledValues(ctx.currentTime);
+            voice.gain.gain.setTargetAtTime(v * (window.AudioCore.LIMITER_LINEAR || 0.5), ctx.currentTime, 0.03);
+          }
+        }
+      };
+    }
+  }
+  // Fallback (legacy path)
   const source = ctx.createBufferSource();
   source.buffer = buffer;
   source.loop = !!loop;
   const gain = ctx.createGain();
-  // Fast fade-in: 50ms instead of 1.2s
+  // Fast fade-in: 30ms (AudioCore standard)
   gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-  gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.05);
+  gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.03);
   // DC-blocking high-pass filter (15Hz) to protect transducer coils
   const dcBlock = ctx.createBiquadFilter();
   dcBlock.type = 'highpass';
@@ -5812,25 +5873,20 @@ function createOggPlayer(buffer, loop, volume) {
     stop() {
       try {
         const now = ctx.currentTime;
-        const fadeOutSec = 0.06;
+        const fadeOutSec = 0.03; // AudioCore standard
         gain.gain.cancelScheduledValues(now);
         gain.gain.setValueAtTime(gain.gain.value, now);
         gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
-        source.stop(now + fadeOutSec + 0.01);
-        // Defer disconnects until the fade has played out — disconnecting
-        // now severs the ramp and ends the loop in a click/static pop.
+        source.stop(now + fadeOutSec + 0.005);
         setTimeout(function () {
           try { source.disconnect(); dcBlock.disconnect(); gain.disconnect(); } catch (_) {}
-        }, 90);
+        }, 70);
       } catch (e) {
         try { source.stop(); } catch (_) {}
       }
     },
     setVol(v) {
       if (ctx) {
-        // Smooth ramp instead of an instantaneous jump: a raw setValueAtTime
-        // while a fade is running leaves the ramp cancelled at full scale and
-        // clicks through the DC-blocker as static on every slider move.
         gain.gain.cancelScheduledValues(ctx.currentTime);
         gain.gain.setTargetAtTime(v, ctx.currentTime, 0.03);
       }
@@ -5861,6 +5917,12 @@ function toggleSoundTile(id) {
   // Zero-autoplay invariant: never start a nature loop while the tab is hidden.
   // (Stopping an already-playing tile above stays available while hidden.)
   if (typeof document !== 'undefined' && document.hidden) return Promise.resolve();
+  // Hard gate: user gesture required (AudioCore enforces this)
+  if (window.AudioCore && !window.AudioCore.isGestureReceived()) {
+    showToast(cfg.lang === 'ar' ? '⚠️ تفاعل المستخدم مطلوب' : '⚠️ User interaction required');
+    renderSoundsStudio();
+    return Promise.resolve();
+  }
   const ctx = ensureProceduralAudioContext();
   if (!ctx) { showToast(cfg.lang === 'ar' ? '⚠️ مشغل الصوت غير متاح' : '⚠️ Audio output unavailable'); return Promise.resolve(); }
   if (ctx.state === 'suspended') ctx.resume();
@@ -5919,14 +5981,19 @@ function stopAllAudio() {
   try {
     if (toneAudio) { toneAudio.pause(); toneAudio.currentTime = 0; toneAudio = null; }
   } catch (_) {}
-  // Instant master kill — cuts all output immediately, sources then fade out individually
-  if (typeof window !== 'undefined' && typeof window.dfMasterAudioMute === 'function') {
+  // Instant master kill — cuts all output immediately via AudioCore
+  if (window.AudioCore) {
+    window.AudioCore.muteMaster(true);
+    window.AudioCore.stopAllVoices();
+    // Unmute after brief moment to allow next sound
+    setTimeout(() => window.AudioCore.muteMaster(false), 50);
+  } else if (typeof window !== 'undefined' && typeof window.dfMasterAudioMute === 'function') {
     try { window.dfMasterAudioMute(); } catch (_) {}
   }
 
   SOUNDS_DATA.forEach(s => stopSoundTile(s.id));
 
-  // Stop all active procedural noise sources with click-free 60ms fade
+  // Stop all active procedural noise sources with click-free 30ms fade
   activeNoiseSources.forEach(noiseSource => {
     try {
       if (typeof noiseSource.stop === 'function') {
@@ -5936,13 +6003,13 @@ function stopAllAudio() {
         const ctx = noiseSource.source.context || webAudioCtx;
         if (ctx) {
           const now = ctx.currentTime;
-          const fadeOutSec = 0.06;
+          const fadeOutSec = 0.03;
           if (noiseSource.gain) {
             noiseSource.gain.gain.cancelScheduledValues(now);
             noiseSource.gain.gain.setValueAtTime(noiseSource.gain.gain.value, now);
             noiseSource.gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
           }
-          noiseSource.source.stop(now + fadeOutSec + 0.01);
+          noiseSource.source.stop(now + fadeOutSec + 0.005);
         } else {
           noiseSource.source.stop();
         }

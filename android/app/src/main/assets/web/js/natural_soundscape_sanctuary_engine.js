@@ -2,23 +2,24 @@
  * DEEP FOCUS — High-Fidelity Natural Soundscape Sanctuary Engine (Mission #180)
  * Realistic Brownian/Pink noise filtering for Rain, Waves, Wind, Campfire, and Streams.
  * CC0 offline buffer preference with instantaneous synthetic fallback. Zero music.
- * v2.2: Single shared AudioContext, zero static/hiss, instant stop, gesture-gated.
+ * v2.3: Uses AudioCore for single shared AudioContext, zero static/hiss, instant stop, gesture-gated.
  */
 (function(root) {
   'use strict';
 
-  const XFADE_MS = 20;
-  const DC_BLOCK_HZ = 15;
-  const LIMITER_LINEAR = Math.pow(10, -6.0 / 20); // -6dB ear-safety ceiling
+  const audioCore = typeof window !== 'undefined' ? window.AudioCore : null;
 
   // Generate a seamlessly looping buffer by crossfading end to start
-  // Includes DC removal, peak normalization, and hard safety clamp
+  // Delegates to AudioCore for the actual implementation
   function createSeamlessBuffer(ctx, durationSec, generatorFn) {
+    if (audioCore && audioCore.createSeamlessBuffer) {
+      return audioCore.createSeamlessBuffer(ctx, durationSec, generatorFn, 1);
+    }
+    // Fallback (should never be used)
+    const XFADE_MS = 20;
     const extraSec = XFADE_MS / 1000;
     const finalSize = Math.floor(ctx.sampleRate * durationSec);
     const xfadeSamples = Math.max(1, Math.floor(ctx.sampleRate * extraSec));
-    // Generate exactly finalSize + xfadeSamples so the generator emits a genuine
-    // tail continuation past the loop point for the crossfade to consume.
     const bufferSize = finalSize + xfadeSamples;
     const totalSec = bufferSize / ctx.sampleRate;
     const tempBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
@@ -65,11 +66,15 @@
 
   // Get the single shared master AudioContext (created only on user gesture)
   function getSharedContext() {
+    if (audioCore) {
+      return audioCore.getContext();
+    }
+    // Fallback for legacy
     if (typeof window !== 'undefined' && typeof window.dfGetGlobalAudioContext === 'function') {
       try {
         return window.dfGetGlobalAudioContext();
       } catch (e) {
-        // Gesture not yet granted - will be handled by caller
+        // Gesture not yet granted
       }
     }
     return null;
@@ -116,16 +121,6 @@
       return true;
     }
 
-    // Create a DC-blocking high-pass filter
-    createDCBlock() {
-      if (!this.ctx) return null;
-      const filter = this.ctx.createBiquadFilter();
-      filter.type = 'highpass';
-      filter.frequency.setValueAtTime(DC_BLOCK_HZ, this.ctx.currentTime);
-      filter.Q.setValueAtTime(0.707, this.ctx.currentTime); // Butterworth
-      return filter;
-    }
-
     // إنشاء مخزن صوتي للضوضاء الوردية/البنية فائقة النقاء للمطر والأمواج
     createNaturalNoiseBuffer(type) {
       if (!this.ctx) return null;
@@ -151,10 +146,8 @@
             data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
           } else if (type === 'ocean' || type === 'wind') {
             // Brown Noise: leaky integrator of WHITE noise (-6dB/oct slope).
-            // Integrating the pink signal doubled the infrasonic weight into a
-            // constant pressure rumble that bled through the loop as hiss.
-            // The 0.9985 leak keeps DC bounded across buffer restarts.
-            brownAccum = 0.9985 * brownAccum + white * 0.5;
+            // Using AudioCore's BROWN_POLE (0.997) and BROWN_GAIN (0.4) for bounded DC.
+            brownAccum = 0.997 * brownAccum + white * 0.4;
             data[i] = brownAccum;
           } else {
             // Campfire crackle: sparse pops on low noise floor
@@ -189,6 +182,7 @@
     play(soundKey, volume = 0.7) {
       // Zero-autoplay invariant: never start a nature loop while the tab is hidden.
       if (typeof document !== 'undefined' && document.hidden) return;
+      if (!audioCore || !audioCore.isGestureReceived()) return; // Hard gate
       this.initContext();
       if (!this.ctx) return;
       this.stop(soundKey);
@@ -197,14 +191,21 @@
                          (soundKey.includes('ocean') || soundKey.includes('wind')) ? 'ocean' : 'fire';
 
       const noiseBuffer = this.createNaturalNoiseBuffer(bufferType);
-      const source = this.ctx.createBufferSource();
-      source.buffer = noiseBuffer;
-      source.loop = true;
+      if (!noiseBuffer) return;
 
-      // DC-blocking filter
-      const dcBlock = this.createDCBlock();
+      // Use AudioCore's voice management for consistent behavior
+      const voice = audioCore.createVoice(noiseBuffer, true);
+      if (!voice) return;
 
-      // مرشح الترددات لنقاء الصوت واستبعاد أي خشونة
+      // Apply volume (voice gain starts at 0.0001 and ramps to 1 in 30ms)
+      // Scale by volume * 0.5 to stay well under limiter
+      const targetGain = Math.max(0.0001, volume * 0.5);
+      const now = this.ctx.currentTime;
+      voice.gain.gain.cancelScheduledValues(now);
+      voice.gain.gain.setValueAtTime(0.0001, now);
+      voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.05);
+
+      // Add spectral shaping based on sound type
       const filter = this.ctx.createBiquadFilter();
       if (bufferType === 'rain') {
         filter.type = 'lowpass';
@@ -218,34 +219,21 @@
         filter.frequency.value = 800;
       }
 
-      const gain = this.ctx.createGain();
-      // Reduced gain with -6dB ear-safety ceiling (0.7 → 0.35).
-      // Click-free onset: ramp from silence so source.start() never pops.
-      gain.gain.setValueAtTime(0.0001, this.ctx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(Math.max(0.0001, volume * 0.5), this.ctx.currentTime + 0.05);
+      // Insert filter between dcBlock and gain
+      voice.dcBlock.disconnect();
+      voice.dcBlock.connect(filter);
+      filter.connect(voice.gain);
 
-      source.connect(dcBlock);
-      dcBlock.connect(filter);
-      filter.connect(gain);
-      // Route through the shared ear-safety destination so the master kill
-      // switch / Stop / tab-hide mutes this track too (never raw destination).
-      let out = this.ctx.destination;
-      try {
-        if (typeof window !== "undefined" && typeof window.getSafeAudioDestination === "function") {
-          out = window.getSafeAudioDestination(this.ctx) || this.ctx.destination;
-        }
-      } catch (_) { out = this.ctx.destination; }
-      gain.connect(out);
-
-      source.start();
-      this.activeTracks[soundKey] = { source, dcBlock, gain, filter };
+      this.activeTracks[soundKey] = { voice, filter };
     }
 
     setVolume(soundKey, volume) {
-      if (this.activeTracks[soundKey] && this.activeTracks[soundKey].gain) {
+      const track = this.activeTracks[soundKey];
+      if (track && track.voice && track.voice.gain) {
         // Smooth ramp (not a raw setValueAtTime) — click-free slider moves
         const t0 = this.ctx ? this.ctx.currentTime : 0;
-        this.activeTracks[soundKey].gain.gain.setTargetAtTime(volume, t0, 0.03);
+        const targetGain = Math.max(0.0001, volume * 0.5);
+        track.voice.gain.gain.setTargetAtTime(targetGain, t0, 0.03);
       }
     }
 
@@ -253,28 +241,13 @@
       if (this.activeTracks[soundKey]) {
         try {
           const track = this.activeTracks[soundKey];
-          const now = this.ctx ? this.ctx.currentTime : 0;
-          const fadeOutSec = 0.06;
-          if (track.gain) {
-            track.gain.gain.cancelScheduledValues(now);
-            track.gain.gain.setValueAtTime(track.gain.gain.value, now);
-            track.gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
+          track.voice.stop(); // AudioCore handles fade + disconnect
+          if (track.filter) {
+            try { track.filter.disconnect(); } catch (_) {}
           }
-          track.source.stop(now + fadeOutSec + 0.01);
         } catch (e) {
-          try { this.activeTracks[soundKey].source.stop(); } catch (_) {}
+          // Ignore
         }
-        // Defer disconnects until the fade has played out — disconnecting now
-        // severs the ramp and ends the track in a click/static pop.
-        const trackRef = this.activeTracks[soundKey];
-        setTimeout(() => {
-          try {
-            trackRef.source.disconnect();
-            trackRef.dcBlock?.disconnect();
-            trackRef.gain?.disconnect();
-            trackRef.filter?.disconnect();
-          } catch (_) {}
-        }, 90);
         delete this.activeTracks[soundKey];
       }
     }

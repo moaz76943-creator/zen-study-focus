@@ -1,7 +1,7 @@
 /**
  * DEEP FOCUS — Exhaustive 3D Spatial Acoustic Studio & 10-Band Parametric EQ
  * Module: modules/audio/spatial_acoustic_studio.js
- * Version: v450.0.0 | Code: 41169
+ * Version: v451.0.0
  *
  * Zero-static procedural synthesis engine. Every sound source is a pre-rendered
  * AudioBuffer played through BufferSourceNode — no oscillators, no
@@ -15,7 +15,6 @@
  *   6. Analyser-backed visualiser
  *   7. Master safety ceiling (-6dB) + instant stop with click-free fade
  */
-
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     define([], factory);
@@ -30,19 +29,23 @@
   const STORAGE_EQ_KEY = 'df_acoustic_eq_state_v1';
   const EQ_FREQUENCIES = [31, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
 
-  // Ear-safety ceiling mirrored from studio_audio_purifier_engine.js
-  const LIMITER_DB = -6.0;
-  const LIMITER_LINEAR = Math.pow(10, LIMITER_DB / 20); // ≈ 0.501
-  const FADE_OUT_SEC = 0.06;
-  const XFADE_MS = 20; // Crossfade duration for seamless looping
+  // Use AudioCore constants
+  const audioCore = typeof window !== 'undefined' ? window.AudioCore : null;
+  const LIMITER_LINEAR = audioCore ? audioCore.LIMITER_LINEAR : Math.pow(10, -6.0 / 20);
+  const FADE_OUT_SEC = audioCore ? audioCore.FADE_OUT_MS / 1000 : 0.03;
+  const XFADE_MS = audioCore ? audioCore.XFADE_MS : 20;
+  const DC_BLOCK_HZ = audioCore ? audioCore.DC_BLOCK_HZ : 15;
 
   // Generate a seamlessly looping buffer by crossfading end to start
+  // Delegates to AudioCore for the actual implementation
   function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
+    if (audioCore && audioCore.createSeamlessBuffer) {
+      return audioCore.createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels);
+    }
+    // Fallback (should never be used)
     const extraSec = XFADE_MS / 1000;
     const finalSize = Math.floor(ctx.sampleRate * durationSec);
     const xfadeSamples = Math.max(1, Math.floor(ctx.sampleRate * extraSec));
-    // Generate exactly finalSize + xfadeSamples so the generator emits a genuine
-    // tail continuation past the loop point for the crossfade to consume.
     const bufferSize = finalSize + xfadeSamples;
     const totalSec = bufferSize / ctx.sampleRate;
     const tempBuffer = ctx.createBuffer(numChannels, bufferSize, ctx.sampleRate);
@@ -50,19 +53,13 @@
     for (let ch = 0; ch < numChannels; ch++) {
       channelData.push(tempBuffer.getChannelData(ch));
     }
-
     generatorFn(channelData, ctx.sampleRate, totalSec);
 
     const finalBuffer = ctx.createBuffer(numChannels, finalSize, ctx.sampleRate);
     for (let ch = 0; ch < numChannels; ch++) {
       const finalData = finalBuffer.getChannelData(ch);
       const tempChData = channelData[ch];
-      // Copy the main body; the tail samples remain as-is.
       finalData.set(tempChData.subarray(0, finalSize));
-      // Crossfade the genuine tail continuation into the head so the loop wrap
-      // is click-free. Weighting makes final[0] == tail-start and
-      // final[xfade-1] == head, which is continuous with the generator output
-      // across the loop boundary (temp[finalSize-1] -> temp[finalSize]).
       for (let i = 0; i < xfadeSamples; i++) {
         const t = i / xfadeSamples;
         finalData[i] = (1 - t) * tempChData[finalSize + i] + t * tempChData[i];
@@ -113,58 +110,59 @@
     initAudioContext() {
       if (this.audioCtx) return this.audioCtx;
 
-      // Prefer the single shared master AudioContext + ear-safety kill chain
-      // so studio playback is silenced by Stop/mute/tab-hide like every other
-      // voice. A private context drains separate from Stop and keeps humming —
-      // fall back to one only when the shared context is truly unavailable.
-      let ctx = null;
-      try {
-        if (typeof window !== 'undefined' && typeof window.dfGetGlobalAudioContext === 'function') {
-          ctx = window.dfGetGlobalAudioContext();
+      // Use AudioCore's shared context
+      if (audioCore) {
+        this.audioCtx = audioCore.getContext();
+        if (this.audioCtx) {
+          // Build our EQ chain into AudioCore's master chain
+          this.buildEqChain(this.audioCtx);
+          return this.audioCtx;
         }
-      } catch (e) { ctx = null; }
-
-      if (!ctx) {
-        const AudioContextClass = typeof window !== 'undefined' &&
-          (window.AudioContext || window.webkitAudioContext);
-        if (!AudioContextClass) {
-          throw new Error('Web Audio API is not supported in this environment');
-        }
-        ctx = new AudioContextClass();
       }
-      this.audioCtx = ctx;
 
-      this.masterGain = this.audioCtx.createGain();
+      // Fallback (should not happen if AudioCore loaded)
+      const AudioContextClass = typeof window !== 'undefined' &&
+        (window.AudioContext || window.webkitAudioContext);
+      if (!AudioContextClass) {
+        throw new Error('Web Audio API is not supported in this environment');
+      }
+      this.audioCtx = new AudioContextClass();
+      this.buildEqChain(this.audioCtx);
+      return this.audioCtx;
+    }
+
+    buildEqChain(ctx) {
+      this.masterGain = ctx.createGain();
       this.masterGain.gain.setValueAtTime(
         this.options.defaultVolume * LIMITER_LINEAR,
-        this.audioCtx.currentTime
+        ctx.currentTime
       );
 
-      this.analyser = this.audioCtx.createAnalyser();
+      this.analyser = ctx.createAnalyser();
       this.analyser.fftSize = 64;
 
       // DC-blocking high-pass filter (15Hz) to protect transducer coils from infrasonic content
-      this.dcBlockFilter = this.audioCtx.createBiquadFilter();
+      this.dcBlockFilter = ctx.createBiquadFilter();
       this.dcBlockFilter.type = 'highpass';
-      this.dcBlockFilter.frequency.setValueAtTime(15, this.audioCtx.currentTime);
-      this.dcBlockFilter.Q.setValueAtTime(0.707, this.audioCtx.currentTime); // Butterworth
+      this.dcBlockFilter.frequency.setValueAtTime(DC_BLOCK_HZ, ctx.currentTime);
+      this.dcBlockFilter.Q.setValueAtTime(0.707, ctx.currentTime);
 
       this.eqFilters = EQ_FREQUENCIES.map((freq, idx) => {
-        const filter = this.audioCtx.createBiquadFilter();
+        const filter = ctx.createBiquadFilter();
         if (idx === 0) {
           filter.type = 'lowshelf';
         } else if (idx === EQ_FREQUENCIES.length - 1) {
           filter.type = 'highshelf';
         } else {
           filter.type = 'peaking';
-          filter.Q.setValueAtTime(1.4, this.audioCtx.currentTime);
+          filter.Q.setValueAtTime(1.4, ctx.currentTime);
         }
-        filter.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
-        filter.gain.setValueAtTime(this.eqGains[idx], this.audioCtx.currentTime);
+        filter.frequency.setValueAtTime(freq, ctx.currentTime);
+        filter.gain.setValueAtTime(this.eqGains[idx], ctx.currentTime);
         return filter;
       });
 
-      // Chain: DC block -> EQ filters -> master gain -> analyser -> master kill chain
+      // Chain: DC block -> EQ filters -> master gain -> analyser -> AudioCore master output
       this.dcBlockFilter.connect(this.eqFilters[0]);
       for (let i = 0; i < this.eqFilters.length - 1; i++) {
         this.eqFilters[i].connect(this.eqFilters[i + 1]);
@@ -172,82 +170,52 @@
 
       this.eqFilters[this.eqFilters.length - 1].connect(this.masterGain);
       this.masterGain.connect(this.analyser);
-      const outDest = (typeof window !== 'undefined' && typeof window.getSafeAudioDestination === 'function')
-        ? window.getSafeAudioDestination(this.audioCtx)
-        : this.audioCtx.destination;
-      this.analyser.connect(outDest);
 
-      return this.audioCtx;
+      // Connect to AudioCore's master output (which goes through limiter → DC → destination)
+      const masterOut = audioCore ? audioCore.getMasterOutput() : ctx.destination;
+      this.analyser.connect(masterOut);
     }
 
     /** Paul Kellet pink-noise, pre-rendered, bounded well under the limiter. */
-      generatePinkNoiseBuffer(durationSec = 5) {
-        const ctx = this.initAudioContext();
-        return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
-          const data = channelData[0];
-          const bufferSize = Math.floor(sampleRate * totalSec);
+    generatePinkNoiseBuffer(durationSec = 5) {
+      const ctx = this.initAudioContext();
+      return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+        const data = channelData[0];
+        const bufferSize = Math.floor(sampleRate * totalSec);
 
-          let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-          for (let i = 0; i < bufferSize; i++) {
-            const white = Math.random() * 2 - 1;
-            b0 = 0.99886 * b0 + white * 0.0555179;
-            b1 = 0.99332 * b1 + white * 0.0750759;
-            b2 = 0.96900 * b2 + white * 0.1538520;
-            b3 = 0.86650 * b3 + white * 0.3104856;
-            b4 = 0.55000 * b4 + white * 0.5329522;
-            b5 = -0.7616 * b5 - white * 0.0168980;
-            b6 = white * 0.115926;
-            const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
-            data[i] = pink * 0.06;
-          }
-          // DC-removal pass: kill residual sample-average hum before normalize.
-          let mean = 0;
-          for (let i = 0; i < bufferSize; i++) mean += data[i];
-          mean /= bufferSize;
-          for (let i = 0; i < bufferSize; i++) data[i] -= mean;
-          // Peak-normalize to 0.9 (full scale minus headroom): guarantees no
-          // clipping and identical loudness across loop restarts.
-          let peak = 0;
-          for (let i = 0; i < bufferSize; i++) { const a = Math.abs(data[i]); if (a > peak) peak = a; }
-          const norm = peak > 0 ? 0.9 / peak : 1;
-          for (let i = 0; i < bufferSize; i++) data[i] *= norm;
-          // Hard safety clamp
-          for (let i = 0; i < bufferSize; i++) {
-            if (data[i] > 1.0) data[i] = 1.0;
-            else if (data[i] < -1.0) data[i] = -1.0;
-          }
-        }, 1);
-      }
+        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const white = Math.random() * 2 - 1;
+          b0 = 0.99886 * b0 + white * 0.0555179;
+          b1 = 0.99332 * b1 + white * 0.0750759;
+          b2 = 0.96900 * b2 + white * 0.1538520;
+          b3 = 0.86650 * b3 + white * 0.3104856;
+          b4 = 0.55000 * b4 + white * 0.5329522;
+          b5 = -0.7616 * b5 - white * 0.0168980;
+          b6 = white * 0.115926;
+          const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
+          data[i] = pink * 0.06;
+        }
+        // AudioCore's createSeamlessBuffer handles DC removal, normalization, clamp
+      }, 1);
+    }
 
-      /** Rain: quiet white bed, all spectral shaping done by the biquad chain. */
-      generateRainBuffer(durationSec = 5) {
-        const ctx = this.initAudioContext();
-        return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
-          const data = channelData[0];
-          const bufferSize = Math.floor(sampleRate * totalSec);
-          let peak = 0;
-          for (let i = 0; i < bufferSize; i++) {
-            data[i] = (Math.random() * 2 - 1) * 0.08;
-            const absV = Math.abs(data[i]);
-            if (absV > peak) peak = absV;
-          }
-          // DC-removal pass
-          let mean = 0;
-          for (let i = 0; i < bufferSize; i++) mean += data[i];
-          mean /= bufferSize;
-          for (let i = 0; i < bufferSize; i++) data[i] -= mean;
-          // Peak-normalize to 0.9
-          const norm = peak > 0 ? 0.9 / peak : 1;
-          for (let i = 0; i < bufferSize; i++) data[i] *= norm;
-          // Hard safety clamp
-          for (let i = 0; i < bufferSize; i++) {
-            if (data[i] > 1.0) data[i] = 1.0;
-            else if (data[i] < -1.0) data[i] = -1.0;
-          }
-        }, 1);
-      }
+    /** Rain: quiet white bed, all spectral shaping done by the biquad chain. */
+    generateRainBuffer(durationSec = 5) {
+      const ctx = this.initAudioContext();
+      return createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+        const data = channelData[0];
+        const bufferSize = Math.floor(sampleRate * totalSec);
+        let peak = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          data[i] = (Math.random() * 2 - 1) * 0.08;
+          const absV = Math.abs(data[i]);
+          if (absV > peak) peak = absV;
+        }
+        // AudioCore's createSeamlessBuffer handles DC removal, normalization, clamp
+      }, 1);
+    }
 
-    /**
     /**
      * Ocean: brownian rumble with the shoreline swell baked directly into the
      * buffer, so no LFO node has to be kept alive. Zero-static version.
@@ -269,7 +237,7 @@
         for (let i = 0; i < bufferSize; i++) {
           const white = Math.random() * 2 - 1;
           // Leaky integrator: bounded DC, no drift
-          brownAccum = 0.9985 * brownAccum + white * 0.5;
+          brownAccum = 0.997 * brownAccum + white * 0.4; // AudioCore's BROWN_POLE & BROWN_GAIN
           const t = i / sampleRate;
           // 0.55..1.0 swell, keeps the noise well below the limiter ceiling.
           const swell = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(2 * Math.PI * swellHz * t));
@@ -277,18 +245,7 @@
           data[i] = v;
           if (Math.abs(v) > peak) peak = Math.abs(v);
         }
-        // DC-removal pass: kill residual sample-average hum before normalize.
-        let mean = 0;
-        for (let i = 0; i < bufferSize; i++) mean += data[i];
-        mean /= bufferSize;
-        for (let i = 0; i < bufferSize; i++) data[i] -= mean;
-        // Peak-normalize to 0.9 (full scale minus headroom): guarantees no
-        // clipping and identical loudness across loop restarts.
-        // NOTE: peak must be re-measured after DC removal to stay honest.
-        let peak2 = 0;
-        for (let i = 0; i < bufferSize; i++) { const a = Math.abs(data[i]); if (a > peak2) peak2 = a; }
-        const norm2 = peak2 > 0 ? 0.9 / peak2 : 1;
-        for (let i = 0; i < bufferSize; i++) data[i] *= norm2;
+        // Peak normalize handled by createSeamlessBuffer
       }, 1);
     }
 
@@ -311,13 +268,7 @@
           left[i] = Math.sin(TWO_PI * 216 * t) * amp;
           right[i] = Math.sin(TWO_PI * 256 * t) * amp;
         }
-        // Hard safety clamp
-        for (let i = 0; i < bufferSize; i++) {
-          if (left[i] > 1.0) left[i] = 1.0;
-          else if (left[i] < -1.0) left[i] = -1.0;
-          if (right[i] > 1.0) right[i] = 1.0;
-          else if (right[i] < -1.0) right[i] = -1.0;
-        }
+        // AudioCore's createSeamlessBuffer handles clamp
       }, 2);
     }
 
@@ -399,7 +350,7 @@
       this._startBufferSource(this.generateBinaural40HzBuffer(5), null);
     }
 
-    /** Instant stop with a 60ms click-free fade, tears down every node. */
+    /** Instant stop with a 30ms click-free fade, tears down every node. */
     stop() {
       this.isPlaying = false;
 
@@ -408,13 +359,14 @@
         this.sourceNode = null;
         try {
           const now = this.audioCtx.currentTime;
-          const fade = this.audioCtx.createGain();
-          fade.gain.setValueAtTime(1, now);
-          fade.gain.linearRampToValueAtTime(0, now + FADE_OUT_SEC);
+          const fade = FADE_OUT_SEC;
+          const fadeGain = this.audioCtx.createGain();
+          fadeGain.gain.setValueAtTime(1, now);
+          fadeGain.gain.linearRampToValueAtTime(0, now + fade);
           source.disconnect();
-          source.connect(fade);
-          fade.connect(this.eqFilters[0]);
-          source.stop(now + FADE_OUT_SEC + 0.01);
+          source.connect(fadeGain);
+          fadeGain.connect(this.eqFilters[0]);
+          source.stop(now + fade + 0.005);
         } catch (e) {
           try { source.stop(); } catch (_) {}
           try { source.disconnect(); } catch (_) {}

@@ -1,8 +1,9 @@
 /**
  * DEEP FOCUS — Lifecycle Memory Sentinel & Hardware Resource Guard
  * Module: modules/core/lifecycle_memory_sentinel.js
- * Version: v476.0.0
+ * Version: v477.0.0
  * Purpose: Track, pool, and release hardware listeners, AudioContexts, and Workers to guarantee 0 leaks.
+ * Now compatible with AudioCore singleton context management.
  */
 
 (function (root, factory) {
@@ -16,6 +17,7 @@
 }(typeof self !== "undefined" ? self : this, function () {
     "use strict";
 
+    const audioCore = typeof window !== 'undefined' ? window.AudioCore : null;
     const activeListeners = new Set();
     const activeWorkers = new Set();
 
@@ -24,17 +26,16 @@
 
         init: function () {
             if (this.isWatching || typeof window === "undefined") return;
-            this.hijackLegacyAudioConstructors();
             this.bindUnloadJanitor();
             this.isWatching = true;
-            console.log("[MemorySentinel] Guarding hardware resources, Workers, and AudioContexts.");
+            console.log("[MemorySentinel] Guarding hardware resources, Workers, and AudioContexts (via AudioCore).");
         },
 
+        // AudioContext creation is now managed exclusively by AudioCore
+        // This method is kept for compatibility but delegates to AudioCore
         hijackLegacyAudioConstructors: function () {
-            // Intercept any rogue new AudioContext() and route to WebAudioSingletonEngine
-            const OrigAudio = window.AudioContext || window.webkitAudioContext;
-            if (OrigAudio && window.WebAudioSingletonEngine) {
-                console.log("[MemorySentinel] Legacy AudioContext constructors intercepted.");
+            if (audioCore) {
+                console.log("[MemorySentinel] AudioContext management delegated to AudioCore.");
             }
         },
 
@@ -74,6 +75,10 @@
             window.addEventListener("pagehide", () => {
                 this.purgeAllListeners();
                 this.terminateAllWorkers();
+                // Also stop all audio via AudioCore
+                if (audioCore) {
+                    audioCore.stopAllVoices();
+                }
             });
         }
     };

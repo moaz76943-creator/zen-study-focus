@@ -1,21 +1,24 @@
 /**
- * DEEP FOCUS — Global Singleton Nature Audio Engine (v631.0.0)
+ * DEEP FOCUS — Global Singleton Nature Audio Engine (v632.0.0)
+ * Uses AudioCore for all Web Audio operations.
  * Fixes:
  *   1. Never auto-plays on app startup (user gesture required)
  *   2. Global singleton stops ALL previous players before starting any new one (zero overlap/static)
  *   3. Seamless crossfade looping via Web Audio API BufferSourceNode (zero artifacts)
  *   4. User gesture gating for all playback
  *   5. 100% pure nature sounds, no music, no synthetic tones
- *   6. v631: REAL noise synthesis in generateNoiseBuffer (Paul Kellet pink + leaky brown,
+ *   6. REAL noise synthesis in generateNoiseBuffer (Paul Kellet pink + leaky brown,
  *      peak-normalized, DC-free) — no all-zero buffers, no hiss, no loop static.
- *   7. v631: All routes pass through a master DynamicsCompressor limiter (via
- *      window.getSafeAudioDestination when present) so stacked loops can never clip.
- *   8. v631: Click-free instant stop: 75ms linear gain ramp before source.stop().
- *   9. v631: .ogg decode failure falls back to procedural pink/brown noise so nature
+ *   7. All routes pass through AudioCore's master DynamicsCompressor limiter so
+ *      stacked loops can never clip.
+ *   8. Click-free instant stop: 30ms linear gain ramp before source.stop().
+ *   9. .ogg decode failure falls back to procedural pink/brown noise so nature
  *      audio stays reliable offline; HTMLAudio fallback only when Web Audio is absent.
  */
 (function (global) {
   'use strict';
+
+  const audioCore = global.AudioCore;
 
   const SOUND_FILES = {
     rain: 'audio/rain_window.ogg',
@@ -33,8 +36,8 @@
   };
 
   const XFADE_SEC = 0.02;
-  const FADE_IN_SEC = 0.18;
-  const FADE_OUT_SEC = 0.075;
+  const FADE_IN_SEC = 0.03;  // AudioCore's 30ms
+  const FADE_OUT_SEC = 0.03; // AudioCore's 30ms
 
   if (!global.__ZEN_AUDIO_SINGLETON__) {
     global.__ZEN_AUDIO_SINGLETON__ = {
@@ -50,7 +53,8 @@
       activeSource: null,
       activeGain: null,
       activeDC: null,
-      activeHTML: []
+      activeHTML: [],
+      activeSources: []  // Track all concurrent layers
     };
   }
   const S = global.__ZEN_AUDIO_SINGLETON__;
@@ -58,15 +62,19 @@
   if (typeof document !== 'undefined' && !S.gestureBound) {
     S.gestureBound = true;
     const markGesture = function () { S.userInteracted = true; };
-    document.addEventListener('pointerdown', markGesture, { passive: true });
-    document.addEventListener('touchstart', markGesture, { passive: true });
-    document.addEventListener('keydown', markGesture, { passive: true });
+    document.addEventListener('pointerdown', markGesture, { passive: true, once: true });
+    document.addEventListener('touchstart', markGesture, { passive: true, once: true });
+    document.addEventListener('keydown', markGesture, { passive: true, once: true });
   }
 
   function clamp01(v) { return Math.max(0, Math.min(1, v)); }
   function finalVol(targetVol) { return S.muted ? 0 : clamp01(targetVol); }
 
   function getCtx() {
+    if (audioCore) {
+      return audioCore.getContext();
+    }
+    // Legacy fallback
     try {
       if (typeof global.dfGetGlobalAudioContext === 'function') {
         const shared = global.dfGetGlobalAudioContext();
@@ -87,6 +95,10 @@
   }
 
   function getSafeDestination(ctx) {
+    if (audioCore) {
+      return audioCore.getMasterOutput();
+    }
+    // Legacy fallback
     try {
       if (typeof global.getSafeAudioDestination === 'function') {
         const d = global.getSafeAudioDestination(ctx);
@@ -154,7 +166,8 @@
         // Leaky integrator of WHITE noise (the true brown slope). Integrating
         // the pink signal doubled the low-frequency weight into infrasonic
         // rumble that bleeds as a constant pressure hiss on loops.
-        brown = 0.9985 * brown + white * 0.5;
+        // Use AudioCore's BROWN_POLE (0.997) and BROWN_GAIN (0.4)
+        brown = 0.997 * brown + white * 0.4;
         data[i] = brown;
         if (Math.abs(brown) > peak) peak = Math.abs(brown);
       }
@@ -217,6 +230,7 @@
     S.bufferLoading[cacheKey] = promise;
     return promise;
   }
+
   function clearFadeTimers() {
     if (S.fadeTimers && S.fadeTimers.size) {
       S.fadeTimers.forEach(function (t) { clearInterval(t); });
@@ -246,7 +260,7 @@
   function stopAllGlobal() {
     S.noiseGeneration = (S.noiseGeneration || 0) + 1;
     clearFadeTimers();
-    // Web Audio ambient sources: click-free 75ms linear ramp, then stop.
+    // Web Audio ambient sources: click-free 30ms linear ramp, then stop.
     // Track every concurrent layer (mixAmbient stacks rain+forest); the old
     // code only faded S.activeGain, so the first layer kept playing at full
     // volume after Stop — a permanent background loop.
@@ -266,7 +280,7 @@
     });
     sources.forEach(function (entry) {
       try {
-        if (ctx && ctx.state !== 'closed') entry.source.stop(ctx.currentTime + FADE_OUT_SEC + 0.01);
+        if (ctx && ctx.state !== 'closed') entry.source.stop(ctx.currentTime + FADE_OUT_SEC + 0.005);
         else entry.source.stop();
       } catch (e) {}
     });
@@ -279,7 +293,7 @@
         try { if (entry.gain) entry.gain.disconnect(); } catch (e) {}
         try { if (entry.dc) entry.dc.disconnect(); } catch (e) {}
       });
-    }, 130);
+    }, 70); // 30ms fade + 5ms buffer + margin
     S.activeSources = [];
     S.activeSource = null;
     S.activeGain = null;
@@ -304,6 +318,7 @@
 
   function playSingleClean(srcKey, loop, targetVol) {
     if (!S.userInteracted) return null; // BLOCKED: user gesture required (zero autoplay)
+    if (audioCore && !audioCore.isGestureReceived()) return null; // Hard gate via AudioCore
     const ctx = getCtx();
     if (!ctx) {
       if (typeof global.Audio === 'undefined') return null;
@@ -367,8 +382,9 @@
     }).catch(function () {});
     return { pending: true };
   }
+
   const SovereignRealAudio = {
-    version: '631.0.0',
+    version: '632.0.0',
     volume: S.volume,
     muted: S.muted,
     cues: {
@@ -398,6 +414,7 @@
     },
     playBell: function () {
       if (S.muted || !S.userInteracted) return false; // gesture gate: zero autoplay
+      if (audioCore && !audioCore.isGestureReceived()) return false; // Hard gate
       if (typeof global.Audio === 'undefined') return false;
       const ctx = getCtx();
       if (ctx && typeof ctx.createBufferSource === 'function') {
@@ -446,6 +463,10 @@
             try { entry.gain.gain.setValueAtTime(Math.max(0.0001, finalVol(S.volume)), vctx.currentTime); } catch (e) {}
           });
         }
+        // Also update AudioCore master volume if available
+        if (audioCore) {
+          audioCore.setMasterVolume(S.volume);
+        }
       }
       return this.volume;
     },
@@ -465,12 +486,15 @@
           } catch (e) {}
         });
       }
+      if (audioCore) {
+        audioCore.muteMaster(S.muted);
+      }
       return S.muted;
     }
   };
 
   global.SovereignAudioSuite = {
-    version: '631.0.0',
+    version: '632.0.0',
     ensureContext: function () { return getCtx(); },
     chimes: { PHI: 1.618, BASE_HZ: 432, playGoldenChime: function () { return SovereignRealAudio.playBell(); } },
     binaural: { active: false, start: function () { this.active = true; return SovereignRealAudio.playAmbient('water'); }, stop: function () { this.active = false; return SovereignRealAudio.stopAmbient(); } },
@@ -479,7 +503,7 @@
   };
 
   global.SovereignAmbientDSP = {
-    version: '631.0.0',
+    version: '632.0.0',
     activeNoiseType: null,
     generateNoiseBuffer: function (type, durationSec, sampleRate) {
       const len = Math.floor(Math.max(1, durationSec || 1) * (sampleRate || 44100));
