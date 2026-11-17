@@ -21,10 +21,11 @@
      */
     init: function () {
       // Apply safe fallbacks immediately before Android insets arrive
-      // Default: status bar ~24px, nav bar ~32px (gesture handle), 48dp touch clearance
+      // Default: status bar ~24dp, nav bar 56dp (3-button) for safety, 48dp touch clearance
+      // This ensures 3-button nav never overlaps on first paint before Android callback fires.
       this.applyCSSVariables({
         top: 24,
-        bottom: 32,
+        bottom: 56,
         left: 0,
         right: 0
       });
@@ -36,10 +37,10 @@
 
     /**
      * Updates insets received from Android WindowInsetsCompat listener via JavascriptInterface.
-     * @param {number} top Top inset in px (status bar / punch hole)
-     * @param {number} bottom Bottom inset in px (gesture navigation pill / 3-button nav bar height)
-     * @param {number} left Left cutout in px
-     * @param {number} right Right cutout in px
+     * @param {number} top Top inset in dp (status bar / punch hole)
+     * @param {number} bottom Bottom inset in dp (gesture navigation pill / 3-button nav bar height)
+     * @param {number} left Left cutout in dp
+     * @param {number} right Right cutout in dp
      */
     updateInsets: function (top, bottom, left, right) {
       this.currentInsets.top = Math.max(0, parseInt(top, 10) || 0);
@@ -62,15 +63,15 @@
 
     /**
      * Injects CSS variables onto documentElement with !important to override conflicting rules.
-     * --df-safe-top: status bar / cutout top inset
-     * --df-safe-bottom: navigation bar / gesture handle bottom inset (raw from Android)
+     * --df-safe-top: status bar / cutout top inset (dp)
+     * --df-safe-bottom: navigation bar / gesture handle bottom inset (dp)
      * --df-bottom-nav-clearance: --df-safe-bottom + 48dp touch clearance for floating elements
      */
     applyCSSVariables: function (insets) {
       if (typeof document === 'undefined' || !document.documentElement) return;
 
       var root = document.documentElement;
-      var navInset = insets.bottom; // raw nav/gesture height from Android
+      var navInset = insets.bottom; // nav/gesture height in dp (from Android via MainActivity)
       var clearance = navInset + 48; // 48dp touch clearance above nav bar
 
       root.style.setProperty('--df-safe-top', insets.top + 'px', 'important');
