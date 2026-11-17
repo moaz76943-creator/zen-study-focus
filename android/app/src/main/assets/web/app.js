@@ -877,10 +877,20 @@ function playCompletionTone(toneKey) {
     audio.loop = false;
     audio.volume = Math.max(0, Math.min(1, tone.level * 2));
     const stopAt = Math.min(3, Math.max(0.4, tone.decay)) * 1000;
+    // Linear fade from the starting level over the tone's decay window — the
+    // old fixed -0.08 staircase zipper-noised on every tick.
+    const startVolume = audio.volume;
+    const fadeSteps = 30;
+    let fadeTick = 0;
     const fadeStep = setInterval(() => {
       if (toneAudio !== audio) { clearInterval(fadeStep); return; }
-      audio.volume = Math.max(0, audio.volume - 0.08);
-    }, Math.max(60, stopAt / 14));
+      fadeTick++;
+      audio.volume = Math.max(0, startVolume * (1 - fadeTick / fadeSteps));
+      if (fadeTick >= fadeSteps) {
+        clearInterval(fadeStep);
+        try { audio.pause(); } catch (_) { /* already stopped */ }
+      }
+    }, Math.max(20, stopAt / fadeSteps));
     setTimeout(() => {
       clearInterval(fadeStep);
       try { audio.pause(); } catch (_) { /* already stopped */ }
@@ -5843,6 +5853,9 @@ function toggleSoundTile(id) {
   }
   const token = (soundGeneration[id] || 0) + 1;
   soundGeneration[id] = token;
+  // Zero-autoplay invariant: never start a nature loop while the tab is hidden.
+  // (Stopping an already-playing tile above stays available while hidden.)
+  if (typeof document !== 'undefined' && document.hidden) return Promise.resolve();
   const ctx = ensureProceduralAudioContext();
   if (!ctx) { showToast(cfg.lang === 'ar' ? '⚠️ مشغل الصوت غير متاح' : '⚠️ Audio output unavailable'); return Promise.resolve(); }
   if (ctx.state === 'suspended') ctx.resume();
@@ -5896,6 +5909,11 @@ function playPresetRelaxMix() {
 const activeNoiseSources = new Set();
 
 function stopAllAudio() {
+  // Completion tone is a raw HTMLAudioElement outside the Web Audio graph —
+  // Stop must silence it too, or the chime keeps sounding after instant Stop.
+  try {
+    if (toneAudio) { toneAudio.pause(); toneAudio.currentTime = 0; toneAudio = null; }
+  } catch (_) {}
   // Instant master kill — cuts all output immediately, sources then fade out individually
   if (typeof window !== 'undefined' && typeof window.dfMasterAudioMute === 'function') {
     try { window.dfMasterAudioMute(); } catch (_) {}
@@ -10465,13 +10483,8 @@ window.FlashQuizEngine = FlashQuizEngine;
   window.dfHandleVocabAppResume = function() {
     if (typeof document === 'undefined') return false;
     if (!document.hidden) {
-      if (typeof window.speechSynthesis !== 'undefined') {
-        try {
-          if (window.speechSynthesis.paused) {
-            window.speechSynthesis.resume();
-          }
-        } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
-      }
+      // Zero-autoplay invariant: never resume TTS on tab switch alone — speech
+      // is audio, and audio only returns via an explicit user gesture.
       if (typeof window.dfUpdateVocabVoiceStatus === 'function') {
         window.dfUpdateVocabVoiceStatus();
       }
@@ -20334,7 +20347,10 @@ window.dfSynthesizeHarmonic432TuningAcoustics = function(audioCtx, options) {
       try {
         binauralSource = createBinauralSource(audioCtx, 'harmonic_432_8hz', volume);
         if (!binauralSource) return false;
-        binauralSource.source.connect((typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx.destination);
+        // Wire through the engine's gain stage (fade-in, volume clamp, 15Hz DC
+        // block) into the shared kill-switch bus. Connecting the raw source here
+        // bypassed all three: full-amplitude onset pop, dead volume, click on stop.
+        binauralSource.gain.connect((typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx.destination);
         binauralSource.source.start();
         isRunning = true;
         return true;
@@ -20432,7 +20448,9 @@ window.dfSynthesizeGamma40HzBlitzEntrainment = function(audioCtx, options) {
       try {
         binauralSource = createBinauralSource(audioCtx, 'gamma_40hz', volume);
         if (!binauralSource) return false;
-        binauralSource.source.connect((typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx.destination);
+        // Same wired-gain fix as M474 above: route through the fade/volume/DC
+        // block stage, never straight from the source to the destination.
+        binauralSource.gain.connect((typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx.destination);
         binauralSource.source.start();
         isRunning = true;
         return true;
@@ -23128,8 +23146,18 @@ window.dfAccumulateCognitiveDrag = function(switchingEventsCount) {
 window.dfRotateBinauralSpatialField = function(ctx, pannerNode) {
   const lfo = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} }); lfo.frequency.value = 0.05; // 20s rotation
   if (pannerNode.pan) lfo.connect(pannerNode.pan);
+  // Never leak a permanent LFO per call: stop/disconnect the previous one.
+  if (pannerNode.__dfRotLfo) {
+    try { pannerNode.__dfRotLfo.stop(); } catch (_) {}
+    try { pannerNode.__dfRotLfo.disconnect(); } catch (_) {}
+  }
+  pannerNode.__dfRotLfo = lfo;
   lfo.start();
-  return { rotationRateHz: 0.05, status: "ROTATING_STEREO_PAN" };
+  return { rotationRateHz: 0.05, status: "ROTATING_STEREO_PAN", stop: function() {
+    try { lfo.stop(); } catch (_) {}
+    try { lfo.disconnect(); } catch (_) {}
+    if (pannerNode.__dfRotLfo === lfo) pannerNode.__dfRotLfo = null;
+  } };
 };
 
 window.dfIntegrateTungusicYeniseianPack = function() {
@@ -39278,11 +39306,19 @@ window.dfGetSafeMasterDestination = function(ctx) {
     comp.ratio.setValueAtTime(12, ctx.currentTime);        // Brickwall limiter ratio
     comp.attack.setValueAtTime(0.003, ctx.currentTime);    // 3ms instant peak catch
     comp.release.setValueAtTime(0.25, ctx.currentTime);
+    // Fallback path must still expose the instant-kill gain the shared
+    // getSafeAudioDestination chain provides, or Stop cannot silence layers
+    // mixed through this destination.
+    if (!ctx._masterGain && ctx.createGain) {
+      ctx._masterGain = ctx.createGain();
+      ctx._masterGain.gain.setValueAtTime(1, ctx.currentTime);
+      ctx._masterGain.connect(comp);
+    }
     comp.connect(ctx.destination);
     window.DF_MASTER_COMPRESSOR = comp;
     console.log("[DSP SECURITY] Acoustic Ear-Safety Master Limiter active.");
   }
-  return window.DF_MASTER_COMPRESSOR;
+  return ctx._masterGain || window.DF_MASTER_COMPRESSOR;
 };
 
 /* ==========================================================
@@ -48504,8 +48540,9 @@ window.dfStudioAudio = {
     if (ctx.state === 'suspended' && audioContextUserGestureReceived && typeof ctx.resume === 'function') {
       ctx.resume();
     }
-    // Use high-quality brown noise for ambience
-    const noiseSource = createNoiseSource(ctx, 'brown', 0.28);
+    // Use high-quality brown noise for ambience. Level kept subtle — 0.28 was
+    // a muddy rumble bed that read as "constant background noise".
+    const noiseSource = createNoiseSource(ctx, 'brown', 0.16);
     const f = ctx.createBiquadFilter();
     f.type = 'lowpass';
     f.frequency.value = isRain ? 800 : 380;
@@ -48765,10 +48802,12 @@ window.dfTriLayerMixer = {
       comp.ratio.value = 4;
       comp.attack.value = 0.005;
       comp.release.value = 0.25;
-      comp.connect(ctx.destination);
+      // Final output must pass the shared instant-kill gain, never the raw
+      // destination — otherwise Stop/mute/tab-hide cannot silence these layers.
+      comp.connect((typeof window.getSafeAudioDestination === 'function' && window.getSafeAudioDestination(ctx)) || ctx.destination);
       this.compressor = comp;
     }
-    return this.compressor || ctx.destination;
+    return this.compressor || ((typeof window.getSafeAudioDestination === 'function' && window.getSafeAudioDestination(ctx)) || ctx.destination);
   },
   createLayerGain: function(ctx, level) {
     const g = ctx.createGain();
@@ -80662,11 +80701,14 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
         }
         window.dfMasterAudioMute = function() {
             const ctx = dfActiveAudioCtx();
-            if (ctx && ctx._masterGain) ctx._masterGain.gain.setValueAtTime(0, ctx.currentTime);
+            // Fast 20ms ramp, not a hard 0 jump: an un-ramped full-scale cut on
+            // still-running loops is itself a click/static pop on every Stop.
+            if (ctx && ctx._masterGain) ctx._masterGain.gain.setTargetAtTime(0, ctx.currentTime, 0.006);
         };
         window.dfMasterAudioUnmute = function() {
             const ctx = dfActiveAudioCtx();
-            if (ctx && ctx._masterGain) ctx._masterGain.gain.setValueAtTime(1, ctx.currentTime);
+            // Smooth restore: a 0->1 setValueAtTime after Stop is an audible pop.
+            if (ctx && ctx._masterGain) ctx._masterGain.gain.setTargetAtTime(1, ctx.currentTime, 0.015);
         };
         if (window.audioContext) {
             window.getSafeAudioDestination(window.audioContext);

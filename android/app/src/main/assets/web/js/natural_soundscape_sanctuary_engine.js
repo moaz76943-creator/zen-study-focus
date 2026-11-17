@@ -96,13 +96,17 @@
             // The 0.9985 leak keeps DC bounded across buffer restarts.
             brownAccum = 0.9985 * brownAccum + white * 0.5;
             data[i] = brownAccum;
-            if (Math.abs(data[i]) > peak) peak = Math.abs(data[i]);
           } else {
             // Campfire crackle: sparse pops on low noise floor
             const pop = Math.random() > 0.9985 ? (Math.random() * 2 - 1) * 0.8 : 0;
             b0 = 0.99 * b0 + white * 0.02;
             data[i] = b0 * 0.1 + pop;
           }
+          // Peak tracked for EVERY noise family so rain/fire normalize to the
+          // same 0.9 ceiling as ocean — rain/fire previously never normalized,
+          // so loudness and loop-restart consistency varied by sound type.
+          const absV = Math.abs(data[i]);
+          if (absV > peak) peak = absV;
         }
         // DC-removal pass: kill residual sample-average hum (constant static)
         // before the buffer reaches a gain node.
@@ -123,6 +127,8 @@
     }
 
     play(soundKey, volume = 0.7) {
+      // Zero-autoplay invariant: never start a nature loop while the tab is hidden.
+      if (typeof document !== 'undefined' && document.hidden) return;
       this.initContext();
       if (!this.ctx) return;
       this.stop(soundKey);
