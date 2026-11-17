@@ -100,14 +100,14 @@
       root.style.setProperty('--df-safe-left', '0px', 'important');
       root.style.setProperty('--df-safe-right', '0px', 'important');
       root.style.setProperty('--df-webview-padding-bottom', '0px', 'important');
-      // Fixed dock reserve: dock gap (12px) + capsule height (80px) + gap to FAB/Studios (8px)
-      // + max(FAB height 54px, Studios pill height 48px) = 154px. Increased to 160px for
-      // Xiaomi 3-button nav bar height variance and font scaling safety margin.
+      // Fixed dock reserve: dock gap (12px) + capsule height (88px) + gap to FAB/Studios (8px)
+      // + max(FAB height 54px, Studios pill height 48px) = 162px. Increased to 180px for
+      // Xiaomi 3-button nav bar height variance, font scaling, and tall aspect-ratio safety margin.
       // This ensures in-flow content (last card) ends above the floating layers.
-      root.style.setProperty('--df-bottom-nav-clearance', '160px', 'important');
+      root.style.setProperty('--df-bottom-nav-clearance', '180px', 'important');
       // Capsule height estimate for positioning floating elements above it.
-      // Increased to 80px to accommodate 7-tab capsule with labels on tall screens.
-      root.style.setProperty('--df-capsule-height', '80px', 'important');
+      // Increased to 88px to accommodate 7-tab capsule with labels on tall screens and font scaling.
+      root.style.setProperty('--df-capsule-height', '88px', 'important');
     },
 
     onViewportChange: function () {
