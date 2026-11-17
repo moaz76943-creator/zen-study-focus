@@ -5423,6 +5423,9 @@ if (typeof document !== 'undefined' && document.addEventListener) {
     document.addEventListener(evt, markAudioContextUserGesture, { once: true, passive: true });
   });
 }
+// Read-only accessor so boot-time diagnostics (stressTestWebAudioEngine) can
+// prove no gesture happened yet and stay on the deterministic mock context.
+window.__dfAudioGestureReceived = function () { return audioContextUserGestureReceived; };
 
 // Lazy AudioContext: created ONLY on first user gesture, never on load/tab switch
 // In non-browser environments (Node.js tests), allow creation without gesture
@@ -5801,10 +5804,14 @@ function createOggPlayer(buffer, loop, volume) {
         gain.gain.setValueAtTime(gain.gain.value, now);
         gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
         source.stop(now + fadeOutSec + 0.01);
+        // Defer disconnects until the fade has played out — disconnecting
+        // now severs the ramp and ends the loop in a click/static pop.
+        setTimeout(function () {
+          try { source.disconnect(); dcBlock.disconnect(); gain.disconnect(); } catch (_) {}
+        }, 90);
       } catch (e) {
         try { source.stop(); } catch (_) {}
       }
-      try { source.disconnect(); dcBlock.disconnect(); gain.disconnect(); } catch (_) {}
     },
     setVol(v) {
       if (ctx) {
@@ -5931,6 +5938,11 @@ function stopAllAudio() {
     if (typeof window.dfStopAllSounds === "function") { try { window.dfStopAllSounds(); } catch (_) {} }
     if (typeof window.dfStopAmbientSoundscape === "function") { try { window.dfStopAmbientSoundscape(); } catch (_) {} }
     if (typeof window.dfStopBinauralGamma === "function") { try { window.dfStopBinauralGamma(); } catch (_) {} }
+    // Instant-stop coverage for every other engine family — otherwise these
+    // loops/tones keep sounding after Stop (constant background noise).
+    if (window.SovereignAmbientDSP && typeof window.SovereignAmbientDSP.stopNoise === "function") { try { window.SovereignAmbientDSP.stopNoise(); } catch (_) {} }
+    if (window.SovereignBinauralAlpha && typeof window.SovereignBinauralAlpha.stop === "function") { try { window.SovereignBinauralAlpha.stop(); } catch (_) {} }
+    if (window.activeAcousticStudio && typeof window.activeAcousticStudio.stop === "function") { try { window.activeAcousticStudio.stop(); } catch (_) {} }
   }
   renderSoundsStudio();
 }
@@ -11220,11 +11232,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     try {
       if (typeof window === 'undefined') return false;
       var ctx = window.dfGetGlobalAudioContext ? window.dfGetGlobalAudioContext() : null;
-      if (!ctx) {
-        var AudioCtx2 = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx2) return false;
-        ctx = new AudioCtx2();
-      }
+      if (!ctx) return false; // zero-autoplay: never mint an ungated raw context
       var osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       var gain = ctx.createGain();
 
@@ -12802,11 +12810,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     try {
       if (typeof window === "undefined") return false;
       var ctx = window.dfGetGlobalAudioContext ? window.dfGetGlobalAudioContext() : null;
-      if (!ctx) {
-        var AudioCtx3 = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx3) return false;
-        ctx = new AudioCtx3();
-      }
+      if (!ctx) return false; // zero-autoplay: never mint an ungated raw context
 
       var osc1 = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
       var gain1 = ctx.createGain();
@@ -14040,9 +14044,14 @@ window.FlashQuizEngine = FlashQuizEngine;
         _rightOsc.connect(_binauralMasterGain);
       }
 
-      // Wire: MasterGain -> DC Block -> Destination
+      // Wire: MasterGain -> DC Block -> shared ear-safety master chain.
+      // NEVER route straight to ctx.destination: that bypasses the master
+      // kill switch and limiter, so the 40Hz tone survived Stop/mute/tab-hide.
+      var gammaDest = (typeof window.getSafeAudioDestination === "function")
+        ? window.getSafeAudioDestination(_binauralCtx)
+        : _binauralCtx.destination;
       _binauralMasterGain.connect(_binauralDcBlock);
-      _binauralDcBlock.connect(_binauralCtx.destination);
+      _binauralDcBlock.connect(gammaDest);
 
       _leftOsc.start(0);
       _rightOsc.start(0);
@@ -20248,7 +20257,7 @@ window.dfConfigureSaccadicReadingPacer = function(options) {
           gain.gain.exponentialRampToValueAtTime(volume, now + 0.005);
           gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
           osc.connect(gain);
-          gain.connect(audioCtx.destination);
+          gain.connect((typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx.destination);
           osc.start(now);
           osc.stop(now + 0.045);
         }
@@ -20317,7 +20326,7 @@ window.dfSynthesizeHarmonic432TuningAcoustics = function(audioCtx, options) {
       try {
         binauralSource = createBinauralSource(audioCtx, 'harmonic_432_8hz', volume);
         if (!binauralSource) return false;
-        binauralSource.source.connect(audioCtx.destination);
+        binauralSource.source.connect((typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx.destination);
         binauralSource.source.start();
         isRunning = true;
         return true;
@@ -20415,7 +20424,7 @@ window.dfSynthesizeGamma40HzBlitzEntrainment = function(audioCtx, options) {
       try {
         binauralSource = createBinauralSource(audioCtx, 'gamma_40hz', volume);
         if (!binauralSource) return false;
-        binauralSource.source.connect(audioCtx.destination);
+        binauralSource.source.connect((typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx.destination);
         binauralSource.source.start();
         isRunning = true;
         return true;
@@ -21176,7 +21185,7 @@ window.dfSynthesizeWestAfricanTonalContour = function(audioCtx, options) {
       gain.gain.linearRampToValueAtTime(0.15, now + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
       osc.connect(gain);
-      gain.connect(audioCtx.destination);
+      gain.connect((typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx.destination);
       osc.start(now);
       osc.stop(now + 0.26);
       return true;
@@ -38241,13 +38250,18 @@ window.dfGenerateNoiseBuffer = function(ctx, type) {
   const tempData = tempBuffer.getChannelData(0);
   
   let lastOut = 0.0;
+  let brown = 0, brownPeak = 0;
   for (let i = 0; i < bufferSize; i++) {
     const white = Math.random() * 2 - 1;
     if (type === "brown") {
-      // 2-pole brown noise for cleaner spectral rolloff (Paul Kellet style)
-      tempData[i] = (lastOut + (0.02 * white)) / 1.02;
-      lastOut = tempData[i];
-      tempData[i] *= 0.35; // Reduced from 1.2 to eliminate static
+      // True brown noise: leaky integrator of white noise with a bounded
+      // pole (0.9985). The old formula was algebraically white noise (not
+      // brown), which is why it hissed like static instead of rumbling
+      // like rain.
+      brown = 0.9985 * brown + white * 0.5;
+      lastOut = brown;
+      tempData[i] = lastOut;
+      if (Math.abs(lastOut) > brownPeak) brownPeak = Math.abs(lastOut);
     } else {
       // White noise at lower amplitude with spectral shaping
       tempData[i] = white * 0.08; // Reduced from 0.15
@@ -38257,6 +38271,15 @@ window.dfGenerateNoiseBuffer = function(ctx, type) {
     if (tempData[i] > 1.0) tempData[i] = 1.0;
     else if (tempData[i] < -1.0) tempData[i] = -1.0;
   }
+  if (type === "brown" && brownPeak > 0) {
+    const norm = 0.9 / brownPeak;
+    for (let i = 0; i < bufferSize; i++) tempData[i] *= norm;
+  }
+  // DC-removal pass: zero-mean loop boundary, kills hum/static on wrap.
+  let dcMean = 0;
+  for (let i = 0; i < bufferSize; i++) dcMean += tempData[i];
+  dcMean /= bufferSize;
+  for (let i = 0; i < bufferSize; i++) tempData[i] -= dcMean;
   
   // Create final buffer with exact duration and crossfade loop point
   const finalSize = Math.floor(ctx.sampleRate * durationSec);
@@ -38316,7 +38339,9 @@ window.dfPlayNatureSound = async function(soundType) {
   }
 
   const gain = ctx.createGain();
-  gain.gain.value = 0.05;
+  // Click-free onset: ramp from silence instead of jumping to full gain.
+  gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(0.05, ctx.currentTime + 0.05);
 
   noiseSource.connect(dcBlock);
   dcBlock.connect(filter);
@@ -39229,6 +39254,15 @@ window.DF_MASTER_COMPRESSOR = null;
 
 window.dfGetSafeMasterDestination = function(ctx) {
   if (!ctx) return null;
+  // Single master chain for the whole app. The old dedicated parallel
+  // compressor bypassed window.getSafeAudioDestination's instant-kill gain,
+  // so nature loops could not be silenced by Stop/mute/tab-hide. Unify them.
+  if (typeof window.getSafeAudioDestination === "function") {
+    try {
+      const sharedDest = window.getSafeAudioDestination(ctx);
+      if (sharedDest) return sharedDest;
+    } catch (e) { /* fall back to dedicated limiter below */ }
+  }
   if (!window.DF_MASTER_COMPRESSOR) {
     const comp = ctx.createDynamicsCompressor();
     comp.threshold.setValueAtTime(-18, ctx.currentTime); // Soft knee starts at -18dB
@@ -68748,16 +68782,13 @@ const StudyPodEngine = (function() {
   function playSynchronizedBellChime(volume) {
     try {
       let ctx = window.dfGetGlobalAudioContext ? window.dfGetGlobalAudioContext() : null;
-      if (!ctx) {
-        const AudioCtx = window.AudioContext || window.webkitAudioContext;
-        if (!AudioCtx) return false;
-        ctx = new AudioCtx();
-      }
+      if (!ctx) return false; // zero-autoplay: never mint an ungated raw context
       const now = ctx.currentTime;
       const v = Math.min(1, Math.max(0.05, Number(volume) || 0.85));
 
       const masterGain = ctx.createGain();
-      masterGain.gain.setValueAtTime(v, now);
+      masterGain.gain.setValueAtTime(0.0001, now);
+      masterGain.gain.linearRampToValueAtTime(v, now + 0.008); // 8ms attack kills the onset click
       masterGain.gain.exponentialRampToValueAtTime(0.0001, now + 3.8);
       masterGain.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
 
@@ -77887,7 +77918,12 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch (_) { if (typeof window !== "un
         let testCtx = null;
         let isMock = false;
 
-        if (AudioCtx) {
+        // Zero-autoplay: before the first user gesture this must NEVER mint a
+        // real AudioContext (creating + closing one at boot churns the audio
+        // hardware and leaves InvalidStateError rejections). Mock path only.
+        const gestureOk = (typeof window !== "undefined" && typeof window.__dfAudioGestureReceived === "function")
+          ? window.__dfAudioGestureReceived() : true;
+        if (AudioCtx && gestureOk) {
           try {
             testCtx = new AudioCtx();
           } catch (_) {
@@ -77995,10 +78031,10 @@ try{window.dfSyncInfiniteLocaleRegistry();}catch (_) { if (typeof window !== "un
           audioReport.completionTonesTested++;
         });
 
-        // 4. Simulate Background/Foreground App Interruption Cycles
+        // 4. Simulate Background/Foreground App Interruption Cycles (rejections must not leak)
         for (let pauseCycle = 0; pauseCycle < 4; pauseCycle++) {
-          testCtx.suspend();
-          testCtx.resume();
+          try { const p1 = testCtx.suspend(); if (p1 && p1.catch) p1.catch(function () {}); } catch (_) {}
+          try { const p2 = testCtx.resume(); if (p2 && p2.catch) p2.catch(function () {}); } catch (_) {}
           audioReport.interruptionResumeCycles++;
         }
 
@@ -80543,7 +80579,8 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
     });
     // Auto-resume audio context defensively on user gestures
     window.addEventListener("pointerdown", () => {
-        if (window.audioContext && window.audioContext.state === "suspended") {
+        // Zero-autoplay: resume only with an explicit prior user gesture.
+        if (window.audioContext && window.audioContext.state === "suspended" && typeof audioContextUserGestureReceived !== "undefined" && audioContextUserGestureReceived) {
             window.audioContext.resume();
         }
     }, { passive: true });
@@ -80598,17 +80635,14 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
         if (window.audioContext) {
             window.getSafeAudioDestination(window.audioContext);
         }
-        // Zero-autoplay / zero-ambient-leak on tab switch: mute when hidden, restore on visible
+        // Zero-autoplay / zero-ambient-leak on tab switch: mute when hidden,
+        // NEVER unmute on visible/pageshow. Audio only returns via explicit
+        // user gesture (ensureProceduralAudioContext unmutes on Play).
         if (typeof document !== 'undefined') {
             document.addEventListener('visibilitychange', function () {
                 if (document.hidden) {
                     try { window.dfMasterAudioMute && window.dfMasterAudioMute(); } catch (_) {}
-                } else {
-                    try { window.dfMasterAudioUnmute && window.dfMasterAudioUnmute(); } catch (_) {}
                 }
-            });
-            window.addEventListener('pageshow', function () {
-                try { window.dfMasterAudioUnmute && window.dfMasterAudioUnmute(); } catch (_) {}
             });
             window.addEventListener('pagehide', function () {
                 try { window.dfMasterAudioMute && window.dfMasterAudioMute(); } catch (_) {}
@@ -82176,7 +82210,8 @@ window.SovereignChimes = (function() {
             const AudioCtx = window.AudioContext || window.webkitAudioContext;
             if (AudioCtx) window.audioContext = new AudioCtx();
         }
-        if (window.audioContext && window.audioContext.state === "suspended") {
+        // Zero-autoplay: resume only with an explicit prior user gesture.
+        if (window.audioContext && window.audioContext.state === "suspended" && typeof audioContextUserGestureReceived !== "undefined" && audioContextUserGestureReceived) {
             window.audioContext.resume();
         }
         return window.audioContext;
@@ -82324,7 +82359,8 @@ window.SovereignBinauralAlpha = (function() {
             const AudioCtx = window.AudioContext || window.webkitAudioContext;
             if (AudioCtx) window.audioContext = new AudioCtx();
         }
-        if (window.audioContext && window.audioContext.state === "suspended") {
+        // Zero-autoplay: resume only with an explicit prior user gesture.
+        if (window.audioContext && window.audioContext.state === "suspended" && typeof audioContextUserGestureReceived !== "undefined" && audioContextUserGestureReceived) {
             window.audioContext.resume();
         }
         return window.audioContext;
@@ -82391,6 +82427,7 @@ window.SovereignBinauralAlpha = (function() {
             setTimeout(() => {
                 if (oscLeft) { try { oscLeft.stop(); oscLeft.disconnect(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); } }
                 if (oscRight) { try { oscRight.stop(); oscRight.disconnect(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); } }
+                if (gainNode) { try { gainNode.disconnect(); gainNode = null; } catch (e) {} }
                 isPlaying = false;
             }, 550);
 
@@ -83178,6 +83215,10 @@ window.SovereignAudioGuardian = (function() {
     let isBound = false;
 
     async function attemptResume(triggerSource) {
+        // Zero-autoplay: never resurrect the context from a tab switch, focus
+        // or pageshow unless the user has already granted a gesture. A bare
+        // resume here would count as unsolicited audio on tab switch.
+        try { if (typeof audioContextUserGestureReceived === "undefined" || !audioContextUserGestureReceived) return false; } catch (_) { return false; }
         const ctx = window.audioContext;
         if (!ctx) return false;
 

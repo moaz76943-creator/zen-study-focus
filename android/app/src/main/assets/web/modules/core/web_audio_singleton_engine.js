@@ -73,7 +73,11 @@
                 gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.035);
 
                 osc.connect(gain);
-                gain.connect(ctx.destination);
+                // Single master chain: clicks must obey the instant kill switch
+                // (Stop/mute/tab-hide), not bypass it to the raw destination.
+                gain.connect((typeof window !== "undefined" && typeof window.getSafeAudioDestination === "function")
+                    ? window.getSafeAudioDestination(ctx)
+                    : ctx.destination);
 
                 osc.start();
                 osc.stop(ctx.currentTime + 0.04);
@@ -98,7 +102,11 @@
                 gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.5);
 
                 osc.connect(gain);
-                gain.connect(ctx.destination);
+                // Single master chain: session bells must obey the instant kill
+                // switch (Stop/mute/tab-hide), not bypass it to raw destination.
+                gain.connect((typeof window !== "undefined" && typeof window.getSafeAudioDestination === "function")
+                    ? window.getSafeAudioDestination(ctx)
+                    : ctx.destination);
 
                 osc.start();
                 osc.stop(ctx.currentTime + 1.6);
@@ -124,7 +132,11 @@
                     gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 1.8);
 
                     osc.connect(gain);
-                    gain.connect(ctx.destination);
+                    // Single master chain: completion chimes must obey the
+                    // instant kill switch (Stop/mute/tab-hide), not bypass it.
+                    gain.connect((typeof window !== "undefined" && typeof window.getSafeAudioDestination === "function")
+                        ? window.getSafeAudioDestination(ctx)
+                        : ctx.destination);
 
                     osc.start(startTime);
                     osc.stop(startTime + 1.9);

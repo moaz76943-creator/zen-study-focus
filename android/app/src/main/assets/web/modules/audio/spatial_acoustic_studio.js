@@ -113,13 +113,26 @@
     initAudioContext() {
       if (this.audioCtx) return this.audioCtx;
 
-      const AudioContextClass = typeof window !== 'undefined' &&
-        (window.AudioContext || window.webkitAudioContext);
-      if (!AudioContextClass) {
-        throw new Error('Web Audio API is not supported in this environment');
-      }
+      // Prefer the single shared master AudioContext + ear-safety kill chain
+      // so studio playback is silenced by Stop/mute/tab-hide like every other
+      // voice. A private context drains separate from Stop and keeps humming —
+      // fall back to one only when the shared context is truly unavailable.
+      let ctx = null;
+      try {
+        if (typeof window !== 'undefined' && typeof window.dfGetGlobalAudioContext === 'function') {
+          ctx = window.dfGetGlobalAudioContext();
+        }
+      } catch (e) { ctx = null; }
 
-      this.audioCtx = new AudioContextClass();
+      if (!ctx) {
+        const AudioContextClass = typeof window !== 'undefined' &&
+          (window.AudioContext || window.webkitAudioContext);
+        if (!AudioContextClass) {
+          throw new Error('Web Audio API is not supported in this environment');
+        }
+        ctx = new AudioContextClass();
+      }
+      this.audioCtx = ctx;
 
       this.masterGain = this.audioCtx.createGain();
       this.masterGain.gain.setValueAtTime(
@@ -151,7 +164,7 @@
         return filter;
       });
 
-      // Chain: DC block -> EQ filters -> master gain -> analyser -> destination
+      // Chain: DC block -> EQ filters -> master gain -> analyser -> master kill chain
       this.dcBlockFilter.connect(this.eqFilters[0]);
       for (let i = 0; i < this.eqFilters.length - 1; i++) {
         this.eqFilters[i].connect(this.eqFilters[i + 1]);
@@ -159,7 +172,10 @@
 
       this.eqFilters[this.eqFilters.length - 1].connect(this.masterGain);
       this.masterGain.connect(this.analyser);
-      this.analyser.connect(this.audioCtx.destination);
+      const outDest = (typeof window !== 'undefined' && typeof window.getSafeAudioDestination === 'function')
+        ? window.getSafeAudioDestination(this.audioCtx)
+        : this.audioCtx.destination;
+      this.analyser.connect(outDest);
 
       return this.audioCtx;
     }

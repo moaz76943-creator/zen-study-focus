@@ -131,7 +131,9 @@
   function synthNoiseInto(data, color) {
     const n = data.length;
     if (color === 'white') {
-      for (let i = 0; i < n; i++) data[i] = (Math.random() * 2 - 1) * 0.3;
+      // Full-band white at low amplitude — 0.3 was audible hiss; 0.08 is a
+      // clean air-tone through the 15Hz DC blockers downstream.
+      for (let i = 0; i < n; i++) data[i] = (Math.random() * 2 - 1) * 0.08;
       return;
     }
     let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
@@ -149,7 +151,10 @@
       if (color === 'pink') {
         data[i] = pink * 0.11;
       } else { // brown
-        brown = 0.9985 * brown + pink * 0.5; // leaky integrator: bounded DC
+        // Leaky integrator of WHITE noise (the true brown slope). Integrating
+        // the pink signal doubled the low-frequency weight into infrasonic
+        // rumble that bleeds as a constant pressure hiss on loops.
+        brown = 0.9985 * brown + white * 0.5;
         data[i] = brown;
         if (Math.abs(brown) > peak) peak = Math.abs(brown);
       }
@@ -242,32 +247,44 @@
     S.noiseGeneration = (S.noiseGeneration || 0) + 1;
     clearFadeTimers();
     // Web Audio ambient sources: click-free 75ms linear ramp, then stop.
-    try {
-      const ctx = S.dspContext;
-      if (S.activeGain && ctx && ctx.state !== 'closed') {
-        const now = ctx.currentTime;
-        S.activeGain.gain.cancelScheduledValues(now);
-        S.activeGain.gain.setValueAtTime(Math.max(0.0001, S.activeGain.gain.value), now);
-        S.activeGain.gain.linearRampToValueAtTime(0, now + FADE_OUT_SEC);
-      }
-    } catch (e) {}
-    const src = S.activeSource;
-    if (src) {
+    // Track every concurrent layer (mixAmbient stacks rain+forest); the old
+    // code only faded S.activeGain, so the first layer kept playing at full
+    // volume after Stop — a permanent background loop.
+    const ctx = S.activeCtx || S.dspContext;
+    const sources = (S.activeSources && S.activeSources.length)
+      ? S.activeSources.slice()
+      : (S.activeSource ? [{ source: S.activeSource, gain: S.activeGain, dc: S.activeDC }] : []);
+    sources.forEach(function (entry) {
       try {
-        const ctx = S.dspContext;
-        if (ctx && ctx.state !== 'closed') src.stop(ctx.currentTime + FADE_OUT_SEC + 0.01);
-        else src.stop();
+        if (entry.gain && ctx && ctx.state !== 'closed') {
+          const now = ctx.currentTime;
+          entry.gain.gain.cancelScheduledValues(now);
+          entry.gain.gain.setValueAtTime(Math.max(0.0001, entry.gain.gain.value), now);
+          entry.gain.gain.linearRampToValueAtTime(0, now + FADE_OUT_SEC);
+        }
       } catch (e) {}
-    }
-    const kill = function () {
-      try { if (S.activeSource) S.activeSource.disconnect(); } catch (e) {}
-      try { if (S.activeGain) S.activeGain.disconnect(); } catch (e) {}
-      try { if (S.activeDC) S.activeDC.disconnect(); } catch (e) {}
-      S.activeSource = null;
-      S.activeGain = null;
-      S.activeDC = null;
-    };
-    setTimeout(kill, 130);
+    });
+    sources.forEach(function (entry) {
+      try {
+        if (ctx && ctx.state !== 'closed') entry.source.stop(ctx.currentTime + FADE_OUT_SEC + 0.01);
+        else entry.source.stop();
+      } catch (e) {}
+    });
+    // Capture refs so the timer tears down exactly these nodes, never a newer
+    // source that started after this stop.
+    const killList = sources;
+    setTimeout(function () {
+      killList.forEach(function (entry) {
+        try { if (entry.source) entry.source.disconnect(); } catch (e) {}
+        try { if (entry.gain) entry.gain.disconnect(); } catch (e) {}
+        try { if (entry.dc) entry.dc.disconnect(); } catch (e) {}
+      });
+    }, 130);
+    S.activeSources = [];
+    S.activeSource = null;
+    S.activeGain = null;
+    S.activeDC = null;
+    S.activeCtx = null;
     // HTML fallback players: same click-free ramp.
     if (S.activeHTML && S.activeHTML.length) {
       S.activeHTML.forEach(function (a) { fadeStopHTML(a); });
@@ -315,8 +332,11 @@
       }
       return a;
     }
-    S.noiseGeneration = (S.noiseGeneration || 0) + 1;
-    const gen = S.noiseGeneration;
+    S.activeCtx = ctx;
+    S.activeSources = S.activeSources || [];
+    // Capture the shared stop epoch WITHOUT bumping it, so concurrent layers
+    // (mixAmbient) are all valid — only a stop invalidates in-flight builds.
+    const gen = S.noiseGeneration || 0;
     buildLoopBuffer(ctx, srcKey).then(function (buffer) {
       if (gen !== (S.noiseGeneration || 0)) return; // stale request (stop happened)
       if (!buffer) return;
@@ -337,10 +357,12 @@
       S.activeSource = source;
       S.activeGain = gain;
       S.activeDC = dc;
+      S.activeSources.push({ source: source, gain: gain, dc: dc });
       source.onended = function () {
         if (S.activeSource === source) {
           S.activeSource = null; S.activeGain = null; S.activeDC = null;
         }
+        S.activeSources = (S.activeSources || []).filter(function (e) { return e.source !== source; });
       };
     }).catch(function () {});
     return { pending: true };
@@ -379,8 +401,9 @@
       if (typeof global.Audio === 'undefined') return false;
       const ctx = getCtx();
       if (ctx && typeof ctx.createBufferSource === 'function') {
-        S.noiseGeneration = (S.noiseGeneration || 0) + 1;
-        const gen = S.noiseGeneration;
+        // Capture epoch without bumping: a stop() must silence the bell's
+        // scheduled attack, but the bell itself must not cancel ambient builds.
+        const gen = S.noiseGeneration || 0;
         buildLoopBuffer(ctx, 'cue').then(function (buffer) {
           if (gen !== (S.noiseGeneration || 0)) return;
           if (!buffer) return;
@@ -415,11 +438,14 @@
         for (let i = 0; i < S.players.length; i++) {
           try { S.players[i].volume = S.muted ? 0 : S.volume; } catch (e) {}
         }
-        try {
-          if (S.activeGain && S.dspContext) {
-            S.activeGain.gain.setValueAtTime(Math.max(0.0001, finalVol(S.volume)), S.dspContext.currentTime);
-          }
-        } catch (e) {}
+        // Shared-context mode: apply to every tracked Web Audio layer.
+        const vctx = S.activeCtx || S.dspContext;
+        if (vctx) {
+          const targets = (S.activeSources && S.activeSources.length) ? S.activeSources : (S.activeGain ? [{ gain: S.activeGain }] : []);
+          targets.forEach(function (entry) {
+            try { entry.gain.gain.setValueAtTime(Math.max(0.0001, finalVol(S.volume)), vctx.currentTime); } catch (e) {}
+          });
+        }
       }
       return this.volume;
     },
@@ -429,12 +455,16 @@
       for (let i = 0; i < S.players.length; i++) {
         try { S.players[i].volume = S.muted ? 0 : S.volume; } catch (e) {}
       }
-      try {
-        if (S.activeGain && S.dspContext) {
-          S.activeGain.gain.cancelScheduledValues(S.dspContext.currentTime);
-          S.activeGain.gain.setValueAtTime(Math.max(0.0001, finalVol(S.volume)), S.dspContext.currentTime);
-        }
-      } catch (e) {}
+      const vctx = S.activeCtx || S.dspContext;
+      if (vctx) {
+        const targets = (S.activeSources && S.activeSources.length) ? S.activeSources : (S.activeGain ? [{ gain: S.activeGain }] : []);
+        targets.forEach(function (entry) {
+          try {
+            entry.gain.gain.cancelScheduledValues(vctx.currentTime);
+            entry.gain.gain.setValueAtTime(Math.max(0.0001, finalVol(S.volume)), vctx.currentTime);
+          } catch (e) {}
+        });
+      }
       return S.muted;
     }
   };
