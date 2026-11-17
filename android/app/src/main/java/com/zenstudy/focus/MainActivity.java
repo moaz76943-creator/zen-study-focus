@@ -116,10 +116,12 @@ public class MainActivity extends AppCompatActivity {
             boolean hasVisibleNavBar = navigationBars.bottom > 0 || systemBars.bottom > 0;
             boolean isGestureNav = hasGestureHandle && !hasVisibleNavBar;
 
-            // Apply minimum nav bar height fallback (Material spec: 56dp 3-button, 32dp gesture handle)
-            // This ensures WebView padding and JS calibrator both have safe minimums even if insets report 0.
+            // Apply minimum nav bar height fallback (Material spec: 56dp 3-button, 32dp gesture handle);
+            // Xiaomi Android 15 3-button nav bar is taller (~72dp); use 72dp floor to prevent
+            // WebView viewport from extending behind the nav bar, which clips bottom cards and
+            // causes the Studios pill to overlap content.
             float density = getResources().getDisplayMetrics().density;
-            int minNavDp = isGestureNav ? 32 : 56;
+            int minNavDp = isGestureNav ? 32 : 72;
             int minNavPx = Math.round(minNavDp * density);
             if (navBottom < minNavPx) navBottom = minNavPx;
 
