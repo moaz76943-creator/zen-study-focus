@@ -100,9 +100,10 @@
       root.style.setProperty('--df-safe-left', '0px', 'important');
       root.style.setProperty('--df-safe-right', '0px', 'important');
       root.style.setProperty('--df-webview-padding-bottom', '0px', 'important');
-      // Fixed dock reserve: 12px dock gap + ~62px capsule + 12px card clearance = 86px.
-      // Kept constant so floating layers never cover each other or the last card.
-      root.style.setProperty('--df-bottom-nav-clearance', '86px', 'important');
+      // Fixed dock reserve: dock gap (12px) + capsule height (70px) + gap to FAB/Studios (8px)
+      // + max(FAB height 54px, Studios pill height 48px) = 144px.
+      // This ensures in-flow content (last card) ends above the floating layers.
+      root.style.setProperty('--df-bottom-nav-clearance', '144px', 'important');
       // Capsule height estimate for positioning floating elements above it.
       root.style.setProperty('--df-capsule-height', '70px', 'important');
     },

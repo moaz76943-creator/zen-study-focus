@@ -35,7 +35,7 @@ assert.ok(html.includes('var(--df-capsule-height, 70px) + 8px'),
 console.log('✔ Dock formulas use the calibrated single-owner inset variables.');
 
 // Body must reserve enough bottom clearance for the capsule (gap + ~70px capsule + card gap).
-assert.ok(/padding-bottom:\s*calc\(var\(--df-webview-padding-bottom, 56px\) \+ var\(--df-bottom-nav-clearance, 86px\)\)/.test(html),
+assert.ok(/padding-bottom:\s*calc\(var\(--df-webview-padding-bottom, 56px\) \+ var\(--df-bottom-nav-clearance, 144px\)\)/.test(html),
   'body must reserve --df-bottom-nav-clearance above the native inset edge');
 console.log('✔ Body bottom clearance reserves capsule + FAB zone above the safe content edge.');
 

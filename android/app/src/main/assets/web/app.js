@@ -41249,7 +41249,7 @@ window.dfApplySafeAreaInsets = function() {
     }
     body {
       padding-top: var(--safe-top) !important;
-      padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px)) !important;
+      padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px)) !important;
       padding-left: var(--safe-left) !important;
       padding-right: var(--safe-right) !important;
       box-sizing: border-box !important;
@@ -47855,7 +47855,7 @@ window.dfApplySafeAreaInsets = function(rootEl) {
       '}',
       'body {',
       '  padding-top: var(--safe-top);',
-      '  padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px));',
+      '  padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px));',
       '}'
     ].join('\n');
     if (document.head) document.head.appendChild(styleEl);
