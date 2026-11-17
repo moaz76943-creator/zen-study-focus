@@ -135,6 +135,28 @@
         const t = i / xfadeSamples;
         finalData[i] = srcData[i] * t + srcData[finalSize + i] * (1 - t);
       }
+
+      // Post-process: DC removal → peak normalize → hard clamp (same as procedural buffers)
+      // 1. DC removal
+      let mean = 0;
+      for (let i = 0; i < finalSize; i++) mean += finalData[i];
+      mean /= finalSize;
+      for (let i = 0; i < finalSize; i++) finalData[i] -= mean;
+
+      // 2. Peak normalize to 0.9 (leaves headroom for master limiter)
+      let peak = 0;
+      for (let i = 0; i < finalSize; i++) {
+        const a = Math.abs(finalData[i]);
+        if (a > peak) peak = a;
+      }
+      const norm = peak > 0 ? 0.9 / peak : 1;
+      for (let i = 0; i < finalSize; i++) finalData[i] *= norm;
+
+      // 3. Hard safety clamp
+      for (let i = 0; i < finalSize; i++) {
+        if (finalData[i] > 1.0) finalData[i] = 1.0;
+        else if (finalData[i] < -1.0) finalData[i] = -1.0;
+      }
     }
     return finalBuffer;
   }
@@ -200,6 +222,23 @@
       const t = i / xfadeSamples;
       outData[i] = tempData[i] * t + tempData[finalSize + i] * (1 - t);
     }
+
+    // Post-process: peak normalize → hard clamp (DC already removed by synthNoiseInto)
+    // 1. Peak normalize to 0.9 (leaves headroom for master limiter)
+    let peak = 0;
+    for (let i = 0; i < finalSize; i++) {
+      const a = Math.abs(outData[i]);
+      if (a > peak) peak = a;
+    }
+    const norm = peak > 0 ? 0.9 / peak : 1;
+    for (let i = 0; i < finalSize; i++) outData[i] *= norm;
+
+    // 2. Hard safety clamp
+    for (let i = 0; i < finalSize; i++) {
+      if (outData[i] > 1.0) outData[i] = 1.0;
+      else if (outData[i] < -1.0) outData[i] = -1.0;
+    }
+
     return out;
   }
 

@@ -192,6 +192,7 @@
       } else if (t === "pink") {
         // Paul Kellet pink noise approximation
         var b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+        var peak = 0;
         for (var j = 0; j < len; j++) {
           var w = Math.random() * 2 - 1;
           b0 = 0.99886 * b0 + w * 0.0555179;
@@ -203,13 +204,24 @@
           b6 = w * 0.115926;
           var pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362;
           buf[j] = pink * 0.11;
+          var a = Math.abs(buf[j]);
+          if (a > peak) peak = a;
         }
+        // Peak normalize to 0.9 (consistent with AudioCore)
+        var norm = peak > 0 ? 0.9 / peak : 1;
+        for (var n = 0; n < len; n++) buf[n] *= norm;
       } else {
         // white noise — properly filled buffer (never a silent zero buffer);
         // 0.5 was audible static hiss, 0.08 matches the other engines.
+        var peak = 0;
         for (var k = 0; k < len; k++) {
           buf[k] = (Math.random() * 2 - 1) * 0.08;
+          var a = Math.abs(buf[k]);
+          if (a > peak) peak = a;
         }
+        // Peak normalize to 0.9 (consistent with AudioCore)
+        var norm = peak > 0 ? 0.9 / peak : 1;
+        for (var n = 0; n < len; n++) buf[n] *= norm;
       }
       // DC-removal pass: kill residual sample-average hum (constant static)
       // before the buffer reaches a gain node.
@@ -217,6 +229,12 @@
       for (var m = 0; m < len; m++) mean += buf[m];
       mean /= len;
       for (var d = 0; d < len; d++) buf[d] -= mean;
+
+      // Hard safety clamp: [-1, 1]
+      for (var c = 0; c < len; c++) {
+        if (buf[c] > 1.0) buf[c] = 1.0;
+        else if (buf[c] < -1.0) buf[c] = -1.0;
+      }
       return buf;
     },
     playNoise: function (type, vol) { this.activeNoiseType = type || "rain"; return SovereignRealAudio.playAmbient(type, vol); },

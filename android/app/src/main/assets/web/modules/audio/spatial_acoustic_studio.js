@@ -42,7 +42,7 @@
     if (audioCore && audioCore.createSeamlessBuffer) {
       return audioCore.createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels);
     }
-    // Fallback (should never be used)
+    // Fallback (should never be used) - matches AudioCore's full processing
     const extraSec = XFADE_MS / 1000;
     const finalSize = Math.floor(ctx.sampleRate * durationSec);
     const xfadeSamples = Math.max(1, Math.floor(ctx.sampleRate * extraSec));
@@ -55,14 +55,45 @@
     }
     generatorFn(channelData, ctx.sampleRate, totalSec);
 
+    // Post-process each channel: DC removal → peak norm → hard clamp
+    for (let ch = 0; ch < numChannels; ch++) {
+      const data = channelData[ch];
+
+      // 1. DC removal (entire buffer including xfade tail)
+      let mean = 0;
+      for (let i = 0; i < bufferSize; i++) mean += data[i];
+      mean /= bufferSize;
+      for (let i = 0; i < bufferSize; i++) data[i] -= mean;
+
+      // 2. Peak normalize to 0.9 (leaves headroom for master limiter)
+      let peak = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const a = Math.abs(data[i]);
+        if (a > peak) peak = a;
+      }
+      const norm = peak > 0 ? 0.9 / peak : 1;
+      for (let i = 0; i < bufferSize; i++) data[i] *= norm;
+
+      // 3. Hard safety clamp
+      for (let i = 0; i < bufferSize; i++) {
+        if (data[i] > 1.0) data[i] = 1.0;
+        else if (data[i] < -1.0) data[i] = -1.0;
+      }
+    }
+
+    // 4. Crossfade tail into head for seamless loop
     const finalBuffer = ctx.createBuffer(numChannels, finalSize, ctx.sampleRate);
     for (let ch = 0; ch < numChannels; ch++) {
       const finalData = finalBuffer.getChannelData(ch);
-      const tempChData = channelData[ch];
-      finalData.set(tempChData.subarray(0, finalSize));
+      const tempData = channelData[ch];
+
+      // Body: copy main segment unchanged
+      finalData.set(tempData.subarray(0, finalSize));
+
+      // Head crossfade: blend natural tail continuation into head
       for (let i = 0; i < xfadeSamples; i++) {
         const t = i / xfadeSamples;
-        finalData[i] = (1 - t) * tempChData[finalSize + i] + t * tempChData[i];
+        finalData[i] = (1 - t) * tempData[finalSize + i] + t * tempData[i];
       }
     }
     return finalBuffer;
