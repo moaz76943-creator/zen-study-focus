@@ -563,7 +563,9 @@
             // make this dark pill's label unreadable — declare white with !important so it wins.
             pill.style.setProperty("color", "#ffffff", "important");
             pill.style.width = "auto";
-            pill.style.maxWidth = "min(320px, calc(100vw - 64px))";
+            // Reserve space for FAB (left:24px + width:54px + 12px gap = 90px from left)
+            // so Studios pill never overlaps the FAB on narrow screens.
+            pill.style.maxWidth = "min(320px, calc(100vw - 102px))";
             pill.style.minHeight = "48px";
             pill.style.background = "rgba(17, 24, 39, 0.97)";
             pill.style.backdropFilter = "blur(12px)";
