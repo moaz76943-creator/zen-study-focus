@@ -10,27 +10,28 @@
   // Generate a seamlessly looping buffer by crossfading end to start
   function createSeamlessBuffer(ctx, durationSec, generatorFn) {
     const extraSec = XFADE_MS / 1000;
-    const totalSec = durationSec + extraSec;
-    const bufferSize = Math.floor(ctx.sampleRate * totalSec);
+    const finalSize = Math.floor(ctx.sampleRate * durationSec);
+    const xfadeSamples = Math.max(1, Math.floor(ctx.sampleRate * extraSec));
+    // Generate exactly finalSize + xfadeSamples so the generator emits a genuine
+    // tail continuation past the loop point for the crossfade to consume.
+    const bufferSize = finalSize + xfadeSamples;
+    const totalSec = bufferSize / ctx.sampleRate;
     const tempBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const tempData = tempBuffer.getChannelData(0);
-    
-    // Generate extra-long buffer
+
     generatorFn(tempData, ctx.sampleRate, totalSec);
-    
-    // Create final buffer with exact duration
-    const finalSize = Math.floor(ctx.sampleRate * durationSec);
+
     const finalBuffer = ctx.createBuffer(1, finalSize, ctx.sampleRate);
     const finalData = finalBuffer.getChannelData(0);
-    
-    const xfadeSamples = Math.floor(ctx.sampleRate * extraSec);
-    // Copy main portion
+    // Copy the main body; the tail samples remain as-is.
     finalData.set(tempData.subarray(0, finalSize));
-    // Crossfade loop point: blend end into start
+    // Crossfade the genuine tail continuation into the head so the loop wrap
+    // is click-free. Weighting makes final[0] == tail-start and
+    // final[xfade-1] == head, which is continuous with the generator output
+    // across the loop boundary (temp[finalSize-1] -> temp[finalSize]).
     for (let i = 0; i < xfadeSamples; i++) {
       const t = i / xfadeSamples;
-      const endIdx = finalSize - xfadeSamples + i;
-      finalData[i] = (1 - t) * finalData[i] + t * tempData[endIdx];
+      finalData[i] = (1 - t) * tempData[finalSize + i] + t * tempData[i];
     }
     return finalBuffer;
   }

@@ -13956,28 +13956,28 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 
   function dfStopBinauralGamma() {
-    try {
-      if (_binauralMasterGain && _binauralCtx) {
-        _binauralMasterGain.gain.setValueAtTime(_binauralMasterGain.gain.value, _binauralCtx.currentTime);
-        _binauralMasterGain.gain.exponentialRampToValueAtTime(0.0001, _binauralCtx.currentTime + 0.5);
+      try {
+        if (_binauralMasterGain && _binauralCtx) {
+          _binauralMasterGain.gain.setValueAtTime(_binauralMasterGain.gain.value, _binauralCtx.currentTime);
+          _binauralMasterGain.gain.exponentialRampToValueAtTime(0.0001, _binauralCtx.currentTime + 0.06);
 
-        setTimeout(function() {
-          try {
-            if (_leftOsc) { _leftOsc.stop(); _leftOsc.disconnect(); _leftOsc = null; }
-            if (_rightOsc) { _rightOsc.stop(); _rightOsc.disconnect(); _rightOsc = null; }
-            if (_binauralMasterGain) { _binauralMasterGain.disconnect(); _binauralMasterGain = null; }
-            if (_binauralDcBlock) { _binauralDcBlock.disconnect(); _binauralDcBlock = null; }
-          } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-        }, 550);
-      }
-    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+          setTimeout(function() {
+            try {
+              if (_leftOsc) { _leftOsc.stop(); _leftOsc.disconnect(); _leftOsc = null; }
+              if (_rightOsc) { _rightOsc.stop(); _rightOsc.disconnect(); _rightOsc = null; }
+              if (_binauralMasterGain) { _binauralMasterGain.disconnect(); _binauralMasterGain = null; }
+              if (_binauralDcBlock) { _binauralDcBlock.disconnect(); _binauralDcBlock = null; }
+            } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+          }, 100);
+        }
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
-    try {
-      localStorage.setItem("df_binaural_gamma_active_v1", "false");
-    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+      try {
+        localStorage.setItem("df_binaural_gamma_active_v1", "false");
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
-    return { active: false };
-  }
+      return { active: false };
+    }
 
   function dfStartBinauralGamma(carrierFreq) {
     dfStopBinauralGamma();
@@ -38255,11 +38255,13 @@ window.dfGenerateNoiseBuffer = function(ctx, type) {
   const xfadeSamples = Math.floor(ctx.sampleRate * extraSec);
   // Copy main portion
   finalData.set(tempData.subarray(0, finalSize));
-  // Crossfade loop point: blend end into start
+  // Crossfade the genuine tail continuation into the head so the loop wrap
+  // is click-free. Weighting makes final[0] == tail-start and
+  // final[xfade-1] == head, which is continuous with the generator output
+  // across the loop boundary (temp[finalSize-1] -> temp[finalSize]).
   for (let i = 0; i < xfadeSamples; i++) {
     const t = i / xfadeSamples;
-    const endIdx = finalSize - xfadeSamples + i;
-    finalData[i] = (1 - t) * finalData[i] + t * tempData[endIdx];
+    finalData[i] = (1 - t) * tempData[finalSize + i] + t * tempData[i];
   }
   
   return finalBuffer;

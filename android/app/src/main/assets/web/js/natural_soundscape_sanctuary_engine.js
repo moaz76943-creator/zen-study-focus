@@ -13,27 +13,28 @@
   // Generate a seamlessly looping buffer by crossfading end to start
   function createSeamlessBuffer(ctx, durationSec, generatorFn) {
     const extraSec = XFADE_MS / 1000;
-    const totalSec = durationSec + extraSec;
-    const bufferSize = Math.floor(ctx.sampleRate * totalSec);
+    const finalSize = Math.floor(ctx.sampleRate * durationSec);
+    const xfadeSamples = Math.max(1, Math.floor(ctx.sampleRate * extraSec));
+    // Generate exactly finalSize + xfadeSamples so the generator emits a genuine
+    // tail continuation past the loop point for the crossfade to consume.
+    const bufferSize = finalSize + xfadeSamples;
+    const totalSec = bufferSize / ctx.sampleRate;
     const tempBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
     const tempData = tempBuffer.getChannelData(0);
-    
-    // Generate extra-long buffer
+
     generatorFn(tempData, ctx.sampleRate, totalSec);
-    
-    // Create final buffer with exact duration
-    const finalSize = Math.floor(ctx.sampleRate * durationSec);
+
     const finalBuffer = ctx.createBuffer(1, finalSize, ctx.sampleRate);
     const finalData = finalBuffer.getChannelData(0);
-    
-    const xfadeSamples = Math.floor(ctx.sampleRate * extraSec);
-    // Copy main portion
+    // Copy the main body; the tail samples remain as-is.
     finalData.set(tempData.subarray(0, finalSize));
-    // Crossfade loop point: blend end into start
+    // Crossfade the genuine tail continuation into the head so the loop wrap
+    // is click-free. Weighting makes final[0] == tail-start and
+    // final[xfade-1] == head, which is continuous with the generator output
+    // across the loop boundary (temp[finalSize-1] -> temp[finalSize]).
     for (let i = 0; i < xfadeSamples; i++) {
       const t = i / xfadeSamples;
-      const endIdx = finalSize - xfadeSamples + i;
-      finalData[i] = (1 - t) * finalData[i] + t * tempData[endIdx];
+      finalData[i] = (1 - t) * tempData[finalSize + i] + t * tempData[i];
     }
     return finalBuffer;
   }
@@ -72,8 +73,9 @@
         const bufferSize = Math.floor(sampleRate * durationSec);
         // Full Paul Kellet pink noise filter
         let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-        // Brown noise accumulator
+        // Brown noise accumulator with leak to prevent DC drift (bounded random walk)
         let brownAccum = 0;
+        let peak = 0;
 
         for (let i = 0; i < bufferSize; i++) {
           const white = Math.random() * 2 - 1;
@@ -89,6 +91,7 @@
             b6 = white * 0.115926;
           } else if (type === 'ocean' || type === 'wind') {
             // Brown Noise: integrate pink noise (-6dB/oct additional slope)
+            // With leak factor to prevent unbounded DC drift → no static/clipping on loop
             b0 = 0.99886 * b0 + white * 0.0555179;
             b1 = 0.99332 * b1 + white * 0.0750759;
             b2 = 0.96900 * b2 + white * 0.1538520;
@@ -97,8 +100,10 @@
             b5 = -0.7616 * b5 - white * 0.0168980;
             const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
             b6 = white * 0.115926;
-            brownAccum = brownAccum + pink * 0.01;
+            // Leaky integrator: bounded DC, no drift across buffer restarts
+            brownAccum = 0.9985 * brownAccum + pink * 0.5;
             data[i] = brownAccum * 0.8;
+            if (Math.abs(data[i]) > peak) peak = Math.abs(data[i]);
           } else {
             // Campfire crackle: sparse pops on low noise floor
             const pop = Math.random() > 0.9985 ? (Math.random() * 2 - 1) * 0.8 : 0;
@@ -106,7 +111,11 @@
             data[i] = b0 * 0.1 + pop;
           }
         }
-        // Hard safety clamp
+        // Peak-normalize to 0.9 (full scale minus headroom): guarantees no clipping
+        // and identical loudness across loop restarts.
+        const norm = peak > 0 ? 0.9 / peak : 1;
+        for (let i = 0; i < bufferSize; i++) data[i] *= norm;
+        // Hard safety clamp (defensive, should never trigger after normalization)
         for (let i = 0; i < bufferSize; i++) {
           if (data[i] > 1.0) data[i] = 1.0;
           else if (data[i] < -1.0) data[i] = -1.0;
