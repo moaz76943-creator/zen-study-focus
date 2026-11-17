@@ -82,19 +82,19 @@ public class MainActivity extends AppCompatActivity {
         // display cutouts and the on-screen keyboard.
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         ViewCompat.setOnApplyWindowInsetsListener(webView, (v, windowInsets) -> {
-            // Android 15 (API 35) edge-to-edge: systemBars() returns status + navigation (including gesture handle).
-            // On Xiaomi gesture navigation, navigationBars() can return 0; systemBars() is authoritative.
-            // Also query mandatorySystemGestures for the gesture handle zone which may exceed navigationBars.
+            // Android 15 (API 35) edge-to-edge: systemBars() returns status + navigation bars.
+            // On Xiaomi gesture navigation, navigationBars() can return 0; systemBars() is authoritative for bars.
+            // Query mandatorySystemGestures (replaces deprecated systemGestures) for the gesture handle zone.
             Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()
                     | WindowInsetsCompat.Type.displayCutout());
             Insets navigationBars = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars());
-            Insets systemGestures = windowInsets.getInsets(WindowInsetsCompat.Type.systemGestures());
+            Insets mandatorySystemGestures = windowInsets.getInsets(WindowInsetsCompat.Type.mandatorySystemGestures());
             Insets ime = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
 
             // Status bar top from systemBars (includes cutout top)
             int paddingTop = systemBars.top;
-            // Navigation bottom: max of navigationBars, systemBars, systemGestures (gesture handle), IME
-            int navBottom = Math.max(Math.max(navigationBars.bottom, systemBars.bottom), systemGestures.bottom);
+            // Navigation bottom: max of navigationBars, systemBars, mandatorySystemGestures (gesture handle), IME
+            int navBottom = Math.max(Math.max(navigationBars.bottom, systemBars.bottom), mandatorySystemGestures.bottom);
             int paddingBottom = Math.max(navBottom, ime.bottom);
             int paddingLeft = systemBars.left;
             int paddingRight = systemBars.right;

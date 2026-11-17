@@ -48,8 +48,10 @@
 .bottom-nav,
 nav.bottom-navigation,
 #main-bottom-nav {
-    padding-bottom: calc(var(--zen-safe-bottom) + var(--df-bottom-nav-clearance, 8px)) !important;
-    min-height: calc(56px + var(--zen-safe-bottom));
+    /* Sit ON TOP of system nav bar; internal padding only */
+    bottom: var(--df-safe-bottom, 0px) !important;
+    padding-bottom: 8px !important;
+    min-height: 56px !important;
 }
 
 /* Small Viewport Specific overrides (320px - 360px) */

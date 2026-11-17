@@ -891,7 +891,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
 
     body {
       padding-top: var(--df-sat);
-      padding-bottom: calc(var(--df-sab) + var(--df-bottom-nav-clearance, 94px)) !important;
+      /* Body content padding clears floating elements (FAB, Studios pill).
+         --df-bottom-nav-clearance = nav inset + 48dp touch clearance. */
+      padding-bottom: var(--df-bottom-nav-clearance, 94px) !important;
       padding-left: var(--df-sal);
       padding-right: var(--df-sar);
     }
@@ -1431,7 +1433,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     /* Edge-to-Edge Safe Area Insets for Android 15 / Xiaomi 17T Pro */
     body {
         padding-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
-        padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));
+        /* Body content padding clears floating elements (FAB, Studios pill).
+           --df-bottom-nav-clearance = nav inset + 48dp touch clearance. */
+        padding-bottom: var(--df-bottom-nav-clearance, 108px);
         padding-left: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
         padding-right: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
     }
