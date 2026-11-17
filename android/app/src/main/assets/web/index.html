@@ -65,7 +65,10 @@
       font-variant-numeric: tabular-nums lining-nums;
       -webkit-tap-highlight-color: transparent;
     }
-    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 20px); overflow-x: hidden; user-select: none; }
+    /* Reserve clears the docked bottom stack: capsule (12 gap + 70 capsule), then the
+       8px dock gap above it, then the fixed FAB / Studios pill row (54px), plus 12px
+       so the last in-flow card can never sit under a floating layer. */
+    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px + 54px + 12px); overflow-x: hidden; user-select: none; }
     input, textarea { user-select: text; text-align: start; }
 
     body.deep-lockdown .dynamic-hero-header,
@@ -931,8 +934,10 @@ header, .app-header, .top-bar, .dynamic-hero-header {
       position: relative;
       transition: max-width 0.25s cubic-bezier(0.16, 1, 0.3, 1);
       will-change: max-width;
-      transform: translateZ(0);
-      backface-visibility: hidden;
+      /* No transform/filter/backdrop-filter/perspective here: any of them would make
+         .app-shell the containing block for position:fixed descendants, anchoring the
+         bottom capsule / FAB to the page bottom instead of the viewport and covering
+         the last card on every screen. */
     }
 
     /* Tall Aspect Ratio Phones (Xiaomi 17T Pro, Galaxy Ultra, Sony Xperia - 19.5:9 to 21:9) */
