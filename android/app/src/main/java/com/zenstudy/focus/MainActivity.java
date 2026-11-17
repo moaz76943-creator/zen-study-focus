@@ -82,9 +82,9 @@ public class MainActivity extends AppCompatActivity {
         // display cutouts and the on-screen keyboard.
         WindowCompat.setDecorFitsSystemWindows(getWindow(), false);
         ViewCompat.setOnApplyWindowInsetsListener(webView, (v, windowInsets) -> {
-            // Android 15 (API 35) edge-to-edge: systemBars() returns status + navigation bars.
-            // On Xiaomi gesture navigation, navigationBars() can return 0; systemBars() is authoritative for bars.
-            // Query mandatorySystemGestures (replaces deprecated systemGestures) for the gesture handle zone.
+            // Android 15 (API 35) edge-to-edge: systemBars() returns status + navigation bars (3-button).
+            // On Xiaomi gesture navigation, navigationBars() returns 0; mandatorySystemGestures() provides the gesture handle height.
+            // systemBars() on gesture nav returns only status bar (bottom = 0). Combine all three for true bar height.
             Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()
                     | WindowInsetsCompat.Type.displayCutout());
             Insets navigationBars = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars());
@@ -93,7 +93,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Status bar top from systemBars (includes cutout top)
             int paddingTop = systemBars.top;
-            // Navigation bottom: max of navigationBars, systemBars, mandatorySystemGestures (gesture handle), IME
+            // Navigation bottom: max of navigationBars (3-button), systemBars.bottom (3-button), mandatorySystemGestures (gesture handle), IME
             int navBottom = Math.max(Math.max(navigationBars.bottom, systemBars.bottom), mandatorySystemGestures.bottom);
             int paddingBottom = Math.max(navBottom, ime.bottom);
             int paddingLeft = systemBars.left;

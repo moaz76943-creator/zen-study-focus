@@ -444,9 +444,9 @@
     /* 6-Tab Bottom Capsule */
     .bottom-nav-capsule {
       position: fixed;
-      /* Sit ON TOP of the system navigation bar (3-button or gesture handle).
-         --df-safe-bottom = raw nav bar inset from Android (0 for gesture handle, ~56px for 3-button). */
-      bottom: var(--df-safe-bottom, 0px);
+      /* Sit ABOVE the system navigation bar with 48dp touch clearance.
+         --df-bottom-nav-clearance = nav inset + 48dp clearance (gesture handle or 3-button nav). */
+      bottom: var(--df-bottom-nav-clearance, 108px);
       width: calc(100% - 20px);
       max-width: 420px;
       left: 50%;
@@ -926,8 +926,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         padding-bottom: 22px !important;
       }
       .bottom-nav-capsule {
-        /* Sit ON TOP of system nav bar */
-        bottom: var(--df-safe-bottom, 0px) !important;
+        /* Sit ABOVE system nav bar with clearance */
+        bottom: var(--df-bottom-nav-clearance, 108px) !important;
         padding: 5px 3px !important;
         padding-bottom: 5px !important;
       }
@@ -1014,9 +1014,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     /* Bottom Navigation Capsule Universal Fluid Protection */
     .bottom-nav-capsule {
       position: fixed !important;
-      /* Sit ON TOP of the system navigation bar.
-         --df-safe-bottom = raw nav bar inset from Android. */
-      bottom: var(--df-safe-bottom, 0px) !important;
+      /* Sit ABOVE the system navigation bar with 48dp touch clearance.
+         --df-bottom-nav-clearance = nav inset + 48dp clearance. */
+      bottom: var(--df-bottom-nav-clearance, 108px) !important;
       left: 50% !important;
       transform: translateX(-50%) !important;
       width: min(calc(100% - 16px), 540px) !important;
@@ -1391,8 +1391,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         height: min(66vw, 252px) !important;
       }
       .bottom-nav-capsule {
-        /* Sit ON TOP of system nav bar */
-        bottom: var(--df-safe-bottom, 0px) !important;
+        /* Sit ABOVE system nav bar with clearance */
+        bottom: var(--df-bottom-nav-clearance, 108px) !important;
       }
     }
 
