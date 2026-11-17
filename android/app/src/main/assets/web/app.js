@@ -5519,8 +5519,12 @@ const SEAMLESS_XFADE_MS = 20;
 
 function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
   const extraSec = SEAMLESS_XFADE_MS / 1000;
-  const totalSec = durationSec + extraSec;
-  const bufferSize = Math.floor(ctx.sampleRate * totalSec);
+  const finalSize = Math.floor(ctx.sampleRate * durationSec);
+  const xfadeSamples = Math.max(1, Math.floor(ctx.sampleRate * extraSec));
+  // Generate exactly finalSize + xfadeSamples so the generator emits a genuine
+  // tail continuation past the loop point for the crossfade to consume.
+  const bufferSize = finalSize + xfadeSamples;
+  const totalSec = bufferSize / ctx.sampleRate;
   const tempBuffer = ctx.createBuffer(numChannels, bufferSize, ctx.sampleRate);
   const channelData = [];
   for (let ch = 0; ch < numChannels; ch++) {
@@ -5528,17 +5532,19 @@ function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
   }
   generatorFn(channelData, ctx.sampleRate, totalSec);
 
-  const finalSize = Math.floor(ctx.sampleRate * durationSec);
   const finalBuffer = ctx.createBuffer(numChannels, finalSize, ctx.sampleRate);
-  const xfadeSamples = Math.floor(ctx.sampleRate * extraSec);
   for (let ch = 0; ch < numChannels; ch++) {
     const finalData = finalBuffer.getChannelData(ch);
     const tempChData = channelData[ch];
+    // Copy the main body; the tail samples remain as-is.
     finalData.set(tempChData.subarray(0, finalSize));
+    // Crossfade the genuine tail continuation into the head so the loop wrap
+    // is click-free. Weighting makes final[0] == tail-start and
+    // final[xfade-1] == head, which is continuous with the generator output
+    // across the loop boundary (temp[finalSize-1] -> temp[finalSize]).
     for (let i = 0; i < xfadeSamples; i++) {
       const t = i / xfadeSamples;
-      const endIdx = finalSize - xfadeSamples + i;
-      finalData[i] = (1 - t) * finalData[i] + t * tempChData[endIdx];
+      finalData[i] = (1 - t) * tempChData[finalSize + i] + t * tempChData[i];
     }
   }
   return finalBuffer;
@@ -5570,8 +5576,14 @@ function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
         b6 = white * 0.115926;
       }
     } else if (color === 'brown') {
-      // Brown noise: Paul Kellet -6dB/octave (no DC offset, no static)
+      // Brown noise: leaky-integrator of Paul Kellet pink noise.
+      //   * A simple pink->integrator random walk accumulates DC drift across
+      //     the whole buffer, clipping into static on loop restart.
+      //   * The leak factor (-6dB/oct brown slope, bounded) keeps DC centered
+      //     so no clipping static can appear.
       let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      let brown = 0;
+      let peak = 0;
       for (let i = 0; i < bufferSize; i++) {
         const white = Math.random() * 2 - 1;
         b0 = 0.99886 * b0 + white * 0.0555179;
@@ -5582,9 +5594,15 @@ function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
         b5 = -0.7616 * b5 - white * 0.0168980;
         const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
         b6 = white * 0.115926;
-        // Integrate pink to get brown (-6dB/oct additional slope)
-        data[i] = (i === 0 ? pink : data[i - 1] + pink * 0.01) * 0.08;
+        // Leaky integrator: bounded DC, no drift, peak-normalized below
+        brown = 0.9985 * brown + pink * 0.5;
+        data[i] = brown;
+        if (Math.abs(brown) > peak) peak = Math.abs(brown);
       }
+      // Normalize peak to 0.9 (full scale minus headroom): guarantees no
+      // clipping and identical loudness across loop restarts.
+      const norm = peak > 0 ? 0.9 / peak : 1;
+      for (let i = 0; i < bufferSize; i++) data[i] *= norm;
     }
 
     // Hard safety clamp
@@ -5694,34 +5712,29 @@ const oggLoadingPromises = {};
 
 // Create seamless looping OGG buffer with crossfade
 function createSeamlessOggBuffer(ctx, buffer) {
-  const durationSec = buffer.duration;
-  const extraSec = SEAMLESS_XFADE_MS / 1000;
-  const totalSec = durationSec + extraSec;
   const sampleRate = ctx.sampleRate;
-  const bufferSize = Math.floor(sampleRate * totalSec);
-  const finalSize = Math.floor(sampleRate * durationSec);
-  const numChannels = buffer.numberOfChannels;
-
-  const tempBuffer = ctx.createBuffer(numChannels, bufferSize, sampleRate);
-  for (let ch = 0; ch < numChannels; ch++) {
-    const srcData = buffer.getChannelData(ch);
-    const dstData = tempBuffer.getChannelData(ch);
-    // Fill extra portion with looped content
-    for (let i = 0; i < bufferSize; i++) {
-      dstData[i] = srcData[i % srcData.length];
-    }
-  }
+  const xfadeSamples = Math.max(1, Math.floor(sampleRate * (SEAMLESS_XFADE_MS / 1000)));
+  const numChannels = Math.max(1, buffer.numberOfChannels || 1);
+  // Resolve source length robustly (test mocks may omit ArrayBuffer.length)
+  const srcLen = buffer.length || (buffer.getChannelData(0) ? buffer.getChannelData(0).length : 1);
+  const finalSize = Math.max(1, srcLen - xfadeSamples);
 
   const finalBuffer = ctx.createBuffer(numChannels, finalSize, sampleRate);
-  const xfadeSamples = Math.floor(sampleRate * extraSec);
   for (let ch = 0; ch < numChannels; ch++) {
+    const srcData = buffer.getChannelData(ch);
     const finalData = finalBuffer.getChannelData(ch);
-    const tempChData = tempBuffer.getChannelData(ch);
-    finalData.set(tempChData.subarray(0, finalSize));
-    for (let i = 0; i < xfadeSamples; i++) {
+    // Body: copy samples [xfadeSamples, finalSize) unchanged.
+    for (let i = xfadeSamples; i < finalSize; i++) {
+      finalData[i] = srcData[i];
+    }
+    // Head crossfade: blend original tail (src[finalSize+i]) into original
+    // head (src[i]) so the loop wraps seamlessly.
+    //   final[0] == src[finalSize] (natural continuation of src[finalSize-1])
+    //   final[finalSize-1] == src[finalSize-1]
+    // so the buffer wrap is a 1-sample step, not a jump.
+    for (let i = 0; i < xfadeSamples && i < finalSize; i++) {
       const t = i / xfadeSamples;
-      const endIdx = finalSize - xfadeSamples + i;
-      finalData[i] = (1 - t) * finalData[i] + t * tempChData[endIdx];
+      finalData[i] = srcData[i] * t + srcData[finalSize + i] * (1 - t);
     }
   }
   return finalBuffer;

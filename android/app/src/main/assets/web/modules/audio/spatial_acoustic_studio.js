@@ -39,32 +39,33 @@
   // Generate a seamlessly looping buffer by crossfading end to start
   function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
     const extraSec = XFADE_MS / 1000;
-    const totalSec = durationSec + extraSec;
-    const bufferSize = Math.floor(ctx.sampleRate * totalSec);
+    const finalSize = Math.floor(ctx.sampleRate * durationSec);
+    const xfadeSamples = Math.max(1, Math.floor(ctx.sampleRate * extraSec));
+    // Generate exactly finalSize + xfadeSamples so the generator emits a genuine
+    // tail continuation past the loop point for the crossfade to consume.
+    const bufferSize = finalSize + xfadeSamples;
+    const totalSec = bufferSize / ctx.sampleRate;
     const tempBuffer = ctx.createBuffer(numChannels, bufferSize, ctx.sampleRate);
     const channelData = [];
     for (let ch = 0; ch < numChannels; ch++) {
       channelData.push(tempBuffer.getChannelData(ch));
     }
-    
-    // Generate extra-long buffer
+
     generatorFn(channelData, ctx.sampleRate, totalSec);
-    
-    // Create final buffer with exact duration
-    const finalSize = Math.floor(ctx.sampleRate * durationSec);
+
     const finalBuffer = ctx.createBuffer(numChannels, finalSize, ctx.sampleRate);
-    
-    const xfadeSamples = Math.floor(ctx.sampleRate * extraSec);
     for (let ch = 0; ch < numChannels; ch++) {
       const finalData = finalBuffer.getChannelData(ch);
       const tempChData = channelData[ch];
-      // Copy main portion
+      // Copy the main body; the tail samples remain as-is.
       finalData.set(tempChData.subarray(0, finalSize));
-      // Crossfade loop point: blend end into start
+      // Crossfade the genuine tail continuation into the head so the loop wrap
+      // is click-free. Weighting makes final[0] == tail-start and
+      // final[xfade-1] == head, which is continuous with the generator output
+      // across the loop boundary (temp[finalSize-1] -> temp[finalSize]).
       for (let i = 0; i < xfadeSamples; i++) {
         const t = i / xfadeSamples;
-        const endIdx = finalSize - xfadeSamples + i;
-        finalData[i] = (1 - t) * finalData[i] + t * tempChData[endIdx];
+        finalData[i] = (1 - t) * tempChData[finalSize + i] + t * tempChData[i];
       }
     }
     return finalBuffer;
@@ -209,9 +210,11 @@
     }
 
     /**
+    /**
      * Ocean: brownian rumble with the shoreline swell baked directly into the
      * buffer, so no LFO node has to be kept alive. Zero-static version.
-     * Uses proper brown noise (integrated pink) for zero static/hiss.
+     * Uses a bounded leaky-integrator of Paul Kellet pink noise: no DC drift,
+     * no clipping static, peak-normalized below the limiter ceiling.
      */
     generateOceanBuffer(durationSec = 5) {
       const ctx = this.initAudioContext();
@@ -220,9 +223,10 @@
         const bufferSize = Math.floor(sampleRate * totalSec);
 
         const swellHz = 0.08;
-        // Proper brown noise: integrate pink noise (Paul Kellet -6dB/oct)
+        // Bounded brown noise: leaky integrator (no unbounded random walk)
         let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
         let brownAccum = 0;
+        let peak = 0;
         for (let i = 0; i < bufferSize; i++) {
           const white = Math.random() * 2 - 1;
           b0 = 0.99886 * b0 + white * 0.0555179;
@@ -233,18 +237,19 @@
           b5 = -0.7616 * b5 - white * 0.0168980;
           const pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362;
           b6 = white * 0.115926;
-          // Integrate pink to get brown
-          brownAccum = brownAccum + pink * 0.01;
+          // Leaky integrator: bounded DC, no drift
+          brownAccum = 0.9985 * brownAccum + pink * 0.5;
           const t = i / sampleRate;
           // 0.55..1.0 swell, keeps the noise well below the limiter ceiling.
           const swell = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(2 * Math.PI * swellHz * t));
-          data[i] = brownAccum * 0.8 * swell;
+          const v = brownAccum * 0.8 * swell;
+          data[i] = v;
+          if (Math.abs(v) > peak) peak = Math.abs(v);
         }
-        // Hard safety clamp
-        for (let i = 0; i < bufferSize; i++) {
-          if (data[i] > 1.0) data[i] = 1.0;
-          else if (data[i] < -1.0) data[i] = -1.0;
-        }
+        // Peak-normalize to 0.9 (full scale minus headroom): guarantees no
+        // clipping and identical loudness across loop restarts.
+        const norm = peak > 0 ? 0.9 / peak : 1;
+        for (let i = 0; i < bufferSize; i++) data[i] *= norm;
       }, 1);
     }
 
