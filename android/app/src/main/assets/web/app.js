@@ -10022,7 +10022,7 @@ window.FlashQuizEngine = FlashQuizEngine;
 
     var toast = document.createElement('div');
     toast.id = 'df-vocab-undo-toast';
-    toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid rgba(244,63,94,0.4);border-radius:12px;padding:10px 16px;color:#f8fafc;font-size:13px;display:flex;align-items:center;gap:12px;z-index:99999;box-shadow:0 12px 30px rgba(0,0,0,0.5);';
+    toast.style.cssText = 'position:fixed;bottom:calc(var(--df-webview-padding-bottom, 56px) + 12px);left:50%;transform:translateX(-50%);background:#1e293b;border:1px solid rgba(244,63,94,0.4);border-radius:12px;padding:10px 16px;color:#f8fafc;font-size:13px;display:flex;align-items:center;gap:12px;z-index:99999;box-shadow:0 12px 30px rgba(0,0,0,0.5);';
 
     var msgSpan = document.createElement('span');
     msgSpan.textContent = 'تم حذف ';
@@ -12285,7 +12285,7 @@ window.FlashQuizEngine = FlashQuizEngine;
     try {
       var toast = document.createElement('div');
       toast.id = 'df-vocab-toast';
-      toast.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%);z-index:99999;padding:10px 16px;border-radius:24px;font-size:13px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,0.4);direction:rtl;text-align:center;pointer-events:none;transition:opacity 0.25s ease;opacity:0;background:' + bg + ';border:1px solid ' + border + ';color:' + color + ';';
+      toast.style.cssText = 'position:fixed;bottom:calc(var(--df-webview-padding-bottom, 56px) + 12px);left:50%;transform:translateX(-50%);z-index:99999;padding:10px 16px;border-radius:24px;font-size:13px;font-weight:bold;box-shadow:0 8px 20px rgba(0,0,0,0.4);direction:rtl;text-align:center;pointer-events:none;transition:opacity 0.25s ease;opacity:0;background:' + bg + ';border:1px solid ' + border + ';color:' + color + ';';
       toast.textContent = String(message);
 
       document.body.appendChild(toast);
@@ -41216,7 +41216,7 @@ window.dfApplySafeAreaInsets = function() {
     }
     body {
       padding-top: var(--safe-top) !important;
-      padding-bottom: var(--safe-bottom) !important;
+      padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px)) !important;
       padding-left: var(--safe-left) !important;
       padding-right: var(--safe-right) !important;
       box-sizing: border-box !important;
@@ -47822,7 +47822,7 @@ window.dfApplySafeAreaInsets = function(rootEl) {
       '}',
       'body {',
       '  padding-top: var(--safe-top);',
-      '  padding-bottom: var(--safe-bottom);',
+      '  padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 86px));',
       '}'
     ].join('\n');
     if (document.head) document.head.appendChild(styleEl);
@@ -80759,7 +80759,7 @@ window.SovereignDataVault = (function() {
         if (!toast) {
             toast = document.createElement("div");
             toast.id = "vaultToast";
-            toast.style.cssText = "position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%); background: #111111; color: #4ade80; border: 1px solid #333333; padding: 10px 20px; border-radius: 8px; font-size: 14px; z-index: 999999; box-shadow: 0 4px 12px rgba(0,0,0,0.8); pointer-events: none; transition: opacity 0.3s ease;";
+            toast.style.cssText = "position: fixed; bottom: calc(var(--df-webview-padding-bottom, 56px) + 80px); left: 50%; transform: translateX(-50%); background: #111111; color: #4ade80; border: 1px solid #333333; padding: 10px 20px; border-radius: 8px; font-size: 14px; z-index: 999999; box-shadow: 0 4px 12px rgba(0,0,0,0.8); pointer-events: none; transition: opacity 0.3s ease;";
             document.body.appendChild(toast);
         }
         toast.textContent = msg;

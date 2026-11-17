@@ -1,5 +1,5 @@
 /**
- * DEEP FOCUS — SovereignInsetsCalibrator (v606.0.0)
+ * DEEP FOCUS — SovereignInsetsCalibrator (v607.0.0)
  * Android 15 Edge-to-Edge & Gesture Navigation Insets Calibration Engine.
  * Dynamically updates CSS root variables for status bar, gesture navigation pill,
  * and camera cutouts on Xiaomi 17T Pro (AMOLED 120Hz/144Hz).
@@ -12,12 +12,13 @@
   'use strict';
 
   var SovereignInsetsCalibrator = {
-    version: '606.0.0',
+    version: '607.0.0',
     currentInsets: {
       top: 0,
       bottom: 0,
       left: 0,
-      right: 0
+      right: 0,
+      paddingBottom: 0
     },
 
     _hasRealInsets: false,
@@ -35,7 +36,8 @@
           top: 24,
           bottom: 56,
           left: 0,
-          right: 0
+          right: 0,
+          paddingBottom: 56
         });
       }
       if (typeof window !== 'undefined') {
@@ -50,12 +52,14 @@
      * @param {number} bottom Bottom inset in DP (gesture navigation pill / 3-button nav bar height)
      * @param {number} left Left cutout in DP
      * @param {number} right Right cutout in DP
+     * @param {number} paddingBottom WebView padding-bottom in DP (max of navBottom and IME)
      */
-    updateInsets: function (top, bottom, left, right) {
+    updateInsets: function (top, bottom, left, right, paddingBottom) {
       this.currentInsets.top = Math.max(0, parseInt(top, 10) || 0);
       this.currentInsets.bottom = Math.max(0, parseInt(bottom, 10) || 0);
       this.currentInsets.left = Math.max(0, parseInt(left, 10) || 0);
       this.currentInsets.right = Math.max(0, parseInt(right, 10) || 0);
+      this.currentInsets.paddingBottom = Math.max(0, parseInt(paddingBottom, 10) || this.currentInsets.bottom);
 
       // Mark that we've received real insets from Android; prevents init() from overwriting with fallbacks.
       this._hasRealInsets = true;
@@ -77,6 +81,7 @@
      * Injects CSS variables onto documentElement with !important to override conflicting rules.
      * --df-safe-top: status bar / cutout top inset (dp)
      * --df-safe-bottom: navigation bar / gesture handle bottom inset (dp)
+     * --df-webview-padding-bottom: WebView padding-bottom in DP (max of navBottom and IME)
      * --df-bottom-nav-clearance: fixed reserve (dp) that clears the docked bottom capsule plus
      *   FAB / Studios pill for in-flow content. The WebView itself is padded above the
      *   system nav bar in MainActivity, so this must NOT include the nav inset again.
@@ -86,14 +91,18 @@
 
       var root = document.documentElement;
       var navInset = insets.bottom; // nav/gesture height in dp (from Android via MainActivity)
+      var paddingBottom = insets.paddingBottom; // WebView padding-bottom in dp
 
       root.style.setProperty('--df-safe-top', insets.top + 'px', 'important');
       root.style.setProperty('--df-safe-bottom', navInset + 'px', 'important');
       root.style.setProperty('--df-safe-left', insets.left + 'px', 'important');
       root.style.setProperty('--df-safe-right', insets.right + 'px', 'important');
+      root.style.setProperty('--df-webview-padding-bottom', paddingBottom + 'px', 'important');
       // Fixed dock reserve: 12px dock gap + ~62px capsule + 12px card clearance = 86px.
       // Kept constant so floating layers never cover each other or the last card.
       root.style.setProperty('--df-bottom-nav-clearance', '86px', 'important');
+      // Capsule height estimate for positioning floating elements above it.
+      root.style.setProperty('--df-capsule-height', '70px', 'important');
     },
 
     onViewportChange: function () {

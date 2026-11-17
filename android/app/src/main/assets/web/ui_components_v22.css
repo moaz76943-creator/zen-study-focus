@@ -160,7 +160,7 @@ html[dir="rtl"] .df-v22 .df22-icon--next { transform: scaleX(-1); }
   max-width: 100%;
   overflow-x: auto;
   overscroll-behavior-inline: contain;
-  padding: 6px max(6px, env(safe-area-inset-right, 0px), var(--df-safe-right, 0px)) calc(6px + max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px), var(--df-bottom-nav-clearance, 0px)));
+  padding: 6px max(6px, env(safe-area-inset-right, 0px), var(--df-safe-right, 0px)) calc(6px + max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px), calc(var(--df-bottom-nav-clearance, 0px) + var(--df-webview-padding-bottom, 0px))));
   border: 1px solid var(--df22-border);
   border-radius: var(--df22-radius-lg);
   background: var(--df22-surface);
