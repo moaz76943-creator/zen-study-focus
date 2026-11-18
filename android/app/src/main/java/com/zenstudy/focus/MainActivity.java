@@ -125,15 +125,15 @@ public class MainActivity extends AppCompatActivity {
             boolean isGestureNav = hasGestureHandle && !hasVisibleNavBar;
 
             // Xiaomi-specific override: on HyperOS, mandatorySystemGestures.bottom may be > 0 even in 3-button mode,
-            // and navigationBars/systemBars may under-report. If the device is Xiaomi and we have a gesture handle
-            // but no visible nav bar, assume 3-button nav if the gesture handle height exceeds the typical
-            // gesture handle size (~32dp), indicating it's actually the 3-button bar being misreported.
+            // and navigationBars/systemBars may under-report (report 0). If the device is Xiaomi and we have a
+            // gesture handle but no visible nav bar, assume 3-button nav if the gesture handle height exceeds the
+            // standard gesture handle size (32dp), indicating it's actually the 3-button bar being misreported.
             String manufacturer = Build.MANUFACTURER;
             boolean isXiaomi = "xiaomi".equalsIgnoreCase(manufacturer) || "redmi".equalsIgnoreCase(manufacturer) || "poco".equalsIgnoreCase(manufacturer);
-            // Density must be available BEFORE any dp<->px conversion (used in Xiaomi override below).
+            // Density must be available BEFORE any dp<->px conversion (used in Xiaomi overrides below).
             float density = getResources().getDisplayMetrics().density;
-            if (isXiaomi && isGestureNav && mandatorySystemGestures.bottom > Math.round(48 * density)) {
-                // Gesture handle taller than 48dp on Xiaomi = likely 3-button bar misreported as gesture handle.
+            if (isXiaomi && isGestureNav && mandatorySystemGestures.bottom > Math.round(32 * density)) {
+                // Gesture handle taller than 32dp on Xiaomi = likely 3-button bar misreported as gesture handle.
                 isGestureNav = false;
             }
 
@@ -171,12 +171,13 @@ public class MainActivity extends AppCompatActivity {
                 if (navBottom < absoluteMinNavPx) navBottom = absoluteMinNavPx;
             }
 
-            // ADDITIONAL XIAOMI SAFETY: If gesture nav is detected but the "gesture handle"
-            // height exceeds typical gesture handle size (48dp), it's likely a 3-button bar
-            // misreported as gesture handle. Apply a defensive floor to prevent viewport
-            // intrusion. This catches edge cases where the detection logic misclassifies.
-            if (isXiaomi && isGestureNav && mandatorySystemGestures.bottom > Math.round(48 * density)) {
-                int defensiveMinNavDp = 120; // Conservative floor for misclassified 3-button
+            // XIAOMI DEFENSIVE FLOOR: If gesture nav is detected on Xiaomi but no visible
+            // nav bar was reported, apply a 400dp floor regardless. HyperOS frequently
+            // under-reports 3-button bars (navigationBars/systemBars = 0) while reporting
+            // a gesture handle ≤32dp. The cost is extra padding on real gesture nav;
+            // the benefit is never clipping bottom cards or overlapping the Studios pill.
+            if (isXiaomi && isGestureNav) {
+                int defensiveMinNavDp = 400;
                 int defensiveMinNavPx = Math.round(defensiveMinNavDp * density);
                 if (navBottom < defensiveMinNavPx) navBottom = defensiveMinNavPx;
             }
