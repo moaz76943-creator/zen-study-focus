@@ -115,6 +115,17 @@ public class MainActivity extends AppCompatActivity {
             boolean hasVisibleNavBar = navigationBars.bottom > 0 || systemBars.bottom > 0;
             boolean isGestureNav = hasGestureHandle && !hasVisibleNavBar;
 
+            // Xiaomi-specific override: on HyperOS, mandatorySystemGestures.bottom may be > 0 even in 3-button mode,
+            // and navigationBars/systemBars may under-report. If the device is Xiaomi and we have a gesture handle
+            // but no visible nav bar, assume 3-button nav if the gesture handle height exceeds the typical
+            // gesture handle size (~32dp), indicating it's actually the 3-button bar being misreported.
+            String manufacturer = Build.MANUFACTURER;
+            boolean isXiaomi = "xiaomi".equalsIgnoreCase(manufacturer) || "redmi".equalsIgnoreCase(manufacturer) || "poco".equalsIgnoreCase(manufacturer);
+            if (isXiaomi && isGestureNav && mandatorySystemGestures.bottom > Math.round(48 * density)) {
+                // Gesture handle taller than 48dp on Xiaomi = likely 3-button bar misreported as gesture handle.
+                isGestureNav = false;
+            }
+
             // Apply minimum nav bar height fallback (Material spec: 56dp 3-button, 32dp gesture handle);
             // Xiaomi Android 15 3-button nav bar can reach ~96dp on HyperOS; use 100dp floor to prevent
             // WebView viewport from extending behind the nav bar, which clips bottom cards and
@@ -136,6 +147,15 @@ public class MainActivity extends AppCompatActivity {
                 int extraNavDp = 120;
                 int extraNavPx = Math.round(extraNavDp * density);
                 if (navBottom < extraNavPx) navBottom = extraNavPx;
+            }
+            // ULTIMATE SAFETY NET: On Xiaomi devices, apply an absolute minimum floor regardless of
+            // gesture/3-button detection. This handles edge cases where detection fails and the
+            // reported insets are zero or too small. The cost is extra padding (harmless empty space);
+            // the benefit is never clipping content or overlapping the Studios pill/FAB.
+            if (isXiaomi) {
+                int absoluteMinNavDp = 140; // Covers 3-button bars up to ~140dp on HyperOS
+                int absoluteMinNavPx = Math.round(absoluteMinNavDp * density);
+                if (navBottom < absoluteMinNavPx) navBottom = absoluteMinNavPx;
             }
 
             // IME can be taller than nav bar; use max for WebView padding so content stays above keyboard.
