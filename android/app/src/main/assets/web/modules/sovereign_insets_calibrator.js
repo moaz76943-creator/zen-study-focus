@@ -31,15 +31,16 @@
      */
     init: function () {
       if (!this._hasRealInsets) {
-        // Use a higher fallback bottom (500dp) so the initial reserve covers
-        // tall 3-button nav bars on Xiaomi HyperOS (up to ~500dp) before real
-        // insets arrive. The calibrator will update with real values shortly after.
+        // Use a reasonable fallback bottom (100dp) so the initial reserve covers
+        // typical 3-button nav bars before real insets arrive. The calibrator will
+        // update with real values shortly after. Real gesture nav (~32dp) will
+        // quickly correct to a smaller capsule.
         this.applyCSSVariables({
           top: 24,
-          bottom: 500,
+          bottom: 100,
           left: 0,
           right: 0,
-          paddingBottom: 500
+          paddingBottom: 100
         });
       }
       if (typeof window !== 'undefined') {
@@ -51,10 +52,10 @@
     /**
      * Updates insets received from Android WindowInsetsCompat listener via JavascriptInterface.
      * @param {number} top Top inset in DP (status bar / punch hole)
-     * @param {number} bottom Bottom inset in DP (gesture navigation pill / 3-button nav bar height)
+     * @param {number} bottom Bottom inset in DP (ACTUAL reported nav bar height: 3-button bar or gesture handle, NO defensive floors)
      * @param {number} left Left cutout in DP
      * @param {number} right Right cutout in DP
-     * @param {number} paddingBottom WebView padding-bottom in DP (max of navBottom and IME)
+     * @param {number} paddingBottom WebView padding-bottom in DP (max of floored navBottom and IME)
      */
     updateInsets: function (top, bottom, left, right, paddingBottom) {
       this.currentInsets.top = Math.max(0, parseInt(top, 10) || 0);
@@ -82,7 +83,7 @@
     /**
      * Injects CSS variables onto documentElement with !important to override conflicting rules.
      * Design (Android 15 / Xiaomi edge-to-edge): MainActivity pads the WebView's PARENT
-     * FrameLayout with the real system-bar insets (including defensive floors for Xiaomi
+     * FrameLayout with the FLOORED system-bar insets (including defensive floors for Xiaomi
      * HyperOS 3-button nav up to 500dp), so the WebView's layout viewport
      * already ends above the status bar, cutout and 3-button nav bar. Native padding
      * is the single owner of the insets — if CSS re-added them (via --df-safe-top /
@@ -94,6 +95,9 @@
      * plus FAB / Studios pill for in-flow content, measured from the safe content edge.
      * --df-studios-pill-bottom: explicit position for the Studios pill above the capsule.
      * --df-fab-bottom: explicit position for the FAB above the Studios pill.
+     * Capsule height and dock positions are computed from the ACTUAL reported nav bar height
+     * (insets.bottom, no defensive floors), so the floating layers hug the real nav bar
+     * on both gesture and 3-button navigation.
      */
     applyCSSVariables: function (insets) {
       if (typeof document === 'undefined' || !document.documentElement) return;
@@ -108,19 +112,17 @@
       root.style.setProperty('--df-webview-padding-bottom', '0px', 'important');
 
       // Capsule height: base 100px, but respect actual nav bar height if larger.
-      // Use insets.bottom (FLOORED nav bar height from MainActivity, includes defensive
-      // floors for Xiaomi HyperOS 3-button nav up to 500dp) — insets.paddingBottom includes IME
-      // and would incorrectly grow the capsule when the keyboard opens, pushing the
-      // Studios pill and FAB down into content. MainActivity sends navBottomDp as 'bottom'
-      // and max(navBottom, IME) as 'paddingBottom'; we must use the former for dock math.
+      // Use insets.bottom (ACTUAL reported nav bar height from MainActivity, NO defensive floors) —
+      // insets.paddingBottom includes IME and would incorrectly grow the capsule when the keyboard
+      // opens, pushing the Studios pill and FAB down into content. MainActivity sends rawNavBottomDp
+      // as 'bottom' and max(flooredNavBottom, IME) as 'paddingBottom'; we must use the former for dock math.
       var capsuleHeight = Math.max(100, insets.bottom || 100);
       root.style.setProperty('--df-capsule-height', capsuleHeight + 'px', 'important');
 
       // Bottom nav clearance: dock gap (12) + capsuleHeight + gap to Studios (8) + Studios pill height (48)
       // + gap to FAB (8) + FAB height (54) = 130px base. Add native nav bar height (insets.bottom) as floor.
       // This ensures in-flow content (last card) ends above the floating layers on all devices.
-      // Base floor 480 covers Xiaomi HyperOS 3-button nav bars up to ~300dp; with 500dp fallback,
-      // capsuleHeight becomes 500 and clearance computes to 680, covering bars up to ~500dp.
+      // Base floor 480 covers typical nav bars; capsuleHeight scales with actual nav bar height.
       var bottomNavClearance = Math.max(480, capsuleHeight + 130, (insets.bottom || 100) + 180);
       root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
 

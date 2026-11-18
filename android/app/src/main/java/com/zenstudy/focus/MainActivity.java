@@ -173,17 +173,6 @@ public class MainActivity extends AppCompatActivity {
                 if (navBottom < absoluteMinNavPx) navBottom = absoluteMinNavPx;
             }
 
-            // XIAOMI DEFENSIVE FLOOR: If gesture nav is detected on Xiaomi but no visible
-            // nav bar was reported, apply a 500dp floor regardless. HyperOS frequently
-            // under-reports 3-button bars (navigationBars/systemBars = 0) while reporting
-            // a gesture handle ≤32dp. The cost is extra padding on real gesture nav;
-            // the benefit is never clipping bottom cards or overlapping the Studios pill.
-            if (isXiaomi && isGestureNav) {
-                int defensiveMinNavDp = 500;
-                int defensiveMinNavPx = Math.round(defensiveMinNavDp * density);
-                if (navBottom < defensiveMinNavPx) navBottom = defensiveMinNavPx;
-            }
-
             // IME can be taller than nav bar; use max for WebView padding so content stays above keyboard.
             int paddingBottom = Math.max(navBottom, ime.bottom);
 
@@ -221,16 +210,15 @@ public class MainActivity extends AppCompatActivity {
             // Push insets (in dp) to JS calibrator. The WebView itself is now bounded
             // by the parent padding, so CSS dock formulas only need a fallback floor;
             // the values stay available to JS for any reserve math that wants them.
-            // Param 2 (bottom) = navBottomDp (FLOORED nav bar height, includes defensive floors
-            // for Xiaomi HyperOS 3-button nav up to 500dp) for capsule/dock math. This MUST match
-            // the parent FrameLayout padding so the calibrator's dock positions align with the
-            // actual WebView viewport bottom. Param 5 (paddingBottom) = paddingBottomDp (floored,
-            // includes IME) for keyboard handling.
+            // Param 2 (bottom) = rawNavBottomDp (ACTUAL reported nav bar height, NO defensive floors)
+            // for capsule/dock math. The calibrator uses this to size the capsule and position
+            // the Studios pill/FAB relative to the real nav bar. Param 5 (paddingBottom) =
+            // paddingBottomDp (floored, includes IME) for keyboard handling.
             webView.post(() -> {
                 if (webView != null && !isDestroyed()) {
                     String js = "if(window.SovereignInsetsCalibrator) "
                             + "window.SovereignInsetsCalibrator.updateInsets("
-                            + paddingTopDp + "," + navBottomDp + "," + paddingLeftDp + "," + paddingRightDp + ","
+                            + paddingTopDp + "," + rawNavBottomDp + "," + paddingLeftDp + "," + paddingRightDp + ","
                             + paddingBottomDp + ");";
                     webView.evaluateJavascript(js, null);
                 }
@@ -297,7 +285,7 @@ public class MainActivity extends AppCompatActivity {
                 if (hasCachedInsets && view != null && !isDestroyed()) {
                     String js = "if(window.SovereignInsetsCalibrator) "
                             + "window.SovereignInsetsCalibrator.updateInsets("
-                            + cachedPaddingTopDp + "," + cachedNavBottomDp + "," + cachedPaddingLeftDp + ","
+                            + cachedPaddingTopDp + "," + cachedRawNavBottomDp + "," + cachedPaddingLeftDp + ","
                             + cachedPaddingRightDp + "," + cachedPaddingBottomDp + ");";
                     view.evaluateJavascript(js, null);
                 }
