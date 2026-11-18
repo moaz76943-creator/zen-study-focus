@@ -51,12 +51,12 @@
     document.addEventListener('touchstart', unlock, { passive: true, once: true });
     document.addEventListener('keydown', unlock, { passive: true, once: true });
 
-    // Handle tab switch / visibility change: suspend on hidden, require gesture on visible
+    // Handle tab switch / visibility change: suspend on hidden.
+    // On visible, do NOT auto-resume — require explicit user gesture to prevent
+    // any audio auto-play on tab switch. The user must interact to resume.
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && sharedContext && sharedContext.state === 'running') {
         sharedContext.suspend().catch(() => {});
-      } else if (!document.hidden && gestureReceived) {
-        resumeContext();
       }
     }, { passive: true });
   }

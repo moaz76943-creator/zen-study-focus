@@ -43,6 +43,7 @@
   const BROWN_NOISE_AMP = (audioCore && audioCore.BROWN_NOISE_AMP) ? audioCore.BROWN_NOISE_AMP : 0.05;
   const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
   const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
+  const DC_BLOCK_HZ = audioCore ? audioCore.DC_BLOCK_HZ : 40;
 
   if (!global.__ZEN_AUDIO_SINGLETON__) {
     global.__ZEN_AUDIO_SINGLETON__ = {
@@ -135,7 +136,7 @@
     const n = data.length;
     if (color === 'white') {
       // Full-band white at low amplitude — 0.3 was audible hiss; 0.08 is a
-      // clean air-tone through the 15Hz DC blockers downstream.
+      // clean air-tone through the 40Hz DC blockers downstream.
       for (let i = 0; i < n; i++) data[i] = (Math.random() * 2 - 1) * WHITE_NOISE_AMP;
       return;
     }
@@ -355,7 +356,7 @@
       source.loop = !!loop;
       const dc = ctx.createBiquadFilter();
       dc.type = 'highpass';
-      dc.frequency.setValueAtTime(15, ctx.currentTime);
+      dc.frequency.setValueAtTime(DC_BLOCK_HZ, ctx.currentTime);
       dc.Q.setValueAtTime(0.707, ctx.currentTime);
       const gain = ctx.createGain();
       gain.gain.setValueAtTime(0.0001, ctx.currentTime);

@@ -5693,11 +5693,11 @@ function createNoiseSource(ctx, color, gainValue = 0.25) {
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.0001, ctx.currentTime);
   gain.gain.linearRampToValueAtTime(gainValue, ctx.currentTime + 0.05);
-  // DC-blocking high-pass filter (15 Hz) to protect transducer coils
+  // DC-blocking high-pass filter (40 Hz — protects transducer coils & brown noise rumble)
   const dcBlock = ctx.createBiquadFilter();
-  dcBlock.type = 'highpass';
-  dcBlock.frequency.setValueAtTime(15, ctx.currentTime);
-  dcBlock.Q.setValueAtTime(0.707, ctx.currentTime);
+        dcBlock.type = 'highpass';
+        dcBlock.frequency.setValueAtTime(40, ctx.currentTime);
+        dcBlock.Q.setValueAtTime(0.707, ctx.currentTime);
   source.connect(dcBlock);
   dcBlock.connect(gain);
   const noiseSource = { source, gain, dcBlock, color };
