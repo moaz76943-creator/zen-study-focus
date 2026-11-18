@@ -18,7 +18,7 @@ const LOCALIZATION =
 const CSV_ENGINE =
   'android/app/src/main/assets/web/js/study_session_csv_engine.js';
 
-const RTL_LOCALES = new Set(['ar', 'fa', 'ur']);
+const RTL_LOCALES = new Set(['ar', 'fa', 'ur', 'ps', 'prs']);
 const NON_WESTERN_DIGITS = /[\u0660-\u0669\u06F0-\u06F9\u0900-\u096F\u09E6-\u09EF]/;
 
 function load() {

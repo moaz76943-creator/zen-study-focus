@@ -6,7 +6,7 @@
 (function (global) {
   'use strict';
 
-  var RTL_LANGUAGES = ['ar', 'fa', 'ur', 'he_disabled'];
+  var RTL_LANGUAGES = ['ar', 'fa', 'ur', 'ps', 'prs', 'he_disabled'];
   var currentDir = 'ltr';
 
   var SovereignBidiEngine = {
