@@ -32,14 +32,14 @@ console.log('✔ .app-shell is free of containing-block creators (transform/filt
 assert.ok(html.includes('bottom: var(--df-dock-bottom, 12px)'),
   'bottom-nav-capsule must dock via --df-dock-bottom (dock gap only)');
 // Studios pill uses --df-studios-pill-bottom (calibrator computes: dock gap + capsuleHeight + 8px).
-// Initial CSS fallback is 120px (matching calibrator minimum: 12 + 100 + 8).
-assert.ok(html.includes('--df-studios-pill-bottom: 120px'),
+// Initial CSS fallback is 420px (matching calibrator minimum: 12 + 400 + 8, for 400dp floor).
+assert.ok(html.includes('--df-studios-pill-bottom: 420px'),
   'Studios pill must dock above the capsule via --df-studios-pill-bottom');
 console.log('✔ Dock formulas use the calibrated single-owner inset variables.');
 
 // Body must reserve enough bottom clearance for the capsule + Studios pill + FAB zone.
-// --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (480px fallback).
-assert.ok(/padding-bottom:\s*var\(--df-inflow-bottom,\s*480px\)/.test(html),
+// --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (580px fallback).
+assert.ok(/padding-bottom:\s*var\(--df-inflow-bottom,\s*580px\)/.test(html),
   'body must reserve --df-inflow-bottom above the native inset edge');
 console.log('✔ Body bottom clearance reserves capsule + FAB zone above the safe content edge.');
 

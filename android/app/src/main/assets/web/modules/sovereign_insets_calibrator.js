@@ -31,15 +31,15 @@
      */
     init: function () {
       if (!this._hasRealInsets) {
-        // Use a higher fallback bottom (100dp) so the initial reserve covers
-        // tall 3-button nav bars on Xiaomi HyperOS (up to ~300dp) before real
+        // Use a higher fallback bottom (400dp) so the initial reserve covers
+        // tall 3-button nav bars on Xiaomi HyperOS (up to ~400dp) before real
         // insets arrive. The calibrator will update with real values shortly after.
         this.applyCSSVariables({
           top: 24,
-          bottom: 100,
+          bottom: 400,
           left: 0,
           right: 0,
-          paddingBottom: 100
+          paddingBottom: 400
         });
       }
       if (typeof window !== 'undefined') {
