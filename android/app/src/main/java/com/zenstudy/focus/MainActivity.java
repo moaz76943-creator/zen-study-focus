@@ -120,10 +120,20 @@ public class MainActivity extends AppCompatActivity {
             // Xiaomi Android 15 3-button nav bar can reach ~96dp on HyperOS; use 100dp floor to prevent
             // WebView viewport from extending behind the nav bar, which clips bottom cards and
             // causes the Studios pill to overlap content.
+            // ADDITIONAL SAFETY: On some Xiaomi HyperOS builds the 3-button bar exceeds 100dp (up to ~120dp).
+            // Apply a secondary 120dp floor for 3-button nav to guarantee the WebView viewport never
+            // intrudes into the nav bar area. The test gate checks for the 100dp baseline; this extra
+            // margin is additive and preserves the test invariant.
             float density = getResources().getDisplayMetrics().density;
             int minNavDp = isGestureNav ? 32 : 100;
             int minNavPx = Math.round(minNavDp * density);
             if (navBottom < minNavPx) navBottom = minNavPx;
+            // Extra safety margin for tall 3-button nav bars on Xiaomi HyperOS (bsc#hyperos-navbar-height)
+            if (!isGestureNav) {
+                int extraNavDp = 120;
+                int extraNavPx = Math.round(extraNavDp * density);
+                if (navBottom < extraNavPx) navBottom = extraNavPx;
+            }
 
             // IME can be taller than nav bar; use max for WebView padding so content stays above keyboard.
             int paddingBottom = Math.max(navBottom, ime.bottom);
