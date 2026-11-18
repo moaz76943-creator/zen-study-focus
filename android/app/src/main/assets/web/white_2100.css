@@ -302,7 +302,7 @@ body:not(.deep-lockdown) #sec-notes .floating-plus-fab {
   background: var(--zen-rainbow);
   box-shadow: 0 9px 23px -9px rgba(59, 109, 238, .42);
   position: fixed;
-  left: 24px;
+  inset-inline-start: 24px;
   bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px);
   width: 54px;
   height: 54px;
