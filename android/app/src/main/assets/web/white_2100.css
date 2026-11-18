@@ -350,6 +350,30 @@ body:not(.deep-lockdown) #sec-sounds .sounds-photo-grid {gap:11px;}
 body:not(.deep-lockdown) #sec-sounds .sound-Rich-tile {
   border-radius:21px;overflow:hidden;box-shadow:0 11px 23px -14px rgba(26,56,115,.35);
 }
+
+/* STA-1 · Nature Sounds header card — the anchor of the Sounds tab. */
+body:not(.deep-lockdown) #sec-sounds .ns-header-card {
+  background:linear-gradient(145deg,#f6f9ff,#eef4ff);
+  border:1px solid #dbe6fb;
+  border-radius:18px;
+  box-shadow:0 8px 20px -14px rgba(29,78,216,.35);
+  padding:14px 16px;
+  width:100%;
+}
+body:not(.deep-lockdown) #sec-sounds .ns-header-title {
+  font-size:1.12rem;
+  font-weight:800;
+  color:#14264a;
+  margin:0;
+  letter-spacing:-0.01em;
+}
+body:not(.deep-lockdown) #sec-sounds .ns-header-subtitle {
+  font-size:0.85rem;
+  font-weight:500;
+  color:#4a6382;
+  margin:0;
+}
+
 body:not(.deep-lockdown) #sec-analytics .analytics-kpi-grid {gap:10px;margin-bottom:14px;}
 body:not(.deep-lockdown) #sec-analytics .an-kpi-card {
   background:linear-gradient(145deg,#fff,#f7fbff);
