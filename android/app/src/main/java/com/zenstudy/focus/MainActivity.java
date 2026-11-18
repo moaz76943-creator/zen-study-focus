@@ -51,7 +51,8 @@ public class MainActivity extends AppCompatActivity {
     // The initial insets dispatch (requestApplyInsets) fires before loadUrl completes,
     // so the calibrator may not exist yet. We cache and re-send on onPageFinished.
     private int cachedPaddingTopDp = 0;
-    private int cachedNavBottomDp = 0;
+    private int cachedNavBottomDp = 0;          // Floored nav height for content clearance (body padding).
+    private int cachedRawNavBottomDp = 0;      // Actual reported nav height (no defensive floors) for dock math.
     private int cachedPaddingLeftDp = 0;
     private int cachedPaddingRightDp = 0;
     private int cachedPaddingBottomDp = 0;
@@ -185,6 +186,13 @@ public class MainActivity extends AppCompatActivity {
 
             // IME can be taller than nav bar; use max for WebView padding so content stays above keyboard.
             int paddingBottom = Math.max(navBottom, ime.bottom);
+
+            // rawNavBottomDp = actual reported nav bar height (NO defensive floors) for calibrator dock math.
+            // The parent FrameLayout padding uses navBottom (floored) to keep content clear of the nav bar.
+            // The calibrator uses rawNavBottomDp to size the capsule and position the Studios pill/FAB
+            // relative to the viewport bottom (which already ends above the nav bar due to parent padding).
+            int rawNavBottomDp = Math.round(rawNavBottom / density);
+
             int paddingLeft = systemBars.left;
             int paddingRight = systemBars.right;
 
@@ -192,9 +200,8 @@ public class MainActivity extends AppCompatActivity {
             // Parent FrameLayout padding shrinks the WebView; nothing to clip inside it.
 
             // Convert physical pixels to dp for JS calibrator (CSS px == Android dp in WebView).
-            // navBottomDp = floored value (includes all defensive floors) for calibrator dock math.
-            // This MUST match the parent padding so fixed layers (Studios pill, FAB) and content
-            // clearance are computed against the same inset edge that the native padding created.
+            // navBottomDp = floored value (includes all defensive floors) for content clearance (body padding).
+            // rawNavBottomDp = actual reported nav bar height (NO defensive floors) for calibrator dock math.
             // paddingBottomDp = max(navBottom, IME) for keyboard handling.
             int paddingTopDp = Math.round(paddingTop / density);
             int navBottomDp = Math.round(navBottom / density);
@@ -203,23 +210,24 @@ public class MainActivity extends AppCompatActivity {
             int paddingBottomDp = Math.round(paddingBottom / density);
 
             // Cache for re-send on page load (calibrator may not exist during initial dispatch).
-            cachedPaddingTopDp = paddingTopDp;
-            cachedNavBottomDp = navBottomDp; // Send floored nav height so dock math matches parent padding
-            cachedPaddingLeftDp = paddingLeftDp;
-            cachedPaddingRightDp = paddingRightDp;
-            cachedPaddingBottomDp = paddingBottomDp;
-            hasCachedInsets = true;
+                        cachedPaddingTopDp = paddingTopDp;
+                        cachedNavBottomDp = navBottomDp; // Floored nav height for content clearance (body padding).
+                        cachedRawNavBottomDp = rawNavBottomDp; // Actual reported nav height for dock math.
+                        cachedPaddingLeftDp = paddingLeftDp;
+                        cachedPaddingRightDp = paddingRightDp;
+                        cachedPaddingBottomDp = paddingBottomDp;
+                        hasCachedInsets = true;
 
             // Push insets (in dp) to JS calibrator. The WebView itself is now bounded
             // by the parent padding, so CSS dock formulas only need a fallback floor;
             // the values stay available to JS for any reserve math that wants them.
-            // Param 2 (bottom) = navBottomDp (floored nav bar height) for capsule/dock math.
+            // Param 2 (bottom) = rawNavBottomDp (ACTUAL nav bar height, no defensive floors) for capsule/dock math.
             // Param 5 (paddingBottom) = paddingBottomDp (floored, includes IME) for keyboard handling.
             webView.post(() -> {
                 if (webView != null && !isDestroyed()) {
                     String js = "if(window.SovereignInsetsCalibrator) "
                             + "window.SovereignInsetsCalibrator.updateInsets("
-                            + paddingTopDp + "," + navBottomDp + "," + paddingLeftDp + "," + paddingRightDp + ","
+                            + paddingTopDp + "," + rawNavBottomDp + "," + paddingLeftDp + "," + paddingRightDp + ","
                             + paddingBottomDp + ");";
                     webView.evaluateJavascript(js, null);
                 }
@@ -286,7 +294,7 @@ public class MainActivity extends AppCompatActivity {
                 if (hasCachedInsets && view != null && !isDestroyed()) {
                     String js = "if(window.SovereignInsetsCalibrator) "
                             + "window.SovereignInsetsCalibrator.updateInsets("
-                            + cachedPaddingTopDp + "," + cachedNavBottomDp + "," + cachedPaddingLeftDp + ","
+                            + cachedPaddingTopDp + "," + cachedRawNavBottomDp + "," + cachedPaddingLeftDp + ","
                             + cachedPaddingRightDp + "," + cachedPaddingBottomDp + ");";
                     view.evaluateJavascript(js, null);
                 }
@@ -694,8 +702,7 @@ public class MainActivity extends AppCompatActivity {
                             new java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.US).format(new java.util.Date())));
                     send.putExtra(Intent.EXTRA_TEXT,
                         NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_privacy_warning) +
-                        NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_copy_heading) + payload
-                    );
+                        NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_copy_heading) + payload);
                     startActivity(Intent.createChooser(send, NativeLocaleStrings.get(MainActivity.this, R.string.native_backup_share_chooser)));
                 } catch (Exception ignored) { /* no share target or oversized transaction */ }
             });
