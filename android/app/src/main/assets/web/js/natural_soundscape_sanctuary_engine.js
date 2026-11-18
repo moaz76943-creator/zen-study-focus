@@ -96,7 +96,9 @@
               // Brown Noise: leaky integrator of WHITE noise (-6dB/oct slope).
               // Using AudioCore's BROWN_POLE (0.997) and BROWN_GAIN (0.4) for bounded DC.
               brownAccum = 0.997 * brownAccum + white * 0.4;
-              data[i] = brownAccum;
+              // Fixed output scale (peak ≈ 0.55) — the old raw value hard-clamped
+              // ~75% of samples at ±1 into harsh static.
+              data[i] = brownAccum * 0.05;
             } else {
               // Campfire crackle: sparse pops on low noise floor
               // Track noise floor peak separately from pops for consistent normalization

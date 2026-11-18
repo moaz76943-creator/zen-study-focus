@@ -198,11 +198,13 @@
         const t = i / sampleRate;
         // 0.55..1.0 swell, keeps the noise well below the limiter ceiling.
         const swell = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(2 * Math.PI * swellHz * t));
-        const v = brownAccum * 0.8 * swell;
+        // Fixed output scale (peak ≈ 0.55) — the old *0.8 gain left 75% of
+        // samples above ±1 and hard-clamped into harsh static.
+        const v = brownAccum * 0.05 * swell;
         data[i] = v;
         if (Math.abs(v) > peak) peak = Math.abs(v);
       }
-      // Peak normalize handled by createSeamlessBuffer
+      // Amplitude is controlled here by fixed gain — no peak normalization.
     }, 1, false);
   }
 
@@ -277,6 +279,11 @@
         shapers[shapers.length - 1].connect(this.dcBlockFilter);
       } else {
         source.connect(this.dcBlockFilter);
+      }
+
+      // Preset is starting — re-open AudioCore's master (instant Stop mutes it to 0)
+      if (audioCore && typeof audioCore.unmuteMaster === 'function') {
+        audioCore.unmuteMaster();
       }
 
       source.start();

@@ -40,6 +40,7 @@
   const FADE_OUT_SEC = audioCore ? audioCore.FADE_OUT_MS / 1000 : 0.03;
   const BROWN_POLE = audioCore ? audioCore.BROWN_POLE : 0.997;
   const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
+  const BROWN_NOISE_AMP = (audioCore && audioCore.BROWN_NOISE_AMP) ? audioCore.BROWN_NOISE_AMP : 0.05;
   const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
   const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
 
@@ -107,14 +108,18 @@
       mean /= finalSize;
       for (let i = 0; i < finalSize; i++) finalData[i] -= mean;
 
-      // 2. Peak normalize to 0.9 (leaves headroom for master limiter)
+      // 2. Peak limiter: attenuate-only. Never AMPLIFY a quiet loop up to 0.9 —
+      //    that raised the OGG noise floor into constant audible hiss. Only clip
+      //    genuine overshoot above 0.95.
       let peak = 0;
       for (let i = 0; i < finalSize; i++) {
         const a = Math.abs(finalData[i]);
         if (a > peak) peak = a;
       }
-      const norm = peak > 0 ? 0.9 / peak : 1;
-      for (let i = 0; i < finalSize; i++) finalData[i] *= norm;
+      if (peak > 0.95) {
+        const norm = 0.95 / peak;
+        for (let i = 0; i < finalSize; i++) finalData[i] *= norm;
+      }
 
       // 3. Hard safety clamp
       for (let i = 0; i < finalSize; i++) {
@@ -135,7 +140,7 @@
       return;
     }
     let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-    let brown = 0, peak = 0;
+    let brown = 0;
     for (let i = 0; i < n; i++) {
       const white = Math.random() * 2 - 1;
       b0 = 0.99886 * b0 + white * 0.0555179;
@@ -149,18 +154,12 @@
       if (color === 'pink') {
         data[i] = pink * PINK_NOISE_AMP;
       } else { // brown
-        // Leaky integrator of WHITE noise (the true brown slope). Integrating
-        // the pink signal doubled the low-frequency weight into infrasonic
-        // rumble that bleeds as a constant pressure hiss on loops.
-        // Use AudioCore's BROWN_POLE (0.997) and BROWN_GAIN (0.4)
+        // Leaky integrator of WHITE noise (the true brown slope). Fixed output
+        // scale (peak ≈ 0.55) — the old path peak-normalized to 0.9, and unfixed
+        // accumulation rails at ±1 under hard clamp.
         brown = BROWN_POLE * brown + white * BROWN_GAIN;
-        data[i] = brown;
-        if (Math.abs(brown) > peak) peak = Math.abs(brown);
+        data[i] = brown * BROWN_NOISE_AMP;
       }
-    }
-    if (color === 'brown' && peak > 0) {
-      const norm = 0.9 / peak;
-      for (let i = 0; i < n; i++) data[i] *= norm;
     }
     // DC-removal pass: zero-mean loop boundary, kills hum/static on wrap.
     let mean = 0;
@@ -187,17 +186,10 @@
       outData[i] = tempData[i] * t + tempData[finalSize + i] * (1 - t);
     }
 
-    // Post-process: peak normalize → hard clamp (DC already removed by synthNoiseInto)
-    // 1. Peak normalize to 0.9 (leaves headroom for master limiter)
-    let peak = 0;
-    for (let i = 0; i < finalSize; i++) {
-      const a = Math.abs(outData[i]);
-      if (a > peak) peak = a;
-    }
-    const norm = peak > 0 ? 0.9 / peak : 1;
-    for (let i = 0; i < finalSize; i++) outData[i] *= norm;
-
-    // 2. Hard safety clamp
+    // Post-process: NO peak normalization — the generators above already control
+    // output amplitude (white 0.06 / pink 0.08 / brown 0.05). Normalizing to 0.9
+    // amplified quiet noise by >10× into audible hiss.
+    // 1. Hard safety clamp
     for (let i = 0; i < finalSize; i++) {
       if (outData[i] > 1.0) outData[i] = 1.0;
       else if (outData[i] < -1.0) outData[i] = -1.0;
@@ -371,6 +363,10 @@
       source.connect(dc);
       dc.connect(gain);
       gain.connect(getSafeDestination(ctx));
+      // A new ambient source = audible audio desired: restore AudioCore's master
+      if (audioCore && typeof audioCore.unmuteMaster === 'function') {
+        try { audioCore.unmuteMaster(); } catch (_) {}
+      }
       source.start();
       S.activeSource = source;
       S.activeGain = gain;
@@ -437,6 +433,9 @@
           gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
           source.connect(gain);
           gain.connect(getSafeDestination(ctx));
+          if (audioCore && typeof audioCore.unmuteMaster === 'function') {
+            try { audioCore.unmuteMaster(); } catch (_) {}
+          }
           source.start();
           source.stop(now + 1.7);
           setTimeout(function () {

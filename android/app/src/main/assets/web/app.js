@@ -5571,8 +5571,8 @@ function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
 
   // Post-generation processing for ALL channels:
   // 1. DC-removal pass: kill residual sample-average hum (constant static)
-  // 2. Peak-normalize to 0.9 (full scale minus headroom): guarantees no clipping
-  //    and identical loudness across loop restarts.
+  // 2. Peak limiter (attenuate-only): never AMPLIFY quiet buffers — amplifying
+  //    their noise floor to full scale produced constant background hiss.
   // 3. Hard safety clamp (defensive)
   for (let ch = 0; ch < numChannels; ch++) {
     const tempChData = channelData[ch];
@@ -5587,8 +5587,11 @@ function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
       const absV = Math.abs(tempChData[i]);
       if (absV > peak) peak = absV;
     }
-    const norm = peak > 0 ? 0.9 / peak : 1;
-    for (let i = 0; i < bufferSize; i++) tempChData[i] *= norm;
+    // Peak limiter (attenuate-only) — must not amplify quiet procedural noise
+    if (peak > 0.95) {
+      const norm = 0.95 / peak;
+      for (let i = 0; i < bufferSize; i++) tempChData[i] *= norm;
+    }
     // Hard safety clamp
     for (let i = 0; i < bufferSize; i++) {
       if (tempChData[i] > 1.0) tempChData[i] = 1.0;
@@ -5810,14 +5813,16 @@ function createSeamlessOggBuffer(ctx, buffer) {
     mean /= finalSize;
     for (let i = 0; i < finalSize; i++) finalData[i] -= mean;
 
-    // 2. Peak normalize to 0.9 (leaves headroom for master limiter)
+    // 2. Peak limiter: attenuate-only — never amplify quiet OGG noise floor
     let peak = 0;
     for (let i = 0; i < finalSize; i++) {
       const a = Math.abs(finalData[i]);
       if (a > peak) peak = a;
     }
-    const norm = peak > 0 ? 0.9 / peak : 1;
-    for (let i = 0; i < finalSize; i++) finalData[i] *= norm;
+    if (peak > 0.95) {
+      const norm = 0.95 / peak;
+      for (let i = 0; i < finalSize; i++) finalData[i] *= norm;
+    }
 
     // 3. Hard safety clamp
     for (let i = 0; i < finalSize; i++) {

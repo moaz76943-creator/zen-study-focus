@@ -28,6 +28,7 @@
 
   const BROWN_POLE = audioCore ? audioCore.BROWN_POLE : 0.997;
   const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
+  const BROWN_NOISE_AMP = (audioCore && audioCore.BROWN_NOISE_AMP) ? audioCore.BROWN_NOISE_AMP : 0.05;
   const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
   const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
 
@@ -189,23 +190,17 @@
       var buf = new Float32Array(len);
       var t = (type || "white").toLowerCase();
       if (t === "brown") {
-        // Leaky integrator of WHITE noise (true brown slope). Integrating the
-        // old random walk without a peak clamp blew up to ±3.5 and clipped
-        // into static on every loop restart.
+        // Leaky integrator of WHITE noise (true brown slope). Fixed output
+        // scale — raw accumulation reaches ±10 and must never be hard-clamped.
         var last = 0;
-        var peak = 0;
         for (var i = 0; i < len; i++) {
           var white = Math.random() * 2 - 1;
           last = BROWN_POLE * last + white * BROWN_GAIN;
-          buf[i] = last;
-          if (Math.abs(last) > peak) peak = Math.abs(last);
+          buf[i] = last * BROWN_NOISE_AMP;
         }
-        var norm = peak > 0 ? 0.9 / peak : 1;
-        for (var n = 0; n < len; n++) buf[n] *= norm;
       } else if (t === "pink") {
         // Paul Kellet pink noise approximation
         var b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-        var peak = 0;
         for (var j = 0; j < len; j++) {
           var w = Math.random() * 2 - 1;
           b0 = 0.99886 * b0 + w * 0.0555179;
@@ -217,24 +212,13 @@
           b6 = w * 0.115926;
           var pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362;
           buf[j] = pink * PINK_NOISE_AMP;
-          var a = Math.abs(buf[j]);
-          if (a > peak) peak = a;
         }
-        // Peak normalize to 0.9 (consistent with AudioCore)
-        var norm = peak > 0 ? 0.9 / peak : 1;
-        for (var n = 0; n < len; n++) buf[n] *= norm;
       } else {
         // white noise — properly filled buffer (never a silent zero buffer);
         // 0.5 was audible static hiss, 0.06 matches the other engines.
-        var peak = 0;
         for (var k = 0; k < len; k++) {
           buf[k] = (Math.random() * 2 - 1) * WHITE_NOISE_AMP;
-          var a = Math.abs(buf[k]);
-          if (a > peak) peak = a;
         }
-        // Peak normalize to 0.9 (consistent with AudioCore)
-        var norm = peak > 0 ? 0.9 / peak : 1;
-        for (var n = 0; n < len; n++) buf[n] *= norm;
       }
       // DC-removal pass: kill residual sample-average hum (constant static)
       // before the buffer reaches a gain node.

@@ -23,6 +23,7 @@
   const DC_BLOCK_HZ = 40;                                      // protects transducer coils & brown noise rumble
   const BROWN_POLE = 0.997;                                    // leakier = less DC drift
   const BROWN_GAIN = 0.4;                                      // input gain for brown noise
+  const BROWN_NOISE_AMP = 0.05;                               // fixed output scale — never peak-normalized up
   const WHITE_NOISE_AMP = 0.06;                                // consistent across all modules
   const PINK_NOISE_AMP = 0.08;                                 // consistent across all modules
 
@@ -112,6 +113,10 @@
   }
 
   function getMasterOutput() {
+    // Every audible node connects to the master through here — if the app is
+    // wiring up sound, that implies a user gesture, so re-open the ceiling
+    // (instant Stop closed it). Pure read/connection use is idempotent.
+    unmuteMaster();
     return masterGain; // voices connect HERE, not to destination
   }
 
@@ -122,7 +127,7 @@
    * @param {number} durationSec - final loop duration
    * @param {Function} generatorFn(channelData, sampleRate, totalSec) - fills temp buffer
    * @param {number} numChannels - 1 (mono) or 2 (stereo)
-   * @param {boolean} normalize - peak-normalize to 0.9 (default true for OGG; pass false for procedural noise where the generator already controls amplitude)
+   * @param {boolean} normalize - attenuate-only peak limiter above 0.95 (never amplifies; default true is safe for OGG, pass false for procedural noise where the generator already controls amplitude)
    * @returns {AudioBuffer} ready for BufferSourceNode.loop = true
    */
   function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1, normalize = true) {
@@ -151,18 +156,18 @@
       mean /= bufferSize;
       for (let i = 0; i < bufferSize; i++) data[i] -= mean;
 
-      // 2. Peak normalize to 0.9 ONLY when requested (OGG files need it;
-      //    procedural noise buffers already have controlled amplitude and
-      //    must NOT be amplified — normalizing to 0.9 multiplies quiet
-      //    noise by 3-5×, producing constant hiss/static).
+      // 2. Optional peak limiter: attenuate-only. Never amplify (normalizing
+      //    quiet buffers up amplified the noise floor into constant hiss).
       if (normalize) {
         let peak = 0;
         for (let i = 0; i < bufferSize; i++) {
           const a = Math.abs(data[i]);
           if (a > peak) peak = a;
         }
-        const norm = peak > 0 ? 0.9 / peak : 1;
-        for (let i = 0; i < bufferSize; i++) data[i] *= norm;
+        if (peak > 0.95) {
+          const norm = 0.95 / peak;
+          for (let i = 0; i < bufferSize; i++) data[i] *= norm;
+        }
       }
 
       // 3. Hard safety clamp (always applied — prevents clipping regardless of normalization)
@@ -223,21 +228,17 @@
   }
 
   function generateBrownNoise(channelData, sampleRate, durationSec) {
+    // Fixed-output-scale brown noise: bounded leaky integrator scaled by
+    // BROWN_NOISE_AMP (peak ≈ 0.5) — never peak-normalized UP (amplifying quiet
+    // noise produced constant hiss/rumble) and never clamped into rails.
     for (let ch = 0; ch < channelData.length; ch++) {
       const data = channelData[ch];
       const len = data.length;
       let brown = 0;
-      let peak = 0;
       for (let i = 0; i < len; i++) {
         const white = Math.random() * 2 - 1;
         brown = BROWN_POLE * brown + white * BROWN_GAIN;
-        data[i] = brown;
-        const a = Math.abs(brown);
-        if (a > peak) peak = a;
-      }
-      if (peak > 0) {
-        const norm = 0.9 / peak;
-        for (let i = 0; i < len; i++) data[i] *= norm;
+        data[i] = brown * BROWN_NOISE_AMP;
       }
     }
   }
@@ -266,6 +267,15 @@
     source.connect(dcBlock);
     dcBlock.connect(gain);
     gain.connect(getMasterOutput());
+
+    // Voice start = audible audio is desired: restore the master level that
+    // stopAllVoices/stopAllAudio hard-muted to 0 (instant stop). Without this,
+    // nothing could ever play again after a Stop.
+    if (masterGain && sharedContext) {
+      const t = sharedContext.currentTime;
+      masterGain.gain.cancelScheduledValues(t);
+      masterGain.gain.setValueAtTime(0.7 * LIMITER_LINEAR, t);
+    }
 
     source.start();
 
@@ -306,9 +316,17 @@
       try { v.stop(); } catch (_) {}
     });
     activeVoices.clear();
-    // Restore master gain for next sound after a microtask
+    // Master stays hard-muted (0) until the next voice start re-opens it —
+    // no delayed auto-restore, so Stop is truly silent and instant.
+  }
+
+  function unmuteMaster() {
+    // Re-open the master hard ceiling after an instant-stop (which sets it to 0).
+    // Called when a new voice/preset actually starts playing — never on its own.
     if (masterGain && sharedContext) {
-      masterGain.gain.setValueAtTime(0.7 * LIMITER_LINEAR, sharedContext.currentTime + 0.05);
+      const t = sharedContext.currentTime;
+      masterGain.gain.cancelScheduledValues(t);
+      masterGain.gain.setValueAtTime(0.7 * LIMITER_LINEAR, t);
     }
   }
 
@@ -386,14 +404,18 @@
       mean /= finalSize;
       for (let i = 0; i < finalSize; i++) finalData[i] -= mean;
 
-      // 2. Peak normalize to 0.9 (leaves headroom for master limiter)
+      // 2. Peak limiter: attenuate-only. OGG assets are shipped near-full-scale;
+      //    never AMPLIFY a quiet master up (that raised the noise floor into
+      //    constant hiss) — only catch genuine overshoot.
       let peak = 0;
       for (let i = 0; i < finalSize; i++) {
         const a = Math.abs(finalData[i]);
         if (a > peak) peak = a;
       }
-      const norm = peak > 0 ? 0.9 / peak : 1;
-      for (let i = 0; i < finalSize; i++) finalData[i] *= norm;
+      if (peak > 0.95) {
+        const norm = 0.95 / peak;
+        for (let i = 0; i < finalSize; i++) finalData[i] *= norm;
+      }
 
       // 3. Hard safety clamp
       for (let i = 0; i < finalSize; i++) {
@@ -425,6 +447,7 @@
     // Master control
     setMasterVolume,
     muteMaster,
+    unmuteMaster,
     getMasterOutput,
     getAnalyser: () => analyser,
 
@@ -440,6 +463,7 @@
     FADE_OUT_MS,
     BROWN_POLE,
     BROWN_GAIN,
+    BROWN_NOISE_AMP,
     WHITE_NOISE_AMP,
     PINK_NOISE_AMP,
   };
