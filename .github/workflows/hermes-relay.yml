@@ -72,10 +72,10 @@ jobs:
           }
 
           case "$ROLE" in
-            audio)  run_or || run_nv "nvidia/nemotron-3-ultra-550b-a55b" || run_gem "gemini-3.5-flash-lite" || run_gem "gemini-2.5-flash" || true ;;
-            layout) run_nv "nvidia/nemotron-3-ultra-550b-a55b" || run_or || run_gem "gemini-3.5-flash-lite" || run_gem "gemini-2.5-flash" || true ;;
-            ui)     run_nv "deepseek-ai/deepseek-v4.1-flash" || run_gem "gemini-3.5-flash-lite" || run_or || run_gem "gemini-2.5-flash" || true ;;
-            i100n)  run_gem "gemini-3.5-flash-lite" || run_nv "deepseek-ai/deepseek-v4.1-flash" || run_or || run_gem "gemini-2.5-flash" || true ;;
+            audio)  run_or || run_nv "nvidia/nemotron-3-ultra-550b-a55b" || run_gem "gemini-3.8-flash" || run_gem "gemini-3.6-flash" || true ;;
+            layout) run_nv "nvidia/nemotron-3-ultra-550b-a55b" || run_or || run_gem "gemini-3.8-flash" || run_gem "gemini-3.6-flash" || true ;;
+            ui)     run_nv "deepseek-ai/deepseek-v4.1-flash" || run_gem "gemini-3.8-flash" || run_or || run_gem "gemini-3.6-flash" || true ;;
+            i100n)  run_gem "gemini-3.8-flash" || run_nv "deepseek-ai/deepseek-v4.1-flash" || run_or || run_gem "gemini-3.6-flash" || true ;;
           esac
           rm -f /tmp/keys.list
 
