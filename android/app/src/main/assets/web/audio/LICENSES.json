@@ -3,47 +3,47 @@
   "files": [
     {
       "file": "rain_window.ogg",
-      "size_kb": 832.7,
+      "size_kb": 739.8,
       "license": "CC0 / Public Domain",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/4/41/Rain_against_the_window.ogg (noise-reduced 2026-11-18 follow-up 2: 40Hz highpass + afftdn FFT denoise, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded 2026-11-18; provenance unchanged)"
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/41/Rain_against_the_window.ogg (noise-reduced 2026-11-18 follow-up 2: 40Hz highpass + afftdn FFT denoise, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded 2026-11-18; provenance unchanged); 2026-11-18 follow-up 3: leading/trailing silence trimmed and 25ms loop crossfade baked into the file for seamless .ogg looping, re-encoded libvorbis q5, loudness re-checked (~-23 LUFS, <=-1.3 dBFS peaks)"
     },
     {
       "file": "forest_birds.ogg",
-      "size_kb": 617.6,
+      "size_kb": 513.8,
       "license": "CC0 / Public Domain",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/4/42/Bird_singing.ogg (noise-reduced 2026-11-18 follow-up 2: 40Hz highpass + light afftdn, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded 2026-11-18; provenance unchanged)"
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/42/Bird_singing.ogg (noise-reduced 2026-11-18 follow-up 2: 40Hz highpass + light afftdn, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded 2026-11-18; provenance unchanged); 2026-11-18 follow-up 3: leading/trailing silence trimmed and 25ms loop crossfade baked into the file for seamless .ogg looping, re-encoded libvorbis q5, loudness re-checked (~-23 LUFS, <=-1.3 dBFS peaks)"
     },
     {
       "file": "flowing_water.ogg",
-      "size_kb": 349.2,
+      "size_kb": 305.4,
       "license": "CC0 / Public Domain",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/2/26/Flowing-water-100019.ogg (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; 2026-11-18 follow-up: 40Hz highpass + afftdn + lowpass hiss removal, loudness restored, re-encoded; 2026-11-18 follow-up 2: stronger afftdn + 12kHz lowpass to remove flat broadband hiss floor, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded; provenance unchanged)"
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/26/Flowing-water-100019.ogg (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; 2026-11-18 follow-up: 40Hz highpass + afftdn + lowpass hiss removal, loudness restored, re-encoded; 2026-11-18 follow-up 2: stronger afftdn + 12kHz lowpass to remove flat broadband hiss floor, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded; provenance unchanged); 2026-11-18 follow-up 3: leading/trailing silence trimmed and 25ms loop crossfade baked into the file for seamless .ogg looping, re-encoded libvorbis q5, loudness re-checked (~-23 LUFS, <=-1.3 dBFS peaks)"
     },
     {
       "file": "rain_thunder.ogg",
-      "size_kb": 204.9,
+      "size_kb": 182.2,
       "license": "Public domain",
-      "source": "https://commons.wikimedia.org/wiki/File%3ARain_and_thunder.ogg (noise-reduced 2026-11-18 follow-up 2: 40Hz highpass + afftdn FFT denoise, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded 2026-11-18; provenance unchanged)",
+      "source": "https://commons.wikimedia.org/wiki/File%3ARain_and_thunder.ogg (noise-reduced 2026-11-18 follow-up 2: 40Hz highpass + afftdn FFT denoise, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded 2026-11-18; provenance unchanged); 2026-11-18 follow-up 3: leading/trailing silence trimmed and 25ms loop crossfade baked into the file for seamless .ogg looping, re-encoded libvorbis q5, loudness re-checked (~-23 LUFS, <=-1.3 dBFS peaks)",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/Rain_and_thunder.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
     },
     {
       "file": "wind_breeze.ogg",
-      "size_kb": 1907.2,
+      "size_kb": 1944.1,
       "license": "Public domain",
-      "source": "https://commons.wikimedia.org/wiki/File%3A20090610_0_ambience.ogg (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; provenance unchanged)",
+      "source": "https://commons.wikimedia.org/wiki/File%3A20090610_0_ambience.ogg (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; provenance unchanged); 2026-11-18 follow-up 3: leading/trailing silence trimmed and 25ms loop crossfade baked into the file for seamless .ogg looping, re-encoded libvorbis q5, loudness re-checked (~-23 LUFS, <=-1.3 dBFS peaks)",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/20090610_0_ambience.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
     },
     {
       "file": "campfire_embers.ogg",
-      "size_kb": 127.2,
+      "size_kb": 128.1,
       "license": "CC0 / Public Domain",
-      "source": "Procedurally synthesized with ffmpeg (brown-noise low-frequency rumble + high-frequency crackle flutter, amix); original work, no third-party sample or recording, dedicated to the public domain (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; 2026-11-18 follow-up: 40Hz highpass + afftdn + lowpass hiss removal, loudness restored, re-encoded; provenance unchanged)"
+      "source": "Procedurally synthesized with ffmpeg (brown-noise low-frequency rumble + high-frequency crackle flutter, amix); original work, no third-party sample or recording, dedicated to the public domain (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; 2026-11-18 follow-up: 40Hz highpass + afftdn + lowpass hiss removal, loudness restored, re-encoded; provenance unchanged); 2026-11-18 follow-up 3: leading/trailing silence trimmed and 25ms loop crossfade baked into the file for seamless .ogg looping, re-encoded libvorbis q5, loudness re-checked (~-23 LUFS, <=-1.3 dBFS peaks)"
     },
     {
       "file": "water_drop.ogg",
-      "size_kb": 512.8,
+      "size_kb": 438.1,
       "license": "Public domain",
-      "source": "https://commons.wikimedia.org/wiki/File%3ABathtub_water_splashes.ogg (noise-reduced 2026-11-18 follow-up 2: 40Hz highpass + afftdn FFT denoise to remove hissy bed between splashes, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded 2026-11-18; provenance unchanged)",
+      "source": "https://commons.wikimedia.org/wiki/File%3ABathtub_water_splashes.ogg (noise-reduced 2026-11-18 follow-up 2: 40Hz highpass + afftdn FFT denoise to remove hissy bed between splashes, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded 2026-11-18; provenance unchanged); 2026-11-18 follow-up 3: leading/trailing silence trimmed and 25ms loop crossfade baked into the file for seamless .ogg looping, re-encoded libvorbis q5, loudness re-checked (~-23 LUFS, <=-1.3 dBFS peaks)",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/83/Bathtub_water_splashes.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
     }
   ]

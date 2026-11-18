@@ -40,7 +40,7 @@
   const FADE_OUT_SEC = audioCore ? audioCore.FADE_OUT_MS / 1000 : 0.03;
   const BROWN_POLE = audioCore ? audioCore.BROWN_POLE : 0.997;
   const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
-  const BROWN_NOISE_AMP = (audioCore && audioCore.BROWN_NOISE_AMP) ? audioCore.BROWN_NOISE_AMP : 0.045;
+  const BROWN_NOISE_AMP = (audioCore && audioCore.BROWN_NOISE_AMP) ? audioCore.BROWN_NOISE_AMP : 0.03;
   const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
   const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
   const DC_BLOCK_HZ = audioCore ? audioCore.DC_BLOCK_HZ : 40;
@@ -220,7 +220,7 @@
     for (let i = 0; i < finalSize; i++) outData[i] -= mean;
 
     // 2. NO peak normalization — the generators above already control
-    //    output amplitude (white 0.06 / pink 0.08 / brown 0.045). Normalizing to 0.9
+    //    output amplitude (white 0.06 / pink 0.08 / brown 0.03). Normalizing to 0.9
     //    amplified quiet noise by >10× into audible hiss.
     // 3. Hard safety clamp
     for (let i = 0; i < finalSize; i++) {

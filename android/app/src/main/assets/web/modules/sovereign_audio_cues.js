@@ -28,7 +28,7 @@
 
   const BROWN_POLE = audioCore ? audioCore.BROWN_POLE : 0.997;
   const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
-  const BROWN_NOISE_AMP = (audioCore && audioCore.BROWN_NOISE_AMP) ? audioCore.BROWN_NOISE_AMP : 0.045;
+  const BROWN_NOISE_AMP = (audioCore && audioCore.BROWN_NOISE_AMP) ? audioCore.BROWN_NOISE_AMP : 0.03;
   const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
   const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
 
@@ -95,7 +95,7 @@
     if (p && typeof p.then === "function") {
       p.then(function () {
         var step = 0;
-        var steps = 10;
+        var steps = 50; /* 50 micro-steps over 1s — kills the 10-step zipper/stair-stepping hiss on fade-in */
         var fadeInterval = setInterval(function () {
           step++;
           try { a.volume = S.muted ? 0 : finalVol * (step / steps); } catch (e) {}
@@ -104,7 +104,7 @@
             if (S.fadeTimers) S.fadeTimers.delete(fadeInterval);
             if (S.fadeTimer === fadeInterval) S.fadeTimer = null;
           }
-        }, 100);
+        }, 20);
         if (S.fadeTimers) S.fadeTimers.add(fadeInterval);
         S.fadeTimer = fadeInterval;
       }).catch(function () {});

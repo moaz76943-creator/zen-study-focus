@@ -39,7 +39,7 @@
   const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
   const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
   const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
-  const BROWN_NOISE_AMP = audioCore ? audioCore.BROWN_NOISE_AMP : 0.045;
+  const BROWN_NOISE_AMP = audioCore ? audioCore.BROWN_NOISE_AMP : 0.03;
 
   class AcousticStudio {
     constructor(options = {}) {
@@ -184,7 +184,7 @@
       const bufferSize = Math.floor(sampleRate * totalSec);
 
       // Brown noise: leaky integrator of WHITE noise (-6dB/oct slope).
-      // Using AudioCore's BROWN_NOISE_AMP (0.045) for consistent fixed-output scale.
+      // Using AudioCore's BROWN_NOISE_AMP (0.03) for consistent fixed-output scale.
       // The old *0.05 with swell modulation caused loop-boundary discontinuities
       // perceived as static/hiss. Fixed gain with AudioCore's crossfade is clean.
       let brownAccum = 0;

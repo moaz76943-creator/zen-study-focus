@@ -5688,7 +5688,7 @@ function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
           // Fallback generators matching AudioCore's implementation
           const BROWN_POLE = (window.AudioCore && window.AudioCore.BROWN_POLE) ? window.AudioCore.BROWN_POLE : 0.997;
           const BROWN_GAIN = (window.AudioCore && window.AudioCore.BROWN_GAIN) ? window.AudioCore.BROWN_GAIN : 0.4;
-          const BROWN_NOISE_AMP = (window.AudioCore && window.AudioCore.BROWN_NOISE_AMP) ? window.AudioCore.BROWN_NOISE_AMP : 0.045;
+          const BROWN_NOISE_AMP = (window.AudioCore && window.AudioCore.BROWN_NOISE_AMP) ? window.AudioCore.BROWN_NOISE_AMP : 0.03;
           let brown = 0;
           for (let i = 0; i < bufferSize; i++) {
             const white = Math.random() * 2 - 1;
