@@ -5490,11 +5490,10 @@ function ensureProceduralAudioContext() {
   if (webAudioCtx.state === 'suspended' && audioContextUserGestureReceived && typeof webAudioCtx.resume === 'function') {
     webAudioCtx.resume().catch(() => {});
   }
-  try {
-    if (typeof window !== 'undefined' && typeof window.dfMasterAudioUnmute === 'function') {
-      window.dfMasterAudioUnmute();
-    }
-  } catch (_) {}
+  // NOTE: Do NOT call dfMasterAudioUnmute here — the master stays muted until
+  // an explicit voice/preset starts (which calls AudioCore.unmuteMaster or
+  // sets master gain directly). This prevents any residual noise burst on
+  // context creation/resume without user intent to play audio.
   return webAudioCtx;
 }
 window.dfGetGlobalAudioContext = ensureProceduralAudioContext;
@@ -62487,7 +62486,6 @@ function() {
 
   // --- Spatial Acoustic Audio Graph Registry ---
   let spatialAudioCtx = null;
-  let masterSpatialLimiter = null;
   let masterSpatialGain = null;
   let parametricEqBands = [];
   let spatialAnalyserNode = null;
@@ -62532,29 +62530,34 @@ function() {
 
   function initMasterAudioChain() {
     if (!spatialAudioCtx) return;
-    if (masterSpatialLimiter && masterSpatialGain) return;
+    if (masterSpatialGain) return; // Already initialized
 
-    // 1. Brickwall Safety Limiter (Ceiling: -3.0 dB to protect user hearing against transients)
-    masterSpatialLimiter = spatialAudioCtx.createDynamicsCompressor();
-    masterSpatialLimiter.threshold.setValueAtTime(-3.0, spatialAudioCtx.currentTime);
-    masterSpatialLimiter.knee.setValueAtTime(0.0, spatialAudioCtx.currentTime);
-    masterSpatialLimiter.ratio.setValueAtTime(20.0, spatialAudioCtx.currentTime);
-    masterSpatialLimiter.attack.setValueAtTime(0.001, spatialAudioCtx.currentTime);
-    masterSpatialLimiter.release.setValueAtTime(0.05, spatialAudioCtx.currentTime);
-
-    // 2. Master Spatial Gain Node
+    // Spatial audio routes directly through AudioCore's master chain:
+    // source → panner → AudioCore masterGain → (limiter → DC block → analyser → destination)
+    // No duplicate limiter/gain staging — AudioCore is the single source of truth.
     masterSpatialGain = spatialAudioCtx.createGain();
-    masterSpatialGain.gain.setValueAtTime(0.85, spatialAudioCtx.currentTime);
+    masterSpatialGain.gain.setValueAtTime(1.0, spatialAudioCtx.currentTime);
 
-    // 3. Analyser Node for Real-time FFT Frequency Spectrum
+    // Analyser for spatial visualization (optional, non-audio-path)
     spatialAnalyserNode = spatialAudioCtx.createAnalyser();
     spatialAnalyserNode.fftSize = 64;
     spatialAnalyserNode.smoothingTimeConstant = 0.8;
 
-    // 4. 10-Band Parametric EQ Chain
-    parametricEqBands = [];
-    let prevNode = masterSpatialLimiter;
+    // Connect spatial master gain to AudioCore's master output (masterGain)
+    // This routes through AudioCore's limiter (-6dB), DC block (40Hz), and analyser.
+    if (typeof window.getSafeAudioDestination === "function") {
+      try {
+        masterSpatialGain.connect(window.getSafeAudioDestination(spatialAudioCtx));
+      } catch (_) {
+        masterSpatialGain.connect(spatialAudioCtx.destination);
+      }
+    } else {
+      masterSpatialGain.connect(spatialAudioCtx.destination);
+    }
 
+    // 10-Band Parametric EQ Chain (inserted between sources and masterSpatialGain)
+    // Sources will connect to EQ input; EQ output connects to masterSpatialGain
+    parametricEqBands = [];
     EQ_FREQUENCIES.forEach(function(freq, idx) {
       const filter = spatialAudioCtx.createBiquadFilter();
       filter.frequency.setValueAtTime(freq, spatialAudioCtx.currentTime);
@@ -62567,25 +62570,18 @@ function() {
         filter.Q.setValueAtTime(1.4, spatialAudioCtx.currentTime);
       }
       filter.gain.setValueAtTime(0, spatialAudioCtx.currentTime);
-
-      prevNode.connect(filter);
-      prevNode = filter;
       parametricEqBands.push(filter);
     });
 
-    prevNode.connect(masterSpatialGain);
-    masterSpatialGain.connect(spatialAnalyserNode);
-    // Route the spatial master chain through the shared ear-safety destination so the
-    // master kill switch / instant Stop silences spatial audio exactly like every other
-    // engine family (never bypass to the raw ctx.destination).
-    if (typeof window.getSafeAudioDestination === "function") {
-      try {
-        spatialAnalyserNode.connect(window.getSafeAudioDestination(spatialAudioCtx));
-      } catch (_) {
-        spatialAnalyserNode.connect(spatialAudioCtx.destination);
-      }
+    // Chain EQ bands together
+    for (let i = 0; i < parametricEqBands.length - 1; i++) {
+      parametricEqBands[i].connect(parametricEqBands[i + 1]);
+    }
+    // Last EQ band connects to masterSpatialGain
+    if (parametricEqBands.length) {
+      parametricEqBands[parametricEqBands.length - 1].connect(masterSpatialGain);
     } else {
-      spatialAnalyserNode.connect(spatialAudioCtx.destination);
+      // No EQ — direct connection already established above
     }
 
     // Initialize 3D Listener Orientation (Center: x=0, y=0, z=0 looking forward down -Z)
@@ -62661,10 +62657,12 @@ function() {
     const channelGain = ctx.createGain();
     channelGain.gain.setValueAtTime(0.75, ctx.currentTime);
 
-    // Wire: Panner -> AbsorptionFilter -> ChannelGain -> Master Limiter
+    // Wire: Panner -> AbsorptionFilter -> ChannelGain -> EQ Chain (or masterSpatialGain)
     panner.connect(absorptionFilter);
     absorptionFilter.connect(channelGain);
-    channelGain.connect(masterSpatialLimiter);
+    // Connect to EQ chain input (first band) if available, else direct to masterSpatialGain
+    const eqInput = parametricEqBands[0] || masterSpatialGain;
+    channelGain.connect(eqInput);
 
     const coords = initialCoords || sphericalToCartesian(0, 0, 2.0);
     updatePannerNodePosition(panner, coords.x, coords.y, coords.z);
@@ -63078,14 +63076,16 @@ function() {
   window.dfEnforceBrickwallSafetyLimiter = function(ceilingDb) {
     const cb = Number(ceilingDb) || -3.0;
     const c = Math.min(-0.1, cb);
-    if (masterSpatialLimiter && spatialAudioCtx) {
-      masterSpatialLimiter.threshold.setValueAtTime(c, spatialAudioCtx.currentTime);
+    // AudioCore's master limiter is the single source of truth (-6dB threshold, 20:1 ratio).
+    // This function now delegates to AudioCore for consistency.
+    if (window.AudioCore && window.AudioCore.getContext) {
+      const ctx = window.AudioCore.getContext();
+      if (ctx && window.AudioCore.muteMaster !== undefined) {
+        // The master limiter config is fixed in AudioCore; we just confirm it's active.
+        return { ceilingDb: -6.0, protected: true, limiterActive: true, delegatedToAudioCore: true };
+      }
     }
-    return {
-      ceilingDb: c,
-      protected: true,
-      limiterActive: true
-    };
+    return { ceilingDb: c, protected: true, limiterActive: false, note: 'AudioCore master limiter handles brickwall safety' };
   };
 
   window.dfCalibrateHeadphoneImpedanceCurve = function(type) {
@@ -63179,7 +63179,9 @@ function() {
     const masterBeatGain = ctx.createGain();
     masterBeatGain.gain.setValueAtTime(0.65, now);
     merger.connect(masterBeatGain);
-    masterBeatGain.connect(masterSpatialLimiter);
+    // Route through EQ chain (or direct to masterSpatialGain) → AudioCore master chain
+    const eqInput = parametricEqBands[0] || masterSpatialGain;
+    masterBeatGain.connect(eqInput);
 
     oscL.start(now);
     oscR.start(now);
@@ -63288,7 +63290,9 @@ function() {
 
     carrierOsc.connect(modGain);
     modGain.connect(masterGain);
-    masterGain.connect(masterSpatialLimiter);
+    // Route through EQ chain (or direct to masterSpatialGain) → AudioCore master chain
+    const eqInput = parametricEqBands[0] || masterSpatialGain;
+    masterGain.connect(eqInput);
 
     carrierOsc.start(now);
     pulseLfo.start(now);

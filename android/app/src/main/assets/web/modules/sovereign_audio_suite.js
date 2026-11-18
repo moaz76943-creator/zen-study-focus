@@ -6,6 +6,7 @@
  *   3. Smooth 1.2s fade-in without simultaneous multi-deck WebView distortion
  *   4. User gesture gating for all playback
  * 5. 100% pure nature sounds, no music, no synthetic tones
+ * 6. All OGG playback routed through AudioCore for zero-static, instant-stop, unified master chain
  */
 (function (global) {
   'use strict';
@@ -32,7 +33,9 @@
       fadeTimers: new Set(),
       volume: 0.7,
       muted: false,
-      userInteracted: false
+      userInteracted: false,
+      // AudioCore voice tracking for OGG playback
+      oggVoices: new Map()
     };
   }
 
@@ -55,6 +58,13 @@
       S.fadeTimers.forEach(function (t) { clearInterval(t); });
       S.fadeTimers.clear();
     }
+    // Stop AudioCore-tracked OGG voices
+    if (window.AudioCore) {
+      S.oggVoices.forEach((voice, key) => {
+        try { voice.stop(); } catch (_) {}
+      });
+      S.oggVoices.clear();
+    }
     for (var i = 0; i < S.players.length; i++) {
       try {
         S.players[i].pause();
@@ -70,6 +80,29 @@
         try { domAudios[j].pause(); domAudios[j].currentTime = 0; } catch (e) {}
       }
     }
+  }
+
+  async function playOggViaAudioCore(src, loop, targetVol) {
+    if (!window.AudioCore) return null;
+    if (!window.AudioCore.isGestureReceived()) return null; // Hard gate
+
+    const ctx = window.AudioCore.getContext();
+    if (!ctx) return null;
+
+    const buffer = await window.AudioCore.loadOggBuffer(src);
+    if (!buffer) return null;
+
+    const voice = window.AudioCore.createVoice(buffer, loop);
+    if (!voice) return null;
+
+    // Scale voice gain to respect limiter ceiling
+    const targetGain = Math.max(0.0001, targetVol * (window.AudioCore.LIMITER_LINEAR || 0.5));
+    const now = ctx.currentTime;
+    voice.gain.gain.cancelScheduledValues(now);
+    voice.gain.gain.setValueAtTime(0.0001, now);
+    voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.03);
+
+    return voice;
   }
 
   function playSingleClean(src, loop, targetVol) {
@@ -119,13 +152,32 @@
       stopAllGlobal();
       var key = String(type || 'rain').toLowerCase();
       var src = SOUND_FILES[key] || SOUND_FILES.rain;
-      playSingleClean(src, true, S.volume);
+      // Prefer AudioCore for zero-static OGG playback; fallback to HTMLAudioElement
+      if (window.AudioCore && window.AudioCore.loadOggBuffer) {
+        playOggViaAudioCore(src, true, S.volume).then(voice => {
+          if (voice) S.oggVoices.set(key, voice);
+        }).catch(() => {
+          // Fallback to legacy path
+          playSingleClean(src, true, S.volume);
+        });
+      } else {
+        playSingleClean(src, true, S.volume);
+      }
       return true;
     },
     mixAmbient: function () {
       stopAllGlobal();
-      playSingleClean(SOUND_FILES.rain, true, S.volume * 0.6);
-      playSingleClean(SOUND_FILES.forest, true, S.volume * 0.4);
+      if (window.AudioCore && window.AudioCore.loadOggBuffer) {
+        playOggViaAudioCore(SOUND_FILES.rain, true, S.volume * 0.6).then(voice => {
+          if (voice) S.oggVoices.set('rain_mix', voice);
+        });
+        playOggViaAudioCore(SOUND_FILES.forest, true, S.volume * 0.4).then(voice => {
+          if (voice) S.oggVoices.set('forest_mix', voice);
+        });
+      } else {
+        playSingleClean(SOUND_FILES.rain, true, S.volume * 0.6);
+        playSingleClean(SOUND_FILES.forest, true, S.volume * 0.4);
+      }
       return true;
     },
     stopAmbient: function () {
@@ -148,6 +200,17 @@
         for (var i = 0; i < S.players.length; i++) {
           try { S.players[i].volume = S.muted ? 0 : S.volume; } catch (e) {}
         }
+        // Update AudioCore OGG voices volume
+        if (window.AudioCore) {
+          S.oggVoices.forEach((voice, key) => {
+            const targetGain = Math.max(0.0001, S.volume * (window.AudioCore.LIMITER_LINEAR || 0.5));
+            const ctx = window.AudioCore.getContext();
+            if (ctx && voice.gain) {
+              voice.gain.gain.cancelScheduledValues(ctx.currentTime);
+              voice.gain.gain.linearRampToValueAtTime(targetGain, ctx.currentTime + 0.03);
+            }
+          });
+        }
       }
       return this.volume;
     },
@@ -156,6 +219,16 @@
       this.muted = S.muted;
       for (var i = 0; i < S.players.length; i++) {
         try { S.players[i].volume = S.muted ? 0 : S.volume; } catch (e) {}
+      }
+      // Mute AudioCore OGG voices
+      if (window.AudioCore) {
+        S.oggVoices.forEach((voice, key) => {
+          const ctx = window.AudioCore.getContext();
+          if (ctx && voice.gain) {
+            voice.gain.gain.cancelScheduledValues(ctx.currentTime);
+            voice.gain.gain.setValueAtTime(S.muted ? 0 : (S.volume * (window.AudioCore.LIMITER_LINEAR || 0.5)), ctx.currentTime);
+          }
+        });
       }
       return this.muted;
     }

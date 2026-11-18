@@ -30,6 +30,22 @@
         return globalThis.__dfNoopOsc ? noopOsc : ctx["createOscillator"]();
     }
 
+    // Generate a click-free sine tone buffer (for chimes, cues) — delegates to AudioCore
+    function createToneBuffer(ctx, frequency, durationSec, gainValue = 0.3) {
+        if (audioCore && audioCore.createSeamlessBuffer) {
+            return audioCore.createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+                const data = channelData[0];
+                const bufferSize = Math.floor(sampleRate * totalSec);
+                const TWO_PI = Math.PI * 2;
+                for (let i = 0; i < bufferSize; i++) {
+                    const t = i / sampleRate;
+                    data[i] = Math.sin(TWO_PI * frequency * t) * gainValue;
+                }
+            }, 1);
+        }
+        return null;
+    }
+
     const WebAudioSingletonEngine = {
         isInitialized: false,
 

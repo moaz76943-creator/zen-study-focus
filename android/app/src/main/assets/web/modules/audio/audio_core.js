@@ -234,17 +234,25 @@
   }
 
   function generateBrownNoise(channelData, sampleRate, durationSec) {
-    // Fixed-output-scale brown noise: bounded leaky integrator scaled by
-    // BROWN_NOISE_AMP (peak ≈ 0.5) — never peak-normalized UP (amplifying quiet
-    // noise produced constant hiss/rumble) and never clamped into rails.
+    // Fixed-output-scale brown noise: bounded leaky integrator with inline
+    // DC-blocking (1-pole high-pass at ~10Hz) to prevent integrator drift
+    // from accumulating into low-frequency rumble/static over long buffers.
+    // Output scaled by BROWN_NOISE_AMP — never peak-normalized UP (amplifying
+    // quiet noise produced constant hiss/rumble) and never clamped into rails.
+    const dcBlockCoeff = Math.exp(-2 * Math.PI * 10 / sampleRate); // ~10Hz high-pass
     for (let ch = 0; ch < channelData.length; ch++) {
       const data = channelData[ch];
       const len = data.length;
       let brown = 0;
+      let dcBlockState = 0;
       for (let i = 0; i < len; i++) {
         const white = Math.random() * 2 - 1;
         brown = BROWN_POLE * brown + white * BROWN_GAIN;
-        data[i] = brown * BROWN_NOISE_AMP;
+        // Inline DC block: y[n] = x[n] - x[n-1] + coeff * y[n-1]
+        // But we use the simpler leaky form: high-pass the integrator output
+        const raw = brown * BROWN_NOISE_AMP;
+        data[i] = raw - dcBlockState + dcBlockCoeff * (data[i-1] || 0);
+        dcBlockState = raw;
       }
     }
   }
@@ -388,26 +396,32 @@
     const xfadeSamples = Math.max(1, Math.floor(sampleRate * (XFADE_MS / 1000)));
     const numChannels = Math.max(1, buffer.numberOfChannels || 1);
     const srcLen = buffer.length || (buffer.getChannelData(0) ? buffer.getChannelData(0).length : 1);
-    const finalSize = Math.max(1, srcLen - xfadeSamples);
+
+    // For seamless looping, we need the END of the buffer to crossfade into the BEGINNING.
+    // Create an extended buffer: [original audio] + [first xfadeSamples of audio]
+    // Then crossfade the last xfadeSamples of original into the added beginning.
+    // The final buffer length = srcLen (we keep original length, crossfade at tail).
+    const finalSize = srcLen;
+    const extendedSize = srcLen + xfadeSamples;
 
     const finalBuffer = ctx.createBuffer(numChannels, finalSize, sampleRate);
     for (let ch = 0; ch < numChannels; ch++) {
       const srcData = buffer.getChannelData(ch);
       const finalData = finalBuffer.getChannelData(ch);
 
-      // Body: copy middle section (skip first xfadeSamples)
-      for (let i = xfadeSamples; i < finalSize; i++) {
-        finalData[i] = srcData[i];
-      }
-      // Head crossfade: blend natural tail continuation into head for seamless loop
-      // finalData[0] = srcData[finalSize] (continuation of srcData[finalSize-1])
-      // finalData[xfadeSamples-1] ≈ srcData[xfadeSamples-1] (head)
-      for (let i = 0; i < xfadeSamples && i < finalSize; i++) {
+      // Copy the entire original audio
+      finalData.set(srcData);
+
+      // Crossfade the LAST xfadeSamples of the buffer (loop point) into the FIRST xfadeSamples
+      // This ensures when BufferSourceNode loops from finalSize-1 to 0, the transition is smooth
+      const loopStart = finalSize - xfadeSamples;
+      for (let i = 0; i < xfadeSamples; i++) {
         const t = i / xfadeSamples;
-        finalData[i] = (1 - t) * srcData[finalSize + i] + t * srcData[i];
+        // Blend: (1-t) * end_of_audio + t * beginning_of_audio
+        finalData[loopStart + i] = (1 - t) * srcData[loopStart + i] + t * srcData[i];
       }
 
-      // Post-process: DC removal → peak normalize → hard clamp (same as procedural buffers)
+      // Post-process: DC removal → peak limiter (attenuate-only) → hard clamp
       // 1. DC removal
       let mean = 0;
       for (let i = 0; i < finalSize; i++) mean += finalData[i];
