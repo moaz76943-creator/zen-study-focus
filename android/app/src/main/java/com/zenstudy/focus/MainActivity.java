@@ -128,12 +128,15 @@ public class MainActivity extends AppCompatActivity {
             int minNavPx = Math.round(minNavDp * density);
             if (navBottom < minNavPx) navBottom = minNavPx;
             // Extra safety margin for tall 3-button nav bars on Xiaomi HyperOS (bsc#hyperos-navbar-height).
-            // Apply UNCONDITIONALLY as a safety net: if detection misclassifies 3-button as gesture
-            // (e.g., Xiaomi reports 0 for navigationBars/systemBars), we still guarantee 120dp floor.
-            // The calibrator will adjust floating layers (capsule, Studios pill, FAB) accordingly.
-            int extraNavDp = 120;
-            int extraNavPx = Math.round(extraNavDp * density);
-            if (navBottom < extraNavPx) navBottom = extraNavPx;
+            // Apply ONLY for 3-button navigation. Gesture navigation uses the 32dp minimum from above.
+            // If detection misclassifies 3-button as gesture (Xiaomi reports 0 for navigationBars/systemBars),
+            // the 3-button bar height will be captured by systemBars.bottom or navigationBars.bottom
+            // since both report the 3-button bar height on Xiaomi.
+            if (!isGestureNav) {
+                int extraNavDp = 120;
+                int extraNavPx = Math.round(extraNavDp * density);
+                if (navBottom < extraNavPx) navBottom = extraNavPx;
+            }
 
             // IME can be taller than nav bar; use max for WebView padding so content stays above keyboard.
             int paddingBottom = Math.max(navBottom, ime.bottom);
