@@ -379,14 +379,15 @@
     .sounds-photo-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
     /* STA-1 · Nature Sounds lead the Sounds tab.
-       The playable grid is the primary surface; the filter pills, (collapsible)
-       3D Spatial studio, and completion-tone picker follow it. Visual order via
-       flex `order` keeps DOM order intact for the DF09 tone-picker regression
-       (tone-picker before grid in source) while elevating Nature Sounds to top. */
+       Header + category filter pills + playable grid form the primary surface;
+       the 3D Spatial studio (collapsible, collapsed by default) and the
+       completion-tone picker follow. Visual order via flex `order` keeps DOM
+       order intact for the DF09 tone-picker regression (tone-picker before
+       grid in source) while elevating Nature Sounds to the very top. */
        #sec-sounds.active { display: flex; flex-direction: column; }
        #sec-sounds > #natureSoundsHeader { order: 0; }
-       #sec-sounds > #soundsGridBox { order: 1; }
-       #sec-sounds > .segmented-pills-bar { order: 2; }
+       #sec-sounds > .segmented-pills-bar { order: 1; }
+       #sec-sounds > #soundsGridBox { order: 2; }
        #sec-sounds > .mixer-status-bar { order: 3; }
        #sec-sounds > #dfPillar5SpatialMount { order: 4; }
        #sec-sounds > #df-tone-picker-card { order: 5; }
@@ -1751,6 +1752,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
   }
 </style>
   <link rel="stylesheet" href="modules/flashcards/flashcards.css">
+  <link rel="stylesheet" href="styles/df_polish_v23.css">
 </head>
 <body>
 

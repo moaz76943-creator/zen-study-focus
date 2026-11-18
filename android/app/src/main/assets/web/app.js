@@ -6121,8 +6121,17 @@ window.activePlayers = activePlayers;
 
 function filterSoundsByCat(cat, btn) {
   soundCat = cat;
-  btn.parentElement.querySelectorAll('.seg-pill').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
+  // Tolerate programmatic calls without a pill element (previously this threw
+  // "Cannot read properties of null (reading 'parentElement')").
+  const bar = (btn && btn.parentElement) || document.querySelector('.segmented-pills-bar');
+  if (bar) {
+    bar.querySelectorAll('.seg-pill').forEach(b => {
+      const active = btn ? b === btn : (b.getAttribute('onclick') || '').indexOf("'" + cat + "'") !== -1;
+      b.classList.toggle('active', active);
+    });
+  } else if (btn) {
+    btn.classList.add('active');
+  }
   renderSoundsStudio();
 }
 
