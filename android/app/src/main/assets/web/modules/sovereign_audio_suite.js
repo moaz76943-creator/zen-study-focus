@@ -162,9 +162,13 @@
   };
 
   global.SovereignAudioCues = SovereignRealAudio;
-  global.SovereignChimes = global.SovereignAudioSuite.chimes;
-  global.SovereignBinauralAlpha = global.SovereignAudioSuite.binaural;
-  global.SovereignAudioGuardian = global.SovereignAudioSuite.guardian;
+  // Safe whether or not sovereign_ambient_dsp.js published the suite first:
+  var suite = global.SovereignAudioSuite = global.SovereignAudioSuite || {};
+  suite.chimes = suite.chimes || SovereignRealAudio;
+  suite.cues = suite.cues || SovereignRealAudio;
+  global.SovereignChimes = suite.chimes;
+  if (suite.binaural) global.SovereignBinauralAlpha = suite.binaural;
+  if (suite.guardian) global.SovereignAudioGuardian = suite.guardian;
 
   if (typeof module !== 'undefined' && module.exports) {
     module.exports = SovereignRealAudio;

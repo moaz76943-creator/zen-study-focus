@@ -83,7 +83,8 @@
 
   function playSingleClean(src, loop, targetVol) {
     if (typeof Audio === "undefined") return null;
-    if (!S.userInteracted) return null; // BLOCKED: User gesture required
+    // Gesture gate via AudioCore (single source of truth)
+    if (!audioCore || !audioCore.isGestureReceived || !audioCore.isGestureReceived()) return null; // BLOCKED: User gesture required
     var a = new Audio(src);
     a.loop = !!loop;
     a.preload = "auto";

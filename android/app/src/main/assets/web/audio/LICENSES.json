@@ -3,27 +3,27 @@
   "files": [
     {
       "file": "rain_window.ogg",
-      "size_kb": 838.3,
+      "size_kb": 832.7,
       "license": "CC0 / Public Domain",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/4/41/Rain_against_the_window.ogg"
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/41/Rain_against_the_window.ogg (noise-reduced 2026-11-18 follow-up 2: 40Hz highpass + afftdn FFT denoise, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded 2026-11-18; provenance unchanged)"
     },
     {
       "file": "forest_birds.ogg",
-      "size_kb": 628.1,
+      "size_kb": 617.6,
       "license": "CC0 / Public Domain",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/4/42/Bird_singing.ogg"
+      "source": "https://upload.wikimedia.org/wikipedia/commons/4/42/Bird_singing.ogg (noise-reduced 2026-11-18 follow-up 2: 40Hz highpass + light afftdn, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded 2026-11-18; provenance unchanged)"
     },
     {
       "file": "flowing_water.ogg",
-      "size_kb": 319.3,
+      "size_kb": 349.2,
       "license": "CC0 / Public Domain",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/2/26/Flowing-water-100019.ogg (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; 2026-11-18 follow-up: 40Hz highpass + afftdn + lowpass hiss removal, loudness restored, re-encoded; provenance unchanged)"
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/26/Flowing-water-100019.ogg (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; 2026-11-18 follow-up: 40Hz highpass + afftdn + lowpass hiss removal, loudness restored, re-encoded; 2026-11-18 follow-up 2: stronger afftdn + 12kHz lowpass to remove flat broadband hiss floor, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded; provenance unchanged)"
     },
     {
       "file": "rain_thunder.ogg",
-      "size_kb": 221.6,
+      "size_kb": 204.9,
       "license": "Public domain",
-      "source": "https://commons.wikimedia.org/wiki/File%3ARain_and_thunder.ogg",
+      "source": "https://commons.wikimedia.org/wiki/File%3ARain_and_thunder.ogg (noise-reduced 2026-11-18 follow-up 2: 40Hz highpass + afftdn FFT denoise, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded 2026-11-18; provenance unchanged)",
       "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/Rain_and_thunder.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
     },
     {
@@ -41,9 +41,9 @@
     },
     {
       "file": "water_drop.ogg",
-      "size_kb": 545.5,
+      "size_kb": 512.8,
       "license": "Public domain",
-      "source": "https://commons.wikimedia.org/wiki/File%3ABathtub_water_splashes.ogg",
+      "source": "https://commons.wikimedia.org/wiki/File%3ABathtub_water_splashes.ogg (noise-reduced 2026-11-18 follow-up 2: 40Hz highpass + afftdn FFT denoise to remove hissy bed between splashes, loudness-normalized to -23 LUFS / -1.5 dBTP, re-encoded 2026-11-18; provenance unchanged)",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/83/Bathtub_water_splashes.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
     }
   ]
