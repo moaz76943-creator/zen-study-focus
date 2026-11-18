@@ -114,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             // Navigation bottom: max of navigationBars (3-button), systemBars.bottom (3-button), mandatorySystemGestures (gesture handle)
             // On Xiaomi 3-button: navigationBars.bottom > 0 AND systemBars.bottom > 0 (both report nav bar)
             // On Xiaomi gesture: navigationBars.bottom == 0, systemBars.bottom == 0, mandatorySystemGestures.bottom > 0 (gesture handle)
-            int navBottom = Math.max(Math.max(navigationBars.bottom, systemBars.bottom), mandatorySystemGestures.bottom);
+            int rawNavBottom = Math.max(Math.max(navigationBars.bottom, systemBars.bottom), mandatorySystemGestures.bottom);
 
             // Detect gesture navigation robustly for Xiaomi Android 15:
             // - Gesture nav: mandatorySystemGestures.bottom > 0 (gesture handle) AND no visible 3-button bar
@@ -145,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
             // Apply a secondary 120dp floor for 3-button nav to guarantee the WebView viewport never
             // intrudes into the nav bar area. The test gate checks for the 100dp baseline; this extra
             // margin is additive and preserves the test invariant.
+            int navBottom = rawNavBottom;
             int minNavDp = isGestureNav ? 32 : 100;
             int minNavPx = Math.round(minNavDp * density);
             if (navBottom < minNavPx) navBottom = minNavPx;
@@ -191,8 +192,10 @@ public class MainActivity extends AppCompatActivity {
             // Parent FrameLayout padding shrinks the WebView; nothing to clip inside it.
 
             // Convert physical pixels to dp for JS calibrator (CSS px == Android dp in WebView).
-            // navBottom already includes minimum fallback; paddingBottom may be larger due to IME.
+            // rawNavBottomDp = actual nav bar height (no defensive floors) for calibrator dock math.
+            // navBottomDp = floored value for parent padding; paddingBottomDp = max(navBottom, IME) for IME handling.
             int paddingTopDp = Math.round(paddingTop / density);
+            int rawNavBottomDp = Math.round(rawNavBottom / density);
             int navBottomDp = Math.round(navBottom / density);
             int paddingLeftDp = Math.round(paddingLeft / density);
             int paddingRightDp = Math.round(paddingRight / density);
@@ -200,7 +203,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Cache for re-send on page load (calibrator may not exist during initial dispatch).
             cachedPaddingTopDp = paddingTopDp;
-            cachedNavBottomDp = navBottomDp;
+            cachedNavBottomDp = rawNavBottomDp; // Send actual nav height to calibrator for dock math
             cachedPaddingLeftDp = paddingLeftDp;
             cachedPaddingRightDp = paddingRightDp;
             cachedPaddingBottomDp = paddingBottomDp;
@@ -209,11 +212,13 @@ public class MainActivity extends AppCompatActivity {
             // Push insets (in dp) to JS calibrator. The WebView itself is now bounded
             // by the parent padding, so CSS dock formulas only need a fallback floor;
             // the values stay available to JS for any reserve math that wants them.
+            // Param 2 (bottom) = rawNavBottomDp (actual nav bar height) for capsule/dock math.
+            // Param 5 (paddingBottom) = paddingBottomDp (floored, includes IME) for keyboard handling.
             webView.post(() -> {
                 if (webView != null && !isDestroyed()) {
                     String js = "if(window.SovereignInsetsCalibrator) "
                             + "window.SovereignInsetsCalibrator.updateInsets("
-                            + paddingTopDp + "," + navBottomDp + "," + paddingLeftDp + "," + paddingRightDp + ","
+                            + paddingTopDp + "," + rawNavBottomDp + "," + paddingLeftDp + "," + paddingRightDp + ","
                             + paddingBottomDp + ");";
                     webView.evaluateJavascript(js, null);
                 }
