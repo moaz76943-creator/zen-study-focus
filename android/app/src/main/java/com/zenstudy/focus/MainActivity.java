@@ -192,10 +192,11 @@ public class MainActivity extends AppCompatActivity {
             // Parent FrameLayout padding shrinks the WebView; nothing to clip inside it.
 
             // Convert physical pixels to dp for JS calibrator (CSS px == Android dp in WebView).
-            // rawNavBottomDp = actual nav bar height (no defensive floors) for calibrator dock math.
-            // navBottomDp = floored value for parent padding; paddingBottomDp = max(navBottom, IME) for IME handling.
+            // navBottomDp = floored value (includes all defensive floors) for calibrator dock math.
+            // This MUST match the parent padding so fixed layers (Studios pill, FAB) and content
+            // clearance are computed against the same inset edge that the native padding created.
+            // paddingBottomDp = max(navBottom, IME) for keyboard handling.
             int paddingTopDp = Math.round(paddingTop / density);
-            int rawNavBottomDp = Math.round(rawNavBottom / density);
             int navBottomDp = Math.round(navBottom / density);
             int paddingLeftDp = Math.round(paddingLeft / density);
             int paddingRightDp = Math.round(paddingRight / density);
@@ -203,7 +204,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Cache for re-send on page load (calibrator may not exist during initial dispatch).
             cachedPaddingTopDp = paddingTopDp;
-            cachedNavBottomDp = rawNavBottomDp; // Send actual nav height to calibrator for dock math
+            cachedNavBottomDp = navBottomDp; // Send floored nav height so dock math matches parent padding
             cachedPaddingLeftDp = paddingLeftDp;
             cachedPaddingRightDp = paddingRightDp;
             cachedPaddingBottomDp = paddingBottomDp;
@@ -212,13 +213,13 @@ public class MainActivity extends AppCompatActivity {
             // Push insets (in dp) to JS calibrator. The WebView itself is now bounded
             // by the parent padding, so CSS dock formulas only need a fallback floor;
             // the values stay available to JS for any reserve math that wants them.
-            // Param 2 (bottom) = rawNavBottomDp (actual nav bar height) for capsule/dock math.
+            // Param 2 (bottom) = navBottomDp (floored nav bar height) for capsule/dock math.
             // Param 5 (paddingBottom) = paddingBottomDp (floored, includes IME) for keyboard handling.
             webView.post(() -> {
                 if (webView != null && !isDestroyed()) {
                     String js = "if(window.SovereignInsetsCalibrator) "
                             + "window.SovereignInsetsCalibrator.updateInsets("
-                            + paddingTopDp + "," + rawNavBottomDp + "," + paddingLeftDp + "," + paddingRightDp + ","
+                            + paddingTopDp + "," + navBottomDp + "," + paddingLeftDp + "," + paddingRightDp + ","
                             + paddingBottomDp + ");";
                     webView.evaluateJavascript(js, null);
                 }
