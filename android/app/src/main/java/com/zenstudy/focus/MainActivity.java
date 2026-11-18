@@ -47,6 +47,15 @@ public class MainActivity extends AppCompatActivity {
     private int rendererDeaths = 0;
     private long rendererWindowStart = 0L;
     private String backupAwaitingSave = null;
+    // Cached insets (dp) to re-send to calibrator after WebView page load.
+    // The initial insets dispatch (requestApplyInsets) fires before loadUrl completes,
+    // so the calibrator may not exist yet. We cache and re-send on onPageFinished.
+    private int cachedPaddingTopDp = 0;
+    private int cachedNavBottomDp = 0;
+    private int cachedPaddingLeftDp = 0;
+    private int cachedPaddingRightDp = 0;
+    private int cachedPaddingBottomDp = 0;
+    private boolean hasCachedInsets = false;
     // Native text-to-speech for Flashcards (created lazily on the first ttsInit call).
     private NativeTts nativeTts = null;
 
@@ -153,10 +162,10 @@ public class MainActivity extends AppCompatActivity {
             // gesture/3-button detection. This handles edge cases where detection fails and the
             // reported insets are zero or too small. The cost is extra padding (harmless empty space);
             // the benefit is never clipping content or overlapping the Studios pill/FAB.
-            // Xiaomi HyperOS 3-button nav bars can exceed 140dp on some devices/regions; use 160dp
+            // Xiaomi HyperOS 3-button nav bars can exceed 180dp on some devices/regions; use 200dp
             // floor to guarantee the WebView viewport never intrudes into the nav bar area.
             if (isXiaomi) {
-                int absoluteMinNavDp = 160; // Covers 3-button bars up to ~160dp on HyperOS
+                int absoluteMinNavDp = 200; // Covers 3-button bars up to ~200dp on HyperOS
                 int absoluteMinNavPx = Math.round(absoluteMinNavDp * density);
                 if (navBottom < absoluteMinNavPx) navBottom = absoluteMinNavPx;
             }
@@ -176,6 +185,14 @@ public class MainActivity extends AppCompatActivity {
             int paddingLeftDp = Math.round(paddingLeft / density);
             int paddingRightDp = Math.round(paddingRight / density);
             int paddingBottomDp = Math.round(paddingBottom / density);
+
+            // Cache for re-send on page load (calibrator may not exist during initial dispatch).
+            cachedPaddingTopDp = paddingTopDp;
+            cachedNavBottomDp = navBottomDp;
+            cachedPaddingLeftDp = paddingLeftDp;
+            cachedPaddingRightDp = paddingRightDp;
+            cachedPaddingBottomDp = paddingBottomDp;
+            hasCachedInsets = true;
 
             // Push insets (in dp) to JS calibrator. The WebView itself is now bounded
             // by the parent padding, so CSS dock formulas only need a fallback floor;
@@ -239,6 +256,21 @@ public class MainActivity extends AppCompatActivity {
                     if (giveUp) finish(); else recreate();
                 });
                 return true;
+            }
+
+            // Re-send cached insets to calibrator after page load.
+            // The initial insets dispatch fires before loadUrl completes; the calibrator
+            // may not exist yet. This ensures the calibrator always receives real insets.
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                super.onPageFinished(view, url);
+                if (hasCachedInsets && view != null && !isDestroyed()) {
+                    String js = "if(window.SovereignInsetsCalibrator) "
+                            + "window.SovereignInsetsCalibrator.updateInsets("
+                            + cachedPaddingTopDp + "," + cachedNavBottomDp + "," + cachedPaddingLeftDp + ","
+                            + cachedPaddingRightDp + "," + cachedPaddingBottomDp + ");";
+                    view.evaluateJavascript(js, null);
+                }
             }
 
             // Defence in depth for the "100% offline" promise: never fetch network sub-resources.
