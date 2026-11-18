@@ -162,13 +162,23 @@ public class MainActivity extends AppCompatActivity {
             // minimum floor. This handles edge cases where detection fails and the
             // reported insets are zero or too small. The cost is extra padding (harmless
             // empty space); the benefit is never clipping content or overlapping the
-            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can exceed 260dp on some
-            // devices/regions; use 300dp floor to guarantee the WebView viewport never
+            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can exceed 300dp on some
+            // devices/regions; use 400dp floor to guarantee the WebView viewport never
             // intrudes into the nav bar area. DO NOT apply for gesture navigation (handle ~32dp).
             if (isXiaomi && !isGestureNav) {
-                int absoluteMinNavDp = 300; // Covers 3-button bars up to ~300dp on HyperOS
+                int absoluteMinNavDp = 400; // Covers 3-button bars up to ~400dp on HyperOS
                 int absoluteMinNavPx = Math.round(absoluteMinNavDp * density);
                 if (navBottom < absoluteMinNavPx) navBottom = absoluteMinNavPx;
+            }
+
+            // ADDITIONAL XIAOMI SAFETY: If gesture nav is detected but the "gesture handle"
+            // height exceeds typical gesture handle size (48dp), it's likely a 3-button bar
+            // misreported as gesture handle. Apply a defensive floor to prevent viewport
+            // intrusion. This catches edge cases where the detection logic misclassifies.
+            if (isXiaomi && isGestureNav && mandatorySystemGestures.bottom > Math.round(48 * density)) {
+                int defensiveMinNavDp = 120; // Conservative floor for misclassified 3-button
+                int defensiveMinNavPx = Math.round(defensiveMinNavDp * density);
+                if (navBottom < defensiveMinNavPx) navBottom = defensiveMinNavPx;
             }
 
             // IME can be taller than nav bar; use max for WebView padding so content stays above keyboard.
