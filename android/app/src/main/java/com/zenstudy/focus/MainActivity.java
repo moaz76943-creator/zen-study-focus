@@ -121,6 +121,8 @@ public class MainActivity extends AppCompatActivity {
             // gesture handle size (~32dp), indicating it's actually the 3-button bar being misreported.
             String manufacturer = Build.MANUFACTURER;
             boolean isXiaomi = "xiaomi".equalsIgnoreCase(manufacturer) || "redmi".equalsIgnoreCase(manufacturer) || "poco".equalsIgnoreCase(manufacturer);
+            // Density must be available BEFORE any dp<->px conversion (used in Xiaomi override below).
+            float density = getResources().getDisplayMetrics().density;
             if (isXiaomi && isGestureNav && mandatorySystemGestures.bottom > Math.round(48 * density)) {
                 // Gesture handle taller than 48dp on Xiaomi = likely 3-button bar misreported as gesture handle.
                 isGestureNav = false;
@@ -134,7 +136,6 @@ public class MainActivity extends AppCompatActivity {
             // Apply a secondary 120dp floor for 3-button nav to guarantee the WebView viewport never
             // intrudes into the nav bar area. The test gate checks for the 100dp baseline; this extra
             // margin is additive and preserves the test invariant.
-            float density = getResources().getDisplayMetrics().density;
             int minNavDp = isGestureNav ? 32 : 100;
             int minNavPx = Math.round(minNavDp * density);
             if (navBottom < minNavPx) navBottom = minNavPx;
@@ -152,8 +153,10 @@ public class MainActivity extends AppCompatActivity {
             // gesture/3-button detection. This handles edge cases where detection fails and the
             // reported insets are zero or too small. The cost is extra padding (harmless empty space);
             // the benefit is never clipping content or overlapping the Studios pill/FAB.
+            // Xiaomi HyperOS 3-button nav bars can exceed 140dp on some devices/regions; use 160dp
+            // floor to guarantee the WebView viewport never intrudes into the nav bar area.
             if (isXiaomi) {
-                int absoluteMinNavDp = 140; // Covers 3-button bars up to ~140dp on HyperOS
+                int absoluteMinNavDp = 160; // Covers 3-button bars up to ~160dp on HyperOS
                 int absoluteMinNavPx = Math.round(absoluteMinNavDp * density);
                 if (navBottom < absoluteMinNavPx) navBottom = absoluteMinNavPx;
             }
