@@ -393,34 +393,43 @@
     const numChannels = Math.max(1, buffer.numberOfChannels || 1);
     const srcLen = buffer.length || (buffer.getChannelData(0) ? buffer.getChannelData(0).length : 1);
 
-    // For seamless looping, we need BOTH the end to crossfade into the beginning
-    // AND the beginning to crossfade from the end. This creates a symmetric
-    // crossfade region so the loop point (between finalSize-1 and 0) is smooth
-    // from both directions.
+    // Standard seamless loop approach (same as createSeamlessBuffer):
+    // 1. Create extended buffer: original audio + copy of first xfadeSamples (tail continuation)
+    // 2. Crossfade the tail into the head
+    // 3. Truncate to original length
+    // This preserves the original audio body and only modifies the loop boundary region.
     const finalSize = srcLen;
-    const finalBuffer = ctx.createBuffer(numChannels, finalSize, sampleRate);
+    const extendedSize = finalSize + xfadeSamples;
+    const extendedBuffer = ctx.createBuffer(numChannels, extendedSize, sampleRate);
+
     for (let ch = 0; ch < numChannels; ch++) {
       const srcData = buffer.getChannelData(ch);
+      const extData = extendedBuffer.getChannelData(ch);
+
+      // Copy original audio
+      extData.set(srcData, 0);
+      // Append copy of head as tail continuation for crossfade
+      for (let i = 0; i < xfadeSamples; i++) {
+        extData[finalSize + i] = srcData[i];
+      }
+    }
+
+    // Now create final buffer with crossfade (same logic as createSeamlessBuffer)
+    const finalBuffer = ctx.createBuffer(numChannels, finalSize, sampleRate);
+    for (let ch = 0; ch < numChannels; ch++) {
+      const extData = extendedBuffer.getChannelData(ch);
       const finalData = finalBuffer.getChannelData(ch);
 
-      // Copy the entire original audio
-      finalData.set(srcData);
+      // Body: copy main segment unchanged
+      finalData.set(extData.subarray(0, finalSize));
 
-      // Symmetric crossfade: blend the LAST xfadeSamples with the FIRST xfadeSamples
-      // at BOTH the loop end AND the loop start.
-      // This ensures when BufferSourceNode loops from finalSize-1 to 0,
-      // both sides are in the crossfade region and match perfectly.
+      // Head crossfade: blend tail continuation into head
       for (let i = 0; i < xfadeSamples; i++) {
         const t = i / xfadeSamples;
-        // At loop END: blend end_of_audio → beginning_of_audio
-        const loopStart = finalSize - xfadeSamples;
-        finalData[loopStart + i] = (1 - t) * srcData[loopStart + i] + t * srcData[i];
-        // At loop START: blend end_of_audio → beginning_of_audio (reverse direction)
-        // This makes the first xfadeSamples a mirror of the last xfadeSamples
-        finalData[i] = t * srcData[loopStart + i] + (1 - t) * srcData[i];
+        finalData[i] = (1 - t) * extData[finalSize + i] + t * extData[i];
       }
 
-      // Post-process: DC removal → peak limiter (attenuate-only) → hard clamp
+      // Post-process: DC removal -> peak limiter (attenuate-only) -> hard clamp
       // 1. DC removal
       let mean = 0;
       for (let i = 0; i < finalSize; i++) mean += finalData[i];

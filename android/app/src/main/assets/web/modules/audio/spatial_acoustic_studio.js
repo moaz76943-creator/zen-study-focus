@@ -31,7 +31,6 @@
 
   // Use AudioCore constants
   const audioCore = typeof window !== 'undefined' ? window.AudioCore : null;
-  const LIMITER_LINEAR = audioCore ? audioCore.LIMITER_LINEAR : Math.pow(10, -6.0 / 20);
   const FADE_OUT_SEC = audioCore ? audioCore.FADE_OUT_MS / 1000 : 0.03;
   const XFADE_MS = audioCore ? audioCore.XFADE_MS : 20;
   const DC_BLOCK_HZ = (audioCore && audioCore.DC_BLOCK_HZ) ? audioCore.DC_BLOCK_HZ : 40;
@@ -86,7 +85,7 @@
     buildEqChain(ctx) {
       this.masterGain = ctx.createGain();
       this.masterGain.gain.setValueAtTime(
-        this.options.defaultVolume * LIMITER_LINEAR,
+        this.options.defaultVolume,
         ctx.currentTime
       );
 
@@ -360,11 +359,11 @@
       return this.eqGains;
     }
 
-    /** Master volume 0..1, always scaled by the -6dB ceiling. */
+    /** Master volume 0..1. AudioCore's master chain applies the -6dB ceiling. */
     setMasterVolume(vol) {
       const v = Math.max(0, Math.min(1.0, parseFloat(vol) || 0));
       if (this.masterGain && this.audioCtx) {
-        this.masterGain.gain.setValueAtTime(v * LIMITER_LINEAR, this.audioCtx.currentTime);
+        this.masterGain.gain.setValueAtTime(v, this.audioCtx.currentTime);
       }
       return v;
     }
