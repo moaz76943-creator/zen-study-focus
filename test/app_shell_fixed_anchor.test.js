@@ -28,15 +28,19 @@ console.log('✔ .app-shell is free of containing-block creators (transform/filt
 
 // The dock formulas must reference the calibrator-pinned variables, never raw hardcoded
 // safe-area values that would double-count the native parent padding.
-assert.ok(html.includes('bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px))'),
-  'bottom-nav-capsule must dock via --df-webview-padding-bottom + --df-dock-gap');
-assert.ok(html.includes('var(--df-capsule-height, 70px) + 8px'),
-  'Studios pill must dock above the capsule via --df-capsule-height');
+// --df-webview-padding-bottom is pinned to 0px by calibrator; bottom-nav-capsule uses --df-dock-bottom (dock gap only).
+assert.ok(html.includes('bottom: var(--df-dock-bottom, 12px)'),
+  'bottom-nav-capsule must dock via --df-dock-bottom (dock gap only)');
+// Studios pill uses --df-studios-pill-bottom (calibrator computes: dock gap + capsuleHeight + 8px).
+// Initial CSS fallback is 120px (matching calibrator minimum: 12 + 100 + 8).
+assert.ok(html.includes('--df-studios-pill-bottom: 120px'),
+  'Studios pill must dock above the capsule via --df-studios-pill-bottom');
 console.log('✔ Dock formulas use the calibrated single-owner inset variables.');
 
-// Body must reserve enough bottom clearance for the capsule (gap + ~70px capsule + card gap).
-assert.ok(/padding-bottom:\s*calc\(var\(--df-webview-padding-bottom, 56px\) \+ var\(--df-bottom-nav-clearance, 144px\)\)/.test(html),
-  'body must reserve --df-bottom-nav-clearance above the native inset edge');
+// Body must reserve enough bottom clearance for the capsule + Studios pill + FAB zone.
+// --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (280px fallback).
+assert.ok(/padding-bottom:\s*var\(--df-inflow-bottom,\s*280px\)/.test(html),
+  'body must reserve --df-inflow-bottom above the native inset edge');
 console.log('✔ Body bottom clearance reserves capsule + FAB zone above the safe content edge.');
 
 console.log('--- App Shell Fixed-Anchor Guard PASSED ---');

@@ -50,7 +50,7 @@
 .fc-check { display: flex; align-items: center; gap: 10px; min-height: 48px; } .fc-check input { width: 24px; height: 24px; }
 .fc-modal { position: fixed; inset: 0; background: rgba(15,23,42,.45); display: flex; align-items: flex-end; justify-content: center; z-index: 9999; }
 .fc-sheet { width: 100%; max-width: 520px; background: #fff; border-radius: 24px 24px 0 0; padding: 20px 16px calc(20px + max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px))); display: flex; flex-direction: column; gap: 12px; }
-.fc-toast { position: fixed; inset-inline: 16px; bottom: calc(96px + max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px), var(--df-webview-padding-bottom, 0px))); background: #0f172a; color: #fff; padding: 12px 16px; border-radius: 14px; opacity: 0; pointer-events: none; transition: opacity .2s; text-align: center; z-index: 10000; }
+.fc-toast { position: fixed; inset-inline: 16px; bottom: calc(96px + max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px))); background: #0f172a; color: #fff; padding: 12px 16px; border-radius: 14px; opacity: 0; pointer-events: none; transition: opacity .2s; text-align: center; z-index: 10000; }
 .fc-toast.on { opacity: 1; }
 .fc-write { margin: 4px 0; }
 #flashcardsEntry { width: 100%; min-height: 56px; margin: 8px 0; }

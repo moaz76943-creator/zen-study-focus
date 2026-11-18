@@ -303,7 +303,9 @@ body:not(.deep-lockdown) #sec-notes .floating-plus-fab {
   box-shadow: 0 9px 23px -9px rgba(59, 109, 238, .42);
   position: fixed;
   inset-inline-start: 24px;
-  bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px);
+  /* Use calibrator variable --df-fab-bottom (single owner: SovereignInsetsCalibrator).
+     --df-webview-padding-bottom is pinned to 0px; calibrator computes FAB position above Studios pill. */
+  bottom: var(--df-fab-bottom, 176px);
   width: 54px;
   height: 54px;
   border-radius: 50%;
@@ -477,8 +479,9 @@ body:not(.deep-lockdown) .bottom-nav-capsule {
   border-radius: 25px;
   position: fixed;
   /* Docked just above the WebView content-area bottom, which MainActivity already
-     pads clear of the 3-button nav bar. Uses --df-webview-padding-bottom + dock gap. */
-  bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px));
+     pads clear of the 3-button nav bar. Uses --df-dock-bottom (dock gap only;
+     --df-webview-padding-bottom is 0px pinned by calibrator). */
+  bottom: var(--df-dock-bottom, 12px);
   /* Internal padding only; safe-area handled by bottom positioning */
   padding-bottom: 5px;
 }
@@ -662,8 +665,9 @@ body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
 @media (max-width: 430px) {
   body:not(.deep-lockdown) {
     /* Body content padding clears floating elements (FAB, Studios pill).
-       Uses the calibrated single-owner clearance reserve (capsule + Studios pill + FAB + gaps). */
-    padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px)) !important;
+       Uses the calibrated single-owner clearance reserve (capsule + Studios pill + FAB + gaps).
+       --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom. */
+    padding-bottom: var(--df-inflow-bottom, 280px) !important;
   }
   body:not(.deep-lockdown) .bottom-nav-capsule {
     width: calc(100% - 4px);
