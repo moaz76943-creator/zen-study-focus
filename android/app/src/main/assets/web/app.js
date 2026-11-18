@@ -859,7 +859,8 @@ const COMPLETION_TONE_FILES = {
   gong: 'audio/rain_thunder.ogg'
 };
 let toneAudio = null;
-function playCompletionTone(toneKey) {
+let toneVoice = null;
+async function playCompletionTone(toneKey) {
   const key = toneKey || localStorage.getItem('df_end_tone') || 'zen_bell';
   const tone = COMPLETION_TONES[key] || COMPLETION_TONES.zen_bell;
 
@@ -868,36 +869,65 @@ function playCompletionTone(toneKey) {
   }
 
   const file = COMPLETION_TONE_FILES[COMPLETION_TONES[key] ? key : 'zen_bell'];
-  if (tone.freq === 0 || !file || typeof Audio !== 'function') return; // vibrate-only / no audio
+  if (tone.freq === 0 || !file) return; // vibrate-only / no audio
 
   try {
-    if (toneAudio) { try { toneAudio.pause(); } catch (_) { /* already stopped */ } }
-    const audio = new Audio(file);
-    toneAudio = audio;
-    audio.loop = false;
-    audio.volume = Math.max(0, Math.min(1, tone.level * 2));
-    const stopAt = Math.min(3, Math.max(0.4, tone.decay)) * 1000;
-    // Linear fade from the starting level over the tone's decay window — the
-    // old fixed -0.08 staircase zipper-noised on every tick.
-    const startVolume = audio.volume;
-    const fadeSteps = 30;
-    let fadeTick = 0;
-    const fadeStep = setInterval(() => {
-      if (toneAudio !== audio) { clearInterval(fadeStep); return; }
-      fadeTick++;
-      audio.volume = Math.max(0, startVolume * (1 - fadeTick / fadeSteps));
-      if (fadeTick >= fadeSteps) {
-        clearInterval(fadeStep);
-        try { audio.pause(); } catch (_) { /* already stopped */ }
+    // Stop any existing tone
+    if (toneVoice && toneVoice.stop) { toneVoice.stop(); toneVoice = null; }
+    if (toneAudio) { try { toneAudio.pause(); } catch (_) { } toneAudio = null; }
+
+    // Use AudioCore for zero-static, gesture-gated playback
+    if (window.AudioCore && window.AudioCore.isGestureReceived && window.AudioCore.isGestureReceived()) {
+      const ctx = window.AudioCore.getContext();
+      if (ctx) {
+        const buffer = await window.AudioCore.loadOggBuffer(file);
+        if (buffer) {
+          // Play as one-shot (no loop) with fast fade-in/out
+          const voice = window.AudioCore.createVoice(buffer, false);
+          if (voice) {
+            toneVoice = voice;
+            // Scale volume to stay under limiter ceiling
+            const targetGain = Math.max(0.0001, Math.min(1, tone.level * 2) * (window.AudioCore.LIMITER_LINEAR || 0.5));
+            const now = ctx.currentTime;
+            voice.gain.gain.cancelScheduledValues(now);
+            voice.gain.gain.setValueAtTime(0.0001, now);
+            voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.03);
+            // Auto-stop after decay
+            const stopAtSec = Math.min(3, Math.max(0.4, tone.decay));
+            voice.source.stop(now + stopAtSec + 0.005);
+            return;
+          }
+        }
       }
-    }, Math.max(20, stopAt / fadeSteps));
-    setTimeout(() => {
-      clearInterval(fadeStep);
-      try { audio.pause(); } catch (_) { /* already stopped */ }
-      if (toneAudio === audio) toneAudio = null;
-    }, stopAt);
-    const started = audio.play();
-    if (started && typeof started.catch === 'function') started.catch(() => { clearInterval(fadeStep); });
+    }
+
+    // Fallback: HTMLAudioElement (only if AudioCore unavailable or no gesture)
+    if (typeof Audio === 'function') {
+      const audio = new Audio(file);
+      toneAudio = audio;
+      audio.loop = false;
+      audio.volume = Math.max(0, Math.min(1, tone.level * 2));
+      const stopAt = Math.min(3, Math.max(0.4, tone.decay)) * 1000;
+      const startVolume = audio.volume;
+      const fadeSteps = 30;
+      let fadeTick = 0;
+      const fadeStep = setInterval(() => {
+        if (toneAudio !== audio) { clearInterval(fadeStep); return; }
+        fadeTick++;
+        audio.volume = Math.max(0, startVolume * (1 - fadeTick / fadeSteps));
+        if (fadeTick >= fadeSteps) {
+          clearInterval(fadeStep);
+          try { audio.pause(); } catch (_) { }
+        }
+      }, Math.max(20, stopAt / fadeSteps));
+      setTimeout(() => {
+        clearInterval(fadeStep);
+        try { audio.pause(); } catch (_) { }
+        if (toneAudio === audio) toneAudio = null;
+      }, stopAt);
+      const started = audio.play();
+      if (started && typeof started.catch === 'function') started.catch(() => { clearInterval(fadeStep); });
+    }
   } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 }
 
@@ -1002,28 +1032,32 @@ function triggerHaptic(type) {
 
 function playPeacefulChime() {
   try {
-    const ctx = ensureProceduralAudioContext();
-    // Zero-autoplay: only resume after explicit user gesture
-    if (ctx.state === 'suspended' && audioContextUserGestureReceived && typeof ctx.resume === 'function') {
-      ctx.resume();
+    // Use AudioCore for zero-static, gesture-gated playback
+    if (!window.AudioCore || !window.AudioCore.isGestureReceived || !window.AudioCore.isGestureReceived()) {
+      triggerHaptic('complete');
+      return;
     }
+    const ctx = window.AudioCore.getContext();
+    if (!ctx) { triggerHaptic('complete'); return; }
 
-    // نغمة جرس التأمل الهادئة (528 Hz Harmonic)
-    const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-    const gain = ctx.createGain();
+    // Pre-rendered 528Hz → 264Hz exponential sweep tone buffer (3.2s)
+    // Uses AudioCore's createSeamlessBuffer for zero-click, DC-free output
+    const buffer = window.AudioCore.createSeamlessBuffer(ctx, 3.2, (channelData, sampleRate, totalSec) => {
+      const data = channelData[0];
+      const bufferSize = Math.floor(sampleRate * totalSec);
+      const TWO_PI = Math.PI * 2;
+      for (let i = 0; i < bufferSize; i++) {
+        const t = i / sampleRate;
+        // Exponential frequency sweep: 528Hz → 264Hz over 3.2s
+        const freq = 528 * Math.exp(Math.log(264 / 528) * (t / 3.2));
+        data[i] = Math.sin(TWO_PI * freq * t) * 0.35;
+      }
+    }, 1, false);
 
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(528, ctx.currentTime);
-    osc.frequency.exponentialRampToValueAtTime(264, ctx.currentTime + 3.2);
-
-    gain.gain.setValueAtTime(0.35, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 3.2);
-
-    osc.connect(gain);
-    gain.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
-
-    osc.start();
-    osc.stop(ctx.currentTime + 3.2);
+    const voice = window.AudioCore.createVoice(buffer, false);
+    if (voice) {
+      voice.source.stop(ctx.currentTime + 3.2 + 0.005);
+    }
     triggerHaptic('complete');
   } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
 }
@@ -80880,33 +80914,18 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
 
 
 
-/* MASTER AUDIO DYNAMICS COMPRESSOR */
+/* MASTER AUDIO DYNAMICS COMPRESSOR — DELEGATES TO AUDIOCORE */
 (function() {
     if (typeof window !== "undefined") {
+        // Delegate to AudioCore's master output chain (limiter → DC block → analyser → destination)
+        // This ensures a single master chain, zero static/hiss, and instant stop.
         window.getSafeAudioDestination = function(ctx) {
             if (!ctx) return null;
-            window.__dfLastAudioCtx = ctx;
-            if (!ctx._masterCompressor) {
-                try {
-                    const comp = ctx.createDynamicsCompressor();
-                    comp.threshold.setValueAtTime(-14, ctx.currentTime);
-                    comp.knee.setValueAtTime(35, ctx.currentTime);
-                    comp.ratio.setValueAtTime(12, ctx.currentTime);
-                    comp.attack.setValueAtTime(0.003, ctx.currentTime);
-                    comp.release.setValueAtTime(0.25, ctx.currentTime);
-                    // Master gain node for instant kill switch
-                    ctx._masterGain = ctx.createGain();
-                    ctx._masterGain.gain.setValueAtTime(1, ctx.currentTime);
-                    ctx._masterGain.connect(comp);
-                    comp.connect(ctx.destination);
-                    ctx._masterCompressor = comp;
-                    console.log("🛡️ [WebAudio] Master DynamicsCompressor with instant kill attached.");
-                } catch(e) {
-                    console.warn("⚠️ [WebAudio] DynamicsCompressor initialization fallback:", e);
-                    return ctx.destination;
-                }
+            if (window.AudioCore && typeof window.AudioCore.getMasterOutput === 'function') {
+                return window.AudioCore.getMasterOutput();
             }
-            return ctx._masterGain || ctx._masterCompressor;
+            // Fallback for environments without AudioCore (should not happen in production)
+            return ctx.destination;
         };
         // Helpers for instant stop / restore
         function dfActiveAudioCtx() {
