@@ -20,7 +20,7 @@
   const XFADE_MS = 20;                                         // crossfade for seamless loops
   const FADE_IN_MS = 30;                                       // fast click-free onset
   const FADE_OUT_MS = 30;                                      // instant stop
-  const DC_BLOCK_HZ = 15;                                      // protects transducer coils
+  const DC_BLOCK_HZ = 40;                                      // protects transducer coils & brown noise rumble
   const BROWN_POLE = 0.997;                                    // leakier = less DC drift
   const BROWN_GAIN = 0.4;                                      // input gain for brown noise
   const WHITE_NOISE_AMP = 0.06;                                // consistent across all modules
@@ -269,7 +269,7 @@
 
     source.start();
 
-    // Stop function with instant fade
+    // Stop function with instant fade - no setTimeout, truly instant
     function stop() {
       activeVoices.delete(voice);
       try {
@@ -279,14 +279,15 @@
         gain.gain.setValueAtTime(gain.gain.value, now);
         gain.gain.linearRampToValueAtTime(0, now + fade);
         source.stop(now + fade + 0.005);
-        // Immediate disconnect after fade (no setTimeout)
-        setTimeout(() => {
-          try { source.disconnect(); } catch (_) {}
-          try { dcBlock.disconnect(); } catch (_) {}
-          try { gain.disconnect(); } catch (_) {}
-        }, (fade + 0.01) * 1000);
+        // Synchronous disconnect - no setTimeout delay
+        try { source.disconnect(); } catch (_) {}
+        try { dcBlock.disconnect(); } catch (_) {}
+        try { gain.disconnect(); } catch (_) {}
       } catch (e) {
         try { source.stop(); } catch (_) {}
+        try { source.disconnect(); } catch (_) {}
+        try { dcBlock.disconnect(); } catch (_) {}
+        try { gain.disconnect(); } catch (_) {}
       }
     }
 
@@ -296,8 +297,19 @@
   }
 
   function stopAllVoices() {
-    activeVoices.forEach(v => v.stop());
+    // Truly instant: mute master immediately AND stop all voices
+    if (masterGain && sharedContext) {
+      masterGain.gain.cancelScheduledValues(sharedContext.currentTime);
+      masterGain.gain.setValueAtTime(0, sharedContext.currentTime);
+    }
+    activeVoices.forEach(v => {
+      try { v.stop(); } catch (_) {}
+    });
     activeVoices.clear();
+    // Restore master gain for next sound after a microtask
+    if (masterGain && sharedContext) {
+      masterGain.gain.setValueAtTime(0.7 * LIMITER_LINEAR, sharedContext.currentTime + 0.05);
+    }
   }
 
   function setMasterVolume(vol) {
@@ -310,6 +322,7 @@
 
   function muteMaster(muted) {
     if (masterGain && sharedContext) {
+      masterGain.gain.cancelScheduledValues(sharedContext.currentTime);
       masterGain.gain.setValueAtTime(muted ? 0 : (0.7 * LIMITER_LINEAR), sharedContext.currentTime);
     }
   }

@@ -34,7 +34,7 @@
   const LIMITER_LINEAR = audioCore ? audioCore.LIMITER_LINEAR : Math.pow(10, -6.0 / 20);
   const FADE_OUT_SEC = audioCore ? audioCore.FADE_OUT_MS / 1000 : 0.03;
   const XFADE_MS = audioCore ? audioCore.XFADE_MS : 20;
-  const DC_BLOCK_HZ = audioCore ? audioCore.DC_BLOCK_HZ : 15;
+  const DC_BLOCK_HZ = (audioCore && audioCore.DC_BLOCK_HZ) ? audioCore.DC_BLOCK_HZ : 40;
   const BROWN_POLE = audioCore ? audioCore.BROWN_POLE : 0.997;
   const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
   const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
@@ -92,7 +92,7 @@
       this.analyser = ctx.createAnalyser();
       this.analyser.fftSize = 64;
 
-      // DC-blocking high-pass filter (15Hz) to protect transducer coils from infrasonic content
+      // DC-blocking high-pass filter (40 Hz — protects transducer coils & brown noise rumble)
       this.dcBlockFilter = ctx.createBiquadFilter();
       this.dcBlockFilter.type = 'highpass';
       this.dcBlockFilter.frequency.setValueAtTime(DC_BLOCK_HZ, ctx.currentTime);

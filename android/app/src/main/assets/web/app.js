@@ -5533,10 +5533,10 @@ function createBinauralSource(ctx, presetKey, gainValue = 0.15) {
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.0001, ctx.currentTime);
   gain.gain.linearRampToValueAtTime(gainValue, ctx.currentTime + 0.05);
-  // DC-blocking high-pass filter (15 Hz)
+  // DC-blocking high-pass filter (40 Hz — protects transducer coils & brown noise rumble)
   const dcBlock = ctx.createBiquadFilter();
   dcBlock.type = 'highpass';
-  dcBlock.frequency.setValueAtTime(15, ctx.currentTime);
+  dcBlock.frequency.setValueAtTime(40, ctx.currentTime);
   dcBlock.Q.setValueAtTime(0.707, ctx.currentTime);
   source.connect(dcBlock);
   dcBlock.connect(gain);
@@ -5893,10 +5893,10 @@ function createOggPlayer(buffer, loop, volume) {
   // Fast fade-in: 30ms (AudioCore standard)
   gain.gain.setValueAtTime(0.0001, ctx.currentTime);
   gain.gain.linearRampToValueAtTime(volume, ctx.currentTime + 0.03);
-  // DC-blocking high-pass filter (15Hz) to protect transducer coils
+  // DC-blocking high-pass filter (40 Hz — protects transducer coils & brown noise rumble)
   const dcBlock = ctx.createBiquadFilter();
   dcBlock.type = 'highpass';
-  dcBlock.frequency.setValueAtTime(15, ctx.currentTime);
+  dcBlock.frequency.setValueAtTime(40, ctx.currentTime);
   dcBlock.Q.setValueAtTime(0.707, ctx.currentTime);
   source.connect(dcBlock);
   dcBlock.connect(gain);
@@ -6021,8 +6021,8 @@ function stopAllAudio() {
   if (window.AudioCore) {
     window.AudioCore.muteMaster(true);
     window.AudioCore.stopAllVoices(); // Stops all AudioCore-tracked voices
-    // Unmute after brief moment to allow next sound
-    setTimeout(() => window.AudioCore.muteMaster(false), 50);
+    // NOTE: no automatic unmute here — the master stays muted until the user
+    // explicitly starts a new sound, preventing any residual noise burst.
   } else if (typeof window !== 'undefined' && typeof window.dfMasterAudioMute === 'function') {
     try { window.dfMasterAudioMute(); } catch (_) {}
   }
@@ -80795,23 +80795,19 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
         function dfActiveAudioCtx() {
             return (typeof window !== "undefined" && (window.__dfLastAudioCtx || window.audioContext)) || null;
         }
-        window.dfMasterAudioMute = function() {
-            const ctx = dfActiveAudioCtx();
-            // Fast 20ms ramp, not a hard 0 jump: an un-ramped full-scale cut on
-            // still-running loops is itself a click/static pop on every Stop.
-            if (ctx && ctx._masterGain) ctx._masterGain.gain.setTargetAtTime(0, ctx.currentTime, 0.006);
-        };
-        window.dfMasterAudioUnmute = function() {
-            const ctx = dfActiveAudioCtx();
-            // Smooth restore: a 0->1 setValueAtTime after Stop is an audible pop.
-            if (ctx && ctx._masterGain) ctx._masterGain.gain.setTargetAtTime(1, ctx.currentTime, 0.015);
-        };
-        if (window.audioContext) {
-            window.getSafeAudioDestination(window.audioContext);
-        }
-        // Zero-autoplay / zero-ambient-leak on tab switch: mute when hidden,
-        // NEVER unmute on visible/pageshow. Audio only returns via explicit
-        // user gesture (ensureProceduralAudioContext unmutes on Play).
+  if (typeof document !== 'undefined') {
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) {
+        try { window.dfMasterAudioMute && window.dfMasterAudioMute(); } catch (_) {}
+      }
+      // NOTE: Never automatically unbind or resume audio on visibilitychange to prevent
+      // auto-play on tab switch. Audio ONLY starts on explicit user gesture via
+      // AudioCore.bindGesture() or ensureProceduralAudioContext().
+    });
+    window.addEventListener('pagehide', function () {
+      try { window.dfMasterAudioMute && window.dfMasterAudioMute(); } catch (_) {}
+    });
+  }
         if (typeof document !== 'undefined') {
             document.addEventListener('visibilitychange', function () {
                 if (document.hidden) {
@@ -83416,7 +83412,8 @@ window.SovereignAudioGuardian = (function() {
             ctx._guardianAttached = true;
             ctx.addEventListener("statechange", () => {
                 if (ctx.state === "interrupted" || ctx.state === "suspended") {
-                    if (!document.hidden) {
+                    // Only resume when tab is hidden (leaving background)
+                    if (document.hidden) {
                         attemptResume("statechange");
                     }
                 }
@@ -83428,21 +83425,13 @@ window.SovereignAudioGuardian = (function() {
         if (isBound) return;
         isBound = true;
 
-        document.addEventListener("visibilitychange", () => {
-            if (!document.hidden) {
-                bindAudioStateWatcher();
-                attemptResume("visibilitychange");
-            }
-        });
+        // Zero-autoplay on tab switch: never resume audio context on visibility
+        // becoming visible. Audio only resumes via explicit user gesture
+        // (markAudioContextUserGesture / bindGesture).
 
         window.addEventListener("focus", () => {
             bindAudioStateWatcher();
             attemptResume("window-focus");
-        });
-
-        window.addEventListener("pageshow", () => {
-            bindAudioStateWatcher();
-            attemptResume("pageshow");
         });
 
         // First-touch unlock & recovery fallback
