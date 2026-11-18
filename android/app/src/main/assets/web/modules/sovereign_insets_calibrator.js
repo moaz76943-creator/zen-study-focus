@@ -82,7 +82,8 @@
     /**
      * Injects CSS variables onto documentElement with !important to override conflicting rules.
      * Design (Android 15 / Xiaomi edge-to-edge): MainActivity pads the WebView's PARENT
-     * FrameLayout with the real system-bar insets, so the WebView's layout viewport
+     * FrameLayout with the real system-bar insets (including defensive floors for Xiaomi
+     * HyperOS 3-button nav up to 500dp), so the WebView's layout viewport
      * already ends above the status bar, cutout and 3-button nav bar. Native padding
      * is the single owner of the insets — if CSS re-added them (via --df-safe-top /
      * --df-safe-bottom / --df-webview-padding-bottom) every dock offset and body
@@ -107,7 +108,8 @@
       root.style.setProperty('--df-webview-padding-bottom', '0px', 'important');
 
       // Capsule height: base 100px, but respect actual nav bar height if larger.
-      // Use insets.bottom (nav bar height WITHOUT IME) — insets.paddingBottom includes IME
+      // Use insets.bottom (FLOORED nav bar height from MainActivity, includes defensive
+      // floors for Xiaomi HyperOS 3-button nav up to 500dp) — insets.paddingBottom includes IME
       // and would incorrectly grow the capsule when the keyboard opens, pushing the
       // Studios pill and FAB down into content. MainActivity sends navBottomDp as 'bottom'
       // and max(navBottom, IME) as 'paddingBottom'; we must use the former for dock math.

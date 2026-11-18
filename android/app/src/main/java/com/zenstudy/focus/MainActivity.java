@@ -221,13 +221,16 @@ public class MainActivity extends AppCompatActivity {
             // Push insets (in dp) to JS calibrator. The WebView itself is now bounded
             // by the parent padding, so CSS dock formulas only need a fallback floor;
             // the values stay available to JS for any reserve math that wants them.
-            // Param 2 (bottom) = rawNavBottomDp (ACTUAL nav bar height, no defensive floors) for capsule/dock math.
-            // Param 5 (paddingBottom) = paddingBottomDp (floored, includes IME) for keyboard handling.
+            // Param 2 (bottom) = navBottomDp (FLOORED nav bar height, includes defensive floors
+            // for Xiaomi HyperOS 3-button nav up to 500dp) for capsule/dock math. This MUST match
+            // the parent FrameLayout padding so the calibrator's dock positions align with the
+            // actual WebView viewport bottom. Param 5 (paddingBottom) = paddingBottomDp (floored,
+            // includes IME) for keyboard handling.
             webView.post(() -> {
                 if (webView != null && !isDestroyed()) {
                     String js = "if(window.SovereignInsetsCalibrator) "
                             + "window.SovereignInsetsCalibrator.updateInsets("
-                            + paddingTopDp + "," + rawNavBottomDp + "," + paddingLeftDp + "," + paddingRightDp + ","
+                            + paddingTopDp + "," + navBottomDp + "," + paddingLeftDp + "," + paddingRightDp + ","
                             + paddingBottomDp + ");";
                     webView.evaluateJavascript(js, null);
                 }
@@ -294,7 +297,7 @@ public class MainActivity extends AppCompatActivity {
                 if (hasCachedInsets && view != null && !isDestroyed()) {
                     String js = "if(window.SovereignInsetsCalibrator) "
                             + "window.SovereignInsetsCalibrator.updateInsets("
-                            + cachedPaddingTopDp + "," + cachedRawNavBottomDp + "," + cachedPaddingLeftDp + ","
+                            + cachedPaddingTopDp + "," + cachedNavBottomDp + "," + cachedPaddingLeftDp + ","
                             + cachedPaddingRightDp + "," + cachedPaddingBottomDp + ");";
                     view.evaluateJavascript(js, null);
                 }
