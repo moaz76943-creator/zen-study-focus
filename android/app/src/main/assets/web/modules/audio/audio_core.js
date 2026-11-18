@@ -234,25 +234,18 @@
   }
 
   function generateBrownNoise(channelData, sampleRate, durationSec) {
-    // Fixed-output-scale brown noise: bounded leaky integrator with inline
-    // DC-blocking (1-pole high-pass at ~10Hz) to prevent integrator drift
-    // from accumulating into low-frequency rumble/static over long buffers.
+    // Fixed-output-scale brown noise: bounded leaky integrator.
     // Output scaled by BROWN_NOISE_AMP — never peak-normalized UP (amplifying
     // quiet noise produced constant hiss/rumble) and never clamped into rails.
-    const dcBlockCoeff = Math.exp(-2 * Math.PI * 10 / sampleRate); // ~10Hz high-pass
+    // DC removal is handled by createSeamlessBuffer post-process pass (belt-and-suspenders).
     for (let ch = 0; ch < channelData.length; ch++) {
       const data = channelData[ch];
       const len = data.length;
       let brown = 0;
-      let dcBlockState = 0;
       for (let i = 0; i < len; i++) {
         const white = Math.random() * 2 - 1;
         brown = BROWN_POLE * brown + white * BROWN_GAIN;
-        // Inline DC block: y[n] = x[n] - x[n-1] + coeff * y[n-1]
-        // But we use the simpler leaky form: high-pass the integrator output
-        const raw = brown * BROWN_NOISE_AMP;
-        data[i] = raw - dcBlockState + dcBlockCoeff * (data[i-1] || 0);
-        dcBlockState = raw;
+        data[i] = brown * BROWN_NOISE_AMP;
       }
     }
   }
@@ -293,27 +286,30 @@
 
     source.start();
 
-    // Stop function with instant fade - no setTimeout, truly instant
-    function stop() {
-      activeVoices.delete(voice);
-      try {
-        const now = ctx.currentTime;
-        const fade = FADE_OUT_MS / 1000;
-        gain.gain.cancelScheduledValues(now);
-        gain.gain.setValueAtTime(gain.gain.value, now);
-        gain.gain.linearRampToValueAtTime(0, now + fade);
-        source.stop(now + fade + 0.005);
-        // Synchronous disconnect - no setTimeout delay
-        try { source.disconnect(); } catch (_) {}
-        try { dcBlock.disconnect(); } catch (_) {}
-        try { gain.disconnect(); } catch (_) {}
-      } catch (e) {
-        try { source.stop(); } catch (_) {}
-        try { source.disconnect(); } catch (_) {}
-        try { dcBlock.disconnect(); } catch (_) {}
-        try { gain.disconnect(); } catch (_) {}
-      }
-    }
+        // Stop function with instant fade - uses onended to disconnect AFTER fade completes
+        function stop() {
+          activeVoices.delete(voice);
+          try {
+            const now = ctx.currentTime;
+            const fade = FADE_OUT_MS / 1000;
+            gain.gain.cancelScheduledValues(now);
+            gain.gain.setValueAtTime(gain.gain.value, now);
+            gain.gain.linearRampToValueAtTime(0, now + fade);
+            source.stop(now + fade + 0.005);
+            // Defer disconnect until fade completes via onended — disconnecting immediately
+            // would cut off the scheduled fade ramp and produce a click.
+            source.onended = () => {
+              try { source.disconnect(); } catch (_) {}
+              try { dcBlock.disconnect(); } catch (_) {}
+              try { gain.disconnect(); } catch (_) {}
+            };
+          } catch (e) {
+            try { source.stop(); } catch (_) {}
+            try { source.disconnect(); } catch (_) {}
+            try { dcBlock.disconnect(); } catch (_) {}
+            try { gain.disconnect(); } catch (_) {}
+          }
+        }
 
     const voice = { source, gain, dcBlock, stop };
     activeVoices.add(voice);
@@ -397,10 +393,11 @@
     const numChannels = Math.max(1, buffer.numberOfChannels || 1);
     const srcLen = buffer.length || (buffer.getChannelData(0) ? buffer.getChannelData(0).length : 1);
 
-    // For seamless looping, we need the END of the buffer to crossfade into the BEGINNING.
-    // Create an extended buffer: [original audio] + [first xfadeSamples of audio]
-    // Then crossfade the last xfadeSamples of original into the added beginning.
-    // The final buffer length = srcLen (we keep original length, crossfade at tail).
+    // For seamless looping of arbitrary audio, we need the END of the buffer to
+    // crossfade into the BEGINNING. We create an extended buffer that contains
+    // the original audio PLUS the first xfadeSamples of audio (the loop tail).
+    // Then we crossfade the last xfadeSamples of the original into the added tail.
+    // The final buffer length = srcLen (the crossfade region replaces the original tail).
     const finalSize = srcLen;
     const extendedSize = srcLen + xfadeSamples;
 

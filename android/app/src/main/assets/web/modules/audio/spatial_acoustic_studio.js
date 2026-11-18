@@ -319,22 +319,22 @@
         try {
           const now = this.audioCtx.currentTime;
           const fade = FADE_OUT_SEC;
+          // Capture current gain to restore after fade (preserves user volume setting).
+          const gainAtFadeStart = this.masterGain ? this.masterGain.gain.value : 0;
           // Fade using the existing masterGain in the EQ chain (no new nodes).
           if (this.masterGain) {
             this.masterGain.gain.cancelScheduledValues(now);
-            this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
+            this.masterGain.gain.setValueAtTime(gainAtFadeStart, now);
             this.masterGain.gain.linearRampToValueAtTime(0, now + fade);
           }
           source.stop(now + fade + 0.005);
-          // Tear down source and restore masterGain after fade completes.
+          // Tear down source and restore masterGain to the captured gain after fade completes.
           source.onended = () => {
             try { source.disconnect(); } catch (_) {}
             if (this.masterGain && this.audioCtx) {
               const t = this.audioCtx.currentTime;
               this.masterGain.gain.cancelScheduledValues(t);
-              this.masterGain.gain.setValueAtTime(
-                this.options.defaultVolume * LIMITER_LINEAR, t
-              );
+              this.masterGain.gain.setValueAtTime(gainAtFadeStart, t);
             }
           };
         } catch (e) {
