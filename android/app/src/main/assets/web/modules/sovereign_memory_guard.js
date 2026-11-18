@@ -51,13 +51,9 @@
       if (!isDrained) return false;
       isDrained = false;
 
-      // Restore AudioContext if needed
-      if (global.SovereignAudioSuite && typeof global.SovereignAudioSuite.ensureContext === 'function') {
-        var ctx = global.SovereignAudioSuite.ensureContext();
-        if (ctx && ctx.state === 'suspended' && typeof ctx.resume === 'function') {
-          ctx.resume().catch(function () {});
-        }
-      }
+      // Zero-autoplay invariant: never auto-resume the AudioContext on tab switch.
+      // Audio returns only via an explicit user gesture (AudioCore.bindGesture /
+      // ensureProceduralAudioContext). Suspend-on-hide stays above.
 
       if (global.SovereignEventBus) {
         global.SovereignEventBus.emit('memory:restored', { resumedAt: Date.now() });

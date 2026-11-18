@@ -499,7 +499,11 @@
 
   global.SovereignAudioSuite = {
     version: '632.0.0',
-    ensureContext: function () { return getCtx(); },
+    ensureContext: function () {
+      // Never throw into lifecycle/visibility handlers: AudioCore.getContext()
+      // throws when no user gesture has happened yet.
+      try { return getCtx(); } catch (_) { return null; }
+    },
     chimes: { PHI: 1.618, BASE_HZ: 432, playGoldenChime: function () { return SovereignRealAudio.playBell(); } },
     binaural: { active: false, start: function () { this.active = true; return SovereignRealAudio.playAmbient('water'); }, stop: function () { this.active = false; return SovereignRealAudio.stopAmbient(); } },
     guardian: { init: function () {}, getState: function () { return 'ready'; } },

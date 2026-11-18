@@ -3,21 +3,21 @@
   "files": [
     {
       "file": "rain_window.ogg",
-      "size_kb": 1180.0,
+      "size_kb": 838.3,
       "license": "CC0 / Public Domain",
       "source": "https://upload.wikimedia.org/wikipedia/commons/4/41/Rain_against_the_window.ogg"
     },
     {
       "file": "forest_birds.ogg",
-      "size_kb": 789.5,
+      "size_kb": 628.1,
       "license": "CC0 / Public Domain",
       "source": "https://upload.wikimedia.org/wikipedia/commons/4/42/Bird_singing.ogg"
     },
     {
       "file": "flowing_water.ogg",
-      "size_kb": 338.8,
+      "size_kb": 327.8,
       "license": "CC0 / Public Domain",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/2/26/Flowing-water-100019.ogg"
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/26/Flowing-water-100019.ogg (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; provenance unchanged)"
     },
     {
       "file": "rain_thunder.ogg",
@@ -28,20 +28,20 @@
     },
     {
       "file": "wind_breeze.ogg",
-      "size_kb": 1552.8,
+      "size_kb": 1907.2,
       "license": "Public domain",
-      "source": "https://commons.wikimedia.org/wiki/File%3A20090610_0_ambience.ogg",
+      "source": "https://commons.wikimedia.org/wiki/File%3A20090610_0_ambience.ogg (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; provenance unchanged)",
       "url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/20090610_0_ambience.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"
     },
     {
       "file": "campfire_embers.ogg",
-      "size_kb": 216.0,
+      "size_kb": 215.0,
       "license": "CC0 / Public Domain",
-      "source": "Procedurally synthesized with ffmpeg (brown-noise low-frequency rumble + high-frequency crackle flutter, amix); original work, no third-party sample or recording, dedicated to the public domain"
+      "source": "Procedurally synthesized with ffmpeg (brown-noise low-frequency rumble + high-frequency crackle flutter, amix); original work, no third-party sample or recording, dedicated to the public domain (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; provenance unchanged)"
     },
     {
       "file": "water_drop.ogg",
-      "size_kb": 750.0,
+      "size_kb": 545.5,
       "license": "Public domain",
       "source": "https://commons.wikimedia.org/wiki/File%3ABathtub_water_splashes.ogg",
       "url": "https://upload.wikimedia.org/wikipedia/commons/8/83/Bathtub_water_splashes.ogg?utm_source=commons.wikimedia.org&utm_campaign=imageinfo&utm_content=original"

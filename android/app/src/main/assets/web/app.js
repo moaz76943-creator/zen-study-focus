@@ -5440,6 +5440,37 @@ if (typeof document !== 'undefined' && document.addEventListener) {
 // prove no gesture happened yet and stay on the deterministic mock context.
 window.__dfAudioGestureReceived = function () { return audioContextUserGestureReceived; };
 
+// Global instant-mute kill switch used by visibilitychange/pagehide handlers and
+// Stop paths. Previously these call sites referenced window.dfMasterAudioMute /
+// dfMasterAudioUnmute which were never defined anywhere (dead no-ops). Now they
+// are real functions delegating to AudioCore's master gain (fallback: legacy ctx).
+window.dfMasterAudioMute = function () {
+  try {
+    if (window.AudioCore && typeof window.AudioCore.muteMaster === 'function') {
+      window.AudioCore.muteMaster(true);
+      return;
+    }
+    const ctx = (typeof webAudioCtx !== 'undefined') ? webAudioCtx : null;
+    if (ctx && ctx._masterGain && ctx._masterGain.gain) {
+      ctx._masterGain.gain.cancelScheduledValues(ctx.currentTime);
+      ctx._masterGain.gain.setValueAtTime(0, ctx.currentTime);
+    }
+  } catch (_) {}
+};
+window.dfMasterAudioUnmute = function () {
+  try {
+    if (window.AudioCore && typeof window.AudioCore.unmuteMaster === 'function') {
+      window.AudioCore.unmuteMaster();
+      return;
+    }
+    const ctx = (typeof webAudioCtx !== 'undefined') ? webAudioCtx : null;
+    if (ctx && ctx._masterGain && ctx._masterGain.gain) {
+      ctx._masterGain.gain.cancelScheduledValues(ctx.currentTime);
+      ctx._masterGain.gain.setValueAtTime(1, ctx.currentTime);
+    }
+  } catch (_) {}
+};
+
 // Lazy AudioContext: created ONLY on first user gesture, never on load/tab switch
 // Delegates to AudioCore for single shared context
 function ensureProceduralAudioContext() {
@@ -5658,7 +5689,7 @@ function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
           for (let i = 0; i < bufferSize; i++) {
             const white = Math.random() * 2 - 1;
             brown = 0.997 * brown + white * 0.4; // AudioCore's BROWN_POLE & BROWN_GAIN
-            data[i] = brown;
+            data[i] = brown * 0.05; // BROWN_NOISE_AMP — raw accumulation rails at ±1 (harsh static)
           }
         }
       }
@@ -5919,9 +5950,10 @@ function createOggPlayer(buffer, loop, volume) {
         gain.gain.setValueAtTime(gain.gain.value, now);
         gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
         source.stop(now + fadeOutSec + 0.005);
-        setTimeout(function () {
-          try { source.disconnect(); dcBlock.disconnect(); gain.disconnect(); } catch (_) {}
-        }, 70);
+        // Synchronous teardown — instant Stop, no deferred disconnect
+        try { source.disconnect(); } catch (_) {}
+        try { dcBlock.disconnect(); } catch (_) {}
+        try { gain.disconnect(); } catch (_) {}
       } catch (e) {
         try { source.stop(); } catch (_) {}
       }

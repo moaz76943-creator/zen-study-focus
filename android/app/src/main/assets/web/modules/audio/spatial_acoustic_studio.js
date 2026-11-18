@@ -334,6 +334,12 @@
           source.connect(fadeGain);
           fadeGain.connect(this.eqFilters[0]);
           source.stop(now + fade + 0.005);
+          // Tear the fade chain down once the source actually ends — otherwise
+          // every stop() leaks a live fadeGain wired into the EQ bus.
+          source.onended = function () {
+            try { source.disconnect(); } catch (_) {}
+            try { fadeGain.disconnect(); } catch (_) {}
+          };
         } catch (e) {
           try { source.stop(); } catch (_) {}
           try { source.disconnect(); } catch (_) {}
