@@ -158,13 +158,14 @@ public class MainActivity extends AppCompatActivity {
                 int extraNavPx = Math.round(extraNavDp * density);
                 if (navBottom < extraNavPx) navBottom = extraNavPx;
             }
-            // ULTIMATE SAFETY NET: On Xiaomi devices, apply an absolute minimum floor regardless of
-            // gesture/3-button detection. This handles edge cases where detection fails and the
-            // reported insets are zero or too small. The cost is extra padding (harmless empty space);
-            // the benefit is never clipping content or overlapping the Studios pill/FAB.
-            // Xiaomi HyperOS 3-button nav bars can exceed 260dp on some devices/regions; use 300dp
-            // floor to guarantee the WebView viewport never intrudes into the nav bar area.
-            if (isXiaomi) {
+            // ULTIMATE SAFETY NET: On Xiaomi devices with 3-BUTTON NAVIGATION, apply an absolute
+            // minimum floor. This handles edge cases where detection fails and the
+            // reported insets are zero or too small. The cost is extra padding (harmless
+            // empty space); the benefit is never clipping content or overlapping the
+            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can exceed 260dp on some
+            // devices/regions; use 300dp floor to guarantee the WebView viewport never
+            // intrudes into the nav bar area. DO NOT apply for gesture navigation (handle ~32dp).
+            if (isXiaomi && !isGestureNav) {
                 int absoluteMinNavDp = 300; // Covers 3-button bars up to ~300dp on HyperOS
                 int absoluteMinNavPx = Math.round(absoluteMinNavDp * density);
                 if (navBottom < absoluteMinNavPx) navBottom = absoluteMinNavPx;
@@ -211,13 +212,14 @@ public class MainActivity extends AppCompatActivity {
             // (env() is zero here and must stay zero to avoid double padding).
             // Zeroing (not CONSUMED) keeps the WebView's internal state in sync when
             // the keyboard opens/hides, preventing ghost padding after IME dismissal.
+            // Call setInsets separately for each type — combined type masks are not
+            // reliably handled by WindowInsetsCompat.Builder on all Android versions.
             return new WindowInsetsCompat.Builder(windowInsets)
-                    .setInsets(WindowInsetsCompat.Type.systemBars()
-                            | WindowInsetsCompat.Type.displayCutout()
-                            | WindowInsetsCompat.Type.navigationBars()
-                            | WindowInsetsCompat.Type.mandatorySystemGestures()
-                            | WindowInsetsCompat.Type.ime(),
-                            Insets.NONE)
+                    .setInsets(WindowInsetsCompat.Type.systemBars(), Insets.NONE)
+                    .setInsets(WindowInsetsCompat.Type.displayCutout(), Insets.NONE)
+                    .setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.NONE)
+                    .setInsets(WindowInsetsCompat.Type.mandatorySystemGestures(), Insets.NONE)
+                    .setInsets(WindowInsetsCompat.Type.ime(), Insets.NONE)
                     .build();
         });
 

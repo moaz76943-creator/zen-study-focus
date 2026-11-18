@@ -51,15 +51,15 @@
          --df-bottom-nav-clearance is the dock reserve ABOVE the native inset only
          (capsule + Studios pill + FAB zone); it never includes the nav inset.
          Fallbacks match calibrator minimums: capsule 100dp, Studios pill 120dp,
-         FAB 176dp, bottom clearance 320dp. */
+         FAB 176dp, bottom clearance 480dp (covers Xiaomi HyperOS 3-button nav bars up to ~300dp). */
       --df-dock-gap: 12px;
       --df-capsule-height: 100px;
       --df-dock-bottom: calc(var(--df-dock-gap, 12px));
       --df-studios-pill-bottom: 120px;
       --df-fab-bottom: 176px;
       --df-float-bottom: 120px;
-      --df-inflow-bottom: var(--df-bottom-nav-clearance, 320px);
-      --df-bottom-nav-clearance: 320px;
+      --df-inflow-bottom: var(--df-bottom-nav-clearance, 480px);
+      --df-bottom-nav-clearance: 480px;
     }
 
     * {
@@ -68,10 +68,10 @@
       font-variant-numeric: tabular-nums lining-nums;
       -webkit-tap-highlight-color: transparent;
     }
-    /* Reserve clears the docked bottom stack; the pillar7 body rule (later, !important)
-       computes the same reserve. Keep both identical: uses --df-inflow-bottom which
-       resolves to --df-bottom-nav-clearance (320px fallback, calibrator updates). */
-    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: var(--df-inflow-bottom, 320px); overflow-x: hidden; user-select: none; }
+    // Reserve clears the docked bottom stack; the pillar7 body rule (later, !important)
+       // computes the same reserve. Keep both identical: uses --df-inflow-bottom which
+       // resolves to --df-bottom-nav-clearance (480px fallback, calibrator updates).
+    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: var(--df-inflow-bottom, 480px); overflow-x: hidden; user-select: none; }
     input, textarea { user-select: text; text-align: start; }
 
     body.deep-lockdown .dynamic-hero-header,
@@ -928,8 +928,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
       padding-top: var(--df-sat);
       /* Body content padding clears the floating
          elements (FAB, Studios pill) above the capsule.
-         --df-webview-padding-bottom is pinned to 0px by calibrator; use --df-inflow-bottom. */
-      padding-bottom: var(--df-inflow-bottom, 320px) !important;
+         --df-webview-padding-bottom is pinned to 0px by calibrator; use --df-inflow-bottom (480px fallback). */
+      padding-bottom: var(--df-inflow-bottom, 480px) !important;
       padding-left: var(--df-sal);
       padding-right: var(--df-sar);
     }
@@ -1405,7 +1405,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         padding-top: max(16px, max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px))) !important;
         /* Body padding-bottom = fixed clearance for floating
            elements (FAB, Studios pill). --df-webview-padding-bottom is 0px (calibrator). */
-        padding-bottom: var(--df-inflow-bottom, 320px) !important;
+        padding-bottom: var(--df-inflow-bottom, 480px) !important;
       }
       .app-shell {
         display: flex !important;
@@ -1475,12 +1475,12 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     }
     /* Edge-to-Edge Safe Area Insets for Android 15 / Xiaomi 17T Pro
        Native parent padding owns all system-bar insets; CSS env() must not re-add them.
-       --df-webview-padding-bottom is pinned to 0px by calibrator; use --df-inflow-bottom. */
+       --df-webview-padding-bottom is pinned to 0px by calibrator; use --df-inflow-bottom (480px fallback). */
     body {
         padding-top: var(--df-safe-top, 0px);
         /* Body content padding clears the floating
            elements (FAB, Studios pill). */
-        padding-bottom: var(--df-inflow-bottom, 320px);
+        padding-bottom: var(--df-inflow-bottom, 480px);
         padding-left: var(--df-safe-left, 0px);
         padding-right: var(--df-safe-right, 0px);
     }
@@ -1559,8 +1559,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
 <!-- TASK #811: Bottom Nav Clearance & Long-Language Button Wrap -->
 <style id="task-811-layout-fix">
   main, .tab-content, .view-section, section[id*="view"], div[id*="view"], #app {
-    /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (320px fallback). */
-    padding-bottom: var(--df-inflow-bottom, 320px) !important;
+    /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (480px fallback). */
+    padding-bottom: var(--df-inflow-bottom, 480px) !important;
   }
   button, .pill, .chip, .tab-btn {
     white-space: normal !important;
@@ -1738,8 +1738,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     align-self: center !important;
   }
   main, .tab-content, .tab-panel {
-    /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (320px fallback). */
-    padding-bottom: var(--df-inflow-bottom, 320px) !important;
+    /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (480px fallback). */
+    padding-bottom: var(--df-inflow-bottom, 480px) !important;
   }
   [data-i18n="ui_local_data"], [data-i18n="ui_local_data"] *,
   #localDataBadge, #localDataBadge * {
