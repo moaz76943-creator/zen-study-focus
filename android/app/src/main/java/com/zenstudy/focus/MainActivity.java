@@ -88,8 +88,7 @@ public class MainActivity extends AppCompatActivity {
         // AMOLED black behind the inset strips so white status-bar icons stay visible.
         android.widget.FrameLayout insetFrame = new android.widget.FrameLayout(this);
         insetFrame.setBackgroundColor(0xFF000000);
-        insetFrame.addView(webView);
-        setContentView(insetFrame);
+        // Register insets listener BEFORE setContentView so the initial dispatch is caught.
         ViewCompat.setOnApplyWindowInsetsListener(insetFrame, (v, windowInsets) -> {
             // Android 15 (API 35) edge-to-edge: systemBars() returns status + navigation bars (3-button).
             // On Xiaomi gesture navigation, navigationBars() returns 0; mandatorySystemGestures() provides the gesture handle height.
@@ -128,12 +127,13 @@ public class MainActivity extends AppCompatActivity {
             int minNavDp = isGestureNav ? 32 : 100;
             int minNavPx = Math.round(minNavDp * density);
             if (navBottom < minNavPx) navBottom = minNavPx;
-            // Extra safety margin for tall 3-button nav bars on Xiaomi HyperOS (bsc#hyperos-navbar-height)
-            if (!isGestureNav) {
-                int extraNavDp = 120;
-                int extraNavPx = Math.round(extraNavDp * density);
-                if (navBottom < extraNavPx) navBottom = extraNavPx;
-            }
+            // Extra safety margin for tall 3-button nav bars on Xiaomi HyperOS (bsc#hyperos-navbar-height).
+            // Apply UNCONDITIONALLY as a safety net: if detection misclassifies 3-button as gesture
+            // (e.g., Xiaomi reports 0 for navigationBars/systemBars), we still guarantee 120dp floor.
+            // The calibrator will adjust floating layers (capsule, Studios pill, FAB) accordingly.
+            int extraNavDp = 120;
+            int extraNavPx = Math.round(extraNavDp * density);
+            if (navBottom < extraNavPx) navBottom = extraNavPx;
 
             // IME can be taller than nav bar; use max for WebView padding so content stays above keyboard.
             int paddingBottom = Math.max(navBottom, ime.bottom);
@@ -177,6 +177,11 @@ public class MainActivity extends AppCompatActivity {
                             Insets.NONE)
                     .build();
         });
+
+        insetFrame.addView(webView);
+        setContentView(insetFrame);
+        // Force initial insets dispatch now that the view is attached.
+        ViewCompat.requestApplyInsets(insetFrame);
 
         WebSettings settings = webView.getSettings();
         settings.setJavaScriptEnabled(true);
