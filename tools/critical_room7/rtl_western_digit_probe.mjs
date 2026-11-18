@@ -19,7 +19,7 @@ export const CSV_ENGINE =
 
 const TIMER_SAMPLES = Object.freeze([0, 7, 59, 60, 600, 1500, 3599, 3600, 86399, -30]);
 const CALENDAR_DATE = '2026-10-27';
-const RTL_LOCALES = new Set(['ar', 'fa', 'ur']);
+const RTL_LOCALES = new Set(['ar', 'fa', 'ur', 'ps', 'prs']);
 const LRM = '\u200E';
 
 const DEFAULT_CSV_FIXTURE = [
