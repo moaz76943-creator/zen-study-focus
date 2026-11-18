@@ -5564,7 +5564,7 @@ function createBinauralSource(ctx, presetKey, gainValue = 0.15) {
   source.loop = true;
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-  gain.gain.linearRampToValueAtTime(gainValue, ctx.currentTime + 0.05);
+  gain.gain.linearRampToValueAtTime(gainValue, ctx.currentTime + 0.03);
   // DC-blocking high-pass filter (40 Hz — protects transducer coils & brown noise rumble)
   const dcBlock = ctx.createBiquadFilter();
   dcBlock.type = 'highpass';
@@ -5727,7 +5727,7 @@ function createNoiseSource(ctx, color, gainValue = 0.25) {
   source.loop = true;
   const gain = ctx.createGain();
   gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-  gain.gain.linearRampToValueAtTime(gainValue, ctx.currentTime + 0.05);
+  gain.gain.linearRampToValueAtTime(gainValue, ctx.currentTime + 0.03);
   // DC-blocking high-pass filter (40 Hz — protects transducer coils & brown noise rumble)
   const dcBlock = ctx.createBiquadFilter();
         dcBlock.type = 'highpass';
@@ -38421,6 +38421,15 @@ window.dfStopAllSounds = function() {
 };
 
 window.dfGenerateNoiseBuffer = function(ctx, type) {
+  // Delegate to AudioCore for zero-static noise generation (consistent parameters, DC removal, attenuate-only peak limiter)
+  if (window.AudioCore) {
+    switch (type) {
+      case 'brown': return window.AudioCore.createSeamlessBuffer(ctx, 2.0, window.AudioCore.generateBrownNoise, 1, false);
+      case 'white': return window.AudioCore.createSeamlessBuffer(ctx, 2.0, window.AudioCore.generateWhiteNoise, 1, false);
+      case 'pink': return window.AudioCore.createSeamlessBuffer(ctx, 2.0, window.AudioCore.generatePinkNoise, 1, false);
+    }
+  }
+  // Fallback matching AudioCore's implementation exactly
   const durationSec = 2;
   const XFADE_MS = 20;
   const extraSec = XFADE_MS / 1000;
@@ -38428,44 +38437,35 @@ window.dfGenerateNoiseBuffer = function(ctx, type) {
   const bufferSize = Math.floor(ctx.sampleRate * totalSec);
   const tempBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
   const tempData = tempBuffer.getChannelData(0);
-  
-  let lastOut = 0.0;
-  let brown = 0, brownPeak = 0;
+
+  const BROWN_POLE = 0.997;
+  const BROWN_GAIN = 0.4;
+  const BROWN_NOISE_AMP = 0.03;
+  const WHITE_NOISE_AMP = 0.06;
+
+  let brown = 0;
   for (let i = 0; i < bufferSize; i++) {
     const white = Math.random() * 2 - 1;
     if (type === "brown") {
-      // True brown noise: leaky integrator of white noise with a bounded
-      // pole (0.9985). The old formula was algebraically white noise (not
-      // brown), which is why it hissed like static instead of rumbling
-      // like rain.
-      brown = 0.9985 * brown + white * 0.5;
-      lastOut = brown;
-      tempData[i] = lastOut;
-      if (Math.abs(lastOut) > brownPeak) brownPeak = Math.abs(lastOut);
+      // True brown noise: leaky integrator with AudioCore parameters
+      brown = BROWN_POLE * brown + white * BROWN_GAIN;
+      tempData[i] = brown * BROWN_NOISE_AMP;
     } else {
-      // White noise at lower amplitude with spectral shaping
-      tempData[i] = white * 0.08; // Reduced from 0.15
+      // White noise at AudioCore amplitude
+      tempData[i] = white * WHITE_NOISE_AMP;
     }
-    // Hard safety clamp: no generated sample may ever exceed the range the
-    // destination can represent without hard-clipping into static.
-    if (tempData[i] > 1.0) tempData[i] = 1.0;
-    else if (tempData[i] < -1.0) tempData[i] = -1.0;
-  }
-  if (type === "brown" && brownPeak > 0) {
-    const norm = 0.9 / brownPeak;
-    for (let i = 0; i < bufferSize; i++) tempData[i] *= norm;
   }
   // DC-removal pass: zero-mean loop boundary, kills hum/static on wrap.
   let dcMean = 0;
   for (let i = 0; i < bufferSize; i++) dcMean += tempData[i];
   dcMean /= bufferSize;
   for (let i = 0; i < bufferSize; i++) tempData[i] -= dcMean;
-  
+
   // Create final buffer with exact duration and crossfade loop point
   const finalSize = Math.floor(ctx.sampleRate * durationSec);
   const finalBuffer = ctx.createBuffer(1, finalSize, ctx.sampleRate);
   const finalData = finalBuffer.getChannelData(0);
-  
+
   const xfadeSamples = Math.floor(ctx.sampleRate * extraSec);
   // Copy main portion
   finalData.set(tempData.subarray(0, finalSize));
@@ -38477,7 +38477,7 @@ window.dfGenerateNoiseBuffer = function(ctx, type) {
     const t = i / xfadeSamples;
     finalData[i] = (1 - t) * tempData[finalSize + i] + t * tempData[i];
   }
-  
+
   return finalBuffer;
 };
 
@@ -38495,10 +38495,10 @@ window.dfPlayNatureSound = async function(soundType) {
   noiseSource.buffer = buffer;
   noiseSource.loop = true;
 
-  // DC-blocking high-pass filter (15Hz) to protect transducer coils from infrasonic content
+  // DC-blocking high-pass filter (40Hz — matches AudioCore, protects transducer coils & brown noise rumble)
   const dcBlock = ctx.createBiquadFilter();
   dcBlock.type = "highpass";
-  dcBlock.frequency.setValueAtTime(15, ctx.currentTime);
+  dcBlock.frequency.setValueAtTime(40, ctx.currentTime);
   dcBlock.Q.setValueAtTime(0.707, ctx.currentTime); // Butterworth
 
   // Primary spectral shaping filter
@@ -38519,9 +38519,9 @@ window.dfPlayNatureSound = async function(soundType) {
   }
 
   const gain = ctx.createGain();
-  // Click-free onset: ramp from silence instead of jumping to full gain.
+  // Click-free onset: 30ms linear ramp from silence (AudioCore standard)
   gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-  gain.gain.exponentialRampToValueAtTime(0.05, ctx.currentTime + 0.05);
+  gain.gain.linearRampToValueAtTime(0.05, ctx.currentTime + 0.03);
 
   noiseSource.connect(dcBlock);
   dcBlock.connect(filter);
@@ -62528,10 +62528,13 @@ function() {
     if (!node) return null;
     const ctx = getSpatialAudioCtx();
     if (!ctx) return null;
+    unmuteMasterSpatialGain();
     const entry = getOrCreateSpatialPannerNode(soundId);
     if (entry && entry.panner) {
       try {
         node.connect(entry.panner);
+        // Track the source node for instant stop
+        entry.source = node;
         return entry;
       } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
@@ -62615,6 +62618,17 @@ function() {
     } else if (typeof l.setPosition === 'function') {
       l.setPosition(0, 0, 0);
       l.setOrientation(0, 0, -1, 0, 1, 0);
+    }
+  }
+
+  // Unmute master spatial gain (called when new spatial audio starts)
+  function unmuteMasterSpatialGain() {
+    if (masterSpatialGain && spatialAudioCtx) {
+      try {
+        const now = spatialAudioCtx.currentTime;
+        masterSpatialGain.gain.cancelScheduledValues(now);
+        masterSpatialGain.gain.setValueAtTime(1.0, now);
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
     }
   }
 
@@ -63154,6 +63168,7 @@ function() {
   window.dfGenerateBinauralBeats = function(carrierHz, beatHz, durationSec) {
     const ctx = getSpatialAudioCtx();
     if (!ctx) return { error: 'AUDIO_UNAVAILABLE' };
+    unmuteMasterSpatialGain();
 
     const cHz = Math.max(80, Math.min(600, Number(carrierHz) || 216.0));
     const bHz = Math.max(0.5, Math.min(60, Number(beatHz) || 40.0));
@@ -63268,6 +63283,7 @@ function() {
   window.dfGenerateIsochronicBeats = function(carrierHz, pulseRateHz, dutyCycle) {
     const ctx = getSpatialAudioCtx();
     if (!ctx) return { error: 'AUDIO_UNAVAILABLE' };
+    unmuteMasterSpatialGain();
 
     const cHz = Math.max(80, Math.min(600, Number(carrierHz) || 216.0));
     const pRate = Math.max(0.5, Math.min(60, Number(pulseRateHz) || 40.0));
@@ -63412,18 +63428,60 @@ function() {
   };
 
   // Hard stop for every spatial-mixer-side source that the global Stop path used to miss:
-  // 40Hz/10Hz bio-frequency tones and the breeze orbit interval. Panner chains are
-  // signal-less once their sources stop, but the orbit timer previously kept ticking.
+  // 40Hz/10Hz bio-frequency tones, breeze orbit interval, AND all spatial panner sources.
+  // Panner chains are signal-less once their sources stop, but sources were never tracked.
   window.dfStopSpatialMixer = function() {
     isBreezeOrbiting = false;
     if (breezeOrbitTimer) {
       try { clearInterval(breezeOrbitTimer); } catch (_) {}
       breezeOrbitTimer = null;
     }
+    // Stop all tracked spatial sources (buffer sources connected to panners)
+    if (spatialSourcesMap) {
+      Object.keys(spatialSourcesMap).forEach(function(k) {
+        const entry = spatialSourcesMap[k];
+        if (entry && entry.source && typeof entry.source.stop === 'function') {
+          try {
+            const ctx = spatialAudioCtx || entry.source.context;
+            if (ctx) {
+              const now = ctx.currentTime;
+              // Fast 30ms fade-out then stop (AudioCore standard)
+              if (entry.gain && entry.gain.gain) {
+                entry.gain.gain.cancelScheduledValues(now);
+                entry.gain.gain.setValueAtTime(entry.gain.gain.value, now);
+                entry.gain.gain.linearRampToValueAtTime(0.0001, now + 0.03);
+              }
+              entry.source.stop(now + 0.035);
+            } else {
+              entry.source.stop();
+            }
+          } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+        }
+        // Disconnect panner chain
+        if (entry && entry.panner) {
+          try { entry.panner.disconnect(); } catch (_) {}
+        }
+        if (entry && entry.absorption) {
+          try { entry.absorption.disconnect(); } catch (_) {}
+        }
+        if (entry && entry.gain) {
+          try { entry.gain.disconnect(); } catch (_) {}
+        }
+      });
+      spatialSourcesMap = Object.create(null);
+    }
+    // Mute master spatial gain instantly (routes through AudioCore master chain)
+    if (masterSpatialGain && spatialAudioCtx) {
+      try {
+        const now = spatialAudioCtx.currentTime;
+        masterSpatialGain.gain.cancelScheduledValues(now);
+        masterSpatialGain.gain.setValueAtTime(0, now);
+      } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+    }
     try {
       if (typeof window.dfStopBioFrequencyTone === "function") window.dfStopBioFrequencyTone();
     } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-    return { stopped: true, orbitStopped: true, bioToneStopped: true };
+    return { stopped: true, orbitStopped: true, bioToneStopped: true, spatialSourcesStopped: true, masterSpatialMuted: true };
   };
 
   window.dfGetActiveBioFrequencyStatus = function() {
