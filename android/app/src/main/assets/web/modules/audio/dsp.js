@@ -30,7 +30,7 @@
       if (ctx.state === 'suspended') ctx.resume();
 
       // Generate 4-second brown noise buffer via AudioCore
-      const buffer = audioCore.createSeamlessBuffer(ctx, 4, audioCore.generateBrownNoise, 1);
+      const buffer = audioCore.createSeamlessBuffer(ctx, 4, audioCore.generateBrownNoise, 1, false);
 
       const voice = audioCore.createVoice(buffer, true);
       if (voice) {
@@ -52,7 +52,7 @@
 
       if (ctx.state === 'suspended') ctx.resume();
 
-      const buffer = audioCore.createSeamlessBuffer(ctx, 4, audioCore.generatePinkNoise, 1);
+      const buffer = audioCore.createSeamlessBuffer(ctx, 4, audioCore.generatePinkNoise, 1, false);
       const voice = audioCore.createVoice(buffer, true);
       if (voice) {
         const targetGain = 0.3 * audioCore.LIMITER_LINEAR;
@@ -72,7 +72,7 @@
 
       if (ctx.state === 'suspended') ctx.resume();
 
-      const buffer = audioCore.createSeamlessBuffer(ctx, 3, audioCore.generateWhiteNoise, 1);
+      const buffer = audioCore.createSeamlessBuffer(ctx, 3, audioCore.generateWhiteNoise, 1, false);
       const voice = audioCore.createVoice(buffer, true);
       if (voice) {
         const targetGain = 0.2 * audioCore.LIMITER_LINEAR;

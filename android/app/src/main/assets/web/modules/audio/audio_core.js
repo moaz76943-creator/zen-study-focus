@@ -86,11 +86,10 @@
     masterGain = ctx.createGain();
     masterGain.gain.setValueAtTime(0.7 * LIMITER_LINEAR, ctx.currentTime);
 
-    // Master limiter (catches only true overshoot near 0dBFS, not normal playback)
-    // Threshold at -3dB with 6dB knee: compression only engages above -6dB
+    // Master limiter (catches any overshoot from stacked voices)
     masterLimiter = ctx.createDynamicsCompressor();
-    masterLimiter.threshold.setValueAtTime(-3, ctx.currentTime);
-    masterLimiter.knee.setValueAtTime(6, ctx.currentTime);
+    masterLimiter.threshold.setValueAtTime(-12, ctx.currentTime);
+    masterLimiter.knee.setValueAtTime(24, ctx.currentTime);
     masterLimiter.ratio.setValueAtTime(20, ctx.currentTime);
     masterLimiter.attack.setValueAtTime(0.001, ctx.currentTime);
     masterLimiter.release.setValueAtTime(0.1, ctx.currentTime);
@@ -123,9 +122,10 @@
    * @param {number} durationSec - final loop duration
    * @param {Function} generatorFn(channelData, sampleRate, totalSec) - fills temp buffer
    * @param {number} numChannels - 1 (mono) or 2 (stereo)
+   * @param {boolean} normalize - peak-normalize to 0.9 (default true for OGG; pass false for procedural noise where the generator already controls amplitude)
    * @returns {AudioBuffer} ready for BufferSourceNode.loop = true
    */
-  function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
+  function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1, normalize = true) {
     const extraSec = XFADE_MS / 1000;
     const finalSize = Math.floor(ctx.sampleRate * durationSec);
     const xfadeSamples = Math.max(1, Math.floor(ctx.sampleRate * extraSec));
@@ -151,16 +151,21 @@
       mean /= bufferSize;
       for (let i = 0; i < bufferSize; i++) data[i] -= mean;
 
-      // 2. Peak normalize to 0.9 (leaves headroom for master limiter)
-      let peak = 0;
-      for (let i = 0; i < bufferSize; i++) {
-        const a = Math.abs(data[i]);
-        if (a > peak) peak = a;
+      // 2. Peak normalize to 0.9 ONLY when requested (OGG files need it;
+      //    procedural noise buffers already have controlled amplitude and
+      //    must NOT be amplified — normalizing to 0.9 multiplies quiet
+      //    noise by 3-5×, producing constant hiss/static).
+      if (normalize) {
+        let peak = 0;
+        for (let i = 0; i < bufferSize; i++) {
+          const a = Math.abs(data[i]);
+          if (a > peak) peak = a;
+        }
+        const norm = peak > 0 ? 0.9 / peak : 1;
+        for (let i = 0; i < bufferSize; i++) data[i] *= norm;
       }
-      const norm = peak > 0 ? 0.9 / peak : 1;
-      for (let i = 0; i < bufferSize; i++) data[i] *= norm;
 
-      // 3. Hard safety clamp
+      // 3. Hard safety clamp (always applied — prevents clipping regardless of normalization)
       for (let i = 0; i < bufferSize; i++) {
         if (data[i] > 1.0) data[i] = 1.0;
         else if (data[i] < -1.0) data[i] = -1.0;

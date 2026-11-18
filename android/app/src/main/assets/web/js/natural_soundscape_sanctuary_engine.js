@@ -110,7 +110,7 @@
             }
           }
           // AudioCore's createSeamlessBuffer handles DC removal, normalization, clamp
-        }, 1);
+        }, 1, false);
       }
       return null;
     }

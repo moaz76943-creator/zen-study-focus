@@ -5554,7 +5554,7 @@ const SEAMLESS_XFADE_MS = 20;
 // Delegates to AudioCore for zero-static seamless buffer creation
 function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
   if (window.AudioCore && window.AudioCore.createSeamlessBuffer) {
-    return window.AudioCore.createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels);
+    return window.AudioCore.createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels, false);
   }
   // Fallback (should never be used when AudioCore is loaded)
   const extraSec = SEAMLESS_XFADE_MS / 1000;
