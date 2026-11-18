@@ -12,8 +12,8 @@ html, body {
   background-color: var(--df-bg-oled);
   color: var(--df-text-primary);
   padding-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
-  /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (280px fallback). */
-  padding-bottom: var(--df-inflow-bottom, 280px);
+  /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (320px fallback). */
+  padding-bottom: var(--df-inflow-bottom, 320px);
   padding-inline-start: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
   padding-inline-end: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
   -webkit-tap-highlight-color: transparent;

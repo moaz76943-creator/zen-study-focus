@@ -114,7 +114,8 @@
       // Bottom nav clearance: dock gap (12) + capsuleHeight + gap to Studios (8) + Studios pill height (48)
       // + gap to FAB (8) + FAB height (54) = 130px base. Add native nav bar height (insets.bottom) as floor.
       // This ensures in-flow content (last card) ends above the floating layers on all devices.
-      var bottomNavClearance = Math.max(280, capsuleHeight + 130, (insets.bottom || 100) + 180);
+      // Increased base floor from 280 to 320 to accommodate taller 3-button nav bars on Xiaomi HyperOS.
+      var bottomNavClearance = Math.max(320, capsuleHeight + 130, (insets.bottom || 100) + 180);
       root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
 
       // Studios pill position: docked above capsule via --df-capsule-height

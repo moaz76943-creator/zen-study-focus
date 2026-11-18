@@ -41394,8 +41394,8 @@ window.dfApplySafeAreaInsets = function() {
     }
     body {
       padding-top: var(--safe-top) !important;
-      /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (280px fallback). */
-      padding-bottom: var(--df-inflow-bottom, 280px) !important;
+      /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (320px fallback). */
+      padding-bottom: var(--df-inflow-bottom, 320px) !important;
       padding-left: var(--safe-left) !important;
       padding-right: var(--safe-right) !important;
       box-sizing: border-box !important;
@@ -48001,8 +48001,8 @@ window.dfApplySafeAreaInsets = function(rootEl) {
       '}',
       'body {',
       '  padding-top: var(--safe-top);',
-      '  /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (280px fallback). */',
-      '  padding-bottom: var(--df-inflow-bottom, 280px);',
+      '  /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (320px fallback). */',
+      '  padding-bottom: var(--df-inflow-bottom, 320px);',
       '}'
     ].join('\n');
     if (document.head) document.head.appendChild(styleEl);
