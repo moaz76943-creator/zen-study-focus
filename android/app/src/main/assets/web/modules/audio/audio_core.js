@@ -23,7 +23,7 @@
   const DC_BLOCK_HZ = 40;                                      // protects transducer coils & brown noise rumble
   const BROWN_POLE = 0.997;                                    // leakier = less DC drift
   const BROWN_GAIN = 0.4;                                      // input gain for brown noise
-  const BROWN_NOISE_AMP = 0.045;                               // fixed output scale — reduced from 0.05 for extra headroom against leaky-integrator tail peaks
+  const BROWN_NOISE_AMP = 0.03;                                // fixed output scale — reduced from 0.045 for extra headroom against leaky-integrator tail peaks and DC drift
   const WHITE_NOISE_AMP = 0.06;                                // consistent across all modules
   const PINK_NOISE_AMP = 0.08;                                 // consistent across all modules
 

@@ -67,7 +67,7 @@
 
           for (let i = 0; i < bufferSize; i++) {
             const white = Math.random() * 2 - 1;
-            if (type === 'rain' || type === 'water') {
+            if (type === 'rain' || type === 'stream' || type === 'water') {
               // Pink Noise Filter (Paul Kellet -3dB/oct)
               b0 = 0.99886 * b0 + white * 0.0555179;
               b1 = 0.99332 * b1 + white * 0.0750759;
@@ -76,7 +76,7 @@
               b4 = 0.55000 * b4 + white * 0.5329522;
               b5 = -0.7616 * b5 - white * 0.0168980;
               b6 = white * 0.115926;
-              data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+              data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * PINK_NOISE_AMP;
             } else if (type === 'ocean' || type === 'wind') {
               // Brown Noise: leaky integrator of WHITE noise (-6dB/oct slope).
               // Using AudioCore's BROWN_POLE and BROWN_GAIN for bounded DC.

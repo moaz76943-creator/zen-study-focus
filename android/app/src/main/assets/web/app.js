@@ -82578,23 +82578,18 @@ window.SovereignStateSnapshot = (function() {
     };
 })();
 
-// 10Hz Alpha Wave Binaural Tone Generator (Procedural Dual Sine Synthesis)
+// 10Hz Alpha Wave Binaural Tone Generator (Pre-rendered Buffer via AudioCore)
+// Carrier: 432 Hz (L), 442 Hz (R) -> 10 Hz Alpha Entrainment
+// Zero-static, zero-click, seamless looping — no live oscillators, no context leaks
 window.SovereignBinauralAlpha = (function() {
-    let oscLeft = null;
-    let oscRight = null;
-    let gainNode = null;
+    let alphaVoice = null;
     let isPlaying = false;
 
-    function getAudioContext() {
-        if (!window.audioContext) {
-            const AudioCtx = window.AudioContext || window.webkitAudioContext;
-            if (AudioCtx) window.audioContext = new AudioCtx();
+    function getContext() {
+        if (window.AudioCore) {
+            return window.AudioCore.getContext();
         }
-        // Zero-autoplay: resume only with an explicit prior user gesture.
-        if (window.audioContext && window.audioContext.state === "suspended" && typeof audioContextUserGestureReceived !== "undefined" && audioContextUserGestureReceived) {
-            window.audioContext.resume();
-        }
-        return window.audioContext;
+        return null;
     }
 
     function toggle() {
@@ -82606,33 +82601,37 @@ window.SovereignBinauralAlpha = (function() {
     }
 
     function start() {
-        const ctx = getAudioContext();
-        if (!ctx || isPlaying) return;
+        // Gesture gate via AudioCore (single source of truth)
+        if (!window.AudioCore || !window.AudioCore.isGestureReceived()) return;
+        if (isPlaying) return;
+
+        const ctx = getContext();
+        if (!ctx) return;
 
         try {
-            const merger = ctx.createChannelMerger(2);
-            gainNode = ctx.createGain();
-            const dest = window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination;
+            // Use AudioCore's pre-rendered binaural buffer + voice management
+            // This routes through AudioCore's master chain: limiter → DC block → analyser → destination
+            if (window.AudioCore && window.AudioCore.createVoice && window.createBinauralSource) {
+                alphaVoice = window.createBinauralSource(ctx, 'alpha_10hz', 0.15);
+            }
+            if (!alphaVoice) {
+                // Fallback: generate buffer directly if createBinauralSource not available
+                if (window.generateBinauralBuffer) {
+                    const buffer = window.generateBinauralBuffer(ctx, 'alpha_10hz');
+                    if (buffer && window.AudioCore.createVoice) {
+                        alphaVoice = window.AudioCore.createVoice(buffer, true);
+                        if (alphaVoice) {
+                            const targetGain = 0.15 * (window.AudioCore.LIMITER_LINEAR || 0.5);
+                            const now = ctx.currentTime;
+                            alphaVoice.gain.gain.cancelScheduledValues(now);
+                            alphaVoice.gain.gain.setValueAtTime(0.0001, now);
+                            alphaVoice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.03);
+                        }
+                    }
+                }
+            }
+            if (!alphaVoice) return;
 
-            // Carrier: 432 Hz, Offset: 442 Hz -> 10 Hz Alpha Entrainment
-            oscLeft = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-            oscLeft.type = "sine";
-            oscLeft.frequency.setValueAtTime(432, ctx.currentTime);
-
-            oscRight = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-            oscRight.type = "sine";
-            oscRight.frequency.setValueAtTime(442, ctx.currentTime);
-
-            gainNode.gain.setValueAtTime(0.0001, ctx.currentTime);
-            gainNode.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 1.2); // Ultra subtle background tone
-
-            oscLeft.connect(merger, 0, 0);  // Left ear
-            oscRight.connect(merger, 0, 1); // Right ear
-            merger.connect(gainNode);
-            gainNode.connect(dest);
-
-            oscLeft.start();
-            oscRight.start();
             isPlaying = true;
 
             const btn = document.getElementById("toggleBinauralAlphaBtn");
@@ -82641,37 +82640,30 @@ window.SovereignBinauralAlpha = (function() {
                 btn.style.borderColor = "#4ade80";
                 btn.style.color = "#4ade80";
             }
-            console.log("🧠 [BinauralAlpha] 10Hz Alpha tone entrainment started (432Hz/442Hz).");
+            console.log("🧠 [BinauralAlpha] 10Hz Alpha tone entrainment started (432Hz/442Hz) via AudioCore buffer.");
         } catch(e) {
             console.warn("Binaural start error:", e);
         }
     }
 
     function stop() {
-        const ctx = getAudioContext();
-        if (!isPlaying || !ctx) return;
+        if (!isPlaying || !alphaVoice) return;
         try {
-            if (gainNode) {
-                gainNode.gain.setValueAtTime(gainNode.gain.value, ctx.currentTime);
-                gainNode.gain.linearRampToValueAtTime(0.0001, ctx.currentTime + 0.5);
-            }
-            setTimeout(() => {
-                if (oscLeft) { try { oscLeft.stop(); oscLeft.disconnect(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); } }
-                if (oscRight) { try { oscRight.stop(); oscRight.disconnect(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); } }
-                if (gainNode) { try { gainNode.disconnect(); gainNode = null; } catch (e) {} }
-                isPlaying = false;
-            }, 550);
-
-            const btn = document.getElementById("toggleBinauralAlphaBtn");
-            if (btn) {
-                btn.textContent = "🧠 تفعيل تدفق 10Hz Alpha";
-                btn.style.borderColor = "rgba(74,222,128,0.25)";
-                btn.style.color = "#888";
-            }
-            console.log("🧠 [BinauralAlpha] 10Hz Alpha tone stopped.");
+            // Instant stop with AudioCore's 30ms click-free fade
+            alphaVoice.stop();
+            alphaVoice = null;
+            isPlaying = false;
         } catch(e) {
             console.warn("Binaural stop error:", e);
         }
+
+        const btn = document.getElementById("toggleBinauralAlphaBtn");
+        if (btn) {
+            btn.textContent = "🧠 تفعيل تدفق 10Hz Alpha";
+            btn.style.borderColor = "rgba(74,222,128,0.25)";
+            btn.style.color = "#888";
+        }
+        console.log("🧠 [BinauralAlpha] 10Hz Alpha tone stopped.");
     }
 
     return {

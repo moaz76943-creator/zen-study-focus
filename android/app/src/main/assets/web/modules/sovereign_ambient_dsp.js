@@ -154,8 +154,11 @@
     let brown = 0;
     // Inline DC block for brown noise (1-pole high-pass at ~10Hz) to prevent
     // integrator drift from accumulating into low-frequency rumble/static.
-    const dcBlockCoeff = Math.exp(-2 * Math.PI * 10 / (typeof window !== 'undefined' && window.AudioCore ? (window.AudioCore.getContext()?.sampleRate || 44100) : 44100));
-    let dcBlockState = 0;
+    // Correct one-pole highpass: y[n] = a * (y[n-1] + x[n] - x[n-1])
+    // where a = exp(-2πfc/fs) — this matches the continuous-time RC filter response.
+    const dcBlockA = Math.exp(-2 * Math.PI * 10 / (typeof window !== 'undefined' && window.AudioCore ? (window.AudioCore.getContext()?.sampleRate || 44100) : 44100));
+    let dcBlockY = 0;
+    let dcBlockXPrev = 0;
     for (let i = 0; i < n; i++) {
       const white = Math.random() * 2 - 1;
       b0 = 0.99886 * b0 + white * 0.0555179;
@@ -174,9 +177,12 @@
         // accumulation rails at ±1 under hard clamp.
         brown = BROWN_POLE * brown + white * BROWN_GAIN;
         const raw = brown * BROWN_NOISE_AMP;
-        // Inline DC block: high-pass the integrator output
-        data[i] = raw - dcBlockState + dcBlockCoeff * (data[i-1] || 0);
-        dcBlockState = raw;
+        // Inline DC block: one-pole high-pass at ~10Hz
+        // y[n] = a * (y[n-1] + x[n] - x[n-1])
+        const y = dcBlockA * (dcBlockY + raw - dcBlockXPrev);
+        data[i] = y;
+        dcBlockY = y;
+        dcBlockXPrev = raw;
       }
     }
     // DC-removal pass: zero-mean loop boundary, kills hum/static on wrap.
