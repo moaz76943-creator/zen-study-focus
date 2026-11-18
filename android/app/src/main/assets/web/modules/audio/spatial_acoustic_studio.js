@@ -183,29 +183,20 @@
       const data = channelData[0];
       const bufferSize = Math.floor(sampleRate * totalSec);
 
-      // Swell frequency adaptive to buffer duration so exactly one full
-      // cycle fits in the buffer — guarantees seamless loop wrap at any
-      // duration (0.2 Hz only works for 5s buffers).
-      const swellHz = 1 / durationSec;
       // Brown noise: leaky integrator of WHITE noise (-6dB/oct slope).
-      // Integrating the Kellet pink signal doubled the infrasonic weight
-      // into a constant pressure rumble that bled through the loop as hiss.
+      // Using AudioCore's BROWN_NOISE_AMP (0.045) for consistent fixed-output scale.
+      // The old *0.05 with swell modulation caused loop-boundary discontinuities
+      // perceived as static/hiss. Fixed gain with AudioCore's crossfade is clean.
       let brownAccum = 0;
-      let peak = 0;
       for (let i = 0; i < bufferSize; i++) {
         const white = Math.random() * 2 - 1;
-        // Leaky integrator: bounded DC, no drift
-        brownAccum = BROWN_POLE * brownAccum + white * BROWN_GAIN; // AudioCore's BROWN_POLE & BROWN_GAIN
-        const t = i / sampleRate;
-        // 0.55..1.0 swell, keeps the noise well below the limiter ceiling.
-        const swell = 0.55 + 0.45 * (0.5 + 0.5 * Math.sin(2 * Math.PI * swellHz * t));
-        // Fixed output scale (peak ≈ 0.55) — the old *0.8 gain left 75% of
-        // samples above ±1 and hard-clamped into harsh static.
-        const v = brownAccum * 0.05 * swell;
-        data[i] = v;
-        if (Math.abs(v) > peak) peak = Math.abs(v);
+        // Leaky integrator: bounded DC, no drift (AudioCore's constants)
+        brownAccum = BROWN_POLE * brownAccum + white * BROWN_GAIN;
+        // Fixed output scale using AudioCore's BROWN_NOISE_AMP — no swell modulation,
+        // no amplitude variation that breaks seamless loop crossfade.
+        data[i] = brownAccum * BROWN_NOISE_AMP;
       }
-      // Amplitude is controlled here by fixed gain — no peak normalization.
+      // AudioCore's createSeamlessBuffer handles DC removal, clamp, and 20ms crossfade.
     }, 1, false);
   }
 
@@ -328,18 +319,23 @@
         try {
           const now = this.audioCtx.currentTime;
           const fade = FADE_OUT_SEC;
-          const fadeGain = this.audioCtx.createGain();
-          fadeGain.gain.setValueAtTime(1, now);
-          fadeGain.gain.linearRampToValueAtTime(0, now + fade);
-          source.disconnect();
-          source.connect(fadeGain);
-          fadeGain.connect(this.eqFilters[0]);
+          // Fade using the existing masterGain in the EQ chain (no new nodes).
+          if (this.masterGain) {
+            this.masterGain.gain.cancelScheduledValues(now);
+            this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
+            this.masterGain.gain.linearRampToValueAtTime(0, now + fade);
+          }
           source.stop(now + fade + 0.005);
-          // Tear the fade chain down once the source actually ends — otherwise
-          // every stop() leaks a live fadeGain wired into the EQ bus.
-          source.onended = function () {
+          // Tear down source and restore masterGain after fade completes.
+          source.onended = () => {
             try { source.disconnect(); } catch (_) {}
-            try { fadeGain.disconnect(); } catch (_) {}
+            if (this.masterGain && this.audioCtx) {
+              const t = this.audioCtx.currentTime;
+              this.masterGain.gain.cancelScheduledValues(t);
+              this.masterGain.gain.setValueAtTime(
+                this.options.defaultVolume * LIMITER_LINEAR, t
+              );
+            }
           };
         } catch (e) {
           try { source.stop(); } catch (_) {}

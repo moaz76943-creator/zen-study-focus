@@ -35,27 +35,7 @@
       this.ctx = null;
       this.activeTracks = {};
       this.isMuted = false;
-      this.userInteracted = false;
-      this.bindGestureUnlock();
-    }
-
-    bindGestureUnlock() {
-      if (typeof document === 'undefined' || this._gestureBound) return;
-      this._gestureBound = true;
-      const unlock = () => {
-        this.userInteracted = true;
-        // Resume shared context if available
-        const sharedCtx = getSharedContext();
-        if (sharedCtx && sharedCtx.state === 'suspended') {
-          sharedCtx.resume().catch(() => {});
-        }
-        document.removeEventListener('pointerdown', unlock);
-        document.removeEventListener('touchstart', unlock);
-        document.removeEventListener('keydown', unlock);
-      };
-      document.addEventListener('pointerdown', unlock, { passive: true });
-      document.addEventListener('touchstart', unlock, { passive: true });
-      document.addEventListener('keydown', unlock, { passive: true });
+      // Gesture detection delegated to AudioCore (single source of truth)
     }
 
     initContext() {
