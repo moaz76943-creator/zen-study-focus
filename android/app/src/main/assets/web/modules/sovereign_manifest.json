@@ -17,12 +17,6 @@
       "description": "Error-isolated SovereignEventBus, DeltaClock, and WorkerTimer."
     },
     {
-      "id": "sovereign_audio_suite",
-      "file": "modules/sovereign_audio_suite.js",
-      "required": false,
-      "description": "Procedural 432Hz chimes and binaural Alpha wave synthesis (Web Audio DSP)."
-    },
-    {
       "id": "sovereign_analytics_suite",
       "file": "modules/sovereign_analytics_suite.js",
       "required": false,
@@ -183,14 +177,6 @@
       "file": "modules/sovereign_semantic_search.js",
       "description": "On-device semantic search, deterministic token vectorizer & embeddings cache for sovereign offline discovery.",
       "type": "ai"
-    },
-    {
-      "id": "sovereign_audio_cues",
-      "name": "Sovereign Audio Cues",
-      "version": "612.0.0",
-      "file": "modules/sovereign_audio_cues.js",
-      "description": "On-device Web Audio API synthesizer, harmonic Tibetan Zen bells, binaural focus tones & offline speech prompts.",
-      "type": "audio"
     },
     {
       "id": "sovereign_distraction_shield",
