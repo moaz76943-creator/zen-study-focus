@@ -104,15 +104,17 @@
       root.style.setProperty('--df-webview-padding-bottom', '0px', 'important');
 
       // Capsule height: base 100px, but respect actual nav bar height if larger.
-      // The native paddingBottom (insets.paddingBottom) includes the true nav bar height.
-      // Use max of calibrated 100px and native paddingBottom to handle tall Xiaomi 3-button bars.
-      var capsuleHeight = Math.max(100, insets.paddingBottom || 100);
+      // Use insets.bottom (nav bar height WITHOUT IME) — insets.paddingBottom includes IME
+      // and would incorrectly grow the capsule when the keyboard opens, pushing the
+      // Studios pill and FAB down into content. MainActivity sends navBottomDp as 'bottom'
+      // and max(navBottom, IME) as 'paddingBottom'; we must use the former for dock math.
+      var capsuleHeight = Math.max(100, insets.bottom || 100);
       root.style.setProperty('--df-capsule-height', capsuleHeight + 'px', 'important');
 
       // Bottom nav clearance: dock gap (12) + capsuleHeight + gap to Studios (8) + Studios pill height (48)
-      // + gap to FAB (8) + FAB height (54) = 130px base. Add native paddingBottom as floor for safety.
+      // + gap to FAB (8) + FAB height (54) = 130px base. Add native nav bar height (insets.bottom) as floor.
       // This ensures in-flow content (last card) ends above the floating layers on all devices.
-      var bottomNavClearance = Math.max(280, capsuleHeight + 130, insets.paddingBottom + 180);
+      var bottomNavClearance = Math.max(280, capsuleHeight + 130, (insets.bottom || 100) + 180);
       root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
 
       // Studios pill position: docked above capsule via --df-capsule-height
