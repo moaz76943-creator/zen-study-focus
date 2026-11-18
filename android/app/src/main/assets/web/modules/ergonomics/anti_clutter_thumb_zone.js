@@ -94,7 +94,7 @@
       const styles = `
         .df-floating-pill {
           position: fixed;
-          bottom: var(--df-studios-pill-bottom, calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px));
+          bottom: var(--df-studios-pill-bottom, 146px);
           left: 50%;
           transform: translateX(-50%);
           background: rgba(15, 23, 42, 0.92);

@@ -49,16 +49,17 @@
          SovereignInsetsCalibrator (single owner = native padding), so every
          calc() below that references them resolves to the safe content edge.
          --df-bottom-nav-clearance is the dock reserve ABOVE the native inset only
-         (capsule + Studios pill + FAB zone); it never includes the nav inset. */
+         (capsule + Studios pill + FAB zone); it never includes the nav inset.
+         Fallbacks match calibrator minimums: capsule 100dp, Studios pill 120dp,
+         FAB 176dp, bottom clearance 280dp. */
       --df-dock-gap: 12px;
-      --df-capsule-height: 70px;
-      --df-dock-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px));
-      --df-studios-pill-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px);
-      --df-fab-bottom: calc(var(--df-studios-pill-bottom, 146px) + 48px + 8px);
-      --df-float-bottom: var(--df-studios-pill-bottom, 146px);
-      --df-inflow-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px));
-      --df-dock-reserve: calc(var(--df-dock-gap, 12px) + 74px);
-      --df-bottom-nav-clearance: var(--df-dock-reserve, 144px);
+      --df-capsule-height: 100px;
+      --df-dock-bottom: calc(var(--df-dock-gap, 12px));
+      --df-studios-pill-bottom: 120px;
+      --df-fab-bottom: 176px;
+      --df-float-bottom: 120px;
+      --df-inflow-bottom: var(--df-bottom-nav-clearance, 280px);
+      --df-bottom-nav-clearance: 280px;
     }
 
     * {
@@ -68,9 +69,9 @@
       -webkit-tap-highlight-color: transparent;
     }
     /* Reserve clears the docked bottom stack; the pillar7 body rule (later, !important)
-       computes the same reserve. Keep both identical: a flat dock-gap+capsule+float sum here
-       (e.g. 76px) is BELOW the ~82px capsule footprint and would clip the last card. */
-    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px)); overflow-x: hidden; user-select: none; }
+       computes the same reserve. Keep both identical: uses --df-inflow-bottom which
+       resolves to --df-bottom-nav-clearance (280px fallback, calibrator updates). */
+    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: var(--df-inflow-bottom, 280px); overflow-x: hidden; user-select: none; }
     input, textarea { user-select: text; text-align: start; }
 
     body.deep-lockdown .dynamic-hero-header,
@@ -361,7 +362,7 @@
     .lcard-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.68rem; color: var(--text-light); }
 
     .floating-plus-fab {
-      position: fixed; bottom: var(--df-fab-bottom, calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px + 48px + 8px)); left: 24px; width: 54px; height: 54px;
+      position: fixed; bottom: var(--df-fab-bottom, calc(var(--df-studios-pill-bottom, 146px) + 48px + 8px)); left: 24px; width: 54px; height: 54px;
       border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       border: none; color: #ffffff; font-size: 1.7rem; display: flex; align-items: center;
       justify-content: center; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
@@ -466,9 +467,9 @@
     .bottom-nav-capsule {
       position: fixed;
       /* Docked just above the WebView content-area bottom, which MainActivity already
-         pads clear of the 3-button nav bar. Uses --df-webview-padding-bottom (actual
-         WebView padding) + dock gap so capsule sits just above content, never in system bars. */
-      bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px));
+         pads clear of the 3-button nav bar. Uses --df-dock-bottom (dock gap only;
+         --df-webview-padding-bottom is 0px pinned by calibrator). */
+      bottom: var(--df-dock-bottom, 12px);
       width: calc(100% - 20px);
       max-width: 420px;
       left: 50%;
@@ -925,8 +926,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     body {
       padding-top: var(--df-sat);
       /* Body content padding clears the floating
-         elements (FAB, Studios pill) above the capsule. */
-      padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px)) !important;
+         elements (FAB, Studios pill) above the capsule.
+         --df-webview-padding-bottom is pinned to 0px by calibrator; use --df-inflow-bottom. */
+      padding-bottom: var(--df-inflow-bottom, 280px) !important;
       padding-left: var(--df-sal);
       padding-right: var(--df-sar);
     }
@@ -953,8 +955,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         padding-bottom: 22px !important;
       }
       .bottom-nav-capsule {
-        /* Docked a fixed gap above the safe content edge (native parent padding owns the nav bar). */
-        bottom: var(--df-dock-bottom, calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px))) !important;
+        /* Docked a fixed gap above the safe content edge (native parent padding owns the nav bar).
+           --df-webview-padding-bottom is 0px (calibrator); --df-dock-bottom uses dock-gap only. */
+        bottom: var(--df-dock-bottom, 12px) !important;
         padding: 5px 3px !important;
         padding-bottom: 5px !important;
       }
@@ -1042,8 +1045,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     .bottom-nav-capsule {
       position: fixed !important;
       /* Docked a fixed gap above the safe content edge (--df-webview-padding-bottom is pinned
-         0px by the calibrator); never inside the system nav bar. */
-      bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px)) !important;
+         0px by the calibrator); never inside the system nav bar. Uses --df-dock-bottom. */
+      bottom: var(--df-dock-bottom, 12px) !important;
       left: 50% !important;
       transform: translateX(-50%) !important;
       width: min(calc(100% - 16px), 540px) !important;
@@ -1400,8 +1403,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
       body {
         padding-top: max(16px, max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px))) !important;
         /* Body padding-bottom = fixed clearance for floating
-           elements (FAB, Studios pill). */
-        padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px)) !important;
+           elements (FAB, Studios pill). --df-webview-padding-bottom is 0px (calibrator). */
+        padding-bottom: var(--df-inflow-bottom, 280px) !important;
       }
       .app-shell {
         display: flex !important;
@@ -1418,8 +1421,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         height: min(66vw, 252px) !important;
       }
       .bottom-nav-capsule {
-        /* Docked a fixed gap above the safe content edge (native parent padding owns the nav bar). */
-        bottom: var(--df-dock-bottom, calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px))) !important;
+        /* Docked a fixed gap above the safe content edge (native parent padding owns the nav bar).
+           --df-webview-padding-bottom is 0px (calibrator); --df-dock-bottom uses dock-gap only. */
+        bottom: var(--df-dock-bottom, 12px) !important;
       }
     }
 
@@ -1469,12 +1473,13 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         will-change: transform;
     }
     /* Edge-to-Edge Safe Area Insets for Android 15 / Xiaomi 17T Pro
-       Native parent padding owns all system-bar insets; CSS env() must not re-add them. */
+       Native parent padding owns all system-bar insets; CSS env() must not re-add them.
+       --df-webview-padding-bottom is pinned to 0px by calibrator; use --df-inflow-bottom. */
     body {
         padding-top: var(--df-safe-top, 0px);
         /* Body content padding clears the floating
            elements (FAB, Studios pill). */
-        padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px));
+        padding-bottom: var(--df-inflow-bottom, 280px);
         padding-left: var(--df-safe-left, 0px);
         padding-right: var(--df-safe-right, 0px);
     }
@@ -1553,7 +1558,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
 <!-- TASK #811: Bottom Nav Clearance & Long-Language Button Wrap -->
 <style id="task-811-layout-fix">
   main, .tab-content, .view-section, section[id*="view"], div[id*="view"], #app {
-    padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px)) !important;
+    /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (280px fallback). */
+    padding-bottom: var(--df-inflow-bottom, 280px) !important;
   }
   button, .pill, .chip, .tab-btn {
     white-space: normal !important;
@@ -1571,7 +1577,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     border: 1px solid #CBD5E1 !important;
   }
   .fab, #addNoteFab, button[class*="fab"] {
-    bottom: var(--df-fab-bottom, calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px + 48px + 8px)) !important;
+    bottom: var(--df-fab-bottom, calc(var(--df-studios-pill-bottom, 146px) + 48px + 8px)) !important;
     z-index: 40 !important;
   }
   nav button, .bottom-nav button, .nav-bar button {
@@ -1731,7 +1737,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     align-self: center !important;
   }
   main, .tab-content, .tab-panel {
-    padding-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px)) !important;
+    /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (280px fallback). */
+    padding-bottom: var(--df-inflow-bottom, 280px) !important;
   }
   [data-i18n="ui_local_data"], [data-i18n="ui_local_data"] *,
   #localDataBadge, #localDataBadge * {

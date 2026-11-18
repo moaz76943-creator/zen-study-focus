@@ -550,11 +550,10 @@
             pill.setAttribute("aria-label", (document.documentElement.lang || "").toLowerCase().indexOf("ar") === 0 ? "فتح لوحة الاستوديوهات والأدوات" : "Open studios and tools panel");
             pill.style.position = "fixed";
             // Docked to the bottom-right corner above the bottom nav capsule: never covers the FAB (left) or the centred nav tabs.
-            // Use calibrator CSS variables for Android 15 edge-to-edge.
-            // WebView viewport already ends above the system nav bar: MainActivity pads
-            // the parent FrameLayout, and --df-webview-padding-bottom is pinned to 0px.
-            // Pill docks above the capsule: WebView padding-bottom + dock gap + capsule height + 8px gap.
-            pill.style.bottom = "calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px)";
+            // Use calibrator CSS variable --df-studios-pill-bottom (single owner: SovereignInsetsCalibrator).
+            // MainActivity pads the parent FrameLayout; --df-webview-padding-bottom is pinned to 0px by the calibrator.
+            // The calibrator computes: dock gap (12) + capsuleHeight + 8px gap above capsule.
+            pill.style.bottom = "var(--df-studios-pill-bottom, 146px)";
             pill.style.right = "12px";
             pill.style.left = "auto";
             pill.style.transform = "none";

@@ -81,16 +81,17 @@ console.log('✔ Calibrator pins safe-area variables to 0px and publishes the do
     }
   }
 }
-// Body must reserve clearance above the native inset edge. The pillar7 rule (later, !important)
-// and the weak rule up top must both stay on the same formula.
-const bodyReserve = /padding-bottom:\s*calc\(var\(--df-webview-padding-bottom, 56px\) \+ var\(--df-bottom-nav-clearance, 144px\)\)/g;
+// Body must reserve clearance above the native inset edge using --df-inflow-bottom
+// (which resolves to --df-bottom-nav-clearance since --df-webview-padding-bottom is 0px).
+// The pillar7 rule (later, !important) and the weak rule up top must both stay on the same formula.
+const bodyReserve = /padding-bottom:\s*var\(--df-inflow-bottom,\s*280px\)/g;
 assert.ok((html.match(bodyReserve) || []).length >= 2,
-  'body must reserve --df-bottom-nav-clearance above the native inset edge (all body rules)');
+  'body must reserve --df-inflow-bottom above the native inset edge (all body rules)');
 console.log('✔ index.html body reserves clearance via calibrated variables.');
 
 // ---- touch_restorer.css: no fixed bar parked at bottom: 0 ----
 const barBlock = touchRestorer.slice(touchRestorer.indexOf('.bottom-nav-bar {'));
-assert.ok(barBlock.includes('bottom: calc(var(--df-webview-padding-bottom, 0px) + var(--df-dock-gap, 12px))'),
+assert.ok(barBlock.includes('bottom: var(--df-dock-bottom, 12px)'),
   '.bottom-nav-bar must dock above the 3-button nav bar via calibrator variables');
 assert.ok(!/bottom:\s*0;/.test(barBlock), '.bottom-nav-bar must not use bottom: 0');
 console.log('✔ touch_restorer.css .bottom-nav-bar docks above the nav bar.');
@@ -98,7 +99,7 @@ console.log('✔ touch_restorer.css .bottom-nav-bar docks above the nav bar.');
 // ---- app.js dynamic layers: scratchpad trigger must dock via calibrator variables, below modals ----
 const scratch = appJs.slice(appJs.indexOf("'df-float-scratch-btn'"), appJs.indexOf('const self = this;', appJs.indexOf("'df-float-scratch-btn'")));
 assert.ok(scratch.includes("'fixed'"), 'scratchpad trigger must be position:fixed');
-assert.ok(scratch.includes('var(--df-webview-padding-bottom'),
+assert.ok(scratch.includes('var(--df-studios-pill-bottom'),
   'scratchpad trigger must dock via calibrated inset variables, never bottom: 24px');
 assert.ok(!/bottom\s*=\s*'24px'/.test(scratch), 'scratchpad trigger must not hardcode bottom: 24px');
 assert.ok(scratch.includes("zIndex = '150'"),
