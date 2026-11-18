@@ -86,10 +86,11 @@
     masterGain = ctx.createGain();
     masterGain.gain.setValueAtTime(0.7 * LIMITER_LINEAR, ctx.currentTime);
 
-    // Master limiter (catches any overshoot from stacked voices)
+    // Master limiter (catches only true overshoot near 0dBFS, not normal playback)
+    // Threshold at -3dB with 6dB knee: compression only engages above -6dB
     masterLimiter = ctx.createDynamicsCompressor();
-    masterLimiter.threshold.setValueAtTime(-12, ctx.currentTime);
-    masterLimiter.knee.setValueAtTime(24, ctx.currentTime);
+    masterLimiter.threshold.setValueAtTime(-3, ctx.currentTime);
+    masterLimiter.knee.setValueAtTime(6, ctx.currentTime);
     masterLimiter.ratio.setValueAtTime(20, ctx.currentTime);
     masterLimiter.attack.setValueAtTime(0.001, ctx.currentTime);
     masterLimiter.release.setValueAtTime(0.1, ctx.currentTime);
@@ -187,47 +188,52 @@
   }
 
   // ── Noise Generators ──────────────────────────────────────────────
-  function generateWhiteNoise(data, sampleRate, durationSec) {
-    const len = data.length;
-    // Low amplitude — 15Hz DC block downstream removes any residual
-    for (let i = 0; i < len; i++) {
-      data[i] = (Math.random() * 2 - 1) * WHITE_NOISE_AMP;
+  function generateWhiteNoise(channelData, sampleRate, durationSec) {
+    for (let ch = 0; ch < channelData.length; ch++) {
+      const data = channelData[ch];
+      const len = data.length;
+      for (let i = 0; i < len; i++) {
+        data[i] = (Math.random() * 2 - 1) * WHITE_NOISE_AMP;
+      }
     }
   }
 
-  function generatePinkNoise(data, sampleRate, durationSec) {
-    const len = data.length;
-    let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-    for (let i = 0; i < len; i++) {
-      const white = Math.random() * 2 - 1;
-      b0 = 0.99886 * b0 + white * 0.0555179;
-      b1 = 0.99332 * b1 + white * 0.0750759;
-      b2 = 0.96900 * b2 + white * 0.1538520;
-      b3 = 0.86650 * b3 + white * 0.3104856;
-      b4 = 0.55000 * b4 + white * 0.5329522;
-      b5 = -0.7616 * b5 - white * 0.0168980;
-      b6 = white * 0.115926;
-      data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * PINK_NOISE_AMP;
+  function generatePinkNoise(channelData, sampleRate, durationSec) {
+    for (let ch = 0; ch < channelData.length; ch++) {
+      const data = channelData[ch];
+      const len = data.length;
+      let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+      for (let i = 0; i < len; i++) {
+        const white = Math.random() * 2 - 1;
+        b0 = 0.99886 * b0 + white * 0.0555179;
+        b1 = 0.99332 * b1 + white * 0.0750759;
+        b2 = 0.96900 * b2 + white * 0.1538520;
+        b3 = 0.86650 * b3 + white * 0.3104856;
+        b4 = 0.55000 * b4 + white * 0.5329522;
+        b5 = -0.7616 * b5 - white * 0.0168980;
+        b6 = white * 0.115926;
+        data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * PINK_NOISE_AMP;
+      }
     }
   }
 
-  function generateBrownNoise(data, sampleRate, durationSec) {
-    const len = data.length;
-    let brown = 0;
-    let peak = 0;
-    // Leaky integrator of WHITE noise (true -6dB/oct brown).
-    // Pole 0.997 keeps DC bounded over 5s buffers.
-    for (let i = 0; i < len; i++) {
-      const white = Math.random() * 2 - 1;
-      brown = BROWN_POLE * brown + white * BROWN_GAIN;
-      data[i] = brown;
-      const a = Math.abs(brown);
-      if (a > peak) peak = a;
-    }
-    // Peak normalize brown specifically (it has higher crest factor)
-    if (peak > 0) {
-      const norm = 0.9 / peak;
-      for (let i = 0; i < len; i++) data[i] *= norm;
+  function generateBrownNoise(channelData, sampleRate, durationSec) {
+    for (let ch = 0; ch < channelData.length; ch++) {
+      const data = channelData[ch];
+      const len = data.length;
+      let brown = 0;
+      let peak = 0;
+      for (let i = 0; i < len; i++) {
+        const white = Math.random() * 2 - 1;
+        brown = BROWN_POLE * brown + white * BROWN_GAIN;
+        data[i] = brown;
+        const a = Math.abs(brown);
+        if (a > peak) peak = a;
+      }
+      if (peak > 0) {
+        const norm = 0.9 / peak;
+        for (let i = 0; i < len; i++) data[i] *= norm;
+      }
     }
   }
 

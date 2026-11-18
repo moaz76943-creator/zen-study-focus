@@ -182,7 +182,10 @@
       const data = channelData[0];
       const bufferSize = Math.floor(sampleRate * totalSec);
 
-      const swellHz = 0.08;
+      // Swell frequency chosen so integer cycles fit in buffer duration
+      // 0.2 Hz = 1 cycle per 5s, 0.4 Hz = 2 cycles per 5s, etc.
+      // Using 0.2 Hz ensures perfect loop continuity of the amplitude envelope.
+      const swellHz = 0.2;
       // Brown noise: leaky integrator of WHITE noise (-6dB/oct slope).
       // Integrating the Kellet pink signal doubled the infrasonic weight
       // into a constant pressure rumble that bled through the loop as hiss.

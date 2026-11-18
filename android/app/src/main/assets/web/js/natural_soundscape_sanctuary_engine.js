@@ -99,15 +99,15 @@
               data[i] = brownAccum;
             } else {
               // Campfire crackle: sparse pops on low noise floor
+              // Track noise floor peak separately from pops for consistent normalization
               const pop = Math.random() > 0.9985 ? (Math.random() * 2 - 1) * 0.8 : 0;
               b0 = 0.99 * b0 + white * 0.02;
-              data[i] = b0 * 0.1 + pop;
+              const noiseFloor = b0 * 0.1;
+              data[i] = noiseFloor + pop;
+              // Track peak of noise floor only (pops are rare transients, clamped later)
+              const absFloor = Math.abs(noiseFloor);
+              if (absFloor > peak) peak = absFloor;
             }
-            // Peak tracked for EVERY noise family so rain/fire normalize to the
-            // same 0.9 ceiling as ocean — rain/fire previously never normalized,
-            // so loudness and loop-restart consistency varied by sound type.
-            const absV = Math.abs(data[i]);
-            if (absV > peak) peak = absV;
           }
           // AudioCore's createSeamlessBuffer handles DC removal, normalization, clamp
         }, 1);

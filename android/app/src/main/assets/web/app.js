@@ -5628,32 +5628,35 @@ function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
     }
   }
   if (!generatorFn) {
-    // Fallback generators (matching AudioCore's implementation)
-    generatorFn = (data, sampleRate, totalSec) => {
+    // Fallback generators (matching AudioCore's implementation) — accept channelData array
+    generatorFn = (channelData, sampleRate, totalSec) => {
       const bufferSize = Math.floor(sampleRate * totalSec);
-      if (color === 'white') {
-        for (let i = 0; i < bufferSize; i++) {
-          data[i] = (Math.random() * 2 - 1) * 0.06;
-        }
-      } else if (color === 'pink') {
-        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-        for (let i = 0; i < bufferSize; i++) {
-          const white = Math.random() * 2 - 1;
-          b0 = 0.99886 * b0 + white * 0.0555179;
-          b1 = 0.99332 * b1 + white * 0.0750759;
-          b2 = 0.96900 * b2 + white * 0.1538520;
-          b3 = 0.86650 * b3 + white * 0.3104856;
-          b4 = 0.55000 * b4 + white * 0.5329522;
-          b5 = -0.7616 * b5 - white * 0.0168980;
-          b6 = white * 0.115926;
-          data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.08;
-        }
-      } else if (color === 'brown') {
-        let brown = 0;
-        for (let i = 0; i < bufferSize; i++) {
-          const white = Math.random() * 2 - 1;
-          brown = 0.997 * brown + white * 0.4; // AudioCore's BROWN_POLE & BROWN_GAIN
-          data[i] = brown;
+      for (let ch = 0; ch < channelData.length; ch++) {
+        const data = channelData[ch];
+        if (color === 'white') {
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * 0.06;
+          }
+        } else if (color === 'pink') {
+          let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+          for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            b0 = 0.99886 * b0 + white * 0.0555179;
+            b1 = 0.99332 * b1 + white * 0.0750759;
+            b2 = 0.96900 * b2 + white * 0.1538520;
+            b3 = 0.86650 * b3 + white * 0.3104856;
+            b4 = 0.55000 * b4 + white * 0.5329522;
+            b5 = -0.7616 * b5 - white * 0.0168980;
+            b6 = white * 0.115926;
+            data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.08;
+          }
+        } else if (color === 'brown') {
+          let brown = 0;
+          for (let i = 0; i < bufferSize; i++) {
+            const white = Math.random() * 2 - 1;
+            brown = 0.997 * brown + white * 0.4; // AudioCore's BROWN_POLE & BROWN_GAIN
+            data[i] = brown;
+          }
         }
       }
     };
@@ -14099,13 +14102,13 @@ window.FlashQuizEngine = FlashQuizEngine;
         const ctx = _binauralSource.source.context || _binauralCtx;
         if (ctx) {
           const now = ctx.currentTime;
-          const fadeOutSec = 0.06;
+          const fadeOutSec = 0.03; // AudioCore standard instant stop
           if (_binauralSource.gain) {
             _binauralSource.gain.gain.cancelScheduledValues(now);
             _binauralSource.gain.gain.setValueAtTime(_binauralSource.gain.gain.value, now);
             _binauralSource.gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
           }
-          _binauralSource.source.stop(now + fadeOutSec + 0.01);
+          _binauralSource.source.stop(now + fadeOutSec + 0.005);
         } else {
           _binauralSource.source.stop();
         }
@@ -20452,11 +20455,11 @@ window.dfSynthesizeHarmonic432TuningAcoustics = function(audioCtx, options) {
       if (binauralSource) {
         try {
           const now = audioCtx.currentTime;
-          const fadeOutSec = 0.06;
+          const fadeOutSec = 0.03; // AudioCore standard instant stop
           binauralSource.gain.gain.cancelScheduledValues(now);
           binauralSource.gain.gain.setValueAtTime(binauralSource.gain.gain.value, now);
           binauralSource.gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
-          binauralSource.source.stop(now + fadeOutSec + 0.01);
+          binauralSource.source.stop(now + fadeOutSec + 0.005);
         } catch (e) {
           try { binauralSource.source.stop(); } catch (_) {}
         }
@@ -20552,11 +20555,11 @@ window.dfSynthesizeGamma40HzBlitzEntrainment = function(audioCtx, options) {
       if (binauralSource) {
         try {
           const now = audioCtx.currentTime;
-          const fadeOutSec = 0.06;
+          const fadeOutSec = 0.03; // AudioCore standard instant stop
           binauralSource.gain.gain.cancelScheduledValues(now);
           binauralSource.gain.gain.setValueAtTime(binauralSource.gain.gain.value, now);
           binauralSource.gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
-          binauralSource.source.stop(now + fadeOutSec + 0.01);
+          binauralSource.source.stop(now + fadeOutSec + 0.005);
         } catch (e) {
           try { binauralSource.source.stop(); } catch (_) {}
         }
