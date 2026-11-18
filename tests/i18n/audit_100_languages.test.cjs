@@ -46,7 +46,7 @@ const COGNATE_ALLOWLIST = new Set([
   'Tag', 'Term → Definition', 'Timer', 'Total', 'Type', 'Water {0}/{1}', 'Workout', 'Workout {0}/{1}',
   'Zen Sanctuary', 'Zen Study Suite', 'e.g., Action Potential, Dijkstra Algorithm, Photosynthesis, SVD...',
   'fixation', 'lexical', 'min', 'minutes', 'peripheral', 'regression', 'subvocal', '{0} WPM', '{0}Hz AMOLED',
-  '⏹ Stop', '✏️ Pen', '✨ Mix', '✨ Studios', '🌐 {0}D Spatial Radar', '🎧 {0}D Spatial & {1}Hz',
+  '⏹ Stop', '✏️ Pen', '✨ Mix', '✨ Studios', '🎧 {0}D Spatial & {1}Hz',
   '🎧 {0}D Spatial & {1}Hz ↗', '🎯 Target:', '📥 TXT', '🔉 Volume', '🔖 Bookmark', '🖍️ Highlighter',
   '🧠 {0}Hz / {1}Hz Bio-Frequencies'
 ]);
@@ -123,6 +123,26 @@ test('every official language ships a complete, fresh runtime UI pack with no mi
     const dropped = rt.v.filter((v) => typeof v !== 'string' || !v).length;
     assert.equal(dropped, 0, l.code + ' dropped ' + dropped + ' runtime translations');
   }
+});
+
+// Every runtime UI pack must mirror its reviewable JSON pack value-for-value (freshness check).
+test('every runtime UI pack mirrors its reviewable JSON pack value-for-value', () => {
+  for (const l of nonEnglish) {
+    const jsonPack = JSON.parse(readRepo('i18n/packs/' + l.code + '.json')).t || {};
+    const rt = loadRuntimePack(l.code);
+    const mismatched = [];
+    for (let i = 0; i < srcKeys.length; i++) {
+      const expected = jsonPack[srcKeys[i]];
+      if (rt.v[i] !== expected) mismatched.push(srcKeys[i].slice(0, 40));
+    }
+    assert.deepEqual(mismatched, [], l.code + ' runtime pack drifts from JSON pack: ' + mismatched.join(' | '));
+  }
+});
+
+test('xh spatial radar key is translated and not an English fallback', () => {
+  const t = JSON.parse(readRepo('i18n/packs/xh.json')).t || {};
+  const spatialRadarKey = '🌐 {0}D Spatial Radar';
+  assert.notEqual(t[spatialRadarKey], '🌐 {0}D Spatial Radar', 'xh spatial radar key must be translated, not left as English source');
 });
 
 test('no official language leaves a translatable string in English', () => {
