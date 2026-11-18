@@ -49,11 +49,13 @@
          SovereignInsetsCalibrator (single owner = native padding), so every
          calc() below that references them resolves to the safe content edge.
          --df-bottom-nav-clearance is the dock reserve ABOVE the native inset only
-         (capsule + FAB zone + Studios pill, 144px); it never includes the nav inset. */
+         (capsule + Studios pill + FAB zone); it never includes the nav inset. */
       --df-dock-gap: 12px;
       --df-capsule-height: 70px;
       --df-dock-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px));
-      --df-float-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px);
+      --df-studios-pill-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px);
+      --df-fab-bottom: calc(var(--df-studios-pill-bottom, 146px) + 48px + 8px);
+      --df-float-bottom: var(--df-studios-pill-bottom, 146px);
       --df-inflow-bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-bottom-nav-clearance, 144px));
       --df-dock-reserve: calc(var(--df-dock-gap, 12px) + 74px);
       --df-bottom-nav-clearance: var(--df-dock-reserve, 144px);
@@ -359,7 +361,7 @@
     .lcard-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.68rem; color: var(--text-light); }
 
     .floating-plus-fab {
-      position: fixed; bottom: calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px); left: 24px; width: 54px; height: 54px;
+      position: fixed; bottom: var(--df-fab-bottom, calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px + 48px + 8px)); left: 24px; width: 54px; height: 54px;
       border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       border: none; color: #ffffff; font-size: 1.7rem; display: flex; align-items: center;
       justify-content: center; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
@@ -1568,7 +1570,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     border: 1px solid #CBD5E1 !important;
   }
   .fab, #addNoteFab, button[class*="fab"] {
-    bottom: var(--df-float-bottom, calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px)) !important;
+    bottom: var(--df-fab-bottom, calc(var(--df-webview-padding-bottom, 56px) + var(--df-dock-gap, 12px) + var(--df-capsule-height, 70px) + 8px + 48px + 8px)) !important;
     z-index: 40 !important;
   }
   nav button, .bottom-nav button, .nav-bar button {

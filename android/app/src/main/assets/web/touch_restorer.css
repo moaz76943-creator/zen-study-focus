@@ -151,7 +151,7 @@ button:active, .btn:active, [role="button"]:active {
   align-items: center;
   justify-content: space-around;
   z-index: 1000;
-  padding-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));
+  padding-bottom: var(--df-safe-bottom, 0px);
   box-shadow: 0 -4px 12px rgba(15, 23, 42, 0.04);
 }
 
