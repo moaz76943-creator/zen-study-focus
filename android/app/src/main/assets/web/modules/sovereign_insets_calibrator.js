@@ -95,9 +95,10 @@
      * plus FAB / Studios pill for in-flow content, measured from the safe content edge.
      * --df-studios-pill-bottom: explicit position for the Studios pill above the capsule.
      * --df-fab-bottom: explicit position for the FAB above the Studios pill.
-     * Capsule height and dock positions are computed from the ACTUAL reported nav bar height
-     * (insets.bottom, no defensive floors), so the floating layers hug the real nav bar
-     * on both gesture and 3-button navigation.
+     * Capsule height is a FIXED design constant (100px) — the system nav bar height is
+     * already handled by native parent padding. The capsule is an app-level nav bar
+     * that sits just above the viewport bottom (12px dock gap) on both gesture and
+     * 3-button navigation. Dock positions derive from this fixed capsule height.
      */
     applyCSSVariables: function (insets) {
       if (typeof document === 'undefined' || !document.documentElement) return;
@@ -111,32 +112,33 @@
       root.style.setProperty('--df-safe-right', '0px', 'important');
       root.style.setProperty('--df-webview-padding-bottom', '0px', 'important');
 
-      // Capsule height: base 100px, but respect actual nav bar height if larger.
-      // Use insets.bottom (ACTUAL reported nav bar height from MainActivity, NO defensive floors) —
-      // insets.paddingBottom includes IME and would incorrectly grow the capsule when the keyboard
-      // opens, pushing the Studios pill and FAB down into content. MainActivity sends rawNavBottomDp
-      // as 'bottom' and max(flooredNavBottom, IME) as 'paddingBottom'; we must use the former for dock math.
-      var capsuleHeight = Math.max(100, insets.bottom || 100);
+      // Fixed capsule height (design constant). The system nav bar height is already
+      // accounted for by native parent FrameLayout padding; the capsule is an app-level
+      // bottom nav that docks at the viewport bottom with a 12px gap.
+      var capsuleHeight = 100;
       root.style.setProperty('--df-capsule-height', capsuleHeight + 'px', 'important');
 
-      // Bottom nav clearance: dock gap (12) + capsuleHeight + gap to Studios (8) + Studios pill height (48)
-      // + gap to FAB (8) + FAB height (54) = 130px base. Add native nav bar height (insets.bottom) as floor.
-      // This ensures in-flow content (last card) ends above the floating layers on all devices.
-      // Base floor 480 covers typical nav bars; capsuleHeight scales with actual nav bar height.
-      var bottomNavClearance = Math.max(480, capsuleHeight + 130, (insets.bottom || 100) + 180);
-      root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
-
-      // Studios pill position: docked above capsule via --df-capsule-height
-      // bottom = webview-padding-bottom(0) + dock-gap(12) + capsuleHeight + 8
+      // Studios pill position: docked above capsule
+      // bottom = dock-gap(12) + capsuleHeight(100) + gap(8) = 120px
       var studiosPillBottom = 12 + capsuleHeight + 8;
       root.style.setProperty('--df-studios-pill-bottom', studiosPillBottom + 'px', 'important');
 
-      // FAB position: above Studios pill with 8px gap + FAB height 54px
+      // FAB position: above Studios pill with 8px gap
+      // bottom = studiosPillBottom(120) + StudiosHeight(48) + gap(8) = 176px
       var fabBottom = studiosPillBottom + 48 + 8;
       root.style.setProperty('--df-fab-bottom', fabBottom + 'px', 'important');
 
       // Legacy float-bottom for backward compat (points to Studios pill position)
       root.style.setProperty('--df-float-bottom', studiosPillBottom + 'px', 'important');
+
+      // Bottom nav clearance for in-flow content: must clear the highest floating layer
+      // (FAB top = fabBottom + FABheight(54) = 230px) + gap(12) = 242px minimum.
+      // Also handle IME: insets.paddingBottom = max(flooredNavBottom, IME height).
+      // When keyboard opens, content must clear the keyboard.
+      var floatingLayerClearance = fabBottom + 54 + 12; // 242px
+      var imeClearance = (insets.paddingBottom || insets.bottom || 100) + 12;
+      var bottomNavClearance = Math.max(floatingLayerClearance, imeClearance, 240);
+      root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
     },
 
     onViewportChange: function () {
