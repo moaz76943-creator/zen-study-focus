@@ -23,7 +23,7 @@
   const DC_BLOCK_HZ = 40;                                      // protects transducer coils & brown noise rumble
   const BROWN_POLE = 0.997;                                    // leakier = less DC drift
   const BROWN_GAIN = 0.4;                                      // input gain for brown noise
-  const BROWN_NOISE_AMP = 0.05;                               // fixed output scale — never peak-normalized up
+  const BROWN_NOISE_AMP = 0.045;                               // fixed output scale — reduced from 0.05 for extra headroom against leaky-integrator tail peaks
   const WHITE_NOISE_AMP = 0.06;                                // consistent across all modules
   const PINK_NOISE_AMP = 0.08;                                 // consistent across all modules
 
@@ -34,6 +34,12 @@
   let masterLimiter = null;
   let masterDCBlock = null;
   let analyser = null;
+  // User-chosen master volume (0..1). The master chain is hard-muted to 0 by
+  // stopAllVoices/muteMaster; every re-open path must restore THIS value, not a
+  // hard-coded 0.7 — otherwise Stop→play reset the user's volume and let the
+  // full noise floor back in at the wrong level.
+  let userMasterVolume = 0.7;
+  const MASTER_OPEN = () => userMasterVolume * LIMITER_LINEAR;
   const activeVoices = new Set();        // { source, gain, dcBlock, stopFn }
 
   // Gesture detection (once per session) + visibility change handling
@@ -85,7 +91,7 @@
   function buildMasterChain(ctx) {
     // Master gain (user volume * limiter ceiling)
     masterGain = ctx.createGain();
-    masterGain.gain.setValueAtTime(0.7 * LIMITER_LINEAR, ctx.currentTime);
+    masterGain.gain.setValueAtTime(MASTER_OPEN(), ctx.currentTime);
 
     // Master limiter (catches any overshoot from stacked voices)
     masterLimiter = ctx.createDynamicsCompressor();
@@ -122,12 +128,13 @@
 
   // ── Seamless Buffer Generation ───────────────────────────────────
   /**
-   * Creates a click-free looping buffer.
+   * Creates a click-free looping buffer with guaranteed zero-static output.
    * @param {AudioContext} ctx
    * @param {number} durationSec - final loop duration
    * @param {Function} generatorFn(channelData, sampleRate, totalSec) - fills temp buffer
    * @param {number} numChannels - 1 (mono) or 2 (stereo)
-   * @param {boolean} normalize - attenuate-only peak limiter above 0.95 (never amplifies; default true is safe for OGG, pass false for procedural noise where the generator already controls amplitude)
+   * @param {boolean} normalize - DEPRECATED: attenuate-only peak limiter now ALWAYS runs
+   *    (never amplifies; only catches genuine overshoot from leaky integrators etc.)
    * @returns {AudioBuffer} ready for BufferSourceNode.loop = true
    */
   function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1, normalize = true) {
@@ -146,7 +153,7 @@
     // Generate continuous signal (includes xfade tail)
     generatorFn(channelData, ctx.sampleRate, totalSec);
 
-    // Post-process each channel: DC removal → peak norm → hard clamp
+    // Post-process each channel: DC removal → peak norm (attenuate-only, ALWAYS) → hard clamp
     for (let ch = 0; ch < numChannels; ch++) {
       const data = channelData[ch];
 
@@ -156,21 +163,20 @@
       mean /= bufferSize;
       for (let i = 0; i < bufferSize; i++) data[i] -= mean;
 
-      // 2. Optional peak limiter: attenuate-only. Never amplify (normalizing
-      //    quiet buffers up amplified the noise floor into constant hiss).
-      if (normalize) {
-        let peak = 0;
-        for (let i = 0; i < bufferSize; i++) {
-          const a = Math.abs(data[i]);
-          if (a > peak) peak = a;
-        }
-        if (peak > 0.95) {
-          const norm = 0.95 / peak;
-          for (let i = 0; i < bufferSize; i++) data[i] *= norm;
-        }
+      // 2. Peak limiter: ALWAYS attenuate-only. Never amplify — normalizing quiet
+      //    buffers up amplified the noise floor into constant hiss. This catches
+      //    genuine overshoot from leaky integrators (brown noise) or OGG assets.
+      let peak = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const a = Math.abs(data[i]);
+        if (a > peak) peak = a;
+      }
+      if (peak > 0.95) {
+        const norm = 0.95 / peak;
+        for (let i = 0; i < bufferSize; i++) data[i] *= norm;
       }
 
-      // 3. Hard safety clamp (always applied — prevents clipping regardless of normalization)
+      // 3. Hard safety clamp (defensive — should never trigger after peak limiting)
       for (let i = 0; i < bufferSize; i++) {
         if (data[i] > 1.0) data[i] = 1.0;
         else if (data[i] < -1.0) data[i] = -1.0;
@@ -274,7 +280,7 @@
     if (masterGain && sharedContext) {
       const t = sharedContext.currentTime;
       masterGain.gain.cancelScheduledValues(t);
-      masterGain.gain.setValueAtTime(0.7 * LIMITER_LINEAR, t);
+      masterGain.gain.setValueAtTime(MASTER_OPEN(), t);
     }
 
     source.start();
@@ -326,13 +332,15 @@
     if (masterGain && sharedContext) {
       const t = sharedContext.currentTime;
       masterGain.gain.cancelScheduledValues(t);
-      masterGain.gain.setValueAtTime(0.7 * LIMITER_LINEAR, t);
+      masterGain.gain.setValueAtTime(MASTER_OPEN(), t);
     }
   }
 
   function setMasterVolume(vol) {
     const v = Math.max(0, Math.min(1, Number(vol) || 0));
+    userMasterVolume = v;
     if (masterGain && sharedContext) {
+      masterGain.gain.cancelScheduledValues(sharedContext.currentTime);
       masterGain.gain.setValueAtTime(v * LIMITER_LINEAR, sharedContext.currentTime);
     }
     return v;
@@ -341,7 +349,7 @@
   function muteMaster(muted) {
     if (masterGain && sharedContext) {
       masterGain.gain.cancelScheduledValues(sharedContext.currentTime);
-      masterGain.gain.setValueAtTime(muted ? 0 : (0.7 * LIMITER_LINEAR), sharedContext.currentTime);
+      masterGain.gain.setValueAtTime(muted ? 0 : MASTER_OPEN(), sharedContext.currentTime);
     }
   }
 
@@ -391,10 +399,12 @@
       for (let i = xfadeSamples; i < finalSize; i++) {
         finalData[i] = srcData[i];
       }
-      // Head crossfade: blend tail into head
+      // Head crossfade: blend natural tail continuation into head for seamless loop
+      // finalData[0] = srcData[finalSize] (continuation of srcData[finalSize-1])
+      // finalData[xfadeSamples-1] ≈ srcData[xfadeSamples-1] (head)
       for (let i = 0; i < xfadeSamples && i < finalSize; i++) {
         const t = i / xfadeSamples;
-        finalData[i] = srcData[i] * t + srcData[finalSize + i] * (1 - t);
+        finalData[i] = (1 - t) * srcData[finalSize + i] + t * srcData[i];
       }
 
       // Post-process: DC removal → peak normalize → hard clamp (same as procedural buffers)

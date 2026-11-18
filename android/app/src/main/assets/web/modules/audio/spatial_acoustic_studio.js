@@ -39,6 +39,7 @@
   const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
   const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
   const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
+  const BROWN_NOISE_AMP = audioCore ? audioCore.BROWN_NOISE_AMP : 0.045;
 
   class AcousticStudio {
     constructor(options = {}) {

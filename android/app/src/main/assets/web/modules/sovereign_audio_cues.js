@@ -28,7 +28,7 @@
 
   const BROWN_POLE = audioCore ? audioCore.BROWN_POLE : 0.997;
   const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
-  const BROWN_NOISE_AMP = (audioCore && audioCore.BROWN_NOISE_AMP) ? audioCore.BROWN_NOISE_AMP : 0.05;
+  const BROWN_NOISE_AMP = (audioCore && audioCore.BROWN_NOISE_AMP) ? audioCore.BROWN_NOISE_AMP : 0.045;
   const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
   const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
 
@@ -226,6 +226,17 @@
       for (var m = 0; m < len; m++) mean += buf[m];
       mean /= len;
       for (var d = 0; d < len; d++) buf[d] -= mean;
+
+      // Peak limiter: attenuate-only — never amplify quiet noise floor into hiss.
+      var peak = 0;
+      for (var p = 0; p < len; p++) {
+        var a = buf[p] < 0 ? -buf[p] : buf[p];
+        if (a > peak) peak = a;
+      }
+      if (peak > 0.95) {
+        var norm = 0.95 / peak;
+        for (var n = 0; n < len; n++) buf[n] *= norm;
+      }
 
       // Hard safety clamp: [-1, 1]
       for (var c = 0; c < len; c++) {

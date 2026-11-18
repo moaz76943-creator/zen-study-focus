@@ -8,6 +8,11 @@
   'use strict';
 
   const audioCore = typeof window !== 'undefined' ? window.AudioCore : null;
+  const BROWN_POLE = audioCore ? audioCore.BROWN_POLE : 0.997;
+  const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
+  const BROWN_NOISE_AMP = audioCore ? audioCore.BROWN_NOISE_AMP : 0.045;
+  const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
+  const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
 
   // Get the single shared master AudioContext (created only on user gesture)
   function getSharedContext() {
@@ -94,11 +99,11 @@
               data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
             } else if (type === 'ocean' || type === 'wind') {
               // Brown Noise: leaky integrator of WHITE noise (-6dB/oct slope).
-              // Using AudioCore's BROWN_POLE (0.997) and BROWN_GAIN (0.4) for bounded DC.
-              brownAccum = 0.997 * brownAccum + white * 0.4;
-              // Fixed output scale (peak ≈ 0.55) — the old raw value hard-clamped
-              // ~75% of samples at ±1 into harsh static.
-              data[i] = brownAccum * 0.05;
+              // Using AudioCore's BROWN_POLE and BROWN_GAIN for bounded DC.
+              brownAccum = BROWN_POLE * brownAccum + white * BROWN_GAIN;
+              // Fixed output scale using AudioCore's BROWN_NOISE_AMP — the old raw
+              // value hard-clamped ~75% of samples at ±1 into harsh static.
+              data[i] = brownAccum * BROWN_NOISE_AMP;
             } else {
               // Campfire crackle: sparse pops on low noise floor
               // Track noise floor peak separately from pops for consistent normalization

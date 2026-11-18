@@ -5587,7 +5587,7 @@ function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
   if (window.AudioCore && window.AudioCore.createSeamlessBuffer) {
     return window.AudioCore.createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels, false);
   }
-  // Fallback (should never be used when AudioCore is loaded)
+  // Fallback (should never be used when AudioCore is loaded) - includes ALWAYS-ON peak limiter
   const extraSec = SEAMLESS_XFADE_MS / 1000;
   const finalSize = Math.floor(ctx.sampleRate * durationSec);
   const xfadeSamples = Math.max(1, Math.floor(ctx.sampleRate * extraSec));
@@ -5602,7 +5602,7 @@ function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
 
   // Post-generation processing for ALL channels:
   // 1. DC-removal pass: kill residual sample-average hum (constant static)
-  // 2. Peak limiter (attenuate-only): never AMPLIFY quiet buffers — amplifying
+  // 2. Peak limiter (attenuate-only, ALWAYS): never amplify quiet buffers — amplifying
   //    their noise floor to full scale produced constant background hiss.
   // 3. Hard safety clamp (defensive)
   for (let ch = 0; ch < numChannels; ch++) {
@@ -5612,13 +5612,12 @@ function createSeamlessBuffer(ctx, durationSec, generatorFn, numChannels = 1) {
     for (let i = 0; i < bufferSize; i++) mean += tempChData[i];
     mean /= bufferSize;
     for (let i = 0; i < bufferSize; i++) tempChData[i] -= mean;
-    // Peak normalization
+    // Peak limiter (attenuate-only, ALWAYS ON) — must not amplify quiet procedural noise
     let peak = 0;
     for (let i = 0; i < bufferSize; i++) {
       const absV = Math.abs(tempChData[i]);
       if (absV > peak) peak = absV;
     }
-    // Peak limiter (attenuate-only) — must not amplify quiet procedural noise
     if (peak > 0.95) {
       const norm = 0.95 / peak;
       for (let i = 0; i < bufferSize; i++) tempChData[i] *= norm;
@@ -5685,11 +5684,15 @@ function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
             data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.08;
           }
         } else if (color === 'brown') {
+          // Fallback generators matching AudioCore's implementation
+          const BROWN_POLE = (window.AudioCore && window.AudioCore.BROWN_POLE) ? window.AudioCore.BROWN_POLE : 0.997;
+          const BROWN_GAIN = (window.AudioCore && window.AudioCore.BROWN_GAIN) ? window.AudioCore.BROWN_GAIN : 0.4;
+          const BROWN_NOISE_AMP = (window.AudioCore && window.AudioCore.BROWN_NOISE_AMP) ? window.AudioCore.BROWN_NOISE_AMP : 0.045;
           let brown = 0;
           for (let i = 0; i < bufferSize; i++) {
             const white = Math.random() * 2 - 1;
-            brown = 0.997 * brown + white * 0.4; // AudioCore's BROWN_POLE & BROWN_GAIN
-            data[i] = brown * 0.05; // BROWN_NOISE_AMP — raw accumulation rails at ±1 (harsh static)
+            brown = BROWN_POLE * brown + white * BROWN_GAIN;
+            data[i] = brown * BROWN_NOISE_AMP;
           }
         }
       }
@@ -5823,18 +5826,16 @@ function createSeamlessOggBuffer(ctx, buffer) {
   for (let ch = 0; ch < numChannels; ch++) {
     const srcData = buffer.getChannelData(ch);
     const finalData = finalBuffer.getChannelData(ch);
-    // Body: copy samples [xfadeSamples, finalSize) unchanged.
+    // Body: copy middle section (skip first xfadeSamples)
     for (let i = xfadeSamples; i < finalSize; i++) {
       finalData[i] = srcData[i];
     }
-    // Head crossfade: blend original tail (src[finalSize+i]) into original
-    // head (src[i]) so the loop wraps seamlessly.
-    //   final[0] == src[finalSize] (natural continuation of src[finalSize-1])
-    //   final[finalSize-1] == src[finalSize-1]
-    // so the buffer wrap is a 1-sample step, not a jump.
+    // Head crossfade: blend natural tail continuation into head for seamless loop
+    // finalData[0] = srcData[finalSize] (continuation of srcData[finalSize-1])
+    // finalData[xfadeSamples-1] ≈ srcData[xfadeSamples-1] (head)
     for (let i = 0; i < xfadeSamples && i < finalSize; i++) {
       const t = i / xfadeSamples;
-      finalData[i] = srcData[i] * t + srcData[finalSize + i] * (1 - t);
+      finalData[i] = (1 - t) * srcData[finalSize + i] + t * srcData[i];
     }
 
     // Post-process: DC removal → peak normalize → hard clamp (matches AudioCore)
@@ -6092,7 +6093,7 @@ function stopAllAudio() {
   activeNoiseSources.clear();
 
   // Unified instant stop: kill every engine family so no loop keeps playing
-  // after the user hits Stop (ogg singleton, procedural DSP, binaural synth).
+  // after the user hits Stop (ogg singleton, procedural DSP, binaural synth, nature sanctuary).
   try {
     if (window.SovereignAudioCues && typeof window.SovereignAudioCues.stopAmbient === "function") {
       window.SovereignAudioCues.stopAmbient();
@@ -6109,6 +6110,7 @@ function stopAllAudio() {
     if (window.SovereignAmbientDSP && typeof window.SovereignAmbientDSP.stopNoise === "function") { try { window.SovereignAmbientDSP.stopNoise(); } catch (_) {} }
     if (window.SovereignBinauralAlpha && typeof window.SovereignBinauralAlpha.stop === "function") { try { window.SovereignBinauralAlpha.stop(); } catch (_) {} }
     if (window.activeAcousticStudio && typeof window.activeAcousticStudio.stop === "function") { try { window.activeAcousticStudio.stop(); } catch (_) {} }
+    if (window.NaturalSoundscapeSanctuary && typeof window.NaturalSoundscapeSanctuary.stopAll === "function") { try { window.NaturalSoundscapeSanctuary.stopAll(); } catch (_) {} }
   }
   renderSoundsStudio();
 }
@@ -38209,6 +38211,8 @@ if (typeof document !== "undefined") {
       if (window.SovereignAudioCues && typeof window.SovereignAudioCues.stopAmbient === "function") window.SovereignAudioCues.stopAmbient();
       if (window.SovereignAmbientDSP && typeof window.SovereignAmbientDSP.stopNoise === "function") window.SovereignAmbientDSP.stopNoise();
       if (window.activeAcousticStudio && typeof window.activeAcousticStudio.stop === "function") window.activeAcousticStudio.stop();
+      if (window.NaturalSoundscapeSanctuary && typeof window.NaturalSoundscapeSanctuary.stopAll === "function") window.NaturalSoundscapeSanctuary.stopAll();
+      if (window.SovereignBinauralAlpha && typeof window.SovereignBinauralAlpha.stop === "function") window.SovereignBinauralAlpha.stop();
       if (typeof window.dfMasterAudioMute === "function") window.dfMasterAudioMute();
     } catch (_) {}
   };
