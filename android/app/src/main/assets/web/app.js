@@ -5506,8 +5506,10 @@ const BINAURAL_PRESETS = {
   gamma_40hz: { leftHz: 216, rightHz: 256, beatHz: 40, carrierHz: 236, durationSec: 5 },
   alpha_10hz: { leftHz: 211, rightHz: 221, beatHz: 10, carrierHz: 216, durationSec: 5 },
   theta_6hz: { leftHz: 191, rightHz: 197, beatHz: 6, carrierHz: 194, durationSec: 5 },
-  beta_15hz: { leftHz: 242.5, rightHz: 257.5, beatHz: 15, carrierHz: 250, durationSec: 5 },
-  delta_2_5hz: { leftHz: 106.75, rightHz: 109.25, beatHz: 2.5, carrierHz: 108, durationSec: 10 },
+  // Fixed: integer cycles in 5s (242*5=1210, 257*5=1285) — eliminates loop-boundary click
+  beta_15hz: { leftHz: 242, rightHz: 257, beatHz: 15, carrierHz: 249.5, durationSec: 5 },
+  // Fixed: integer cycles in 10s (106.5*10=1065, 109*10=1090) — eliminates loop-boundary click
+  delta_2_5hz: { leftHz: 106.5, rightHz: 109, beatHz: 2.5, carrierHz: 107.75, durationSec: 10 },
   harmonic_432_8hz: { leftHz: 432, rightHz: 440, beatHz: 8, carrierHz: 436, durationSec: 5 }
 };
 
@@ -5819,25 +5821,24 @@ function createSeamlessOggBuffer(ctx, buffer) {
   const numChannels = Math.max(1, buffer.numberOfChannels || 1);
   // Resolve source length robustly (test mocks may omit ArrayBuffer.length)
   const srcLen = buffer.length || (buffer.getChannelData(0) ? buffer.getChannelData(0).length : 1);
-  const finalSize = Math.max(1, srcLen - xfadeSamples);
+  const finalSize = srcLen;
 
   const finalBuffer = ctx.createBuffer(numChannels, finalSize, sampleRate);
   for (let ch = 0; ch < numChannels; ch++) {
     const srcData = buffer.getChannelData(ch);
     const finalData = finalBuffer.getChannelData(ch);
-    // Body: copy middle section (skip first xfadeSamples)
-    for (let i = xfadeSamples; i < finalSize; i++) {
-      finalData[i] = srcData[i];
-    }
-    // Head crossfade: blend natural tail continuation into head for seamless loop
-    // finalData[0] = srcData[finalSize] (continuation of srcData[finalSize-1])
-    // finalData[xfadeSamples-1] ≈ srcData[xfadeSamples-1] (head)
-    for (let i = 0; i < xfadeSamples && i < finalSize; i++) {
+    // Copy the entire original audio
+    finalData.set(srcData);
+    // Crossfade the LAST xfadeSamples of the buffer (loop point) into the FIRST xfadeSamples
+    // This ensures when BufferSourceNode loops from finalSize-1 to 0, the transition is smooth
+    const loopStart = finalSize - xfadeSamples;
+    for (let i = 0; i < xfadeSamples; i++) {
       const t = i / xfadeSamples;
-      finalData[i] = (1 - t) * srcData[finalSize + i] + t * srcData[i];
+      // Blend: (1-t) * end_of_audio + t * beginning_of_audio
+      finalData[loopStart + i] = (1 - t) * srcData[loopStart + i] + t * srcData[i];
     }
 
-    // Post-process: DC removal → peak normalize → hard clamp (matches AudioCore)
+    // Post-process: DC removal → peak limiter (attenuate-only) → hard clamp (matches AudioCore)
     // 1. DC removal
     let mean = 0;
     for (let i = 0; i < finalSize; i++) mean += finalData[i];

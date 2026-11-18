@@ -71,10 +71,10 @@
     },
     beta: {
       name: 'beat_beta',
-      carrierHz: 250,
+      carrierHz: 249.5,
       beatHz: 15,
-      leftFreqHz: 242.5,
-      rightFreqHz: 257.5
+      leftFreqHz: 242,
+      rightFreqHz: 257
     }
   };
 

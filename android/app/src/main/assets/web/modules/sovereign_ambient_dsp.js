@@ -204,10 +204,19 @@
       outData[i] = tempData[i] * t + tempData[finalSize + i] * (1 - t);
     }
 
-    // Post-process: NO peak normalization — the generators above already control
-    // output amplitude (white 0.06 / pink 0.08 / brown 0.045). Normalizing to 0.9
-    // amplified quiet noise by >10× into audible hiss.
-    // 1. Hard safety clamp
+    // Post-process: DC removal → hard safety clamp
+    // 1. DC removal (zero-mean) — eliminates low-frequency rumble/static from
+    //    leaky-integrator drift and crossfade boundary. The inline 10Hz highpass
+    //    in synthNoiseInto helps but isn't perfect; zero-mean guarantees it.
+    let mean = 0;
+    for (let i = 0; i < finalSize; i++) mean += outData[i];
+    mean /= finalSize;
+    for (let i = 0; i < finalSize; i++) outData[i] -= mean;
+
+    // 2. NO peak normalization — the generators above already control
+    //    output amplitude (white 0.06 / pink 0.08 / brown 0.045). Normalizing to 0.9
+    //    amplified quiet noise by >10× into audible hiss.
+    // 3. Hard safety clamp
     for (let i = 0; i < finalSize; i++) {
       if (outData[i] > 1.0) outData[i] = 1.0;
       else if (outData[i] < -1.0) outData[i] = -1.0;
