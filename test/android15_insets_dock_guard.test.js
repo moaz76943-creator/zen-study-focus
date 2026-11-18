@@ -84,7 +84,7 @@ console.log('✔ Calibrator pins safe-area variables to 0px and publishes the do
 // Body must reserve clearance above the native inset edge using --df-inflow-bottom
 // (which resolves to --df-bottom-nav-clearance since --df-webview-padding-bottom is 0px).
 // The pillar7 rule (later, !important) and the weak rule up top must both stay on the same formula.
-const bodyReserve = /padding-bottom:\s*var\(--df-inflow-bottom,\s*280px\)/g;
+const bodyReserve = /padding-bottom:\s*var\(--df-inflow-bottom,\s*320px\)/g;
 assert.ok((html.match(bodyReserve) || []).length >= 2,
   'body must reserve --df-inflow-bottom above the native inset edge (all body rules)');
 console.log('✔ index.html body reserves clearance via calibrated variables.');
