@@ -47,7 +47,6 @@
 
   if (!global.__ZEN_AUDIO_SINGLETON__) {
     global.__ZEN_AUDIO_SINGLETON__ = {
-      players: [],
       fadeTimers: new Set(),
       volume: 0.7,
       muted: false,
@@ -59,7 +58,6 @@
       activeSource: null,
       activeGain: null,
       activeDC: null,
-      activeHTML: [],
       activeSources: []  // Track all concurrent layers
     };
   }
@@ -92,9 +90,10 @@
     const numChannels = Math.max(1, buffer.numberOfChannels || 1);
     const srcLen = buffer.length || (buffer.getChannelData(0) ? buffer.getChannelData(0).length : 1);
 
-    // For seamless looping, crossfade the END of the buffer into the BEGINNING
-    // (at the loop point), not at the head. This ensures when BufferSourceNode
-    // loops from finalSize-1 to 0, the transition is smooth.
+    // For seamless looping, we need BOTH the end to crossfade into the beginning
+    // AND the beginning to crossfade from the end. This creates a symmetric
+    // crossfade region so the loop point (between finalSize-1 and 0) is smooth
+    // from both directions.
     const finalSize = srcLen;
     const finalBuffer = ctx.createBuffer(numChannels, finalSize, sampleRate);
     for (let ch = 0; ch < numChannels; ch++) {
@@ -104,12 +103,18 @@
       // Copy the entire original audio
       finalData.set(srcData);
 
-      // Crossfade the LAST xfadeSamples of the buffer (loop point) into the FIRST xfadeSamples
-      const loopStart = finalSize - xfadeSamples;
+      // Symmetric crossfade: blend the LAST xfadeSamples with the FIRST xfadeSamples
+      // at BOTH the loop end AND the loop start.
+      // This ensures when BufferSourceNode loops from finalSize-1 to 0,
+      // both sides are in the crossfade region and match perfectly.
       for (let i = 0; i < xfadeSamples; i++) {
         const t = i / xfadeSamples;
-        // Blend: (1-t) * end_of_audio + t * beginning_of_audio
+        // At loop END: blend end_of_audio → beginning_of_audio
+        const loopStart = finalSize - xfadeSamples;
         finalData[loopStart + i] = (1 - t) * srcData[loopStart + i] + t * srcData[i];
+        // At loop START: blend end_of_audio → beginning_of_audio (reverse direction)
+        // This makes the first xfadeSamples a mirror of the last xfadeSamples
+        finalData[i] = t * srcData[loopStart + i] + (1 - t) * srcData[i];
       }
 
       // Post-process: DC removal → peak limiter (attenuate-only) → hard clamp
@@ -266,25 +271,6 @@
     }
   }
 
-  function fadeStopHTML(a) {
-    try {
-      const startVol = a.volume || 0;
-      if (startVol <= 0.001) { a.pause(); return; }
-      let step = 0;
-      const steps = 6;
-      const iv = setInterval(function () {
-        step++;
-        try { a.volume = startVol * Math.max(0, 1 - step / steps); } catch (e) {}
-        if (step >= steps || a.paused) {
-          clearInterval(iv);
-          S.fadeTimers.delete(iv);
-          try { a.pause(); a.currentTime = 0; } catch (e) {}
-        }
-      }, 12);
-      S.fadeTimers.add(iv);
-    } catch (e) { try { a.pause(); } catch (e2) {} }
-  }
-
   function stopAllGlobal() {
     S.noiseGeneration = (S.noiseGeneration || 0) + 1;
     clearFadeTimers();
@@ -326,55 +312,13 @@
     S.activeGain = null;
     S.activeDC = null;
     S.activeCtx = null;
-
-    // HTML fallback players: same click-free ramp.
-    if (S.activeHTML && S.activeHTML.length) {
-      S.activeHTML.forEach(function (a) { fadeStopHTML(a); });
-      S.activeHTML = [];
-    }
-    if (S.players && S.players.length) {
-      S.players.forEach(fadeStopHTML);
-      S.players = [];
-    }
-    if (typeof document !== 'undefined') {
-      const domAudios = document.querySelectorAll('audio');
-      for (let j = 0; j < domAudios.length; j++) {
-        try { domAudios[j].pause(); domAudios[j].currentTime = 0; } catch (e) {}
-      }
-    }
   }
 
   function playSingleClean(srcKey, loop, targetVol) {
     // Gesture gate via AudioCore (single source of truth)
     if (!audioCore || !audioCore.isGestureReceived()) return null;
     const ctx = getCtx();
-    if (!ctx) {
-      if (typeof global.Audio === 'undefined') return null;
-      const a = new global.Audio(SOUND_FILES[srcKey] ? SOUND_FILES[srcKey] : SOUND_FILES.rain);
-      a.loop = !!loop;
-      a.preload = 'auto';
-      const fv = finalVol(targetVol);
-      a.volume = 0;
-      S.players.push(a);
-      S.activeHTML.push(a);
-      const p = a.play();
-      if (p && typeof p.then === 'function') {
-        p.then(function () {
-          let step = 0;
-          const steps = 8;
-          const iv = setInterval(function () {
-            step++;
-            try { a.volume = S.muted ? 0 : fv * (step / steps); } catch (e) {}
-            if (step >= steps || a.paused) {
-              clearInterval(iv);
-              S.fadeTimers.delete(iv);
-            }
-          }, 20);
-          S.fadeTimers.add(iv);
-        }).catch(function () {});
-      }
-      return a;
-    }
+    if (!ctx) return null; // No Web Audio context available (no gesture) - fail silently
     S.activeCtx = ctx;
     S.activeSources = S.activeSources || [];
     // Capture the shared stop epoch WITHOUT bumping it, so concurrent layers
@@ -448,38 +392,32 @@
       if (S.muted) return false;
       // Gesture gate via AudioCore (single source of truth)
       if (!audioCore || !audioCore.isGestureReceived()) return false;
-      if (typeof global.Audio === 'undefined') return false;
       const ctx = getCtx();
-      if (ctx && typeof ctx.createBufferSource === 'function') {
-        // Capture epoch without bumping: a stop() must silence the bell's
-        // scheduled attack, but the bell itself must not cancel ambient builds.
-        const gen = S.noiseGeneration || 0;
-        buildLoopBuffer(ctx, 'cue').then(function (buffer) {
-          if (gen !== (S.noiseGeneration || 0)) return;
-          if (!buffer) return;
-          const source = ctx.createBufferSource();
-          source.buffer = buffer;
-          const gain = ctx.createGain();
-          const now = ctx.currentTime;
-          gain.gain.setValueAtTime(0.0001, now);
-          gain.gain.linearRampToValueAtTime(Math.max(0.0001, finalVol(S.volume)), now + 0.02);
-          gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
-          source.connect(gain);
-          gain.connect(getSafeDestination(ctx));
-          if (audioCore && typeof audioCore.unmuteMaster === 'function') {
-            try { audioCore.unmuteMaster(); } catch (_) {}
-          }
-          source.start();
-          source.stop(now + 1.7);
-          setTimeout(function () {
-            try { source.disconnect(); gain.disconnect(); } catch (e) {}
-          }, 1800);
-        }).catch(function () {});
-        return true;
-      }
-      const p = new global.Audio(SOUND_FILES.cue);
-      p.volume = finalVol(S.volume);
-      p.play().catch(function () {});
+      if (!ctx) return false;
+      // Capture epoch without bumping: a stop() must silence the bell's
+      // scheduled attack, but the bell itself must not cancel ambient builds.
+      const gen = S.noiseGeneration || 0;
+      buildLoopBuffer(ctx, 'cue').then(function (buffer) {
+        if (gen !== (S.noiseGeneration || 0)) return;
+        if (!buffer) return;
+        const source = ctx.createBufferSource();
+        source.buffer = buffer;
+        const gain = ctx.createGain();
+        const now = ctx.currentTime;
+        gain.gain.setValueAtTime(0.0001, now);
+        gain.gain.linearRampToValueAtTime(Math.max(0.0001, finalVol(S.volume)), now + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
+        source.connect(gain);
+        gain.connect(getSafeDestination(ctx));
+        if (audioCore && typeof audioCore.unmuteMaster === 'function') {
+          try { audioCore.unmuteMaster(); } catch (_) {}
+        }
+        source.start();
+        source.stop(now + 1.7);
+        setTimeout(function () {
+          try { source.disconnect(); gain.disconnect(); } catch (e) {}
+        }, 1800);
+      }).catch(function () {});
       return true;
     },
     playZenBell: function () { return this.playBell(); },
@@ -488,9 +426,6 @@
       if (typeof val === 'number') {
         S.volume = clamp01(val);
         this.volume = S.volume;
-        for (let i = 0; i < S.players.length; i++) {
-          try { S.players[i].volume = S.muted ? 0 : S.volume; } catch (e) {}
-        }
         // Shared-context mode: apply to every tracked Web Audio layer.
         const vctx = S.activeCtx || S.dspContext;
         if (vctx) {
@@ -509,9 +444,6 @@
     toggleMute: function () {
       S.muted = !S.muted;
       this.muted = S.muted;
-      for (let i = 0; i < S.players.length; i++) {
-        try { S.players[i].volume = S.muted ? 0 : S.volume; } catch (e) {}
-      }
       const vctx = S.activeCtx || S.dspContext;
       if (vctx) {
         const targets = (S.activeSources && S.activeSources.length) ? S.activeSources : (S.activeGain ? [{ gain: S.activeGain }] : []);

@@ -48713,48 +48713,100 @@ window.dfStudioAudio = {
     return this.ctx;
   },
   playAmbience: function(isRain) {
-    const ctx = this.getCtx();
+    // Route through AudioCore for zero-static, master-limited, DC-blocked output
+    if (!window.AudioCore || !window.AudioCore.isGestureReceived()) return;
+    const ctx = window.AudioCore.getContext();
     if (!ctx) return;
     this.stop();
-    // Zero-autoplay: only resume after explicit user gesture
-    if (ctx.state === 'suspended' && audioContextUserGestureReceived && typeof ctx.resume === 'function') {
-      ctx.resume();
-    }
-    // Use high-quality brown noise for ambience. Level kept subtle — 0.28 was
-    // a muddy rumble bed that read as "constant background noise".
-    const noiseSource = createNoiseSource(ctx, 'brown', 0.16);
-    const f = ctx.createBiquadFilter();
-    f.type = 'lowpass';
-    f.frequency.value = isRain ? 800 : 380;
-    noiseSource.source.connect(noiseSource.dcBlock);
-    noiseSource.dcBlock.connect(noiseSource.gain);
-    noiseSource.gain.connect(f);
-    f.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
-    noiseSource.source.start();
-    this.nodes.push(noiseSource.source, noiseSource.gain, noiseSource.dcBlock, f);
+
+    // Use brown noise buffer via AudioCore
+    const buffer = window.AudioCore.createSeamlessBuffer(ctx, 3, (channelData, sampleRate, durationSec) => {
+      const data = channelData[0];
+      const bufferSize = Math.floor(sampleRate * durationSec);
+      let brown = 0;
+      for (let i = 0; i < bufferSize; i++) {
+        const white = Math.random() * 2 - 1;
+        brown = window.AudioCore.BROWN_POLE * brown + white * window.AudioCore.BROWN_GAIN;
+        data[i] = brown * window.AudioCore.BROWN_NOISE_AMP;
+      }
+    }, 1, false);
+
+    // Create voice through AudioCore (includes DC block, gain, master chain)
+    const voice = window.AudioCore.createVoice(buffer, true);
+    if (!voice) return;
+
+    // Insert spectral shaping filter between dcBlock and gain (like natural_soundscape_sanctuary_engine)
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(isRain ? 800 : 380, ctx.currentTime);
+    filter.Q.setValueAtTime(0.707, ctx.currentTime);
+
+    voice.dcBlock.disconnect();
+    voice.dcBlock.connect(filter);
+    filter.connect(voice.gain);
+
+    // Set gain (fade in)
+    const targetGain = 0.16;
+    const now = ctx.currentTime;
+    voice.gain.gain.cancelScheduledValues(now);
+    voice.gain.gain.setValueAtTime(0.0001, now);
+    voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.05);
+
+    // Track for stop() - use voice's own stop method
+    this.nodes.push({
+      stop: () => voice.stop(),
+      disconnect: () => {
+        try { filter.disconnect(); } catch (_) {}
+        try { voice.dcBlock.disconnect(); } catch (_) {}
+      }
+    });
   },
   playBinaural: function(diff) {
-    const ctx = this.getCtx();
+    // Route through AudioCore for zero-static, master-limited, DC-blocked output
+    if (!window.AudioCore || !window.AudioCore.isGestureReceived()) return;
+    const ctx = window.AudioCore.getContext();
     if (!ctx) return;
     this.stop();
-    // Zero-autoplay: only resume after explicit user gesture
-    if (ctx.state === 'suspended' && audioContextUserGestureReceived && typeof ctx.resume === 'function') {
-      ctx.resume();
-    }
-    const oL = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-    const oR = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-    oL.type = 'sine'; oR.type = 'sine';
-    oL.frequency.value = 216;
-    oR.frequency.value = 216 + (diff || 10);
-    const m = ctx.createChannelMerger(2);
-    const g = ctx.createGain();
-    g.gain.setValueAtTime(0.001, ctx.currentTime);
-    const tE2 = ctx.currentTime + 1.5;
-    g.gain.linearRampToValueAtTime(0.18, tE2);
-    oL.connect(m, 0, 0); oR.connect(m, 0, 1);
-    m.connect(g); g.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
-    oL.start(); oR.start();
-    this.nodes.push(oL, oR, g);
+
+    const carrierHz = 216;
+    const beatHz = diff || 10; // Alpha=10, Theta=6, Beta=18, Gamma=40
+    const leftFreq = carrierHz;
+    const rightFreq = carrierHz + beatHz;
+
+    // Create stereo binaural buffer via AudioCore's seamless buffer generator
+    // Duration: 10 seconds (long enough for seamless looping, short enough for memory)
+    const buffer = window.AudioCore.createSeamlessBuffer(ctx, 10, (channelData, sampleRate, totalSec) => {
+      const leftData = channelData[0];
+      const rightData = channelData[1] || leftData; // stereo
+      const bufferSize = Math.floor(sampleRate * totalSec);
+      const TWO_PI = Math.PI * 2;
+      for (let i = 0; i < bufferSize; i++) {
+        const t = i / sampleRate;
+        leftData[i] = Math.sin(TWO_PI * leftFreq * t) * 0.25;
+        if (channelData[1]) {
+          rightData[i] = Math.sin(TWO_PI * rightFreq * t) * 0.25;
+        }
+      }
+    }, 2, false); // stereo, no normalize (amplitude controlled)
+
+    // Use AudioCore's voice management for consistent fade-in/out, DC block, limiter
+    const voice = window.AudioCore.createVoice(buffer, true);
+    if (!voice) return;
+
+    // Set binaural gain (scaled to stay well under limiter ceiling)
+    const targetGain = 0.18; // matches original 0.18 target
+    const now = ctx.currentTime;
+    voice.gain.gain.cancelScheduledValues(now);
+    voice.gain.gain.setValueAtTime(0.0001, now);
+    voice.gain.gain.linearRampToValueAtTime(targetGain, now + 1.5);
+
+    // Track for stop() - use voice's own stop method
+    this.nodes.push({
+      stop: () => voice.stop(),
+      disconnect: () => {
+        try { voice.dcBlock.disconnect(); } catch (_) {}
+      }
+    });
   },
   stop: function() {
     this.nodes.forEach(function(n) {
