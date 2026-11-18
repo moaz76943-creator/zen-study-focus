@@ -1,0 +1,117 @@
+/* ============================================================================
+   DEEP FOCUS — DF Polish v23 (cross-tab / cross-studio elevation layer)
+   Scope: hierarchy, spacing rhythm, contrast, tap targets, focus visibility,
+   and 120Hz-friendly motion (transform/opacity only — never layout props).
+   Loaded LAST so it refines earlier sheets without editing them.
+   No perpetual animations; fully honors prefers-reduced-motion.
+   ============================================================================ */
+
+:root {
+  --df-polish-ease: cubic-bezier(.2, .7, .3, 1);
+  --df-polish-focus: #2563eb;
+  --df-polish-ring: 3px solid var(--df-polish-focus);
+}
+
+/* ---------- Motion: 120Hz-smooth, GPU-only, reduced-motion safe ---------- */
+.sound-Rich-tile,
+.seg-pill,
+.bnav-btn,
+.task-mini-sel,
+.zen-compact-suite-btn,
+.ns-card,
+.pure-white-card,
+.an-kpi-card,
+.modal-card {
+  transition-property: transform, box-shadow, border-color, color, background-color, opacity;
+  transition-duration: .18s;
+  transition-timing-function: var(--df-polish-ease);
+}
+.sound-Rich-tile:active,
+.seg-pill:active,
+.bnav-btn:active,
+.task-mini-sel:active,
+.zen-compact-suite-btn:active { transform: scale(.96); }
+@media (hover: hover) {
+  .sound-Rich-tile:hover { transform: translateY(-2px); }
+  .zen-compact-suite-btn:hover { transform: translateY(-1px); }
+}
+
+/* ---------- Focus visibility (keyboard / TalkBack / switch access) ------- */
+button:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.bnav-btn:focus-visible,
+.seg-pill:focus-visible,
+.sound-Rich-tile:focus-visible {
+  outline: var(--df-polish-ring) !important;
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+/* ---------- Tap targets ≥ 44px on primary interactive chrome ------------- */
+.bnav-btn { min-height: 44px; }
+.seg-pill { min-height: 40px; padding-top: 6px; padding-bottom: 6px; }
+.task-mini-sel { min-height: 38px; }
+.zen-compact-suite-btn { min-height: 56px; }
+.bnav-btn, .seg-pill, .task-mini-sel, .zen-compact-suite-btn, .sound-Rich-tile {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* ---------- Sounds tab: Nature Sounds is the hero ------------------------- */
+#sec-sounds .ns-header-card {
+  margin-top: 2px;
+  margin-bottom: 10px;
+}
+#sec-sounds .segmented-pills-bar { margin-bottom: 10px; }
+#sec-sounds .sounds-photo-grid { gap: 12px; }
+#sec-sounds .mixer-status-bar { margin-bottom: 12px; }
+
+/* ---------- 3D Spatial studio: clean collapsible chrome ------------------
+   The mount is collapsed by default; these rules keep the collapsed card
+   compact and the expanded body scrollable on short screens. */
+#dfPillar5SpatialMount .df-spatial-body { max-height: none; }
+#dfSpatialCollapseToggle { min-height: 32px; }
+#dfSpatialCollapseToggle:hover { background: #eef2ff !important; border-color: #c4b5fd !important; }
+
+/* ---------- Spacing rhythm: consistent vertical cadence per tab ----------- */
+.screen-section { scroll-padding-top: 16px; }
+.screen-section > .pure-white-card,
+.screen-section > .wave-chart-card,
+.screen-section > .ns-header-card { margin-bottom: 12px; }
+.analytics-kpi-grid { gap: 12px; }
+
+/* ---------- Contrast: keep muted text readable on white cards ------------- */
+.ns-header-subtitle,
+.kpi-trend,
+.an-kpi-trend,
+.wave-flow-sub,
+.donut-center-txt { text-rendering: optimizeLegibility; }
+
+/* ---------- Slim, unobtrusive scrollbars (WebView + desktop) -------------- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, .35); border-radius: 999px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- RTL: mirror polish ring offset correctly ---------------------- */
+[dir="rtl"] button:focus-visible,
+[dir="rtl"] [role="button"]:focus-visible { outline-offset: 2px; }
+
+/* ---------- Reduced motion: honor the OS setting completely --------------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .sound-Rich-tile:active,
+  .seg-pill:active,
+  .bnav-btn:active,
+  .task-mini-sel:active,
+  .zen-compact-suite-btn:active { transform: none !important; }
+}
