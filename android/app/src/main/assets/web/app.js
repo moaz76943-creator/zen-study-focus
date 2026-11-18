@@ -5388,12 +5388,13 @@ const SOUNDS_DATA = [
 const SOUND_NAME_EN = { rain: 'Rain on Window', forest: 'Forest Birds' };
 const SOUND_LEGACY_EN = { stream: 'Mountain Stream', wind: 'Highland Wind', thunder: 'Distant Thunder' };
 function dfSoundName(id) {
+  const tr = (key) => (typeof dfCatalogKeyText === 'function' ? dfCatalogKeyText(key, null, key) : key);
   const en = SOUND_NAME_EN[id];
-  if (en) return dfCatalogKeyText(en, null, en);
+  if (en) return tr(en);
   const legacy = (L().sounds && L().sounds[id]) || id;
   // A language that has its own legacy name keeps it; otherwise use the shared catalog instead of English.
   const base = SOUND_LEGACY_EN[id];
-  return base && legacy === base ? dfCatalogKeyText(base, null, base) : legacy;
+  return base && legacy === base ? tr(base) : legacy;
 }
 let soundCat = 'all';
 const activePlayers = {};
@@ -5548,8 +5549,8 @@ function playPresetRelaxMix() {
   toggleSoundTile('rain');
   toggleSoundTile('wind');
 }
-if (typeof document !== 'undefined') {
-  document.addEventListener('df-ui-catalog-applied', () => {
+if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+  window.addEventListener('df-ui-catalog-applied', () => {
     try { if (document.getElementById('soundsGridBox')) renderSoundsStudio(); } catch (_) {}
   });
 }
