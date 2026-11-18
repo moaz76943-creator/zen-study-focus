@@ -137,7 +137,7 @@
       // When keyboard opens, content must clear the keyboard.
       var floatingLayerClearance = fabBottom + 54 + 12; // 242px
       var imeClearance = (insets.paddingBottom || insets.bottom || 100) + 12;
-      var bottomNavClearance = Math.max(floatingLayerClearance, imeClearance, 240);
+      var bottomNavClearance = Math.max(floatingLayerClearance, imeClearance, 300);
       root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
     },
 
