@@ -363,7 +363,12 @@
     setMasterVolume(vol) {
       const v = Math.max(0, Math.min(1.0, parseFloat(vol) || 0));
       if (this.masterGain && this.audioCtx) {
-        this.masterGain.gain.setValueAtTime(v, this.audioCtx.currentTime);
+        // Smooth volume changes (30ms ramp) to avoid clicks when adjusting slider
+        const now = this.audioCtx.currentTime;
+        const fade = 0.03;
+        this.masterGain.gain.cancelScheduledValues(now);
+        this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
+        this.masterGain.gain.linearRampToValueAtTime(v, now + fade);
       }
       return v;
     }

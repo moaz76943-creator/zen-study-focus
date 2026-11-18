@@ -317,26 +317,33 @@
   }
 
   function stopAllVoices() {
-    // Truly instant: mute master immediately AND stop all voices
+    // Fast but click-free: fade master over 30ms while voices fade out
+    const FADE_MS = 30;
     if (masterGain && sharedContext) {
-      masterGain.gain.cancelScheduledValues(sharedContext.currentTime);
-      masterGain.gain.setValueAtTime(0, sharedContext.currentTime);
+      const now = sharedContext.currentTime;
+      const fade = FADE_MS / 1000;
+      masterGain.gain.cancelScheduledValues(now);
+      masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+      masterGain.gain.linearRampToValueAtTime(0, now + fade);
     }
     activeVoices.forEach(v => {
       try { v.stop(); } catch (_) {}
     });
     activeVoices.clear();
-    // Master stays hard-muted (0) until the next voice start re-opens it —
+    // Master stays muted (0) until the next voice start re-opens it —
     // no delayed auto-restore, so Stop is truly silent and instant.
   }
 
   function unmuteMaster() {
-    // Re-open the master hard ceiling after an instant-stop (which sets it to 0).
-    // Called when a new voice/preset actually starts playing — never on its own.
+    // Re-open the master ceiling after an instant-stop with a fast 30ms ramp
+    // to avoid any click when audio resumes.
+    const FADE_MS = 30;
     if (masterGain && sharedContext) {
       const t = sharedContext.currentTime;
+      const fade = FADE_MS / 1000;
       masterGain.gain.cancelScheduledValues(t);
-      masterGain.gain.setValueAtTime(MASTER_OPEN(), t);
+      masterGain.gain.setValueAtTime(masterGain.gain.value, t);
+      masterGain.gain.linearRampToValueAtTime(MASTER_OPEN(), t + fade);
     }
   }
 
@@ -344,16 +351,27 @@
     const v = Math.max(0, Math.min(1, Number(vol) || 0));
     userMasterVolume = v;
     if (masterGain && sharedContext) {
-      masterGain.gain.cancelScheduledValues(sharedContext.currentTime);
-      masterGain.gain.setValueAtTime(v * LIMITER_LINEAR, sharedContext.currentTime);
+      // Smooth volume changes (30ms ramp) to avoid clicks when adjusting slider
+      const FADE_MS = 30;
+      const now = sharedContext.currentTime;
+      const fade = FADE_MS / 1000;
+      masterGain.gain.cancelScheduledValues(now);
+      masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+      masterGain.gain.linearRampToValueAtTime(v * LIMITER_LINEAR, now + fade);
     }
     return v;
   }
 
   function muteMaster(muted) {
     if (masterGain && sharedContext) {
-      masterGain.gain.cancelScheduledValues(sharedContext.currentTime);
-      masterGain.gain.setValueAtTime(muted ? 0 : MASTER_OPEN(), sharedContext.currentTime);
+      // Smooth mute/unmute (30ms ramp) to avoid clicks
+      const FADE_MS = 30;
+      const now = sharedContext.currentTime;
+      const fade = FADE_MS / 1000;
+      const target = muted ? 0 : MASTER_OPEN();
+      masterGain.gain.cancelScheduledValues(now);
+      masterGain.gain.setValueAtTime(masterGain.gain.value, now);
+      masterGain.gain.linearRampToValueAtTime(target, now + fade);
     }
   }
 
@@ -393,10 +411,11 @@
     const numChannels = Math.max(1, buffer.numberOfChannels || 1);
     const srcLen = buffer.length || (buffer.getChannelData(0) ? buffer.getChannelData(0).length : 1);
 
-    // Standard seamless loop approach (same as createSeamlessBuffer):
+    // Standard seamless loop approach for fixed audio assets:
     // 1. Create extended buffer: original audio + copy of first xfadeSamples (tail continuation)
-    // 2. Crossfade the tail into the head
-    // 3. Truncate to original length
+    // 2. Crossfade the ORIGINAL TAIL into the copied head (not head into itself)
+    // 3. Copy the crossfaded tail region to the head for seamless loop
+    // 4. Truncate to original length
     // This preserves the original audio body and only modifies the loop boundary region.
     const finalSize = srcLen;
     const extendedSize = finalSize + xfadeSamples;
@@ -414,19 +433,28 @@
       }
     }
 
-    // Now create final buffer with crossfade (same logic as createSeamlessBuffer)
+    // Now create final buffer with CORRECT crossfade: original tail → copied head
     const finalBuffer = ctx.createBuffer(numChannels, finalSize, sampleRate);
     for (let ch = 0; ch < numChannels; ch++) {
       const extData = extendedBuffer.getChannelData(ch);
       const finalData = finalBuffer.getChannelData(ch);
 
-      // Body: copy main segment unchanged
-      finalData.set(extData.subarray(0, finalSize));
+      // Body: copy main segment (excluding tail region that will be crossfaded)
+      finalData.set(extData.subarray(0, finalSize - xfadeSamples));
 
-      // Head crossfade: blend tail continuation into head
+      // Crossfade region: blend original tail into copied head
+      // extData[finalSize - xfadeSamples + i] = original tail
+      // extData[finalSize + i] = copied head (continuation for seamless loop)
       for (let i = 0; i < xfadeSamples; i++) {
         const t = i / xfadeSamples;
-        finalData[i] = (1 - t) * extData[finalSize + i] + t * extData[i];
+        const tailSample = extData[finalSize - xfadeSamples + i];
+        const headSample = extData[finalSize + i];
+        finalData[finalSize - xfadeSamples + i] = (1 - t) * tailSample + t * headSample;
+      }
+
+      // Head crossfade: copy crossfaded tail region to head for seamless loop
+      for (let i = 0; i < xfadeSamples; i++) {
+        finalData[i] = finalData[finalSize - xfadeSamples + i];
       }
 
       // Post-process: DC removal -> peak limiter (attenuate-only) -> hard clamp

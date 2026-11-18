@@ -103,15 +103,16 @@ check('No master unmute race in stopAllAudio', () => {
   assert(!unmuteRace.test(appJs), 'stopAllAudio must NOT auto-unmute after a delay (race condition)');
 });
 
-// 6. Master gain immediately muted on stop
-check('Master gain immediately muted on stop', () => {
+// 6. Master gain muted on stop (fast 30ms ramp = click-free instant stop)
+check('Master gain muted on stop', () => {
   const audioCore = fs.readFileSync(AUDIO_CORE, 'utf8');
   const stopAllIdx = audioCore.indexOf('function stopAllVoices()');
   assert(stopAllIdx !== -1, 'stopAllVoices() must exist');
   const stopAllEnd = audioCore.indexOf('\n  }', stopAllIdx) + 4;
   const stopAllBody = audioCore.substring(stopAllIdx, stopAllEnd);
-  assert(stopAllBody.includes('cancelScheduledValues') && stopAllBody.includes('setValueAtTime(0'),
-    'stopAllVoices() must cancel scheduled values and set master to 0 immediately');
+  // Must cancel scheduled values and ramp master to 0 (fast 30ms = click-free instant)
+  assert(stopAllBody.includes('cancelScheduledValues'), 'stopAllVoices() must cancel scheduled values');
+  assert(stopAllBody.includes('linearRampToValueAtTime(0'), 'stopAllVoices() must ramp master to 0 (fast click-free)');
 });
 
 // Summary
