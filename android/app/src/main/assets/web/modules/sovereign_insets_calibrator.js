@@ -31,12 +31,15 @@
      */
     init: function () {
       if (!this._hasRealInsets) {
+        // Use a higher fallback bottom (100dp) so the initial reserve covers
+        // tall 3-button nav bars on Xiaomi HyperOS (up to ~300dp) before real
+        // insets arrive. The calibrator will update with real values shortly after.
         this.applyCSSVariables({
           top: 24,
-          bottom: 56,
+          bottom: 100,
           left: 0,
           right: 0,
-          paddingBottom: 56
+          paddingBottom: 100
         });
       }
       if (typeof window !== 'undefined') {
@@ -114,8 +117,8 @@
       // Bottom nav clearance: dock gap (12) + capsuleHeight + gap to Studios (8) + Studios pill height (48)
       // + gap to FAB (8) + FAB height (54) = 130px base. Add native nav bar height (insets.bottom) as floor.
       // This ensures in-flow content (last card) ends above the floating layers on all devices.
-      // Increased base floor from 280 to 320 to accommodate taller 3-button nav bars on Xiaomi HyperOS.
-      var bottomNavClearance = Math.max(320, capsuleHeight + 130, (insets.bottom || 100) + 180);
+      // Base floor 480 covers Xiaomi HyperOS 3-button nav bars up to ~300dp even before real insets arrive.
+      var bottomNavClearance = Math.max(480, capsuleHeight + 130, (insets.bottom || 100) + 180);
       root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
 
       // Studios pill position: docked above capsule via --df-capsule-height
