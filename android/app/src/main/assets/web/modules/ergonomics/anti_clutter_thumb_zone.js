@@ -106,7 +106,7 @@
           display: flex;
           align-items: center;
           gap: 12px;
-          z-index: 999;
+          z-index: 180;
           box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
           transition: all 0.24s cubic-bezier(0.4, 0, 0.2, 1);
         }
