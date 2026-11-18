@@ -15,9 +15,9 @@
     },
     {
       "file": "flowing_water.ogg",
-      "size_kb": 327.8,
+      "size_kb": 319.3,
       "license": "CC0 / Public Domain",
-      "source": "https://upload.wikimedia.org/wikipedia/commons/2/26/Flowing-water-100019.ogg (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; provenance unchanged)"
+      "source": "https://upload.wikimedia.org/wikipedia/commons/2/26/Flowing-water-100019.ogg (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; 2026-11-18 follow-up: 40Hz highpass + afftdn + lowpass hiss removal, loudness restored, re-encoded; provenance unchanged)"
     },
     {
       "file": "rain_thunder.ogg",
@@ -35,9 +35,9 @@
     },
     {
       "file": "campfire_embers.ogg",
-      "size_kb": 215.0,
+      "size_kb": 127.2,
       "license": "CC0 / Public Domain",
-      "source": "Procedurally synthesized with ffmpeg (brown-noise low-frequency rumble + high-frequency crackle flutter, amix); original work, no third-party sample or recording, dedicated to the public domain (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; provenance unchanged)"
+      "source": "Procedurally synthesized with ffmpeg (brown-noise low-frequency rumble + high-frequency crackle flutter, amix); original work, no third-party sample or recording, dedicated to the public domain (noise-reduced: 40Hz highpass + FFT denoise, re-encoded 2026-11-18; 2026-11-18 follow-up: 40Hz highpass + afftdn + lowpass hiss removal, loudness restored, re-encoded; provenance unchanged)"
     },
     {
       "file": "water_drop.ogg",
