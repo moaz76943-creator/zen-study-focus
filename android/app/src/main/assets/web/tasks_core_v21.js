@@ -297,7 +297,7 @@
   function searchTasks(state,filter={}) {
     const q=normalizeTaskSearch(filter.query||'');
     const scores=new Map();
-    return listTasks(state,{includeArchived:!!filter.includeArchived,includeTrash:!!filter.includeTrash}).filter(t=>{
+    return listTasks(state,{includeArchived:!!filter.includeArchived,includeTrash:!!filter.includeTrash,includeStarters:!!filter.includeStarters}).filter(t=>{
       if(filter.status && statusOf(t)!==filter.status)return false;
       if(filter.catKey && t.catKey!==filter.catKey)return false;
       if(filter.projectId!==undefined && t.projectId!==filter.projectId)return false;

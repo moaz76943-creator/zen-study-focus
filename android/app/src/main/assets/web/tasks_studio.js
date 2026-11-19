@@ -265,7 +265,7 @@
     const section=['today','upcoming','overdue','completed'].includes(view)
      ?new Set(C.taskSections(state,currentDay())[view].map(t=>t.id)):null;
     const active=C.searchTasks(state,{query,catKey:category||undefined,status:status||undefined,
-     projectId:projectFilter?Number(projectFilter):undefined,includeArchived:true,
+     projectId:projectFilter?Number(projectFilter):undefined,includeArchived:true,includeStarters:true,
      includeTrash:view==='trash'}).filter(t=>(view==='trash'?!!t.deletedAt:!t.deletedAt)&&(!section||section.has(t.id)));
     if(sortKey){
      const priorityRank={urgent:0,high:1,medium:2,low:3};
