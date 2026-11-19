@@ -52,7 +52,9 @@ console.log(`✓ Test 1: Verified ${testedPairsCount} translation pairs across 1
 
 // Step 4: Verify RTL directionality for eastern languages
 {
-  const rtlLocales = ["ar", "fa", "ur", "ckb", "ps", "sd", "ug"];
+  // Official RTL locales from i18n/languages.json (eastern scripts): ar, fa, ur, ps.
+  // ckb, sd, ug are regional variants NOT counted as separate languages per policy.
+  const rtlLocales = ["ar", "fa", "ur", "ps"];
   for (let r = 0; r < rtlLocales.length; r++) {
     const meta = Registry.getLocaleMetadata(rtlLocales[r]);
     assert.strictEqual(meta.isRtl, true, `${rtlLocales[r]} must have isRtl=true`);

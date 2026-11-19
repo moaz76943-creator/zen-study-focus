@@ -13,6 +13,18 @@ console.log("--- Running 🎯 Mission #064: Global 100-Locale i18n Tests ---");
   assert.strictEqual(codes.includes("ar"), true, "Arabic must be present");
   assert.strictEqual(codes.includes("en"), true, "English must be present");
   console.log("✓ Test 1: 100 Locales registry & strict Hebrew exclusion verified.");
+
+  // Test 1b: Registry codes must fully align with official i18n/languages.json 100-language list
+  const official = require('../i18n/languages.json');
+  const officialCodes = official.languages.map(l => l.code);
+
+  for (const code of codes) {
+    assert.strictEqual(officialCodes.includes(code), true, `Registry code "${code}" must be in official languages.json list`);
+  }
+  for (const code of officialCodes) {
+    assert.strictEqual(codes.includes(code), true, `Official code "${code}" must be present in registry SUPPORTED_LOCALES`);
+  }
+  console.log("✓ Test 1b: Registry codes fully aligned with official i18n/languages.json 100-language list.");
 }
 
 // Test 2: Exclusion Guard actively blocks Hebrew requests and redirects safely
