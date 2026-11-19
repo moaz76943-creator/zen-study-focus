@@ -127,22 +127,18 @@ public class MainActivity extends AppCompatActivity {
 
             // Xiaomi-specific override: on HyperOS, mandatorySystemGestures.bottom may be > 0 even in 3-button mode,
             // and navigationBars/systemBars may under-report (report 0). If the device is Xiaomi and we have a
-            // gesture handle but no visible nav bar, assume 3-button nav if the gesture handle height exceeds the
-            // standard gesture handle size (32dp), indicating it's actually the 3-button bar being misreported.
+            // gesture handle but no visible nav bar, assume 3-button nav and apply the 700dp absolute floor.
+            // This is safer than relying on height thresholds (32dp/100dp) which have a gap: a misreported
+            // 3-button bar at 32-100dp would be missed. Extra padding on gesture nav is harmless (empty space);
+            // missing the nav bar on 3-button clips content and overlaps the Studios pill.
             String manufacturer = Build.MANUFACTURER;
             boolean isXiaomi = "xiaomi".equalsIgnoreCase(manufacturer) || "redmi".equalsIgnoreCase(manufacturer) || "poco".equalsIgnoreCase(manufacturer);
             // Density must be available BEFORE any dp<->px conversion (used in Xiaomi overrides below).
             float density = getResources().getDisplayMetrics().density;
-            if (isXiaomi && isGestureNav && mandatorySystemGestures.bottom > Math.round(32 * density)) {
-                // Gesture handle taller than 32dp on Xiaomi = likely 3-button bar misreported as gesture handle.
-                isGestureNav = false;
-            }
-            // ADDITIONAL XIAOMI SAFETY NET: If detection yields gesture nav but the reported nav height
-            // (rawNavBottom) is suspiciously small (< 100dp), treat as 3-button nav. This catches cases
-            // where the 3-button bar is misreported as a small gesture handle (< 32dp) or all insets are 0.
-            // The 700dp absolute floor below will then apply, guaranteeing the WebView viewport never
-            // intrudes into the nav bar area on Xiaomi 3-button devices.
-            if (isXiaomi && isGestureNav && rawNavBottom < Math.round(100 * density)) {
+            if (isXiaomi && hasGestureHandle && !hasVisibleNavBar) {
+                // Xiaomi with gesture handle but no visible 3-button bar = treat as 3-button nav.
+                // The 700dp absolute floor below will guarantee the WebView viewport never intrudes
+                // into the nav bar area. This covers all misreporting cases (any handle height > 0).
                 isGestureNav = false;
             }
 
