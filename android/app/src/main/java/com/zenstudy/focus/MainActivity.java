@@ -137,6 +137,14 @@ public class MainActivity extends AppCompatActivity {
                 // Gesture handle taller than 32dp on Xiaomi = likely 3-button bar misreported as gesture handle.
                 isGestureNav = false;
             }
+            // ADDITIONAL XIAOMI SAFETY NET: If detection yields gesture nav but the reported nav height
+            // (rawNavBottom) is suspiciously small (< 100dp), treat as 3-button nav. This catches cases
+            // where the 3-button bar is misreported as a small gesture handle (< 32dp) or all insets are 0.
+            // The 700dp absolute floor below will then apply, guaranteeing the WebView viewport never
+            // intrudes into the nav bar area on Xiaomi 3-button devices.
+            if (isXiaomi && isGestureNav && rawNavBottom < Math.round(100 * density)) {
+                isGestureNav = false;
+            }
 
             // Apply minimum nav bar height fallback (Material spec: 56dp 3-button, 32dp gesture handle);
             // Xiaomi Android 15 3-button nav bar can reach ~96dp on HyperOS; use 100dp floor to prevent

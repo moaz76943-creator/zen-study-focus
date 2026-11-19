@@ -31,16 +31,15 @@
      */
     init: function () {
       if (!this._hasRealInsets) {
-        // Use a reasonable fallback bottom (100dp) so the initial reserve covers
-        // typical 3-button nav bars before real insets arrive. The calibrator will
-        // update with real values shortly after. Real gesture nav (~32dp) will
-        // quickly correct to a smaller capsule.
+        // Use a conservative fallback bottom (500dp) matching the Xiaomi 3-button nav floor
+        // so the initial reserve covers tall nav bars before real insets arrive.
+        // Real gesture nav (~32dp) will quickly correct to a smaller capsule.
         this.applyCSSVariables({
           top: 24,
-          bottom: 100,
+          bottom: 500,
           left: 0,
           right: 0,
-          paddingBottom: 100
+          paddingBottom: 500
         });
       }
       if (typeof window !== 'undefined') {
@@ -81,68 +80,72 @@
     },
 
     /**
-     * Injects CSS variables onto documentElement with !important to override conflicting rules.
-     * Design (Android 15 / Xiaomi edge-to-edge): MainActivity pads the WebView's PARENT
-     * FrameLayout with the FLOORED system-bar insets (including defensive floors for Xiaomi
-     * HyperOS 3-button nav up to 500dp), so the WebView's layout viewport
-     * already ends above the status bar, cutout and 3-button nav bar. Native padding
-     * is the single owner of the insets — if CSS re-added them (via --df-safe-top /
-     * --df-safe-bottom / --df-webview-padding-bottom) every dock offset and body
-     * reserve would double-count, pushing the Studios pill over content and leaving
-     * a thick empty band above the nav bar. These variables are therefore pinned to 0px;
-     * raw device values remain available to JS via getInsets().
-     * --df-bottom-nav-clearance: fixed reserve (dp) that clears the docked bottom capsule
-     * plus FAB / Studios pill for in-flow content, measured from the safe content edge.
-     * --df-studios-pill-bottom: explicit position for the Studios pill above the capsule.
-     * --df-fab-bottom: explicit position for the FAB above the Studios pill.
-     * Capsule height is a FIXED design constant (100px) — the system nav bar height is
-     * already handled by native parent padding. The capsule is an app-level nav bar
-     * that sits just above the viewport bottom (12px dock gap) on both gesture and
-     * 3-button navigation. Dock positions derive from this fixed capsule height.
-     */
-    applyCSSVariables: function (insets) {
-      if (typeof document === 'undefined' || !document.documentElement) return;
+         * Injects CSS variables onto documentElement with !important to override conflicting rules.
+         * Design (Android 15 / Xiaomi edge-to-edge): MainActivity pads the WebView's PARENT
+         * FrameLayout with the FLOORED system-bar insets (including defensive floors for Xiaomi
+         * HyperOS 3-button nav up to 700dp), so the WebView's layout viewport
+         * already ends above the status bar, cutout and 3-button nav bar. Native padding
+         * is the single owner of the insets — if CSS re-added them (via --df-safe-top /
+         * --df-safe-bottom / --df-webview-padding-bottom) every dock offset and body
+         * reserve would double-count, pushing the Studios pill over content and leaving
+         * a thick empty band above the nav bar. These variables are therefore pinned to 0px;
+         * raw device values remain available to JS via getInsets().
+         * --df-bottom-nav-clearance: fixed reserve (dp) that clears the docked bottom capsule
+         * plus FAB / Studios pill for in-flow content, measured from the safe content edge.
+         * --df-studios-pill-bottom: explicit position for the Studios pill above the capsule.
+         * --df-fab-bottom: explicit position for the FAB above the Studios pill.
+         * Capsule height is a FIXED design constant (100px) — the system nav bar height is
+         * already handled by native parent padding. The capsule is an app-level nav bar
+         * that sits just above the viewport bottom (12px dock gap) on both gesture and
+         * 3-button navigation. Dock positions derive from this fixed capsule height.
+         */
+        applyCSSVariables: function (insets) {
+          if (typeof document === 'undefined' || !document.documentElement) return;
 
-      var root = document.documentElement;
+          var root = document.documentElement;
 
-      // 0px: the native parent padding already keeps content clear of every bar.
-      root.style.setProperty('--df-safe-top', '0px', 'important');
-      root.style.setProperty('--df-safe-bottom', '0px', 'important');
-      root.style.setProperty('--df-safe-left', '0px', 'important');
-      root.style.setProperty('--df-safe-right', '0px', 'important');
-      root.style.setProperty('--df-webview-padding-bottom', '0px', 'important');
+          // 0px: the native parent padding already keeps content clear of every bar.
+          root.style.setProperty('--df-safe-top', '0px', 'important');
+          root.style.setProperty('--df-safe-bottom', '0px', 'important');
+          root.style.setProperty('--df-safe-left', '0px', 'important');
+          root.style.setProperty('--df-safe-right', '0px', 'important');
+          root.style.setProperty('--df-webview-padding-bottom', '0px', 'important');
 
-      // Fixed capsule height (design constant). The system nav bar height is already
-      // accounted for by native parent FrameLayout padding; the capsule is an app-level
-      // bottom nav that docks at the viewport bottom with a 12px gap.
-      var capsuleHeight = 100;
-      root.style.setProperty('--df-capsule-height', capsuleHeight + 'px', 'important');
+          // Fixed capsule height (design constant). The system nav bar height is already
+          // accounted for by native parent FrameLayout padding; the capsule is an app-level
+          // bottom nav that docks at the viewport bottom with a 12px gap.
+          var capsuleHeight = 100;
+          root.style.setProperty('--df-capsule-height', capsuleHeight + 'px', 'important');
 
-      // Studios pill position: docked above capsule
-      // bottom = dock-gap(12) + capsuleHeight(100) + gap(8) = 120px
-      var studiosPillBottom = 12 + capsuleHeight + 8;
-      root.style.setProperty('--df-studios-pill-bottom', studiosPillBottom + 'px', 'important');
+          // Studios pill position: docked above capsule
+          // bottom = dock-gap(12) + capsuleHeight(100) + gap(8) = 120px
+          var studiosPillBottom = 12 + capsuleHeight + 8;
+          root.style.setProperty('--df-studios-pill-bottom', studiosPillBottom + 'px', 'important');
 
-      // FAB position: above Studios pill with 8px gap
-      // bottom = studiosPillBottom(120) + StudiosHeight(48) + gap(8) = 176px
-      var fabBottom = studiosPillBottom + 48 + 8;
-      root.style.setProperty('--df-fab-bottom', fabBottom + 'px', 'important');
+          // FAB position: above Studios pill with 8px gap
+          // bottom = studiosPillBottom(120) + StudiosHeight(48) + gap(8) = 176px
+          var fabBottom = studiosPillBottom + 48 + 8;
+          root.style.setProperty('--df-fab-bottom', fabBottom + 'px', 'important');
 
-      // Legacy float-bottom for backward compat (points to Studios pill position)
-      root.style.setProperty('--df-float-bottom', studiosPillBottom + 'px', 'important');
+          // Legacy float-bottom for backward compat (points to Studios pill position)
+          root.style.setProperty('--df-float-bottom', studiosPillBottom + 'px', 'important');
 
-      // Bottom nav clearance for in-flow content: must clear the highest floating layer
-      // (FAB top = fabBottom + FABheight(54) = 230px) + gap(12) = 242px minimum.
-      // Also handle IME: insets.paddingBottom = max(flooredNavBottom, IME height).
-      // When keyboard opens, content must clear the keyboard.
-      // Xiaomi 3-button nav floor is 700dp; typical IME is 200-500dp.
-      // If paddingBottom > 500dp, treat as nav bar floor (not IME) and use fixed minimum.
-      var floatingLayerClearance = fabBottom + 54 + 12; // 242px
-      var paddingBottom = insets.paddingBottom || insets.bottom || 100;
-      var imeClearance = paddingBottom > 500 ? 300 : paddingBottom + 12;
-      var bottomNavClearance = Math.max(floatingLayerClearance, imeClearance, 300);
-      root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
-    },
+          // Bottom nav clearance for in-flow content: must clear the highest floating layer
+          // (FAB top = fabBottom + FABheight(54) = 230px) + gap(12) = 242px minimum.
+          // Also handle IME: insets.paddingBottom = max(flooredNavBottom, IME height).
+          // When keyboard opens, content must clear the keyboard.
+          // Xiaomi 3-button nav floor is 700dp; typical IME is 200-500dp.
+          // If paddingBottom > 500dp, treat as nav bar floor (not IME) and use fixed minimum.
+          // CAP the clearance to viewport height minus minimum content area (100px) so the
+          // body padding never exceeds the available viewport on devices with tall nav bars.
+          var floatingLayerClearance = fabBottom + 54 + 12; // 242px
+          var paddingBottom = insets.paddingBottom || insets.bottom || 500;
+          var imeClearance = paddingBottom > 500 ? 300 : paddingBottom + 12;
+          var viewportHeight = (typeof window !== 'undefined' && window.innerHeight) ? window.innerHeight : 800;
+          var maxClearance = Math.max(100, viewportHeight - 100);
+          var bottomNavClearance = Math.min(Math.max(floatingLayerClearance, imeClearance, 300), maxClearance);
+          root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
+        },
 
     onViewportChange: function () {
       // Re-apply insets on orientation change or keyboard toggle
