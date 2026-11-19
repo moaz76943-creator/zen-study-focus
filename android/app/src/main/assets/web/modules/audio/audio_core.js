@@ -93,10 +93,15 @@
     masterGain = ctx.createGain();
     masterGain.gain.setValueAtTime(MASTER_OPEN(), ctx.currentTime);
 
-    // Master limiter (catches any overshoot from stacked voices)
+    // Master limiter (catches genuine overshoot from stacked voices only).
+    // Narrow knee (3 dB) so the limiter is transparent below threshold —
+    // the old 24 dB knee started compressing at -36 dB, right at the
+    // procedural noise floor, audibly modulating it ("hiss/static").
+    // Buffer generation already peak-limits (attenuate-only), so this
+    // is purely a safety net for unexpected transients.
     masterLimiter = ctx.createDynamicsCompressor();
     masterLimiter.threshold.setValueAtTime(-12, ctx.currentTime);
-    masterLimiter.knee.setValueAtTime(24, ctx.currentTime);
+    masterLimiter.knee.setValueAtTime(3, ctx.currentTime);
     masterLimiter.ratio.setValueAtTime(20, ctx.currentTime);
     masterLimiter.attack.setValueAtTime(0.001, ctx.currentTime);
     masterLimiter.release.setValueAtTime(0.1, ctx.currentTime);

@@ -85,6 +85,62 @@
     if (typeof Audio === "undefined") return null;
     // Gesture gate via AudioCore (single source of truth)
     if (!audioCore || !audioCore.isGestureReceived || !audioCore.isGestureReceived()) return null; // BLOCKED: User gesture required
+
+    // Prefer AudioCore's zero-static, limiter-protected, seamlessly looped .ogg voice path.
+    // Falls back to native HTMLAudioElement only when AudioCore lacks loadOggBuffer/createVoice.
+    if (audioCore && audioCore.loadOggBuffer && audioCore.createVoice && audioCore.createSeamlessBuffer) {
+      var ctx = audioCore.getContext();
+      if (ctx) {
+        audioCore.loadOggBuffer(src).then(function (decodedBuf) {
+          if (!decodedBuf || S.muted) return null;
+          var numChannels = decodedBuf.length ? 1 : 1;
+          // Pass to createSeamlessBuffer: it DC-removes, attenuate-only peaks,
+          // and crossfades the tail into the head for a click-free loop.
+          var finalBuffer = audioCore.createSeamlessBuffer(ctx, 2.0, function (channelData, sampleRate, totalSec) {
+            var data = channelData[0];
+            var bufferSize = Math.floor(sampleRate * totalSec);
+            // If decodedBuf is the raw array we already loaded, copy those samples in.
+            // Otherwise synthesize rain/water bed from noise parameters.
+            if (decodedBuf && typeof decodedBuf.length === 'number' && decodedBuf.length > 0) {
+              var minLen = Math.min(bufferSize, decodedBuf.length);
+              for (var idx = 0; idx < minLen; idx++) {
+                data[idx] = decodedBuf[idx];
+              }
+              // If shorter than requested, replicate last sample to avoid phase discontinuity
+              for (var idx = minLen; idx < bufferSize; idx++) {
+                data[idx] = decodedBuf[(minLen - 1) % decodedBuf.length];
+              }
+            } else {
+              for (var idx = 0; idx < bufferSize; idx++) {
+                data[idx] = (Math.random() * 2 - 1) * WHITE_NOISE_AMP;
+              }
+            }
+          }, 1, false);
+
+          var voice = audioCore.createVoice(finalBuffer, true);
+          if (!voice) return null;
+
+          // Ensure per-voice gain is targetVol (not full 1.0)
+          var now2 = ctx.currentTime;
+          voice.gain.gain.cancelScheduledValues(now2);
+          voice.gain.gain.setValueAtTime(0.0001, now2);
+          voice.gain.gain.linearRampToValueAtTime(targetVol * S.volume, now2 + (audioCore.FADE_IN_MS || 0.03));
+          S.players.push({
+            pause: function () { try { voice.stop(); } catch (e) {} },
+            currentTime: 0,
+            removeAttribute: function () {},
+            load: function () {},
+            volume: targetVol * S.volume
+          });
+          return voice;
+        }).catch(function (err) {
+          console.warn("[SovereignAudioCues] AudioCore .ogg path failed, falling back to HTMLAudio:", err);
+        });
+        return true;
+      }
+    }
+
+    // Fallback HTMLAudio path (kept identical to original behavior)
     var a = new Audio(src);
     a.loop = !!loop;
     a.preload = "auto";
@@ -113,7 +169,7 @@
   }
 
   var SovereignRealAudio = {
-    version: "629.0.0",
+    version: "629.1.0",
     volume: S.volume,
     muted: S.muted,
     cues: {
@@ -125,7 +181,7 @@
     startDualDeckLoop: function () {},
     scheduleOrganicAccent: function () {},
     playAmbient: function (type, vol) {
-      if (typeof vol === "number") this.setVolume(vol);
+      if (typeof vol === "number") SovereignRealAudio.setVolume(vol);
       stopAllGlobal();
       var key = String(type || "rain").toLowerCase();
       var src = SOUND_FILES[key] || SOUND_FILES.rain;
@@ -151,8 +207,8 @@
       p.play().catch(function () {});
       return true;
     },
-    playZenBell: function () { return this.playBell(); },
-    playCue: function () { return this.playBell(); },
+    playZenBell: function () { return SovereignRealAudio.playBell(); },
+    playCue: function () { return SovereignRealAudio.playBell(); },
     setVolume: function (val) {
       if (typeof val === "number") {
         S.volume = Math.max(0.0, Math.min(1.0, val));

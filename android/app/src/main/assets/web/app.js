@@ -13765,17 +13765,24 @@ window.FlashQuizEngine = FlashQuizEngine;
   }
 
   function dfStopAmbientSoundscape() {
+    // Instant stop: click-free 30ms master fade, then synchronous node teardown
+    // (no setTimeout deferral — deferred disconnect left the noise floor live
+    // for ~100ms after Stop, reintroducing constant hiss).
     try {
       if (_soundscapeGain && _soundscapeCtx) {
-        _soundscapeGain.gain.cancelScheduledValues(_soundscapeCtx.currentTime);
-        _soundscapeGain.gain.setValueAtTime(_soundscapeGain.gain.value, _soundscapeCtx.currentTime);
-        _soundscapeGain.gain.exponentialRampToValueAtTime(0.0001, _soundscapeCtx.currentTime + 0.08);
-        setTimeout(function() {
-          if (_soundscapeNode) {
-            try { _soundscapeNode.stop(); _soundscapeNode.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
-            _soundscapeNode = null;
-          }
-        }, 100);
+        const now = _soundscapeCtx.currentTime;
+        const FADE_SEC = 0.03; // matches AudioCore FADE_OUT_MS — click-free instant
+        _soundscapeGain.gain.cancelScheduledValues(now);
+        _soundscapeGain.gain.setValueAtTime(_soundscapeGain.gain.value, now);
+        _soundscapeGain.gain.linearRampToValueAtTime(0, now + FADE_SEC);
+      }
+    } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+    // Synchronous teardown right now — source stops, nodes disconnect, no leak window.
+    try {
+      if (_soundscapeNode) {
+        try { _soundscapeNode.stop(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+        try { _soundscapeNode.disconnect(); } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
+        _soundscapeNode = null;
       }
     } catch (_) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", _); }
 
@@ -39479,11 +39486,11 @@ window.dfGetSafeMasterDestination = function(ctx) {
   }
   if (!window.DF_MASTER_COMPRESSOR) {
     const comp = ctx.createDynamicsCompressor();
-    comp.threshold.setValueAtTime(-18, ctx.currentTime); // Soft knee starts at -18dB
-    comp.knee.setValueAtTime(12, ctx.currentTime);
-    comp.ratio.setValueAtTime(12, ctx.currentTime);        // Brickwall limiter ratio
-    comp.attack.setValueAtTime(0.003, ctx.currentTime);    // 3ms instant peak catch
-    comp.release.setValueAtTime(0.25, ctx.currentTime);
+    comp.threshold.setValueAtTime(-12, ctx.currentTime);
+    comp.knee.setValueAtTime(3, ctx.currentTime);       // narrow knee: transparent below threshold
+    comp.ratio.setValueAtTime(20, ctx.currentTime);      // brickwall limiter ratio
+    comp.attack.setValueAtTime(0.001, ctx.currentTime);  // 1ms instant peak catch
+    comp.release.setValueAtTime(0.1, ctx.currentTime);
     // Fallback path must still expose the instant-kill gain the shared
     // getSafeAudioDestination chain provides, or Stop cannot silence layers
     // mixed through this destination.
@@ -47725,10 +47732,10 @@ window.dfCreateAudioDynamicsCompressor = function(audioCtx) {
   const comp = audioCtx.createDynamicsCompressor();
   const now = audioCtx.currentTime || 0;
   comp.threshold.setValueAtTime(-12, now);
-  comp.knee.setValueAtTime(30, now);
-  comp.ratio.setValueAtTime(12, now);
-  comp.attack.setValueAtTime(0.003, now);
-  comp.release.setValueAtTime(0.25, now);
+  comp.knee.setValueAtTime(3, now);       // narrow knee: transparent below threshold
+  comp.ratio.setValueAtTime(20, now);      // brickwall limiter
+  comp.attack.setValueAtTime(0.001, now);  // 1ms attack
+  comp.release.setValueAtTime(0.1, now);
   return { compressorNode: comp, status: 'COMPRESSOR_INITIALIZED' };
 };
 
