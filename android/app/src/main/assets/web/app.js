@@ -51213,11 +51213,12 @@ window.dfScratchpadModal = {
       btn.id = 'df-float-scratch-btn';
       btn.textContent = '+ Note Idea';
       btn.style.position = 'fixed';
-      // Dock above the bottom capsule via the calibrator's single-owner variables:
-      // native parent padding owns the 3-button nav bar. Use --df-studios-pill-bottom
-      // (same layer as Studios pill / FAB; calibrator computes: dock gap + capsule + 8px).
+      // Dock on the LEFT (mirrors FAB horizontal position) at Studios pill height.
+      // Studios pill sits on the RIGHT at --df-studios-pill-bottom; FAB sits on the LEFT at --df-fab-bottom.
+      // This avoids the Studios (10) pill overlap on the right while keeping the same dock layer (z-index 150).
       btn.style.bottom = "var(--df-studios-pill-bottom, 120px)";
-      btn.style.right = '12px';
+      btn.style.left = '24px';
+      btn.style.maxWidth = 'min(280px, calc(100vw - 96px))';
       btn.style.minHeight = '48px';
       btn.style.padding = '0 16px';
       btn.style.borderRadius = '24px';
