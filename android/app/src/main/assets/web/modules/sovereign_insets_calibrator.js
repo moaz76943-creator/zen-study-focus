@@ -136,14 +136,14 @@
           // When keyboard opens, content must clear the keyboard.
           // Xiaomi 3-button nav floor is 700dp; typical IME is 200-500dp.
           // If paddingBottom > 500dp, treat as nav bar floor (not IME) and use fixed minimum.
-          // CAP the clearance to viewport height minus minimum content area (100px) so the
-          // body padding never exceeds the available viewport on devices with tall nav bars.
+          // The clearance is additional body padding INSIDE the WebView viewport (which is
+          // already reduced by native parent padding). It must always be at least
+          // floatingLayerClearance to clear the FAB/Studios pill; never cap it by the
+          // viewport height because the viewport is already short on tall-nav-bar devices.
           var floatingLayerClearance = fabBottom + 54 + 12; // 242px
           var paddingBottom = insets.paddingBottom || insets.bottom || 500;
           var imeClearance = paddingBottom > 500 ? 300 : paddingBottom + 12;
-          var viewportHeight = (typeof window !== 'undefined' && window.innerHeight) ? window.innerHeight : 800;
-          var maxClearance = Math.max(100, viewportHeight - 100);
-          var bottomNavClearance = Math.min(Math.max(floatingLayerClearance, imeClearance, 300), maxClearance);
+          var bottomNavClearance = Math.max(floatingLayerClearance, imeClearance, 300);
           root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
         },
 
