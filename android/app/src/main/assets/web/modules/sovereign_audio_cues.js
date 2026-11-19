@@ -53,6 +53,15 @@
   }
   var S = global.__ZEN_AUDIO_SINGLETON__;
 
+  // Ensure required properties exist (singleton may have been initialized by another module)
+  if (!S.players) S.players = [];
+  if (!S.fadeTimer) S.fadeTimer = null;
+  if (!S.fadeTimers) S.fadeTimers = new Set();
+  if (typeof S.volume !== 'number') S.volume = 0.7;
+  if (typeof S.muted !== 'boolean') S.muted = false;
+  if (!S.activeHTML) S.activeHTML = [];
+  if (!S.activeSources) S.activeSources = [];
+
   // Gesture detection delegated to AudioCore - no local binding
 
   function stopAllGlobal() {

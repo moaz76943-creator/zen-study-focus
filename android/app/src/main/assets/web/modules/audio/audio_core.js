@@ -26,6 +26,11 @@
   const BROWN_NOISE_AMP = 0.03;                                // fixed output scale — reduced from 0.045 for extra headroom against leaky-integrator tail peaks and DC drift
   const WHITE_NOISE_AMP = 0.06;                                // consistent across all modules
   const PINK_NOISE_AMP = 0.08;                                 // consistent across all modules
+  // Master limiter threshold: -3dB (0.707) — high enough to NEVER engage on normal content
+  // (voice peaks × master gain max ≈ 0.35). Only catches genuine overshoots > 0.7.
+  // The old -12dB (0.25) threshold compressed the noise floor into audible hiss/static.
+  const MASTER_LIMITER_THRESHOLD_DB = -3.0;
+  const MASTER_LIMITER_THRESHOLD_LINEAR = Math.pow(10, MASTER_LIMITER_THRESHOLD_DB / 20); // ≈ 0.707
 
   // ── AudioContext Singleton ────────────────────────────────────────
   let sharedContext = null;
@@ -94,13 +99,14 @@
     masterGain.gain.setValueAtTime(MASTER_OPEN(), ctx.currentTime);
 
     // Master limiter (catches genuine overshoot from stacked voices only).
-    // Narrow knee (3 dB) so the limiter is transparent below threshold —
-    // the old 24 dB knee started compressing at -36 dB, right at the
-    // procedural noise floor, audibly modulating it ("hiss/static").
+    // Threshold at -3dB (0.707) — well above normal peak levels (≈0.35) so it
+    // NEVER compresses the noise floor. The old -12dB threshold started
+    // compressing at -36dB, right at the procedural noise floor, audibly
+    // modulating it ("hiss/static"). Narrow knee (3 dB) keeps it transparent.
     // Buffer generation already peak-limits (attenuate-only), so this
     // is purely a safety net for unexpected transients.
     masterLimiter = ctx.createDynamicsCompressor();
-    masterLimiter.threshold.setValueAtTime(-12, ctx.currentTime);
+    masterLimiter.threshold.setValueAtTime(MASTER_LIMITER_THRESHOLD_DB, ctx.currentTime);
     masterLimiter.knee.setValueAtTime(3, ctx.currentTime);
     masterLimiter.ratio.setValueAtTime(20, ctx.currentTime);
     masterLimiter.attack.setValueAtTime(0.001, ctx.currentTime);
@@ -531,6 +537,8 @@
     BROWN_NOISE_AMP,
     WHITE_NOISE_AMP,
     PINK_NOISE_AMP,
+    MASTER_LIMITER_THRESHOLD_DB,
+    MASTER_LIMITER_THRESHOLD_LINEAR,
   };
 
   // Initialize gesture binding immediately

@@ -336,7 +336,10 @@
       dc.Q.setValueAtTime(0.707, ctx.currentTime);
       const gain = ctx.createGain();
       gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(Math.max(0.0001, finalVol(targetVol)), ctx.currentTime + FADE_IN_SEC);
+      // Scale voice gain by LIMITER_LINEAR (0.5) to match other AudioCore paths
+      // and avoid double-gain (voice gain × master gain). finalVol() handles mute/clamp.
+      const targetGain = Math.max(0.0001, finalVol(targetVol) * (audioCore.LIMITER_LINEAR || 0.5));
+      gain.gain.linearRampToValueAtTime(targetGain, ctx.currentTime + FADE_IN_SEC);
       source.connect(dc);
       dc.connect(gain);
       gain.connect(getSafeDestination(ctx));
@@ -405,7 +408,9 @@
         const gain = ctx.createGain();
         const now = ctx.currentTime;
         gain.gain.setValueAtTime(0.0001, now);
-        gain.gain.linearRampToValueAtTime(Math.max(0.0001, finalVol(S.volume)), now + 0.02);
+        // Scale voice gain by LIMITER_LINEAR (0.5) to match other AudioCore paths
+        const targetGain = Math.max(0.0001, finalVol(S.volume) * (audioCore.LIMITER_LINEAR || 0.5));
+        gain.gain.linearRampToValueAtTime(targetGain, now + 0.02);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
         source.connect(gain);
         gain.connect(getSafeDestination(ctx));
@@ -430,8 +435,10 @@
         const vctx = S.activeCtx || S.dspContext;
         if (vctx) {
           const targets = (S.activeSources && S.activeSources.length) ? S.activeSources : (S.activeGain ? [{ gain: S.activeGain }] : []);
+          // Scale voice gain by LIMITER_LINEAR (0.5) to match other AudioCore paths
+          const scaledVol = Math.max(0.0001, finalVol(S.volume) * (audioCore && audioCore.LIMITER_LINEAR ? audioCore.LIMITER_LINEAR : 0.5));
           targets.forEach(function (entry) {
-            try { entry.gain.gain.setValueAtTime(Math.max(0.0001, finalVol(S.volume)), vctx.currentTime); } catch (e) {}
+            try { entry.gain.gain.setValueAtTime(scaledVol, vctx.currentTime); } catch (e) {}
           });
         }
         // Also update AudioCore master volume if available
@@ -447,10 +454,11 @@
       const vctx = S.activeCtx || S.dspContext;
       if (vctx) {
         const targets = (S.activeSources && S.activeSources.length) ? S.activeSources : (S.activeGain ? [{ gain: S.activeGain }] : []);
+        const scaledVol = Math.max(0.0001, finalVol(S.volume) * (audioCore && audioCore.LIMITER_LINEAR ? audioCore.LIMITER_LINEAR : 0.5));
         targets.forEach(function (entry) {
           try {
             entry.gain.gain.cancelScheduledValues(vctx.currentTime);
-            entry.gain.gain.setValueAtTime(Math.max(0.0001, finalVol(S.volume)), vctx.currentTime);
+            entry.gain.gain.setValueAtTime(scaledVol, vctx.currentTime);
           } catch (e) {}
         });
       }
