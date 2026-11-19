@@ -2106,35 +2106,36 @@ header, .app-header, .top-bar, .dynamic-hero-header {
       </main>
 
       <!-- ======================================================
-           5. 12 PURE NATURE SOUNDS SECTION (WITH PHOTOS & SLIDERS)
-           ====================================================== -->
-      <main class="screen-section" id="sec-sounds">
-        <div class="mixer-status-bar">
-          <span id="mixerStatusTxt" data-i18n="mixerReady">🎵 Pure Nature Studio Ready</span>
-          <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-            <button type="button" class="task-mini-sel" id="btnLaunch3DSpatialStudio" onclick="dfOpenSpatialAudioStudio()" style="cursor:pointer; color:#7c3aed; font-weight:800; background:#f5f3ff; border:1px solid #ddd6fe;" data-i18n="btn3DSpatial">🎧 3D Spatial & 40Hz</button>
-            <button class="task-mini-sel" onclick="playPresetRelaxMix()" style="cursor:pointer; color:var(--primary);" data-i18n="btnMyMix">✨ Mix</button>
-            <button class="task-mini-sel" onclick="stopAllAudio()" style="cursor:pointer; color:var(--rose);" data-i18n="btnStopAll">⏹ Stop</button>
-          </div>
-        </div>
+                 5. 12 PURE NATURE SOUNDS SECTION (WITH PHOTOS & SLIDERS)
+                 ====================================================== -->
+            <main class="screen-section" id="sec-sounds">
+              <div id="natureSoundsHeader" class="ns-header-card">
+                <h2 class="ns-header-title">Nature Sounds</h2>
+                <p class="ns-header-subtitle">Pure, calming, and immersive natural soundscapes</p>
+              </div>
 
-        <div class="segmented-pills-bar">
-          <button class="seg-pill active" onclick="filterSoundsByCat('all', this)" data-i18n="filterAll">All</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('water', this)" data-i18n="sndCatWater">Water &amp; Rain 🌧️</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('forest', this)" data-i18n="sndCatForest">Forest &amp; Wind 🌲</button>
-          <button class="seg-pill" onclick="filterSoundsByCat('warm', this)" data-i18n="sndCatWarm">Fire &amp; Earth 🔥</button>
-        </div>
+              <section id="df-tone-picker-card" aria-label="Completion sound"><div id="completionAlertPickerHost"></div></section>
 
-        <div id="natureSoundsHeader" class="ns-header-card" style="order:0;">
-          <h2 class="ns-header-title">Nature Sounds</h2>
-          <p class="ns-header-subtitle">Pure, calming, and immersive natural soundscapes</p>
-        </div>
+              <div class="segmented-pills-bar">
+                <button class="seg-pill active" onclick="filterSoundsByCat('all', this)" data-i18n="filterAll">All</button>
+                <button class="seg-pill" onclick="filterSoundsByCat('water', this)" data-i18n="sndCatWater">Water & Rain 🌧️</button>
+                <button class="seg-pill" onclick="filterSoundsByCat('forest', this)" data-i18n="sndCatForest">Forest & Wind 🌲</button>
+                <button class="seg-pill" onclick="filterSoundsByCat('warm', this)" data-i18n="sndCatWarm">Fire & Earth 🔥</button>
+              </div>
 
-        <section id="df-tone-picker-card" aria-label="Completion sound"><div id="completionAlertPickerHost"></div></section>
-        <div class="sounds-photo-grid" id="soundsGridBox"></div>
+              <div class="sounds-photo-grid" id="soundsGridBox"></div>
 
-        <div id="dfPillar5SpatialMount"></div>
-      </main>
+              <div class="mixer-status-bar">
+                <span id="mixerStatusTxt" data-i18n="mixerReady">🎵 Pure Nature Studio Ready</span>
+                <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
+                  <button type="button" class="task-mini-sel" id="btnLaunch3DSpatialStudio" onclick="dfOpenSpatialAudioStudio()" style="cursor:pointer; color:#7c3aed; font-weight:800; background:#f5f3ff; border:1px solid #ddd6fe;" data-i18n="btn3DSpatial">🎧 3D Spatial & 40Hz</button>
+                  <button class="task-mini-sel" onclick="playPresetRelaxMix()" style="cursor:pointer; color:var(--primary);" data-i18n="btnMyMix">✨ Mix</button>
+                  <button class="task-mini-sel" onclick="stopAllAudio()" style="cursor:pointer; color:var(--rose);" data-i18n="btnStopAll">⏹ Stop</button>
+                </div>
+              </div>
+
+              <div id="dfPillar5SpatialMount"></div>
+            </main>
 
       <!-- ======================================================
            6. ANALYTICS SECTION (FULL DONUT + WAVE CHARTS + WESTERN NUMS)
