@@ -135,8 +135,11 @@
       // (FAB top = fabBottom + FABheight(54) = 230px) + gap(12) = 242px minimum.
       // Also handle IME: insets.paddingBottom = max(flooredNavBottom, IME height).
       // When keyboard opens, content must clear the keyboard.
+      // Xiaomi 3-button nav floor is 700dp; typical IME is 200-500dp.
+      // If paddingBottom > 500dp, treat as nav bar floor (not IME) and use fixed minimum.
       var floatingLayerClearance = fabBottom + 54 + 12; // 242px
-      var imeClearance = (insets.paddingBottom || insets.bottom || 100) + 12;
+      var paddingBottom = insets.paddingBottom || insets.bottom || 100;
+      var imeClearance = paddingBottom > 500 ? 300 : paddingBottom + 12;
       var bottomNavClearance = Math.max(floatingLayerClearance, imeClearance, 300);
       root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
     },
