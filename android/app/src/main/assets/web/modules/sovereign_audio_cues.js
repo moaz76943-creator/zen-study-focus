@@ -102,38 +102,17 @@
       if (ctx) {
         audioCore.loadOggBuffer(src).then(function (decodedBuf) {
           if (!decodedBuf || S.muted) return null;
-          var numChannels = decodedBuf.length ? 1 : 1;
-          // Pass to createSeamlessBuffer: it DC-removes, attenuate-only peaks,
-          // and crossfades the tail into the head for a click-free loop.
-          var finalBuffer = audioCore.createSeamlessBuffer(ctx, 2.0, function (channelData, sampleRate, totalSec) {
-            var data = channelData[0];
-            var bufferSize = Math.floor(sampleRate * totalSec);
-            // If decodedBuf is the raw array we already loaded, copy those samples in.
-            // Otherwise synthesize rain/water bed from noise parameters.
-            if (decodedBuf && typeof decodedBuf.length === 'number' && decodedBuf.length > 0) {
-              var minLen = Math.min(bufferSize, decodedBuf.length);
-              for (var idx = 0; idx < minLen; idx++) {
-                data[idx] = decodedBuf[idx];
-              }
-              // If shorter than requested, replicate last sample to avoid phase discontinuity
-              for (var idx = minLen; idx < bufferSize; idx++) {
-                data[idx] = decodedBuf[(minLen - 1) % decodedBuf.length];
-              }
-            } else {
-              for (var idx = 0; idx < bufferSize; idx++) {
-                data[idx] = (Math.random() * 2 - 1) * WHITE_NOISE_AMP;
-              }
-            }
-          }, 1, false);
-
-          var voice = audioCore.createVoice(finalBuffer, true);
+          // AudioCore.loadOggBuffer returns an already seamlessly-processed
+          // AudioBuffer (DC-removed, peak-limited, crossfaded). No need to
+          // re-wrap it — pass it directly to createVoice.
+          var voice = audioCore.createVoice(decodedBuf, true);
           if (!voice) return null;
 
           // Ensure per-voice gain is targetVol (not full 1.0)
           var now2 = ctx.currentTime;
           voice.gain.gain.cancelScheduledValues(now2);
           voice.gain.gain.setValueAtTime(0.0001, now2);
-          voice.gain.gain.linearRampToValueAtTime(targetVol * S.volume, now2 + (audioCore.FADE_IN_MS || 0.03));
+          voice.gain.gain.linearRampToValueAtTime(targetVol * S.volume, now2 + (audioCore.FADE_IN_MS || 30) / 1000);
           S.players.push({
             pause: function () { try { voice.stop(); } catch (e) {} },
             currentTime: 0,
