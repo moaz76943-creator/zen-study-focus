@@ -63919,7 +63919,7 @@ function() {
     collapseBtn.id = 'dfSpatialCollapseToggle';
     collapseBtn.type = 'button';
     collapseBtn.setAttribute('aria-controls', 'dfSpatialBody');
-    collapseBtn.style.cssText = 'font-size:11px;font-weight:800;color:#475569;background:#f8fafc;border:1px solid #cbd5e1;border-radius:999px;padding:6px 12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:background .15s,border-color .15s,color .15s;';
+    collapseBtn.style.cssText = 'font-size:11px;font-weight:800;color:#475569;background:#f8fafc;border:1px solid #cbd5e1;border-radius:999px;padding:6px 12px;display:inline-flex;align-items:center;justify-content:center;gap:6px;cursor:pointer;transition:background .15s,border-color .15s,color .15s,box-shadow .15s;';
 
     const collapseChevron = document.createElement('span');
     collapseChevron.setAttribute('aria-hidden', 'true');
@@ -63936,6 +63936,11 @@ function() {
       collapseLabel.textContent = lbl;
       collapseChevron.textContent = window.__dfSpatialCollapsed ? '▸' : '▾';
       collapseBtn.setAttribute('aria-label', lbl + ' — ' + DF_SPATIAL_LBL_HINT);
+      // Visual affordance: expand state gets a subtle accent color
+      collapseBtn.style.color = window.__dfSpatialCollapsed ? '#475569' : '#7c3aed';
+      collapseBtn.style.borderColor = window.__dfSpatialCollapsed ? '#cbd5e1' : '#c4b5fd';
+      collapseBtn.style.background = window.__dfSpatialCollapsed ? '#f8fafc' : '#faf5ff';
+      collapseBtn.style.boxShadow = window.__dfSpatialCollapsed ? 'none' : '0 2px 8px rgba(124, 58, 237, 0.12)';
     }
     window.__dfSpatialSetCollapsed = dfSpatialSetCollapsed;
     collapseBtn.onclick = function() { dfSpatialSetCollapsed(!window.__dfSpatialCollapsed); };
