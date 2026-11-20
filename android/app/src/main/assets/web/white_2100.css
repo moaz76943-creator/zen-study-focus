@@ -475,7 +475,10 @@ body:not(.deep-lockdown) .bottom-nav-capsule {
   gap: 1px;
   width: calc(100% - 18px);
   max-width: 480px;
-  padding: 7px 5px 5px;
+  /* Height controlled by calibrator (--df-capsule-height) to match actual nav bar
+     insets and narrow-screen layout. Internal padding uses flex to center content. */
+  height: var(--df-capsule-height, 100px);
+  padding: 0 5px;
   border-radius: 25px;
   position: fixed;
   /* Docked just above the WebView content-area bottom, which MainActivity already
@@ -483,7 +486,8 @@ body:not(.deep-lockdown) .bottom-nav-capsule {
      --df-webview-padding-bottom is 0px pinned by calibrator). */
   bottom: var(--df-dock-bottom, 12px);
   /* Internal padding only; safe-area handled by bottom positioning */
-  padding-bottom: 5px;
+  align-items: center;
+  box-sizing: border-box;
 }
 body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn{min-width:0;padding:7px 1px 5px;gap:3px;border-radius:15px;font-size:clamp(.48rem,2vw,.63rem);line-height:1.1}
 body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn svg{width:19px;height:19px;flex-shrink:0}
@@ -672,7 +676,8 @@ body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
   body:not(.deep-lockdown) .bottom-nav-capsule {
     width: calc(100% - 4px);
     padding-inline: 2px;
-    padding-block-start: clamp(40px, 2.5rem, 80px);
+    /* Capsule height now controlled by --df-capsule-height (calibrator accounts for narrow screen).
+       No extra padding-block-start needed; internal layout centers via align-items. */
     gap: 0;
   }
   body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
