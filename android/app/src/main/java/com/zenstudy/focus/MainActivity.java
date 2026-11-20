@@ -154,11 +154,11 @@ public class MainActivity extends AppCompatActivity {
             // minimum floor. This handles edge cases where detection fails and the
             // reported insets are zero or too small. The cost is extra padding (harmless
             // empty space); the benefit is never clipping content or overlapping the
-            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can reach ~100-120dp;
-            // use 120dp floor to guarantee the WebView viewport never intrudes into the
+            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can reach ~150dp on Android 15;
+            // use 160dp floor to guarantee the WebView viewport never intrudes into the
             // nav bar area. DO NOT apply for gesture navigation (handle ~32dp).
             if (isXiaomi && !isGestureNav) {
-                int absoluteMinNavDp = 120; // Covers 3-button bars up to ~120dp on HyperOS
+                int absoluteMinNavDp = 160; // Covers 3-button bars up to ~160dp on HyperOS Android 15
                 int absoluteMinNavPx = Math.round(absoluteMinNavDp * density);
                 if (navBottom < absoluteMinNavPx) navBottom = absoluteMinNavPx;
             }
