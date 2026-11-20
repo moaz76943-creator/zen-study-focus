@@ -5443,7 +5443,7 @@ const SOUNDS_DATA = [
   { id: 'stream', cat: 'water', cls: 'sbg-stream', vol: 0.5, src: "audio/flowing_water.ogg", url: "audio/flowing_water.ogg" },
   { id: 'forest', cat: 'forest', cls: 'sbg-forest', vol: 0.45, src: "audio/forest_birds.ogg", url: "audio/forest_birds.ogg" },
   { id: 'wind', cat: 'forest', cls: 'sbg-wind', vol: 0.35, src: "audio/wind_breeze.ogg", url: "audio/wind_breeze.ogg" },
-  { id: 'thunder', cat: 'warm', cls: 'sbg-thunder', vol: 0.42, src: "audio/rain_thunder.ogg", url: "audio/rain_thunder.ogg" },
+  { id: 'thunder', cat: 'water', cls: 'sbg-thunder', vol: 0.42, src: "audio/rain_thunder.ogg", url: "audio/rain_thunder.ogg" },
   { id: 'fire', cat: 'warm', cls: 'sbg-fire', vol: 0.45, src: "audio/campfire_embers.ogg", url: "audio/campfire_embers.ogg" },
   { id: 'drip', cat: 'water', cls: 'sbg-drip', vol: 0.35, src: "audio/water_drop.ogg", url: "audio/water_drop.ogg" }
 ];

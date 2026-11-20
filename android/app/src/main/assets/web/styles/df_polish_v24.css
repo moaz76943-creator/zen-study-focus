@@ -1,0 +1,127 @@
+/* ============================================================================ *
+ * DEEP FOCUS — DF Polish v24 (cross-tab / cross-studio elevation layer)
+ * Scope: hierarchy, spacing rhythm, contrast, tap targets, focus visibility,
+ * and 120Hz-friendly motion (transform/opacity only — never layout props).
+ * Loaded LAST so it refines earlier sheets without editing them.
+ * No perpetual animations; fully honors prefers-reduced-motion.
+ * ============================================================================ */
+
+/* ---------- Focus ring consistency: brand primary (#1350a1) aligns with
+      --df22-primary-fill and --df22-focus in design_tokens_v22.css.
+      Replaces the drifted #2563eb from df_polish_v23.css. ------------------- */
+button:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.bnav-btn:focus-visible,
+.seg-pill:focus-visible,
+.sound-Rich-tile:focus-visible {
+  outline: 3px solid #1350a1 !important;
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+/* ---------- Tap targets: enforce 48px on .seg-pill and .task_mini-sel.
+      design_tokens_v22.css forces 48px !important on buttons/role=button,
+      but .seg-pill and .task_mini-sel are not buttons — they were slipping
+      below the Material/AA standard. This lifts them to 48px. ------------- */
+.seg-pill,
+.task-mini-sel {
+  min-height: 48px !important;
+  min-width: 48px !important;
+}
+
+/* ---------- Sounds tab: Nature Sounds is the hero.
+      Promotes the header card to full-width with generous spacing. ---------- */
+#sec-sounds .ns-header-card {
+  margin-top: 2px;
+  margin-bottom: 10px;
+  padding: 14px 16px;
+  border-radius: 18px;
+}
+#sec-sounds .segmented-pills-bar { margin-bottom: 10px; }
+#sec-sounds .sounds-photo-grid { gap: 12px; }
+#sec-sounds .mixer-status-bar { margin-bottom: 12px; }
+
+/* ---------- 3D Spatial studio: clean collapsible chrome ------------------ */
+#dfPillar5SpatialMount .df-spatial-body { max-height: none; }
+#dfSpatialCollapseToggle { min-height: 32px; }
+#dfSpatialCollapseToggle:hover { background: #eef2ff !important; border-color: #c4b5fd !important; }
+
+/* Collapsed spatial studio: compact header + toggle affordance */
+#dfPillar5SpatialMount[aria-expanded="false"] .df-spatial-body { display: none !important; }
+#dfPillar5SpatialMount .df-spatial-body:empty { display: none; }
+
+/* ---------- Spacing rhythm: consistent vertical cadence per tab ----------- */
+.screen-section { scroll-padding-top: 16px; }
+.screen-section > .pure-white-card,
+.screen-section > .wave-chart-card,
+.screen-section > .ns-header-card { margin-bottom: 12px; }
+.analytics-kpi-grid { gap: 12px; }
+.sounds-photo-grid { gap: 12px; }
+.showcase-task-card { margin-bottom: 12px; }
+
+/* ---------- 120Hz-smooth, GPU-only motion (transform/opacity only) --------- */
+.sound-Rich-tile,
+.seg-pill,
+.bnav-btn,
+.task_mini-sel,
+.zen-compact-suite-btn,
+.ns-card,
+.pure-white-card,
+.an-kpi-card,
+.modal-card {
+  transition-property: transform, box-shadow, border-color, color, background-color, opacity;
+  transition-duration: .18s;
+  transition-timing-function: cubic-bezier(.2, .7, .3, 1);
+  will-change: transform, box-shadow, border-color, opacity;
+}
+.sound-Rich-tile:active,
+.seg-pill:active,
+.bnav-btn:active,
+.task_mini-sel:active,
+.zen-compact-suite-btn:active { transform: scale(.96); }
+@media (hover: hover) {
+  .sound-Rich-tile:hover { transform: translateY(-2px); }
+  .zen-compact-suite-btn:hover { transform: translateY(-1px); }
+}
+
+/* GPU-layer hint for progress bars & animated widths (prevent layout thrash) */
+.goal-fill,
+.mbar-fill,
+.training-progress-bar span,
+.today-progress-track span,
+.ring-bar {
+  will-change: width, stroke-dashoffset;
+  transform: translateZ(0);
+}
+
+/* ---------- Tap targets ≥ 44px on primary interactive chrome ------------- */
+.bnav-btn { min-height: 44px; }
+.zen-compact-suite-btn { min-height: 56px; }
+.bnav-btn, .seg-pill, .task_mini-sel, .zen-compact-suite-btn, .sound-Rich-tile {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* ---------- Reduced-motion kill switch: strip all motion on demand ------ */
+@media (prefers-reduced-motion: reduce) {
+  .sound-Rich-tile,
+  .seg-pill,
+  .bnav-btn,
+  .task_mini-sel,
+  .zen-compact-suite-btn,
+  .ns-card,
+  .pure-white-card,
+  .an-kpi-card,
+  .modal-card,
+  .goal-fill,
+  .mbar-fill,
+  .ring-bar {
+    transition-duration: 0ms !important;
+    will-change: auto !important;
+    transform: none !important;
+  }
+}
