@@ -96,19 +96,19 @@
       var flooredNavBottom = insets.paddingBottom; // Floored value (160dp on Xiaomi 3-button, 32dp on gesture, or IME)
 
       // Determine effective nav bar height for capsule sizing
-      // Xiaomi 3-button misreporting: rawNavBottom may be 32 (mandatorySystemGestures handle)
-      // while flooredNavBottom is 160 (160dp floor). Use floored when it's significantly
-      // larger than raw (indicating a defensive floor was applied for 3-button nav).
+      // Prefer flooredNavBottom when it represents the 3-button nav bar floor
+      // (floored > raw indicates a defensive floor was applied; floored <= 500 excludes IME).
+      // This handles Xiaomi misreporting where mandatorySystemGestures reports a handle
+      // height (e.g., 32-100dp) but the actual 3-button nav bar is 160dp.
       var effectiveNavHeight;
-      if (rawNavBottom > 0 && !(rawNavBottom < 50 && flooredNavBottom > 100 && flooredNavBottom > rawNavBottom * 2)) {
-        // Raw is reliable: either gesture nav (raw ~32, floored ~32) or honest 3-button (raw ~96-150)
-        effectiveNavHeight = rawNavBottom;
-      } else if (flooredNavBottom > 32 && flooredNavBottom <= 500) {
-        // Xiaomi 3-button misreporting: raw=32 (handle) but floored=160 (nav bar floor)
-        // or raw=0 but floored=160. Use the floored value which includes the defensive floor.
+      if (flooredNavBottom > rawNavBottom && flooredNavBottom <= 500) {
+        // 3-button nav with defensive floor applied (Xiaomi 160dp floor), or severe under-reporting (raw=0)
         effectiveNavHeight = flooredNavBottom;
+      } else if (rawNavBottom > 0) {
+        // Gesture nav (raw ~ floored ~ 32), honest 3-button (raw == floored),
+        // or IME open (floored > 500, raw is the nav bar height).
+        effectiveNavHeight = rawNavBottom;
       } else {
-        // Default fallback
         effectiveNavHeight = 100;
       }
 
