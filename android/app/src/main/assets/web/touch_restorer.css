@@ -9,7 +9,7 @@
   --safe-bottom-clearance: var(--df-inflow-bottom, 320px);
 }
 
-html, body {
+body {
   padding-top: var(--safe-top) !important;
   padding-bottom: var(--safe-bottom-clearance) !important;
   overflow-x: hidden !important;
