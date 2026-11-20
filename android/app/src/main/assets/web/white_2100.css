@@ -667,7 +667,7 @@ body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
     /* Body content padding clears floating elements (FAB, Studios pill).
        Uses the calibrated single-owner clearance reserve (capsule + Studios pill + FAB + gaps).
        --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom. */
-    padding-bottom: var(--df-inflow-bottom, 320px) !important;
+    padding-bottom: var(--df-inflow-bottom, 300px) !important;
   }
   body:not(.deep-lockdown) .bottom-nav-capsule {
     width: calc(100% - 4px);

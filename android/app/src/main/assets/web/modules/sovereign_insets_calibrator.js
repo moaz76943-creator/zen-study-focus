@@ -31,15 +31,15 @@
      */
     init: function () {
       if (!this._hasRealInsets) {
-        // Use a conservative fallback bottom (700dp) matching the Xiaomi 3-button nav floor
-        // in MainActivity (absoluteMinNavDp = 700) so the initial reserve covers tall nav bars
+        // Use a conservative fallback bottom (120dp) matching the Xiaomi 3-button nav floor
+        // in MainActivity (absoluteMinNavDp = 120) so the initial reserve covers tall nav bars
         // before real insets arrive. Real gesture nav (~32dp) will quickly correct to a smaller capsule.
         this.applyCSSVariables({
           top: 24,
-          bottom: 700,
+          bottom: 120,
           left: 0,
           right: 0,
-          paddingBottom: 700
+          paddingBottom: 120
         });
       }
       if (typeof window !== 'undefined') {
@@ -83,7 +83,7 @@
      * Injects CSS variables onto documentElement with !important to override conflicting rules.
      * Design (Android 15 / Xiaomi edge-to-edge): MainActivity pads the WebView's PARENT
      * FrameLayout with the FLOORED system-bar insets (including defensive floors for Xiaomi
-     * HyperOS 3-button nav up to 700dp), so the WebView's layout viewport
+     * HyperOS 3-button nav up to 120dp), so the WebView's layout viewport
      * already ends above the status bar, cutout and 3-button nav bar. Native padding
      * is the single owner of the insets — if CSS re-added them (via --df-safe-top /
      * --df-safe-bottom / --df-webview-padding-bottom) every dock offset and body
@@ -134,14 +134,14 @@
       // (FAB top = fabBottom + FABheight(54) = 230px) + gap(12) = 242px minimum.
       // Also handle IME: insets.paddingBottom = max(flooredNavBottom, IME height).
       // When keyboard opens, content must clear the keyboard.
-      // Xiaomi 3-button nav floor is 700dp; typical IME is 200-500dp.
+      // Xiaomi 3-button nav floor is 120dp; typical IME is 200-500dp.
       // If paddingBottom > 500dp, treat as nav bar floor (not IME) and use fixed minimum.
       // The clearance is additional body padding INSIDE the WebView viewport (which is
       // already reduced by native parent padding). It must always be at least
       // floatingLayerClearance to clear the FAB/Studios pill; never cap it by the
       // viewport height because the viewport is already short on tall-nav-bar devices.
       var floatingLayerClearance = fabBottom + 54 + 12; // 242px
-      var paddingBottom = insets.paddingBottom || insets.bottom || 700;
+      var paddingBottom = insets.paddingBottom || insets.bottom || 120;
       var imeClearance = paddingBottom > 500 ? 300 : paddingBottom + 12;
       var bottomNavClearance = Math.max(floatingLayerClearance, imeClearance, 300);
       root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');

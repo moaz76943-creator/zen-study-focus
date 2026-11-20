@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Xiaomi-specific override: on HyperOS, mandatorySystemGestures.bottom may be > 0 even in 3-button mode,
             // and navigationBars/systemBars may under-report (report 0). If the device is Xiaomi and we have a
-            // gesture handle but no visible nav bar, assume 3-button nav and apply the 700dp absolute floor.
+            // gesture handle but no visible nav bar, assume 3-button nav and apply the 120dp absolute floor.
             // This is safer than relying on height thresholds (32dp/100dp) which have a gap: a misreported
             // 3-button bar at 32-100dp would be missed. Extra padding on gesture nav is harmless (empty space);
             // missing the nav bar on 3-button clips content and overlaps the Studios pill.
@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
             float density = getResources().getDisplayMetrics().density;
             if (isXiaomi && hasGestureHandle && !hasVisibleNavBar) {
                 // Xiaomi with gesture handle but no visible 3-button bar = treat as 3-button nav.
-                // The 700dp absolute floor below will guarantee the WebView viewport never intrudes
+                // The 120dp absolute floor below will guarantee the WebView viewport never intrudes
                 // into the nav bar area. This covers all misreporting cases (any handle height > 0).
                 isGestureNav = false;
             }
@@ -146,33 +146,19 @@ public class MainActivity extends AppCompatActivity {
             // Xiaomi Android 15 3-button nav bar can reach ~96dp on HyperOS; use 100dp floor to prevent
             // WebView viewport from extending behind the nav bar, which clips bottom cards and
             // causes the Studios pill to overlap content.
-            // ADDITIONAL SAFETY: On some Xiaomi HyperOS builds the 3-button bar exceeds 100dp (up to ~120dp).
-            // Apply a secondary 120dp floor for 3-button nav to guarantee the WebView viewport never
-            // intrudes into the nav bar area. The test gate checks for the 100dp baseline; this extra
-            // margin is additive and preserves the test invariant.
             int navBottom = rawNavBottom;
             int minNavDp = isGestureNav ? 32 : 100;
             int minNavPx = Math.round(minNavDp * density);
             if (navBottom < minNavPx) navBottom = minNavPx;
-            // Extra safety margin for tall 3-button nav bars on Xiaomi HyperOS (bsc#hyperos-navbar-height).
-            // Apply ONLY for 3-button navigation. Gesture navigation uses the 32dp minimum from above.
-            // If detection misclassifies 3-button as gesture (Xiaomi reports 0 for navigationBars/systemBars),
-            // the 3-button bar height will be captured by systemBars.bottom or navigationBars.bottom
-            // since both report the 3-button bar height on Xiaomi.
-            if (!isGestureNav) {
-                int extraNavDp = 200;
-                int extraNavPx = Math.round(extraNavDp * density);
-                if (navBottom < extraNavPx) navBottom = extraNavPx;
-            }
             // ULTIMATE SAFETY NET: On Xiaomi devices with 3-BUTTON NAVIGATION, apply an absolute
             // minimum floor. This handles edge cases where detection fails and the
             // reported insets are zero or too small. The cost is extra padding (harmless
             // empty space); the benefit is never clipping content or overlapping the
-            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can exceed 500dp on some
-            // devices/regions; use 700dp floor to guarantee the WebView viewport never
-            // intrudes into the nav bar area. DO NOT apply for gesture navigation (handle ~32dp).
+            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can reach ~100-120dp;
+            // use 120dp floor to guarantee the WebView viewport never intrudes into the
+            // nav bar area. DO NOT apply for gesture navigation (handle ~32dp).
             if (isXiaomi && !isGestureNav) {
-                int absoluteMinNavDp = 700; // Covers 3-button bars up to ~700dp on HyperOS
+                int absoluteMinNavDp = 120; // Covers 3-button bars up to ~120dp on HyperOS
                 int absoluteMinNavPx = Math.round(absoluteMinNavDp * density);
                 if (navBottom < absoluteMinNavPx) navBottom = absoluteMinNavPx;
             }
