@@ -194,21 +194,30 @@
       }
     }
 
-    // 4. Crossfade tail into head for seamless loop
+    // 4. Symmetric crossfade: blend tail into head AND head into tail for seamless loop
+    // This ensures BOTH sides of the loop boundary are in the crossfade region,
+    // eliminating clicks/static at the wrap point.
     const finalBuffer = ctx.createBuffer(numChannels, finalSize, ctx.sampleRate);
     for (let ch = 0; ch < numChannels; ch++) {
       const finalData = finalBuffer.getChannelData(ch);
       const tempData = channelData[ch];
 
-      // Body: copy main segment unchanged
+      // Body: copy main segment (excluding crossfade regions)
       finalData.set(tempData.subarray(0, finalSize));
 
-      // Head crossfade: blend natural tail continuation into head
-      // finalData[0] = tempData[finalSize] (continuation of tempData[finalSize-1])
-      // finalData[xfadeSamples-1] ≈ tempData[xfadeSamples-1] (head)
+      // Crossfade at loop END: blend original tail → continuation (natural tail)
+      const loopEndStart = finalSize - xfadeSamples;
       for (let i = 0; i < xfadeSamples; i++) {
         const t = i / xfadeSamples;
-        finalData[i] = (1 - t) * tempData[finalSize + i] + t * tempData[i];
+        const tailSample = tempData[loopEndStart + i];
+        const continuationSample = tempData[finalSize + i];
+        finalData[loopEndStart + i] = (1 - t) * tailSample + t * continuationSample;
+      }
+
+      // Crossfade at loop START: blend continuation → original head
+      // Copy the crossfaded tail region to the head for perfect symmetry
+      for (let i = 0; i < xfadeSamples; i++) {
+        finalData[i] = finalData[loopEndStart + i];
       }
     }
     return finalBuffer;

@@ -50,10 +50,10 @@
       this.audioCtx = null;
       this.isPlaying = false;
       this.activePreset = 'pink_noise';
-      this.masterGain = null;
       this.eqFilters = [];
       this.sourceNode = null;
       this.analyser = null;
+      this.dcBlockFilter = null;
       // Gesture detection is handled by AudioCore - no local binding needed
 
       this.eqGains = new Array(EQ_FREQUENCIES.length).fill(0);
@@ -83,12 +83,7 @@
     }
 
     buildEqChain(ctx) {
-      this.masterGain = ctx.createGain();
-      this.masterGain.gain.setValueAtTime(
-        this.options.defaultVolume,
-        ctx.currentTime
-      );
-
+      // Use AudioCore's master output directly — no local masterGain to avoid double attenuation
       this.analyser = ctx.createAnalyser();
       this.analyser.fftSize = 64;
 
@@ -113,18 +108,18 @@
         return filter;
       });
 
-      // Chain: DC block -> EQ filters -> master gain -> analyser -> AudioCore master output
+      // Chain: DC block -> EQ filters -> AudioCore master output (masterGain -> limiter -> DC -> analyser -> destination)
       this.dcBlockFilter.connect(this.eqFilters[0]);
       for (let i = 0; i < this.eqFilters.length - 1; i++) {
         this.eqFilters[i].connect(this.eqFilters[i + 1]);
       }
 
-      this.eqFilters[this.eqFilters.length - 1].connect(this.masterGain);
-      this.masterGain.connect(this.analyser);
-
-      // Connect to AudioCore's master output (which goes through limiter → DC → destination)
+      // Connect last EQ filter to AudioCore's master output (masterGain)
       const masterOut = audioCore ? audioCore.getMasterOutput() : ctx.destination;
-      this.analyser.connect(masterOut);
+      this.eqFilters[this.eqFilters.length - 1].connect(masterOut);
+
+      // Also connect analyser for visualization (taps the signal post-EQ)
+      this.eqFilters[this.eqFilters.length - 1].connect(this.analyser);
     }
 
     /** Paul Kellet pink-noise, pre-rendered, bounded well under the limiter. */
@@ -262,17 +257,20 @@
       source.buffer = buffer;
       source.loop = true;
 
+      // Build the chain: source -> shapers -> dcBlockFilter -> EQ filters -> AudioCore master
+      let lastNode = source;
       if (shapers && shapers.length) {
-        source.connect(shapers[0]);
-        for (let i = 0; i < shapers.length - 1; i++) {
-          shapers[i].connect(shapers[i + 1]);
-        }
-        shapers[shapers.length - 1].connect(this.dcBlockFilter);
-      } else {
-        source.connect(this.dcBlockFilter);
+        shapers.forEach(s => {
+          lastNode.connect(s);
+          lastNode = s;
+        });
       }
+      lastNode.connect(this.dcBlockFilter);
+      // The EQ chain is already built and connected to AudioCore master output
+      // in buildEqChain. The dcBlockFilter is the entry point to the EQ chain.
+      // So we just connect source/shapers to dcBlockFilter.
 
-      // Preset is starting — re-open AudioCore's master (instant Stop mutes it to 0)
+      // A new preset = audible audio desired: restore AudioCore's master
       if (audioCore && typeof audioCore.unmuteMaster === 'function') {
         audioCore.unmuteMaster();
       }
@@ -308,7 +306,7 @@
       this._startBufferSource(this.generateBinaural40HzBuffer(5), null);
     }
 
-    /** Instant stop with a 30ms click-free fade, tears down every node. */
+    /** Instant stop with a 30ms click-free fade, tears down source node. */
     stop() {
       this.isPlaying = false;
 
@@ -318,23 +316,22 @@
         try {
           const now = this.audioCtx.currentTime;
           const fade = FADE_OUT_SEC;
-          // Capture current gain to restore after fade (preserves user volume setting).
-          const gainAtFadeStart = this.masterGain ? this.masterGain.gain.value : 0;
-          // Fade using the existing masterGain in the EQ chain (no new nodes).
-          if (this.masterGain) {
-            this.masterGain.gain.cancelScheduledValues(now);
-            this.masterGain.gain.setValueAtTime(gainAtFadeStart, now);
-            this.masterGain.gain.linearRampToValueAtTime(0, now + fade);
-          }
+          // Fade using a temporary gain node inserted before dcBlockFilter
+          // to avoid modifying the shared EQ chain.
+          const fadeGain = this.audioCtx.createGain();
+          fadeGain.gain.setValueAtTime(1, now);
+          fadeGain.gain.linearRampToValueAtTime(0, now + fade);
+
+          // Reconnect: source -> fadeGain -> dcBlockFilter (EQ chain)
+          source.disconnect();
+          source.connect(fadeGain);
+          fadeGain.connect(this.dcBlockFilter);
+
           source.stop(now + fade + 0.005);
-          // Tear down source and restore masterGain to the captured gain after fade completes.
+          // Clean up fadeGain after fade completes
           source.onended = () => {
             try { source.disconnect(); } catch (_) {}
-            if (this.masterGain && this.audioCtx) {
-              const t = this.audioCtx.currentTime;
-              this.masterGain.gain.cancelScheduledValues(t);
-              this.masterGain.gain.setValueAtTime(gainAtFadeStart, t);
-            }
+            try { fadeGain.disconnect(); } catch (_) {}
           };
         } catch (e) {
           try { source.stop(); } catch (_) {}
@@ -359,16 +356,11 @@
       return this.eqGains;
     }
 
-    /** Master volume 0..1. AudioCore's master chain applies the -6dB ceiling. */
+    /** Master volume 0..1. Delegates to AudioCore's master volume. */
     setMasterVolume(vol) {
       const v = Math.max(0, Math.min(1.0, parseFloat(vol) || 0));
-      if (this.masterGain && this.audioCtx) {
-        // Smooth volume changes (30ms ramp) to avoid clicks when adjusting slider
-        const now = this.audioCtx.currentTime;
-        const fade = 0.03;
-        this.masterGain.gain.cancelScheduledValues(now);
-        this.masterGain.gain.setValueAtTime(this.masterGain.gain.value, now);
-        this.masterGain.gain.linearRampToValueAtTime(v, now + fade);
+      if (audioCore) {
+        audioCore.setMasterVolume(v);
       }
       return v;
     }

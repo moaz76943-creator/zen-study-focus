@@ -210,9 +210,17 @@
     const out = ctx.createBuffer(1, finalSize, ctx.sampleRate);
     const outData = out.getChannelData(0);
     for (let i = 0; i < finalSize; i++) outData[i] = tempData[i];
+
+    // Symmetric crossfade: blend tail into head AND head into tail for seamless loop
+    // Crossfade at loop END: blend original tail → continuation
+    const loopEndStart = finalSize - xfadeSamples;
     for (let i = 0; i < xfadeSamples; i++) {
       const t = i / xfadeSamples;
-      outData[i] = tempData[i] * t + tempData[finalSize + i] * (1 - t);
+      outData[loopEndStart + i] = (1 - t) * tempData[loopEndStart + i] + t * tempData[finalSize + i];
+    }
+    // Crossfade at loop START: copy crossfaded tail to head
+    for (let i = 0; i < xfadeSamples; i++) {
+      outData[i] = outData[loopEndStart + i];
     }
 
     // Post-process: DC removal → hard safety clamp
