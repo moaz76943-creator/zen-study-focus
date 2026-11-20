@@ -25,6 +25,7 @@
   transition-property: transform, box-shadow, border-color, color, background-color, opacity;
   transition-duration: .18s;
   transition-timing-function: var(--df-polish-ease);
+  will-change: transform, box-shadow, border-color, opacity;
 }
 .sound-Rich-tile:active,
 .seg-pill:active,
@@ -34,6 +35,16 @@
 @media (hover: hover) {
   .sound-Rich-tile:hover { transform: translateY(-2px); }
   .zen-compact-suite-btn:hover { transform: translateY(-1px); }
+}
+
+/* GPU-layer hint for progress bars & animated widths (prevent layout thrash) */
+.goal-fill,
+.mbar-fill,
+.training-progress-bar span,
+.today-progress-track span,
+.ring-bar {
+  will-change: width, stroke-dashoffset;
+  transform: translateZ(0);
 }
 
 /* ---------- Focus visibility (keyboard / TalkBack / switch access) ------- */
@@ -70,12 +81,14 @@ textarea:focus-visible,
 #sec-sounds .sounds-photo-grid { gap: 12px; }
 #sec-sounds .mixer-status-bar { margin-bottom: 12px; }
 
-/* ---------- 3D Spatial studio: clean collapsible chrome ------------------
-   The mount is collapsed by default; these rules keep the collapsed card
-   compact and the expanded body scrollable on short screens. */
+/* ---------- 3D Spatial studio: clean collapsible chrome ------------------ */
 #dfPillar5SpatialMount .df-spatial-body { max-height: none; }
 #dfSpatialCollapseToggle { min-height: 32px; }
 #dfSpatialCollapseToggle:hover { background: #eef2ff !important; border-color: #c4b5fd !important; }
+
+/* Collapsed spatial studio: compact header + toggle affordance */
+#dfPillar5SpatialMount[aria-expanded="false"] .df-spatial-body { display: none !important; }
+#dfPillar5SpatialMount .df-spatial-body:empty { display: none; }
 
 /* ---------- Spacing rhythm: consistent vertical cadence per tab ----------- */
 .screen-section { scroll-padding-top: 16px; }
@@ -83,13 +96,58 @@ textarea:focus-visible,
 .screen-section > .wave-chart-card,
 .screen-section > .ns-header-card { margin-bottom: 12px; }
 .analytics-kpi-grid { gap: 12px; }
+.sounds-photo-grid { gap: 12px; }
+.showcase-task-card { margin-bottom: 12px; }
+.learning-rich-card { margin-bottom: 12px; }
+.ns-card { margin-bottom: 12px; }
+.an-kpi-card { margin-bottom: 12px; }
+.pure-white-card { margin-bottom: 12px; }
+.focus-hero-card { margin-bottom: 12px; }
+.quick-training-card { margin-bottom: 12px; }
+.today-plan-card { margin-bottom: 12px; }
+.daily-goals-card { margin-bottom: 12px; }
+.wave-chart-card { margin-bottom: 12px; }
+.ns-header-card { margin-bottom: 12px; }
+
+/* Consistent internal padding rhythm for white cards */
+.pure-white-card,
+.focus-hero-card,
+.quick-training-card,
+.today-plan-card,
+.daily-goals-card,
+.showcase-task-card,
+.learning-rich-card,
+.ns-card,
+.an-kpi-card,
+.wave-chart-card,
+.modal-card {
+  padding: 16px;
+}
 
 /* ---------- Contrast: keep muted text readable on white cards ------------- */
+/* Elevate readability: specific elements that appear on white/near-white card
+   surfaces already loaded in white_2100.css; these overrides ensure WCAG AA
+   ≥4.5:1 without altering token definitions used elsewhere. */
 .ns-header-subtitle,
-.kpi-trend,
+.ns-count,
 .an-kpi-trend,
 .wave-flow-sub,
-.donut-center-txt { text-rendering: optimizeLegibility; }
+.donut-center-txt,
+.ring-mode-txt,
+.today-plan-task-detail,
+.notes-studio-stats span,
+.delta-chip {
+  color: #5b6b82 !important;
+  text-rendering: optimizeLegibility;
+}
+
+/* Ensure placeholder text is readable on white inputs */
+input::placeholder,
+textarea::placeholder,
+select::placeholder {
+  color: #7183a4 !important;
+  opacity: 1;
+}
 
 /* ---------- Slim, unobtrusive scrollbars (WebView + desktop) -------------- */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
