@@ -301,11 +301,10 @@
         else entry.source.stop();
       } catch (e) {}
     });
-    // Disconnect immediately after scheduling stop (no setTimeout)
+    // Disconnect AFTER fade completes (via onended) — disconnecting immediately
+    // after scheduling stop cancels the scheduled fade ramp and causes a click/pop.
     sources.forEach(function (entry) {
-      try { if (entry.source) entry.source.disconnect(); } catch (e) {}
-      try { if (entry.gain) entry.gain.disconnect(); } catch (e) {}
-      try { if (entry.dc) entry.dc.disconnect(); } catch (e) {}
+      try { if (entry.source) entry.source.onended = null; } catch (e) {}
     });
     S.activeSources = [];
     S.activeSource = null;

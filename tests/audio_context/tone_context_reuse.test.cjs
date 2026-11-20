@@ -68,8 +68,9 @@ function rigTile(playPromises=[]){
         resume: () => Promise.resolve(),
         createBuffer: (ch,len,sr) => ({getChannelData:()=>new Float32Array(len)}),
         createBufferSource: () => ({loop:false,buffer:null,connect(){},start(){},stop(){},disconnect(){}}),
-        createBiquadFilter: () => ({type:'',frequency:{value:0},connect(){},disconnect(){}}),
+        createBiquadFilter: () => ({type:'',frequency:{value:0,setValueAtTime(){}},Q:{value:0,setValueAtTime(){}},connect(){},disconnect(){}}),
         createGain: () => ({connect(){},disconnect(){},gain:{value:1,setValueAtTime(){},cancelScheduledValues(){},setTargetAtTime(){},linearRampToValueAtTime(){}}}),
+        createDynamicsCompressor: () => ({threshold:{value:0,setValueAtTime(){}},knee:{value:0,setValueAtTime(){}},ratio:{value:0,setValueAtTime(){}},attack:{value:0,setValueAtTime(){}},release:{value:0,setValueAtTime(){}},connect(){},disconnect(){}}),
         decodeAudioData: (buf) => Promise.resolve({duration:1,sampleRate:8000,getChannelData:()=>new Float32Array(8000)})
       };
     },

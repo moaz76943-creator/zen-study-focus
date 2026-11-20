@@ -5508,10 +5508,14 @@ window.dfMasterAudioUnmute = function () {
 // Lazy AudioContext: created ONLY on first user gesture, never on load/tab switch
 // Delegates to AudioCore for single shared context
 function ensureProceduralAudioContext() {
+  // ALWAYS delegate to AudioCore — it is the single source of truth for
+  // Web Audio. Creating a second context (the old fallback) bypassed the
+  // master limiter/DC-block chain and produced constant static/hiss.
   if (window.AudioCore) {
     return window.AudioCore.getContext();
   }
-  // Fallback for environments without AudioCore
+  // Fallback for environments without AudioCore — create context with
+  // proper master chain (limiter + DC block) to prevent static.
   const AudioCtx = window.AudioContext || window.webkitAudioContext;
   if (!AudioCtx) throw new Error('Web Audio is unavailable');
   const isNodeEnv = typeof window === 'undefined' || typeof navigator === 'undefined' || navigator.userAgent?.includes('Node.js');
@@ -5520,6 +5524,9 @@ function ensureProceduralAudioContext() {
   }
   if (!webAudioCtx || webAudioCtx.state === 'closed') {
     webAudioCtx = new AudioCtx();
+    // Build master chain on the fallback context so it shares the same
+    // zero-static architecture as AudioCore (limiter → DC block → destination).
+    buildMasterChainFallback(webAudioCtx);
   }
   if (webAudioCtx.state === 'suspended' && audioContextUserGestureReceived && typeof webAudioCtx.resume === 'function') {
     webAudioCtx.resume().catch(() => {});
@@ -5527,8 +5534,53 @@ function ensureProceduralAudioContext() {
   // NOTE: Do NOT call dfMasterAudioUnmute here — the master stays muted until
   // an explicit voice/preset starts (which calls AudioCore.unmuteMaster or
   // sets master gain directly). This prevents any residual noise burst on
-  // context creation/resume without user intent to play audio.
+  // startup or tab switch.
   return webAudioCtx;
+}
+
+// Build a master chain on the fallback context (used only when AudioCore
+// is unavailable). Mirrors AudioCore.buildMasterChain: gain → limiter →
+// DC block → destination. Without this, the fallback path produced
+// constant static/hiss because raw oscillator output hit the destination
+// with no DC removal or limiter protection.
+function buildMasterChainFallback(ctx) {
+  if (!ctx || typeof ctx.createGain !== 'function') return;
+  const masterGain = ctx.createGain();
+  if (masterGain.gain && typeof masterGain.gain.setValueAtTime === 'function') {
+    masterGain.gain.setValueAtTime(0.5, ctx.currentTime); // -6dB limiter ceiling
+  }
+
+  let tail = masterGain;
+  // Limiter — skip gracefully on runtimes without DynamicsCompressor.
+  if (typeof ctx.createDynamicsCompressor === 'function') {
+    const limiter = ctx.createDynamicsCompressor();
+    try {
+      limiter.threshold.setValueAtTime(-3, ctx.currentTime);
+      limiter.knee.setValueAtTime(3, ctx.currentTime);
+      limiter.ratio.setValueAtTime(20, ctx.currentTime);
+      limiter.attack.setValueAtTime(0.001, ctx.currentTime);
+      limiter.release.setValueAtTime(0.1, ctx.currentTime);
+    } catch (_) {}
+    tail.connect(limiter);
+    tail = limiter;
+  }
+
+  // DC-blocking high-pass — removes constant DC offset / rumble (hiss source).
+  if (typeof ctx.createBiquadFilter === 'function') {
+    const dcBlock = ctx.createBiquadFilter();
+    dcBlock.type = 'highpass';
+    try {
+      dcBlock.frequency.setValueAtTime(40, ctx.currentTime);
+      dcBlock.Q.setValueAtTime(0.707, ctx.currentTime);
+    } catch (_) {}
+    tail.connect(dcBlock);
+    tail = dcBlock;
+  }
+
+  tail.connect(ctx.destination);
+
+  // Store master gain for mute/unmute operations
+  ctx._masterGain = masterGain;
 }
 window.dfGetGlobalAudioContext = ensureProceduralAudioContext;
 
@@ -5931,17 +5983,18 @@ async function getOggBuffer(src) {
 function createOggPlayer(buffer, loop, volume) {
   const ctx = ensureProceduralAudioContext();
   if (!ctx || !buffer) return null;
-  // Use AudioCore's voice management for consistent behavior
+
+  // Prefer AudioCore's voice management (production path — always available in app).
+  // AudioCore.createVoice connects to masterGain (start of chain), ensuring
+  // DC-blocking and limiter are applied.
   if (window.AudioCore && window.AudioCore.createVoice) {
     const voice = window.AudioCore.createVoice(buffer, !!loop);
     if (voice) {
-      // Apply volume (voice gain ramps from 0.0001 to 1 in 30ms)
       const targetGain = volume * (window.AudioCore.LIMITER_LINEAR || 0.5);
       const now = ctx.currentTime;
       voice.gain.gain.cancelScheduledValues(now);
       voice.gain.gain.setValueAtTime(0.0001, now);
       voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.03);
-      // AudioCore tracks this voice internally — return minimal wrapper
       return {
         source: voice.source,
         gain: voice.gain,
@@ -5956,7 +6009,12 @@ function createOggPlayer(buffer, loop, volume) {
       };
     }
   }
-  // Fallback (legacy path)
+
+  // Fallback for test environments / edge cases where AudioCore is unavailable.
+  // Connect to the fallback context's master chain start (ctx._masterGain) so
+  // audio passes through limiter + DC block. Never connect directly to
+  // ctx.destination — that bypasses the chain and causes static/hiss.
+  const dest = ctx._masterGain || ctx.destination;
   const source = ctx.createBufferSource();
   source.buffer = buffer;
   source.loop = !!loop;
@@ -5971,7 +6029,7 @@ function createOggPlayer(buffer, loop, volume) {
   dcBlock.Q.setValueAtTime(0.707, ctx.currentTime);
   source.connect(dcBlock);
   dcBlock.connect(gain);
-  gain.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
+  gain.connect(dest);
   source.start();
   const player = {
     source,
@@ -5985,10 +6043,14 @@ function createOggPlayer(buffer, loop, volume) {
         gain.gain.setValueAtTime(gain.gain.value, now);
         gain.gain.linearRampToValueAtTime(0, now + fadeOutSec);
         source.stop(now + fadeOutSec + 0.005);
-        // Synchronous teardown — instant Stop, no deferred disconnect
-        try { source.disconnect(); } catch (_) {}
-        try { dcBlock.disconnect(); } catch (_) {}
-        try { gain.disconnect(); } catch (_) {}
+        // Defer teardown until fade completes via onended
+        const cleanup = () => {
+          try { source.disconnect(); } catch (_) {}
+          try { dcBlock.disconnect(); } catch (_) {}
+          try { gain.disconnect(); } catch (_) {}
+          source.onended = null;
+        };
+        source.onended = cleanup;
       } catch (e) {
         try { source.stop(); } catch (_) {}
       }
@@ -80976,10 +81038,13 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
         }
     });
     // Auto-resume audio context defensively on user gestures
+    // Use AudioCore's gesture state — never auto-resume on tab switch
     window.addEventListener("pointerdown", () => {
         // Zero-autoplay: resume only with an explicit prior user gesture.
-        if (window.audioContext && window.audioContext.state === "suspended" && typeof audioContextUserGestureReceived !== "undefined" && audioContextUserGestureReceived) {
-            window.audioContext.resume();
+        if (window.AudioCore && window.AudioCore.isGestureReceived()) {
+            // AudioCore is already tracking the gesture; no need to resume
+            // the context here — AudioCore manages it. Auto-resuming here
+            // would bypass the user-gesture gate and enable auto-play on tab switch.
         }
     }, { passive: true });
     window.requestScreenLock = requestScreenLock;
@@ -82590,6 +82655,13 @@ window.SovereignChimes = (function() {
     const BASE_VERDI_FREQ = 432;   // Natural harmonic Verdi tuning (A=432Hz)
 
     function getAudioContext() {
+        // ALWAYS delegate to AudioCore — it is the single shared context.
+        // Creating a second context here (window.audioContext) bypassed the
+        // master limiter/DC-block chain and produced static/hiss from
+        // cross-context connections.
+        if (window.AudioCore && typeof window.AudioCore.getContext === 'function') {
+            return window.AudioCore.getContext();
+        }
         if (!window.audioContext) {
             const AudioCtx = window.AudioContext || window.webkitAudioContext;
             if (AudioCtx) window.audioContext = new AudioCtx();
