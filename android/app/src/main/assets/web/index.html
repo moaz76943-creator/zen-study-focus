@@ -392,27 +392,59 @@
        #sec-sounds > #dfPillar5SpatialMount { order: 4; }
        #sec-sounds > #df-tone-picker-card { order: 5; }
 
-  /* Nature Sounds Header Card Styles */
+  /* Nature Sounds Header Card Styles — Elevated Visual Prominence */
   .ns-header-card {
-    background: var(--card-pure);
-    border-radius: var(--radius-lg);
-    padding: 16px;
-    box-shadow: var(--shadow-card);
-    margin: 16px 0;
+    background: linear-gradient(135deg, var(--card-pure) 0%, #f8faff 100%);
+    border-radius: var(--radius-xl);
+    padding: 20px 18px 18px;
+    box-shadow: var(--shadow-card), 0 0 0 1px rgba(37, 99, 235, 0.06);
+    margin: 8px 4px 16px;
     border: 1px solid var(--border-soft);
+    position: relative;
+    overflow: hidden;
+  }
+  .ns-header-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at 90% -10%, rgba(6, 182, 212, 0.08) 0%, transparent 60%);
+    pointer-events: none;
   }
   .ns-header-title {
-    font-size: 1.4rem;
-    font-weight: 800;
+    font-size: 1.5rem;
+    font-weight: 900;
     color: var(--text-main);
-    margin: 0 0 8px 0;
-    line-height: 1.3;
+    margin: 0 0 6px 0;
+    line-height: 1.25;
+    letter-spacing: -0.3px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    position: relative;
+  }
+  .ns-header-title::before {
+    content: "🍃";
+    font-size: 1.35em;
+    line-height: 1;
+    filter: drop-shadow(0 2px 4px rgba(6, 182, 212, 0.25));
+  }
+  .ns-header-badge {
+    font-size: 0.65rem;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    color: var(--primary);
+    background: var(--primary-soft);
+    padding: 3px 8px;
+    border-radius: var(--radius-pill);
+    margin-left: 4px;
   }
   .ns-header-subtitle {
     font-size: 1rem;
     color: var(--text-muted);
     margin: 0 0 12px 0;
-    line-height: 1.5;
+    line-height: 1.55;
+    position: relative;
   }
 
     .sound-Rich-tile {
@@ -2133,7 +2165,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
                  ====================================================== -->
             <main class="screen-section" id="sec-sounds">
               <div id="natureSoundsHeader" class="ns-header-card">
-                <h2 class="ns-header-title">Nature Sounds</h2>
+                <h2 class="ns-header-title">Nature Sounds<span class="ns-header-badge">Premium</span></h2>
                 <p class="ns-header-subtitle">Pure, calming, and immersive natural soundscapes</p>
               </div>
 
