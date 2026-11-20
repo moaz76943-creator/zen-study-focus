@@ -39486,10 +39486,10 @@ window.dfGetSafeMasterDestination = function(ctx) {
   }
   if (!window.DF_MASTER_COMPRESSOR) {
     const comp = ctx.createDynamicsCompressor();
-    comp.threshold.setValueAtTime(-12, ctx.currentTime);
-    comp.knee.setValueAtTime(3, ctx.currentTime);       // narrow knee: transparent below threshold
-    comp.ratio.setValueAtTime(20, ctx.currentTime);      // brickwall limiter ratio
-    comp.attack.setValueAtTime(0.001, ctx.currentTime);  // 1ms instant peak catch
+    comp.threshold.setValueAtTime(-3, ctx.currentTime);    // -3dB: NEVER compress noise floor (was -12dB = hiss)
+    comp.knee.setValueAtTime(3, ctx.currentTime);          // narrow knee: transparent below threshold
+    comp.ratio.setValueAtTime(20, ctx.currentTime);        // brickwall limiter ratio
+    comp.attack.setValueAtTime(0.001, ctx.currentTime);    // 1ms instant peak catch
     comp.release.setValueAtTime(0.1, ctx.currentTime);
     // Fallback path must still expose the instant-kill gain the shared
     // getSafeAudioDestination chain provides, or Stop cannot silence layers
@@ -47731,10 +47731,10 @@ window.dfCreateAudioDynamicsCompressor = function(audioCtx) {
   }
   const comp = audioCtx.createDynamicsCompressor();
   const now = audioCtx.currentTime || 0;
-  comp.threshold.setValueAtTime(-12, now);
-  comp.knee.setValueAtTime(3, now);       // narrow knee: transparent below threshold
-  comp.ratio.setValueAtTime(20, now);      // brickwall limiter
-  comp.attack.setValueAtTime(0.001, now);  // 1ms attack
+  comp.threshold.setValueAtTime(-3, now);   // -3dB: NEVER compress noise floor (was -12dB = hiss)
+  comp.knee.setValueAtTime(3, now);         // narrow knee: transparent below threshold
+  comp.ratio.setValueAtTime(20, now);        // brickwall limiter
+  comp.attack.setValueAtTime(0.001, now);    // 1ms attack
   comp.release.setValueAtTime(0.1, now);
   return { compressorNode: comp, status: 'COMPRESSOR_INITIALIZED' };
 };
@@ -49036,11 +49036,11 @@ window.dfTriLayerMixer = {
     if (!this.compressor &&
         ctx.createDynamicsCompressor) {
       const comp = ctx.createDynamicsCompressor();
-      comp.threshold.value = -18;
-      comp.knee.value = 20;
-      comp.ratio.value = 4;
-      comp.attack.value = 0.005;
-      comp.release.value = 0.25;
+      comp.threshold.setValueAtTime(-3, ctx.currentTime);   // -3dB: NEVER compress noise floor (was -18dB)
+      comp.knee.setValueAtTime(3, ctx.currentTime);        // narrow knee: transparent below threshold (was 20dB)
+      comp.ratio.setValueAtTime(20, ctx.currentTime);       // brickwall limiter (was 4:1)
+      comp.attack.setValueAtTime(0.001, ctx.currentTime);   // 1ms attack (was 5ms)
+      comp.release.setValueAtTime(0.1, ctx.currentTime);    // 100ms release (was 250ms)
       // Final output must pass the shared instant-kill gain, never the raw
       // destination — otherwise Stop/mute/tab-hide cannot silence these layers.
       comp.connect((typeof window.getSafeAudioDestination === 'function' && window.getSafeAudioDestination(ctx)) || ctx.destination);
