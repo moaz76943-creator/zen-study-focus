@@ -127,7 +127,7 @@ public class MainActivity extends AppCompatActivity {
 
             // Xiaomi-specific override: on HyperOS, mandatorySystemGestures.bottom may be > 0 even in 3-button mode,
             // and navigationBars/systemBars may under-report (report 0). If the device is Xiaomi and we have a
-            // gesture handle but no visible nav bar, assume 3-button nav and apply the 120dp absolute floor.
+            // gesture handle but no visible nav bar, assume 3-button nav and apply the 160dp absolute floor.
             // This is safer than relying on height thresholds (32dp/100dp) which have a gap: a misreported
             // 3-button bar at 32-100dp would be missed. Extra padding on gesture nav is harmless (empty space);
             // missing the nav bar on 3-button clips content and overlaps the Studios pill.
