@@ -12873,6 +12873,17 @@ window.FlashQuizEngine = FlashQuizEngine;
 
   function dfOnPomodoroSessionCompleted() {
     try {
+      // Play the user-selected completion tone from the DF09 picker, if set.
+      // The DF09 picker stores the choice in localStorage as df_end_tone
+      // (one of: zen_bell, tibetan_bowl, woodblock, crystal, gong, vibrate).
+      if (typeof window !== "undefined" && typeof window.playCompletionTone === "function") {
+        const selectedTone = localStorage.getItem('df_end_tone');
+        if (selectedTone) {
+          window.playCompletionTone(selectedTone);
+          return;
+        }
+      }
+      // Fall back to the built-in zero-autoplay sine chime.
       if (typeof window !== "undefined" && typeof window.dfPlayZenGoalCompletionChime === "function") {
         window.dfPlayZenGoalCompletionChime();
       }
