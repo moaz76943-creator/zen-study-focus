@@ -32,15 +32,15 @@
      */
     init: function () {
       if (!this._hasRealInsets) {
-        // Use a conservative fallback bottom (120dp) matching the Xiaomi 3-button nav floor
-        // in MainActivity (absoluteMinNavDp = 160) so the initial reserve covers tall nav bars
+        // Use a conservative fallback bottom (200dp) matching the Xiaomi 3-button nav floor
+        // in MainActivity (absoluteMinNavDp = 200) so the initial reserve covers tall nav bars
         // before real insets arrive. Real gesture nav (~32dp) will quickly correct to a smaller capsule.
         this.applyCSSVariables({
           top: 24,
-          bottom: 120,
+          bottom: 200,
           left: 0,
           right: 0,
-          paddingBottom: 120
+          paddingBottom: 200
         });
       }
       if (typeof window !== 'undefined') {
@@ -118,8 +118,8 @@
       var minCapsuleHeight = effectiveNavHeight > 50 ? 100 : 32;
       var capsuleHeight = Math.max(effectiveNavHeight, minCapsuleHeight);
 
-      // Cap at reasonable maximum for Xiaomi HyperOS 3-button (160dp floor + some margin)
-      if (capsuleHeight > 180) capsuleHeight = 180;
+      // Cap at reasonable maximum for Xiaomi HyperOS 3-button (200dp floor + some margin)
+      if (capsuleHeight > 220) capsuleHeight = 220;
 
       // Account for narrow-screen extra padding in CSS (media query max-width: 430px)
       // CSS adds padding-block-start: clamp(40px, 2.5rem, 80px) to .bottom-nav-capsule
@@ -174,7 +174,7 @@
       var floatingLayerClearance = capsuleHeight + 196;
       // IME clearance: if paddingBottom > 500 (IME), use 300; else paddingBottom + 12
       var imeClearance = paddingBottom > 500 ? 300 : paddingBottom + 12;
-      // Minimum 300px (covers Xiaomi 3-button nav up to ~160dp capsule)
+      // Minimum 396px (covers Xiaomi 3-button nav up to ~200dp capsule)
       return Math.max(floatingLayerClearance, imeClearance, 300);
     },
 

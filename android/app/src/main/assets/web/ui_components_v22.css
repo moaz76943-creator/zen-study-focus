@@ -161,8 +161,8 @@ html[dir="rtl"] .df-v22 .df22-icon--next { transform: scaleX(-1); }
   overflow-x: auto;
   overscroll-behavior-inline: contain;
   /* --df-webview-padding-bottom and --df-safe-bottom are 0px (calibrator).
-     Use --df-inflow-bottom (== --df-bottom-nav-clearance, 320px fallback) for bottom clearance. */
-  padding: 6px max(6px, env(safe-area-inset-right, 0px), var(--df-safe-right, 0px)) calc(6px + max(env(safe-area-inset-bottom, 0px), var(--df-inflow-bottom, 320px)));
+     Use --df-inflow-bottom (== --df-bottom-nav-clearance, 396px fallback) for bottom clearance. */
+  padding: 6px max(6px, env(safe-area-inset-right, 0px), var(--df-safe-right, 0px)) calc(6px + max(env(safe-area-inset-bottom, 0px), var(--df-inflow-bottom, 396px)));
   border: 1px solid var(--df22-border);
   border-radius: var(--df22-radius-lg);
   background: var(--df22-surface);

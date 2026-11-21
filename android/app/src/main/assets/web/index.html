@@ -50,16 +50,16 @@
          calc() below that references them resolves to the safe content edge.
          --df-bottom-nav-clearance is the dock reserve ABOVE the native inset only
          (capsule + Studios pill + FAB zone); it never includes the nav inset.
-         Fallbacks match calibrator minimums: capsule 100px, Studios pill 168px,
-         FAB 230px, bottom clearance 300px (covers Xiaomi HyperOS 3-button nav bars up to ~160dp). */
+         Fallbacks match calibrator minimums: capsule 100px, Studios pill 268px,
+         FAB 330px, bottom clearance 396px (covers Xiaomi HyperOS 3-button nav bars up to ~200dp). */
       --df-dock-gap: 12px;
       --df-capsule-height: 100px;
       --df-dock-bottom: calc(var(--df-dock-gap, 12px));
-      --df-studios-pill-bottom: 168px;
-      --df-fab-bottom: 230px;
-      --df-float-bottom: 168px;
-      --df-inflow-bottom: var(--df-bottom-nav-clearance, 300px);
-      --df-bottom-nav-clearance: 300px;
+      --df-studios-pill-bottom: 268px;
+      --df-fab-bottom: 330px;
+      --df-float-bottom: 268px;
+      --df-inflow-bottom: var(--df-bottom-nav-clearance, 396px);
+      --df-bottom-nav-clearance: 396px;
     }
 
     * {
@@ -70,8 +70,8 @@
     }
     // Reserve clears the docked bottom stack; the pillar7 body rule (later, !important)
        // computes the same reserve. Keep both identical: uses --df-inflow-bottom which
-       // resolves to --df-bottom-nav-clearance (300px fallback, calibrator updates).
-    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: var(--df-inflow-bottom, 300px); overflow-x: hidden; user-select: none; }
+       // resolves to --df-bottom-nav-clearance (396px fallback, calibrator updates).
+    body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: var(--df-inflow-bottom, 396px); overflow-x: hidden; user-select: none; }
     input, textarea { user-select: text; text-align: start; }
 
     body.deep-lockdown .dynamic-hero-header,
@@ -362,7 +362,7 @@
     .lcard-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.68rem; color: var(--text-light); }
 
     .floating-plus-fab {
-      position: fixed; bottom: var(--df-fab-bottom, 230px); left: 24px; width: 54px; height: 54px;
+      position: fixed; bottom: var(--df-fab-bottom, 330px); left: 24px; width: 54px; height: 54px;
       border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       border: none; color: #ffffff; font-size: 1.7rem; display: flex; align-items: center;
       justify-content: center; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
@@ -983,8 +983,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
       padding-top: var(--df-sat);
       /* Body content padding clears the floating
          elements (FAB, Studios pill) above the capsule.
-         --df-webview-padding-bottom is pinned to 0px by calibrator; use --df-inflow-bottom (300px fallback). */
-      padding-bottom: var(--df-inflow-bottom, 300px) !important;
+         --df-webview-padding-bottom is pinned to 0px by calibrator; use --df-inflow-bottom (396px fallback). */
+      padding-bottom: var(--df-inflow-bottom, 396px) !important;
       padding-left: var(--df-sal);
       padding-right: var(--df-sar);
     }
@@ -1460,7 +1460,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
         padding-top: max(16px, max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px))) !important;
         /* Body padding-bottom = fixed clearance for floating
            elements (FAB, Studios pill). --df-webview-padding-bottom is 0px (calibrator). */
-        padding-bottom: var(--df-inflow-bottom, 300px) !important;
+        padding-bottom: var(--df-inflow-bottom, 396px) !important;
       }
       .app-shell {
         display: flex !important;
@@ -1530,15 +1530,15 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     }
     /* Edge-to-Edge Safe Area Insets for Android 15 / Xiaomi 17T Pro
        Native parent padding owns all system-bar insets; CSS env() must not re-add them.
-       --df-webview-padding-bottom is pinned to 0px by calibrator; use --df-inflow-bottom (300px fallback). */
-    body {
-        padding-top: var(--df-safe-top, 0px);
-        /* Body content padding clears the floating
-           elements (FAB, Studios pill). */
-        padding-bottom: var(--df-inflow-bottom, 300px);
-        padding-left: var(--df-safe-left, 0px);
-        padding-right: var(--df-safe-right, 0px);
-    }
+       --df-webview-padding-bottom is pinned to 0px by calibrator; use --df-inflow-bottom (396px fallback). */
+          body {
+              padding-top: var(--df-safe-top, 0px);
+              /* Body content padding clears the floating
+                 elements (FAB, Studios pill). */
+              padding-bottom: var(--df-inflow-bottom, 396px);
+              padding-left: var(--df-safe-left, 0px);
+              padding-right: var(--df-safe-right, 0px);
+          }
     </style>
 
     <!-- ACCESSIBILITY FONT-SCALE GUARD (TASK #730) -->
@@ -1614,8 +1614,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
 <!-- TASK #811: Bottom Nav Clearance & Long-Language Button Wrap -->
 <style id="task-811-layout-fix">
   main, .tab-content, .view-section, section[id*="view"], div[id*="view"], #app {
-    /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (300px fallback). */
-    padding-bottom: var(--df-inflow-bottom, 300px) !important;
+    /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (396px fallback). */
+    padding-bottom: var(--df-inflow-bottom, 396px) !important;
   }
   button, .pill, .chip, .tab-btn {
     white-space: normal !important;
@@ -1633,7 +1633,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     border: 1px solid #CBD5E1 !important;
   }
   .fab, #addNoteFab, button[class*="fab"] {
-    bottom: var(--df-fab-bottom, 230px) !important;
+    bottom: var(--df-fab-bottom, 330px) !important;
     z-index: 40 !important;
   }
   nav button, .bottom-nav button, .nav-bar button {
@@ -1793,8 +1793,8 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     align-self: center !important;
   }
   main, .tab-content, .tab-panel {
-    /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (300px fallback). */
-    padding-bottom: var(--df-inflow-bottom, 300px) !important;
+    /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (396px fallback). */
+    padding-bottom: var(--df-inflow-bottom, 396px) !important;
   }
   [data-i18n="ui_local_data"], [data-i18n="ui_local_data"] *,
   #localDataBadge, #localDataBadge * {

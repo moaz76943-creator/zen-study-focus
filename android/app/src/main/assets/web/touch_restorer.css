@@ -5,8 +5,8 @@
 :root {
   --safe-top: var(--df-safe-top, 0px);
   --safe-bottom: var(--df-safe-bottom, 0px);
-  /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (320px fallback). */
-  --safe-bottom-clearance: var(--df-inflow-bottom, 320px);
+  /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (396px fallback). */
+  --safe-bottom-clearance: var(--df-inflow-bottom, 396px);
 }
 
 body {
