@@ -14,7 +14,7 @@ const keys = context.window.ZEN_LOCALE_FIELD_KEYS;
 const rows = context.window.ZEN_LOCALE_ROWS;
 const extras = context.window.ZEN_LOCALE_EXTRAS;
 const names = ['fr','de','pt','it','nl','tr','ru','id','vi','pl','zh','hi','ja','ko','bn','ur','fa'];
-assert.equal(keys.length, 47);
+assert.equal(keys.length, 48);
 assert.equal(new Set(keys).size, keys.length);
 assert.equal(Object.keys(rows).length, 17);
 assert.equal(Object.keys(extras).length, 17);
@@ -27,7 +27,7 @@ for (const lang of names) {
     assert.equal(typeof row[n], 'string', lang + '.' + keys[n]);
     assert.ok(row[n].trim().length > 0, lang + '.' + keys[n]);
   }
-  assert.ok(Array.isArray(extra.sounds) && extra.sounds.length === 12, lang + '.sounds');
+  assert.ok(Array.isArray(extra.sounds) && extra.sounds.length === 13, lang + '.sounds');
   assert.ok(Array.isArray(extra.tasks) && extra.tasks.length === 4, lang + '.tasks');
   assert.ok(Array.isArray(extra.notes) && extra.notes.length === 3, lang + '.notes');
   assert.ok(extra.sounds.every(s => typeof s === 'string' && s.trim()), lang + ' invalid sound label');
@@ -41,6 +41,7 @@ const app = fs.readFileSync(path.join(root, 'app.js'), 'utf8');
 const cutoff = app.indexOf('let todayISO =');
 assert.ok(cutoff > 0, 'Locale initialization not found');
 context.document = {addEventListener() {}};
+context.window.addEventListener = () => {};
 context.console = console;
 vm.runInContext(app.slice(0, cutoff) + '\nthis._builtLanguages = DICT;', context, {filename: 'app.js:i18n-init'});
 const built = context._builtLanguages;
@@ -50,7 +51,7 @@ for (const lang of ['en','ar','es',...names]) {
   const dict = built[lang];
   assert.ok(dict, lang + ' missing dictionary');
   assert.deepEqual(Object.keys(dict).sort(), expectedKeys, lang + ' dictionary missing UI keys');
-  assert.equal(Object.keys(dict.sounds).length, 12);
+  assert.equal(Object.keys(dict.sounds).length, 13);
   assert.equal(dict.weekdays.length, 7);
   assert.equal(dict.months.length, 12);
   assert.equal(dict.sampleTasks.length, 4);
