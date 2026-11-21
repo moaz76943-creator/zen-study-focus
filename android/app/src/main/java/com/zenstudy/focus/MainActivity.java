@@ -96,11 +96,13 @@ public class MainActivity extends AppCompatActivity {
         // viewport already ends above the status bar / 3-button nav bar and every
         // fixed dock offset in CSS can be measured from the safe content edge.
         // AMOLED black behind the inset strips so white status-bar icons stay visible.
-        android.widget.FrameLayout insetFrame = new android.widget.FrameLayout(this);
+        // LinearLayout (vertical) constrains match_parent children to padded bounds,
+        // so the WebView's layout viewport = visible area (window minus system insets).
+        // This fixes position:fixed layers (capsule, Studios pill, FAB) anchoring to the
+        // full window bottom instead of the safe content edge.
+        android.widget.LinearLayout insetFrame = new android.widget.LinearLayout(this);
+        insetFrame.setOrientation(android.widget.LinearLayout.VERTICAL);
         insetFrame.setBackgroundColor(0xFF000000);
-        // Critical: clipToPadding=true makes the FrameLayout's padding shrink the WebView bounds.
-        // Without this, WebView fills the entire FrameLayout (including padded area), rendering
-        // behind system bars and causing clipped bottom cards + floating pill overlap.
         insetFrame.setClipToPadding(true);
         // Register insets listener BEFORE setContentView so the initial dispatch is caught.
         ViewCompat.setOnApplyWindowInsetsListener(insetFrame, (v, windowInsets) -> {
