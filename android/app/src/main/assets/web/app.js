@@ -21096,7 +21096,7 @@ window.df_i18n = (function() {
     'btn_pause': { ar: 'إيقاف مؤقت', en: 'Pause', de: 'Pause', fr: 'Pause', es: 'Pausar', tr: 'Duraklat', id: 'Jeda', ur: 'وقفہ', fa: 'توقف' },
     'btn_resume': { ar: 'استئناف', en: 'Resume', de: 'Fortsetzen', fr: 'Reprendre', es: 'Reanudar', tr: 'Devam Et', id: 'Lanjutkan', ur: 'دوبارہ شروع', fa: 'ادامه' },
     'btn_reset': { ar: 'إعادة ضبط', en: 'Reset', de: 'Zurücksetzen', fr: 'Réinitialiser', es: 'Reiniciar', tr: 'Sıfırla', id: 'Reset', ur: 'دوبارہ ترتیب', fa: 'بازنشانی' },
-    'mode_pomodoro': { ar: 'بومودورو 25 دقيقة', en: 'Pomodoro 25m', de: 'Pomodoro 25m', fr: 'Pomodoro 25m', es: 'Pomodoro 25m', tr: 'Pomodoro 25dk', id: 'Pomodoro 25m', ur: 'پومودورو 25 منٹ', fa: 'پومودورو ۲۵ دقیقه' },
+    'mode_pomodoro': { ar: 'بومودورو 25 دقيقة', en: 'Pomodoro 25m', de: 'Pomodoro 25m', fr: 'Pomodoro 25m', es: 'Pomodoro 25m', tr: 'Pomodoro 25dk', id: 'Pomodoro 25m', ur: 'پومودورو 25 منٹ', fa: 'پومودورو 25 دقیقه' },
     'mode_short_break': { ar: 'استراحة قصيرة', en: 'Short Break', de: 'Kurze Pause', fr: 'Pause courte', es: 'Pausa corta', tr: 'Kısa Mola', id: 'Istirahat Singkat', ur: 'مختصر وقفہ', fa: 'استراحت کوتاه' },
     'mode_long_break': { ar: 'استراحة طويلة', en: 'Long Break', de: 'Lange Pause', fr: 'Pause longue', es: 'Pausa larga', tr: 'Uzun Mola', id: 'Istirahat Panjang', ur: 'طویل وقفہ', fa: 'استراحت طولانی' },
 
