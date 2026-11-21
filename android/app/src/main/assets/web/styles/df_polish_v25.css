@@ -1,0 +1,739 @@
+/* ============================================================================
+   DEEP FOCUS — DF Polish v25 (cross-tab / cross-studio elevation layer)
+   Scope: hierarchy, spacing rhythm, contrast, tap targets, focus visibility,
+   120Hz-friendly motion (transform/opacity only — never layout props),
+   and studio-specific refinements.
+   Loaded LAST so it refines earlier sheets without editing them.
+   No perpetual animations; fully honors prefers-reduced-motion.
+   ============================================================================ */
+
+/* ---------- Color System: Unified focus/accent palette ------------------- */
+:root {
+  --df25-focus: #1350a1;
+  --df25-focus-soft: #eff6ff;
+  --df25-success: #0e765d;
+  --df25-success-soft: #ecfdf5;
+  --df25-danger: #a53733;
+  --df25-danger-soft: #fef2f2;
+  --df25-warning: #b45309;
+  --df25-warning-soft: #fffbeb;
+  --df25-violet: #7c3aed;
+  --df25-violet-soft: #f5f3ff;
+  --df25-ring: 3px solid var(--df25-focus);
+  --df25-ease: cubic-bezier(.2, .7, .3, 1);
+
+  /* Backwards-compatible aliases so the polish layer can use either
+     --df22-* tokens or its own shorthand without clashing. */
+  --text-main: var(--df22-ink, #1c2e4d);
+  --text-muted: var(--df22-muted, #50617a);
+  --text-light: #7183a4;
+  --primary: var(--df22-primary, #1759ad);
+  --primary-soft: var(--df22-blue-soft, #eaf4ff);
+  --border-soft: var(--df22-border, #dce5f0);
+  --card-pure: var(--df22-surface, #ffffff);
+  --shadow-card: var(--df22-shadow-card, 0 7px 24px rgba(30, 60, 110, 0.08));
+  --emerald: var(--df22-success, #0e765d);
+  --emerald-soft: #ecfdf5;
+  --rose: var(--df22-danger, #a53733);
+  --rose-soft: #fef2f2;
+  --amber: var(--df25-warning, #b45309);
+  --amber-soft: var(--df25-warning-soft, #fffbeb);
+  --warning: var(--df25-warning, #b45309);
+  --violet: var(--df25-violet, #7c3aed);
+  --violet-soft: var(--df25-violet-soft, #f5f3ff);
+}
+
+/* ---------- Focus visibility: keyboard / TalkBack / switch access ------- */
+button:focus-visible,
+[role="button"]:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+.bnav-btn:focus-visible,
+.seg-pill:focus-visible,
+.sound-Rich-tile:focus-visible,
+.ns-card:focus-visible,
+.pure-white-card:focus-visible,
+.zen-compact-suite-btn:focus-visible,
+.task-mini-sel:focus-visible {
+  outline: var(--df25-ring) !important;
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+/* RTL mirror focus ring correctly */
+[dir="rtl"] button:focus-visible,
+[dir="rtl"] [role="button"]:focus-visible,
+[dir="rtl"] .bnav-btn:focus-visible {
+  outline-offset: 2px;
+}
+
+/* ---------- Tap targets: Material Design & WCAG AAA ≥48px ---------------- */
+.bnav-btn { min-height: 48px; }
+.seg-pill,
+.task-mini-sel,
+.task_mini-sel {
+  min-height: 48px !important;
+  min-width: 48px !important;
+}
+.zen-compact-suite-btn { min-height: 56px; }
+
+.bnav-btn,
+.seg-pill,
+.task-mini-sel,
+.task_mini-sel,
+.zen-compact-suite-btn,
+.sound-Rich-tile,
+.ns-card,
+.pure-white-card,
+.an-kpi-card,
+.modal-card {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* ---------- 120Hz-smooth, GPU-only motion (transform/opacity only) ------- */
+.sound-Rich-tile,
+.seg-pill,
+.bnav-btn,
+.task-mini-sel,
+.task_mini-sel,
+.zen-compact-suite-btn,
+.ns-card,
+.pure-white-card,
+.an-kpi-card,
+.modal-card,
+.showcase-task-card,
+.learning-rich-card,
+.focus-hero-card,
+.quick-training-card,
+.today-plan-card,
+.daily-goals-card {
+  transition-property: transform, box-shadow, border-color, color, background-color, opacity;
+  transition-duration: .18s;
+  transition-timing-function: var(--df25-ease);
+  will-change: transform, box-shadow, border-color, opacity;
+  transform: translateZ(0); /* Force compositor layer */
+}
+
+.sound-Rich-tile:active,
+.seg-pill:active,
+.bnav-btn:active,
+.task-mini-sel:active,
+.task_mini-sel:active,
+.zen-compact-suite-btn:active {
+  transform: scale(.96);
+}
+
+@media (hover: hover) {
+  .sound-Rich-tile:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.12);
+  }
+  .seg-pill:hover,
+  .bnav-btn:hover {
+    transform: translateY(-1px);
+  }
+  .zen-compact-suite-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 28px -8px rgba(15, 23, 42, 0.15);
+  }
+  .ns-card:hover {
+    box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.1);
+  }
+  .pure-white-card:hover {
+    box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.08);
+  }
+}
+
+/* GPU-layer hint for progress bars & animated widths (prevent layout thrash) */
+.goal-fill,
+.mbar-fill,
+.training-progress-bar span,
+.today-progress-track span,
+.ring-bar {
+  will-change: width, stroke-dashoffset;
+  transform: translateZ(0);
+}
+
+/* ---------- Consistent spacing rhythm: 12px vertical cadence -------------- */
+.screen-section { scroll-padding-top: 16px; }
+
+.screen-section > .pure-white-card,
+.screen-section > .wave-chart-card,
+.screen-section > .ns-header-card,
+.screen-section > .focus-hero-card,
+.screen-section > .quick-training-card,
+.screen-section > .today-plan-card,
+.screen-section > .daily-goals-card,
+.screen-section > .showcase-task-card {
+  margin-bottom: 12px;
+}
+
+.analytics-kpi-grid { gap: 12px; }
+.sounds-photo-grid { gap: 12px; }
+.showcase-task-card { margin-bottom: 12px; }
+.learning-rich-card { margin-bottom: 12px; }
+.ns-card { margin-bottom: 12px; }
+.an-kpi-card { margin-bottom: 12px; }
+.pure-white-card { margin-bottom: 12px; }
+.focus-hero-card { margin-bottom: 12px; }
+.quick-training-card { margin-bottom: 12px; }
+.today-plan-card { margin-bottom: 12px; }
+.daily-goals-card { margin-bottom: 12px; }
+.wave-chart-card { margin-bottom: 12px; }
+.ns-header-card { margin-bottom: 12px; }
+.showcase-task-card { margin-bottom: 12px; }
+
+/* Consistent internal padding for all cards */
+.pure-white-card,
+.focus-hero-card,
+.quick-training-card,
+.today-plan-card,
+.daily-goals-card,
+.showcase-task-card,
+.learning-rich-card,
+.ns-card,
+.an-kpi-card,
+.wave-chart-card,
+.modal-card {
+  padding: 16px;
+}
+
+/* ---------- Sounds tab: Nature Sounds as hero section -------------------- */
+#sec-sounds .ns-header-card {
+  margin-top: 2px;
+  margin-bottom: 12px;
+  padding: 16px;
+  border-radius: 20px;
+  box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.08), 0 0 0 1px rgba(37, 99, 235, 0.06);
+}
+#sec-sounds .segmented-pills-bar { margin-bottom: 10px; }
+#sec-sounds .sounds-photo-grid { gap: 12px; }
+#sec-sounds .mixer-status-bar { margin-bottom: 12px; }
+
+/* Nature Sounds header title: visual weight */
+.ns-header-title {
+  font-size: 1.5rem;
+  font-weight: 900;
+  color: var(--text-main);
+  letter-spacing: -0.3px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.ns-header-title::before {
+  content: "🍃";
+  font-size: 1.35em;
+  line-height: 1;
+  filter: drop-shadow(0 2px 4px rgba(6, 182, 212, 0.25));
+}
+.ns-header-badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--primary);
+  background: var(--primary-soft);
+  padding: 3px 8px;
+  border-radius: 999px;
+}
+.ns-header-subtitle {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin: 8px 0 0;
+  line-height: 1.55;
+}
+
+/* Sound tiles: elevated visual consistency */
+.sound-Rich-tile {
+  background: var(--card-pure);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 14px;
+  box-shadow: var(--shadow-card);
+}
+.sound-Rich-tile.playing {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  box-shadow: 0 0 16px rgba(37, 99, 235, 0.2);
+}
+.stile-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.stile-play-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  background: var(--card-pure);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.15s var(--df25-ease);
+}
+.stile-play-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
+.stile-switch { width: 44px; height: 24px; border-radius: 12px; background: #cbd5e1; position: relative; }
+.style-switch:has(.stile-knob) {}
+.stile-knob { width: 18px; height: 18px; border-radius: 9px; background: #fff; position: absolute; top: 3px; left: 3px; transition: left 0.15s var(--df25-ease), background 0.15s var(--df25-ease); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+.sound-Rich-tile.playing .stile-knob { left: calc(100% - 21px); background: var(--primary); }
+.stile-name { font-weight: 700; color: var(--text-main); margin-top: 10px; }
+.stile-volume-label { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 0.8rem; color: var(--text-muted); }
+.stile-vol { flex: 1; margin-left: 8px; accent-color: var(--primary); }
+
+/* ---------- 3D Spatial studio: clean collapsible chrome ------------------ */
+#dfPillar5SpatialMount .df-spatial-body { max-height: none; }
+#dfSpatialCollapseToggle { min-height: 32px; }
+#dfSpatialCollapseToggle:hover { background: #eef2ff !important; border-color: #c4b5fd !important; }
+#dfSpatialCollapseToggle:focus-visible { outline: var(--df25-ring) !important; outline-offset: 2px; }
+
+/* Collapsed spatial studio: compact header + toggle affordance */
+#dfPillar5SpatialMount[aria-expanded="false"] .df-spatial-body { display: none !important; }
+#dfPillar5SpatialMount .df-spatial-body:empty { display: none; }
+
+/* Spatial sub-tabs */
+#dfPillar5SpatialMount .df-white-premium {
+  background: #ffffff;
+  color: #0f172a;
+  border: 1.5px solid #cbd5e1;
+  border-radius: 20px;
+  padding: 16px;
+  margin: 12px 0;
+  box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.08);
+}
+#dfPillar5SpatialMount button[role="tab"] {
+  padding: 8px 14px;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s var(--df25-ease);
+  background: transparent;
+  color: #475569;
+}
+#dfPillar5SpatialMount button[role="tab"]:hover { background: #f1f5f9; }
+#dfPillar5SpatialMount button[role="tab"][aria-selected="true"] {
+  background: #ffffff;
+  color: var(--df25-violet);
+  font-weight: 800;
+  box-shadow: 0 2px 8px rgba(124, 58, 237, 0.12);
+}
+#dfPillar5SpatialMount canvas { max-width: 100%; height: auto; }
+
+/* ---------- Timer tab: Core focus zone visual hierarchy ------------------ */
+#sec-timer .focus-hero-card {
+  background: linear-gradient(135deg, var(--card-pure) 0%, #f8faff 100%);
+  border-radius: 24px;
+  padding: 20px;
+  margin-bottom: 16px;
+  box-shadow: var(--shadow-card), 0 0 0 1px rgba(37, 99, 235, 0.06);
+}
+.ring-container { max-width: 320px; margin: 0 auto; }
+.ring-bar { stroke-linecap: round; filter: drop-shadow(0 4px 12px rgba(37, 99, 235, 0.3)); }
+.ring-mode-txt { color: #5b6b82 !important; }
+.delta-chip {
+  min-height: 40px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: var(--primary-soft);
+  color: var(--primary);
+  border: 1px solid var(--border-soft);
+  font-weight: 700;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: all 0.15s var(--df25-ease);
+}
+.delta-chip:hover { background: var(--primary); color: #fff; transform: translateY(-1px); }
+.delta-chip:active { transform: scale(0.96); }
+.domain-card {
+  min-height: 56px;
+  border-radius: 16px;
+  border: 1.5px solid var(--border-soft);
+  background: var(--card-pure);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s var(--df25-ease);
+}
+.domain-card.active,
+.domain-card[aria-pressed="true"] {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  box-shadow: 0 0 16px rgba(37, 99, 235, 0.2);
+}
+.domain-card:hover { transform: translateY(-1px); }
+.home-quick-chip {
+  min-height: 44px;
+  min-width: 64px;
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  background: var(--card-pure);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s var(--df25-ease);
+}
+.home-quick-chip[aria-pressed="true"] {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* ---------- Tasks tab: Clean list hierarchy ------------------------------ */
+.showcase-task-card {
+  background: var(--card-pure);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow-card);
+  transition: all 0.15s var(--df25-ease);
+}
+.showcase-task-card:hover { box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.12); }
+.learning-rich-card {
+  background: var(--card-pure);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow-card);
+}
+.today-plan-card,
+.daily-goals-card {
+  background: var(--card-pure);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow-card);
+}
+
+/* ---------- Notes tab: Cornell tri-zone elevation ------------------------ */
+.ns-card {
+  background: var(--card-pure);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 14px 16px;
+  box-shadow: var(--shadow-card);
+  transition: all 0.15s var(--df25-ease);
+}
+.ns-card:hover { box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.1); }
+.ns-draft-bar {
+  background: var(--amber-soft);
+  border: 1px solid #fcd34d;
+  border-radius: 12px;
+  padding: 10px 12px;
+  margin: 8px 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+#nsDraftRestore, #nsDraftDiscard {
+  min-height: 36px;
+  min-width: 36px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-soft);
+  background: var(--card-pure);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s var(--df25-ease);
+}
+#nsDraftRestore:hover { background: var(--emerald-soft); color: var(--emerald); border-color: var(--emerald); }
+#nsDraftDiscard:hover { background: var(--rose-soft); color: var(--rose); border-color: var(--rose); }
+#nsSaveButton {
+  min-height: 44px;
+  padding: 10px 20px;
+  border-radius: 12px;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.15s var(--df25-ease);
+}
+#nsSaveButton:hover { background: #1d4ed8; transform: translateY(-1px); }
+#nsSaveButton:active { transform: scale(0.96); }
+
+/* ---------- Analytics tab: KPI cards & charts ---------------------------- */
+.an-kpi-card {
+  background: var(--card-pure);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow-card);
+  text-align: center;
+}
+.an-kpi-num {
+  font-size: 2.5rem;
+  font-weight: 900;
+  color: var(--text-main);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.an-kpi-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.an-kpi-trend { color: #5b6b82 !important; font-size: 0.75rem; }
+.wave-chart-card {
+  background: var(--card-pure);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: var(--shadow-card);
+}
+.donut-center-txt { color: #5b6b82 !important; font-weight: 800; }
+.legend-grid { gap: 10px; }
+.legend-item { display: flex; align-items: center; gap: 8px; }
+.legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ---------- Flashcards tab: Active recall polish ------------------------- */
+.flashcard-front,
+.flashcard-back {
+  background: var(--card-pure);
+  border: 1px solid var(--border-soft);
+  border-radius: 20px;
+  padding: 24px;
+  min-height: 180px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: var(--shadow-card);
+  font-size: 1.25rem;
+  line-height: 1.5;
+}
+.flashcard-btn {
+  min-height: 44px;
+  min-width: 80px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  border: none;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s var(--df25-ease);
+}
+.flashcard-btn.easy { background: var(--emerald-soft); color: var(--emerald); }
+.flashcard-btn.good { background: var(--primary-soft); color: var(--primary); }
+.flashcard-btn.hard { background: var(--amber-soft); color: var(--warning); }
+
+/* ---------- Calendar tab: Heatmap & events ------------------------------- */
+.calendar-day {
+  aspect-ratio: 1;
+  border-radius: 8px;
+  border: 1px solid var(--border-soft);
+  background: var(--card-pure);
+  cursor: pointer;
+  transition: all 0.15s var(--df25-ease);
+}
+.calendar-day:hover { transform: scale(1.05); box-shadow: 0 4px 12px rgba(15,23,42,0.1); }
+.calendar-day.today { border-color: var(--primary); background: var(--primary-soft); }
+.calendar-day.has-session { background: var(--emerald-soft); border-color: var(--emerald); }
+
+/* ---------- Quick Training: Preset cards -------------------------------- */
+.quick-training-card {
+  background: linear-gradient(135deg, var(--card-pure) 0%, #f8faff 100%);
+  border-radius: 20px;
+  padding: 18px;
+  border: 1px solid var(--border-soft);
+  box-shadow: var(--shadow-card);
+}
+.qt-preset-btn {
+  min-height: 48px;
+  min-width: 100px;
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border-soft);
+  background: var(--card-pure);
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s var(--df25-ease);
+}
+.qt-preset-btn:hover { border-color: var(--primary); background: var(--primary-soft); transform: translateY(-1px); }
+.qt-preset-btn.active { border-color: var(--primary); background: var(--primary); color: #fff; }
+
+/* ---------- Studio Navigator Drawer: Floating pill & drawer -------------- */
+#zenStudioTriggerPill {
+  transition: all 0.2s var(--df25-ease) !important;
+}
+#zenStudioTriggerPill:hover {
+  box-shadow: 0 12px 32px rgba(34, 197, 94, 0.4);
+  transform: translateY(-2px) scale(1.02);
+}
+#zenStudioTriggerPill:active { transform: scale(0.97); }
+#sovereignCalmToolsDrawer {
+  background: #070707;
+  border: 1px solid #1a1a1a;
+  border-radius: 16px;
+  box-shadow: 0 24px 48px -12px rgba(0,0,0,0.6);
+}
+#sovereignCalmToolsToggle {
+  transition: all 0.15s var(--df25-ease);
+}
+#sovereignCalmToolsToggle:hover {
+  background: rgba(74, 222, 128, 0.1);
+}
+#sovereignCalmToolsBody button {
+  transition: all 0.15s var(--df25-ease);
+}
+#sovereignCalmToolsBody button:hover {
+  transform: translateX(4px);
+}
+
+/* ---------- Modal & overlay consistency ---------------------------------- */
+.modal-overlay {
+  backdrop-filter: blur(4px);
+  background: rgba(15, 23, 42, 0.72) !important;
+}
+.modal-card {
+  background: #FFFFFF !important;
+  color: #0F172A !important;
+  border-radius: 18px !important;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.35) !important;
+}
+body.dark .modal-card,
+body.dark-mode .modal-card {
+  background: #111827 !important;
+  color: #F9FAFB !important;
+}
+
+/* ---------- Slim, unobtrusive scrollbars (WebView + desktop) ------------- */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-thumb { background: rgba(100, 116, 139, .35); border-radius: 999px; }
+::-webkit-scrollbar-track { background: transparent; }
+
+/* ---------- Contrast: readable muted text on white cards ----------------- */
+.ns-header-subtitle,
+.ns-count,
+.an-kpi-trend,
+.wave-flow-sub,
+.donut-center-txt,
+.ring-mode-txt,
+.today-plan-task-detail,
+.notes-studio-stats span,
+.delta-chip {
+  color: #5b6b82 !important;
+  text-rendering: optimizeLegibility;
+}
+input::placeholder,
+textarea::placeholder,
+select::placeholder {
+  color: #7183a4 !important;
+  opacity: 1;
+}
+
+/* ---------- Reduced motion: honor the OS setting completely -------------- */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .sound-Rich-tile,
+  .seg-pill,
+  .bnav-btn,
+  .task-mini-sel,
+  .task_mini-sel,
+  .zen-compact-suite-btn,
+  .ns-card,
+  .pure-white-card,
+  .an-kpi-card,
+  .modal-card,
+  .goal-fill,
+  .mbar-fill,
+  .ring-bar {
+    transition-duration: 0ms !important;
+    will-change: auto !important;
+    transform: none !important;
+  }
+  .sound-Rich-tile:active,
+  .seg-pill:active,
+  .bnav-btn:active,
+  .task-mini-sel:active,
+  .task_mini-sel:active,
+  .zen-compact-suite-btn:active {
+    transform: none !important;
+  }
+}
+
+/* ---------- High contrast mode support ----------------------------------- */
+@media (prefers-contrast: high) {
+  .sound-Rich-tile,
+  .ns-card,
+  .pure-white-card,
+  .an-kpi-card,
+  .modal-card {
+    border-width: 2px !important;
+    border-color: #000 !important;
+  }
+  .seg-pill,
+  .bnav-btn,
+  .task-mini-sel {
+    border: 2px solid #000 !important;
+  }
+  :focus-visible { outline-width: 4px !important; }
+}
+
+/* ---------- Dark mode refinements ---------------------------------------- */
+body.dark,
+body.dark-mode {
+  --bg-sheet: #0f172a;
+  --card-pure: #111827;
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+  --text-light: #64748b;
+  --border-soft: #334155;
+  --primary: #60a5fa;
+  --primary-soft: #1e3a5f;
+  --emerald: #34d399;
+  --emerald-soft: #064e3b;
+  --violet: #a78bfa;
+  --violet-soft: #2e1065;
+  --amber: #fbbf24;
+  --amber-soft: #422006;
+  --rose: #f87171;
+  --rose-soft: #450a0a;
+}
+body.dark .sound-Rich-tile,
+body.dark-mode .sound-Rich-tile {
+  background: #111827;
+  border-color: #334155;
+}
+body.dark .sound-Rich-tile.playing,
+body.dark-mode .sound-Rich-tile.playing {
+  border-color: #60a5fa;
+  background: #1e3a5f;
+}
+body.dark .ns-card,
+body.dark-mode .ns-card,
+body.dark .pure-white-card,
+body.dark-mode .pure-white-card,
+body.dark .an-kpi-card,
+body.dark-mode .an-kpi-card,
+body.dark .focus-hero-card,
+body.dark-mode .focus-hero-card,
+body.dark .quick-training-card,
+body.dark-mode .quick-training-card {
+  background: #111827;
+  border-color: #334155;
+}
+body.dark .seg-pill,
+body.dark-mode .seg-pill,
+body.dark .bnav-btn,
+body.dark-mode .bnav-btn,
+body.dark .task-mini-sel,
+body.dark-mode .task-mini-sel {
+  border-color: #334155;
+  color: #f8fafc;
+}
+body.dark .seg-pill.active,
+body.dark-mode .seg-pill.active {
+  background: #1e3a5f;
+  border-color: #60a5fa;
+  color: #60a5fa;
+}
+
+/* ---------- Print styles ------------------------------------------------- */
+@media print {
+  .bnav-btn,
+  .floating-plus-fab,
+  #zenStudioTriggerPill,
+  .modal-overlay { display: none !important; }
+  .screen-section { display: block !important; }
+  body { padding-bottom: 0 !important; }
+}

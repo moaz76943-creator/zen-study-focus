@@ -6217,13 +6217,15 @@ window.stopAllAudio = stopAllAudio;
 window.activePlayers = activePlayers;
 
 function filterSoundsByCat(cat, btn) {
-  soundCat = cat;
+  // Coerce an undefined/null category to 'all' so a programmatic call can
+  // never silently filter every tile out of the grid.
+  soundCat = cat || 'all';
   // Tolerate programmatic calls without a pill element (previously this threw
   // "Cannot read properties of null (reading 'parentElement')").
   const bar = (btn && btn.parentElement) || document.querySelector('.segmented-pills-bar');
   if (bar) {
     bar.querySelectorAll('.seg-pill').forEach(b => {
-      const active = btn ? b === btn : (b.getAttribute('onclick') || '').indexOf("'" + cat + "'") !== -1;
+      const active = btn ? b === btn : (b.getAttribute('onclick') || '').indexOf("'" + soundCat + "'") !== -1;
       b.classList.toggle('active', active);
     });
   } else if (btn) {
@@ -6231,6 +6233,7 @@ function filterSoundsByCat(cat, btn) {
   }
   renderSoundsStudio();
 }
+window.filterSoundsByCat = filterSoundsByCat;
 
 function renderSoundsStudio() {
   const box = document.getElementById('soundsGridBox');
@@ -64003,17 +64006,19 @@ function() {
 
     function dfSpatialSetCollapsed(collapsed) {
       window.__dfSpatialCollapsed = !!collapsed;
-      bodyWrap.style.display = window.__dfSpatialCollapsed ? 'none' : 'flex';
-      collapseBtn.setAttribute('aria-expanded', String(!window.__dfSpatialCollapsed));
+      if (bodyWrap) bodyWrap.style.display = window.__dfSpatialCollapsed ? 'none' : 'flex';
+      if (collapseBtn) collapseBtn.setAttribute('aria-expanded', String(!window.__dfSpatialCollapsed));
       const lbl = window.__dfSpatialCollapsed ? DF_SPATIAL_LBL_EXPAND : DF_SPATIAL_LBL_COLLAPSE;
-      collapseLabel.textContent = lbl;
-      collapseChevron.textContent = window.__dfSpatialCollapsed ? '▸' : '▾';
-      collapseBtn.setAttribute('aria-label', lbl + ' — ' + DF_SPATIAL_LBL_HINT);
+      if (collapseLabel) collapseLabel.textContent = lbl;
+      if (collapseChevron) collapseChevron.textContent = window.__dfSpatialCollapsed ? '▸' : '▾';
+      if (collapseBtn) collapseBtn.setAttribute('aria-label', lbl + ' — ' + DF_SPATIAL_LBL_HINT);
       // Visual affordance: expand state gets a subtle accent color
-      collapseBtn.style.color = window.__dfSpatialCollapsed ? '#475569' : '#7c3aed';
-      collapseBtn.style.borderColor = window.__dfSpatialCollapsed ? '#cbd5e1' : '#c4b5fd';
-      collapseBtn.style.background = window.__dfSpatialCollapsed ? '#f8fafc' : '#faf5ff';
-      collapseBtn.style.boxShadow = window.__dfSpatialCollapsed ? 'none' : '0 2px 8px rgba(124, 58, 237, 0.12)';
+      if (collapseBtn) {
+        collapseBtn.style.color = window.__dfSpatialCollapsed ? '#475569' : '#7c3aed';
+        collapseBtn.style.borderColor = window.__dfSpatialCollapsed ? '#cbd5e1' : '#c4b5fd';
+        collapseBtn.style.background = window.__dfSpatialCollapsed ? '#f8fafc' : '#faf5ff';
+        collapseBtn.style.boxShadow = window.__dfSpatialCollapsed ? 'none' : '0 2px 8px rgba(124, 58, 237, 0.12)';
+      }
     }
     window.__dfSpatialSetCollapsed = dfSpatialSetCollapsed;
     collapseBtn.onclick = function() { dfSpatialSetCollapsed(!window.__dfSpatialCollapsed); };
