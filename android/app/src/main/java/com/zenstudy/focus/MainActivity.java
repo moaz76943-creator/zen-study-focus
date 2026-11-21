@@ -98,6 +98,10 @@ public class MainActivity extends AppCompatActivity {
         // AMOLED black behind the inset strips so white status-bar icons stay visible.
         android.widget.FrameLayout insetFrame = new android.widget.FrameLayout(this);
         insetFrame.setBackgroundColor(0xFF000000);
+        // Critical: clipToPadding=true makes the FrameLayout's padding shrink the WebView bounds.
+        // Without this, WebView fills the entire FrameLayout (including padded area), rendering
+        // behind system bars and causing clipped bottom cards + floating pill overlap.
+        insetFrame.setClipToPadding(true);
         // Register insets listener BEFORE setContentView so the initial dispatch is caught.
         ViewCompat.setOnApplyWindowInsetsListener(insetFrame, (v, windowInsets) -> {
             // Android 15 (API 35) edge-to-edge: systemBars() returns status + navigation bars (3-button).
