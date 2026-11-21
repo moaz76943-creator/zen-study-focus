@@ -89,6 +89,13 @@ assert.ok((html.match(bodyReserve) || []).length >= 2,
   'body must reserve --df-inflow-bottom above the native inset edge (all body rules)');
 console.log('✔ index.html body reserves clearance via calibrated variables.');
 
+// Studios pill fallback updated to 340px (clearance - 56) to prevent content overlap.
+// FAB fallback updated to 402px (studiosPillBottom + 62).
+assert.ok(html.includes('--df-studios-pill-bottom: 340px'),
+  'Studios pill fallback must be 340px (clearance - pillHeight - gap)');
+assert.ok(html.includes('--df-fab-bottom: 402px'),
+  'FAB fallback must be 402px (studiosPillBottom + FABHeight + gap)');
+
 // ---- touch_restorer.css: no fixed bar parked at bottom: 0 ----
 const barBlock = touchRestorer.slice(touchRestorer.indexOf('.bottom-nav-bar {'));
 assert.ok(barBlock.includes('bottom: var(--df-dock-bottom, 12px)'),

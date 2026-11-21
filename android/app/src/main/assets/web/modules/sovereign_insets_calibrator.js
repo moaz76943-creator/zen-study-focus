@@ -140,10 +140,18 @@
      * Studios pill height = 48px. Capsule top = dockGap(12) + capsuleHeight.
      * Studios pill bottom = capsuleTop + pillHeight + gap(8) = capsuleHeight + 68.
      * @param {number} capsuleHeight Computed capsule height
+     * @param {number} bottomNavClearance Computed clearance for in-flow content
      * @returns {number} Studios pill bottom position in px
      */
-    _computeStudiosPillBottom: function (capsuleHeight) {
-      // dockGap(12) + capsuleHeight + studiosPillHeight(48) + gap(8) = capsuleHeight + 68
+    _computeStudiosPillBottom: function (capsuleHeight, bottomNavClearance) {
+      // Position Studios pill at the clearance boundary so content never scrolls under it.
+      // Studios pill height = 48px, gap above content = 8px.
+      // bottom = clearance - gap - pillHeight = clearance - 56.
+      // Fallback to capsule-based formula if clearance not provided (backward compat).
+      if (typeof bottomNavClearance === 'number' && bottomNavClearance > 0) {
+        return bottomNavClearance - 56;
+      }
+      // Legacy fallback: dockGap(12) + capsuleHeight + studiosPillHeight(48) + gap(8) = capsuleHeight + 68
       return capsuleHeight + 68;
     },
 
@@ -156,8 +164,8 @@
      * @returns {number} FAB bottom position in px
      */
     _computeFabBottom: function (capsuleHeight, studiosPillBottom) {
-      // studiosPillBottom + FABHeight(54) + gap(8) = capsuleHeight + 130
-      return studiosPillBottom + 54 + 8;
+      // studiosPillBottom + FABHeight(54) + gap(8) = studiosPillBottom + 62
+      return studiosPillBottom + 62;
     },
 
     /**
@@ -214,24 +222,8 @@
       var capsuleHeight = this._computeCapsuleHeight(insets);
       root.style.setProperty('--df-capsule-height', capsuleHeight + 'px', 'important');
 
-      // Studios pill position: docked above capsule with no overlap
-      // bottom = dockGap(12) + capsuleHeight + studiosPillHeight(48) + gap(8) = capsuleHeight + 68
-      var studiosPillBottom = this._computeStudiosPillBottom(capsuleHeight);
-      root.style.setProperty('--df-studios-pill-bottom', studiosPillBottom + 'px', 'important');
-
-      // FAB position: above Studios pill with 8px gap
-      // bottom = studiosPillBottom + FABHeight(54) + gap(8) = capsuleHeight + 130
-      var fabBottom = this._computeFabBottom(capsuleHeight, studiosPillBottom);
-      root.style.setProperty('--df-fab-bottom', fabBottom + 'px', 'important');
-
-      // Legacy float-bottom for backward compat (points to Studios pill position)
-      root.style.setProperty('--df-float-bottom', studiosPillBottom + 'px', 'important');
-
-      // Dock bottom gap (capsule dock position from viewport bottom)
-      root.style.setProperty('--df-dock-bottom', '12px', 'important');
-
       // Bottom nav clearance for in-flow content: must clear the highest floating layer
-      // (FAB top = fabBottom + FABHeight(54) = capsuleHeight + 184) + gap(12) = capsuleHeight + 196.
+      // (FAB top = fabBottom + FABHeight(54)) + gap(12).
       // Also handle IME: insets.paddingBottom = max(flooredNavBottom, IME height).
       // When keyboard opens, content must clear the keyboard.
       // Xiaomi 3-button nav floor is 160dp; typical IME is 200-500dp.
@@ -243,6 +235,22 @@
       var paddingBottom = insets.paddingBottom || insets.bottom || 120;
       var bottomNavClearance = this._computeBottomNavClearance(capsuleHeight, paddingBottom);
       root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
+
+      // Studios pill position: docked at the clearance boundary so content never overlaps.
+      // bottom = clearance - gap(8) - pillHeight(48) = clearance - 56.
+      var studiosPillBottom = this._computeStudiosPillBottom(capsuleHeight, bottomNavClearance);
+      root.style.setProperty('--df-studios-pill-bottom', studiosPillBottom + 'px', 'important');
+
+      // FAB position: above Studios pill with 8px gap.
+      // bottom = studiosPillBottom + FABHeight(54) + gap(8) = studiosPillBottom + 62.
+      var fabBottom = this._computeFabBottom(capsuleHeight, studiosPillBottom);
+      root.style.setProperty('--df-fab-bottom', fabBottom + 'px', 'important');
+
+      // Legacy float-bottom for backward compat (points to Studios pill position)
+      root.style.setProperty('--df-float-bottom', studiosPillBottom + 'px', 'important');
+
+      // Dock bottom gap (capsule dock position from viewport bottom)
+      root.style.setProperty('--df-dock-bottom', '12px', 'important');
 
       // Inflow bottom for body padding (resolves to bottom-nav-clearance since webview-padding-bottom is 0)
       root.style.setProperty('--df-inflow-bottom', bottomNavClearance + 'px', 'important');
