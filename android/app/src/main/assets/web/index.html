@@ -50,14 +50,14 @@
          calc() below that references them resolves to the safe content edge.
          --df-bottom-nav-clearance is the dock reserve ABOVE the native inset only
          (capsule + Studios pill + FAB zone); it never includes the nav inset.
-         Fallbacks match calibrator minimums: capsule 100px, Studios pill 268px,
-         FAB 330px, bottom clearance 396px (covers Xiaomi HyperOS 3-button nav bars up to ~200dp). */
+         Fallbacks match calibrator minimums: capsule 100px, Studios pill 340px,
+         FAB 402px, bottom clearance 396px (covers Xiaomi HyperOS 3-button nav bars up to ~200dp). */
       --df-dock-gap: 12px;
       --df-capsule-height: 100px;
       --df-dock-bottom: calc(var(--df-dock-gap, 12px));
-      --df-studios-pill-bottom: 268px;
-      --df-fab-bottom: 330px;
-      --df-float-bottom: 268px;
+      --df-studios-pill-bottom: 340px;
+      --df-fab-bottom: 402px;
+      --df-float-bottom: 340px;
       --df-inflow-bottom: var(--df-bottom-nav-clearance, 396px);
       --df-bottom-nav-clearance: 396px;
     }
