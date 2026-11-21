@@ -41,6 +41,7 @@
       beat_alpha: 'Alpha Differential (10 Hz Calm Alertness)',
       beat_theta: 'Theta Differential (6 Hz Deep Reflection)',
       beat_beta: 'Beta Differential (15 Hz Problem Solving)',
+      beat_gamma: 'Gamma Differential (40 Hz Peak Focus)',
       zero_music_label: '100% Pure Non-Musical Acoustic Signal'
     },
     ar: {
@@ -50,6 +51,7 @@
       beat_alpha: 'تردد ألفا الثنائي (10 هرتز يقظة هادئة)',
       beat_theta: 'تردد ثيتا الثنائي (6 هرتز تدبر عميق)',
       beat_beta: 'تردد بيتا الثنائي (15 هرتز تركيز تحليلي)',
+      beat_gamma: 'تردد غاما الثنائي (40 هرتز تركيز ذروي)',
       zero_music_label: 'إشارة صوتية فيزيائية نقية 100% خالية تماماً من الموسيقى'
     }
   };
@@ -75,6 +77,13 @@
       beatHz: 15,
       leftFreqHz: 242,
       rightFreqHz: 257
+    },
+    gamma: {
+      name: 'beat_gamma',
+      carrierHz: 236,
+      beatHz: 40,
+      leftFreqHz: 216,
+      rightFreqHz: 256
     }
   };
 

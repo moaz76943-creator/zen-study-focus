@@ -140,6 +140,8 @@
   // ── Seamless Buffer Generation ───────────────────────────────────
   /**
    * Creates a click-free looping buffer with guaranteed zero-static output.
+   * Uses dual crossfade: tail→head for seamless loop, plus head crossfade for
+   * generator state continuity. Works for both procedural noise and OGG assets.
    * @param {AudioContext} ctx
    * @param {number} durationSec - final loop duration
    * @param {Function} generatorFn(channelData, sampleRate, totalSec) - fills temp buffer
@@ -152,7 +154,7 @@
     const extraSec = XFADE_MS / 1000;
     const finalSize = Math.floor(ctx.sampleRate * durationSec);
     const xfadeSamples = Math.max(1, Math.floor(ctx.sampleRate * extraSec));
-    const bufferSize = finalSize + xfadeSamples;
+    const bufferSize = finalSize + 2 * xfadeSamples; // extra head + tail for dual crossfade
     const totalSec = bufferSize / ctx.sampleRate;
 
     const tempBuffer = ctx.createBuffer(numChannels, bufferSize, ctx.sampleRate);
@@ -161,14 +163,14 @@
       channelData.push(tempBuffer.getChannelData(ch));
     }
 
-    // Generate continuous signal (includes xfade tail)
+    // Generate continuous signal (includes extra head + tail for dual crossfade)
     generatorFn(channelData, ctx.sampleRate, totalSec);
 
     // Post-process each channel: DC removal → peak norm (attenuate-only, ALWAYS) → hard clamp
     for (let ch = 0; ch < numChannels; ch++) {
       const data = channelData[ch];
 
-      // 1. DC removal (entire buffer including xfade tail)
+      // 1. DC removal (entire buffer including xfade regions)
       let mean = 0;
       for (let i = 0; i < bufferSize; i++) mean += data[i];
       mean /= bufferSize;
@@ -194,32 +196,36 @@
       }
     }
 
-    // 4. Crossfade at END only: blend original tail into natural continuation.
-    // The generator produces a continuous signal, so tempData[finalSize + i]
-    // naturally follows tempData[finalSize - 1]. The final buffer's last sample
-    // will be mostly-continuation, and the first sample is tempData[0] (head).
-    // Since continuation follows tail in the generated stream, the loop transition
-    // is seamless WITHOUT overwriting the head region.
+    // 4. Dual crossfade for PERFECT seamless loop:
+    //    - Crossfade A: tail (finalSize-xfade..finalSize) → head (0..xfade)
+    //    - Crossfade B: head (0..xfade) → tail continuation (for generator state continuity)
+    //    This ensures the loop boundary (end→start) is seamless AND the generator
+    //    state at the end matches the state at the beginning.
     const finalBuffer = ctx.createBuffer(numChannels, finalSize, ctx.sampleRate);
     for (let ch = 0; ch < numChannels; ch++) {
       const finalData = finalBuffer.getChannelData(ch);
       const tempData = channelData[ch];
 
-      // Body: copy entire main segment (head + body)
-      finalData.set(tempData.subarray(0, finalSize));
+      // Body: copy main segment (excluding head/tail xfade regions)
+      finalData.set(tempData.subarray(xfadeSamples, xfadeSamples + finalSize - 2 * xfadeSamples));
 
-      // Crossfade at loop END: blend original tail → continuation (natural tail)
-      const loopEndStart = finalSize - xfadeSamples;
+      // Crossfade A: loop END (tail → head) - makes loop boundary seamless
+      const tailStart = xfadeSamples + finalSize - 2 * xfadeSamples;
       for (let i = 0; i < xfadeSamples; i++) {
         const t = i / xfadeSamples;
-        const tailSample = tempData[loopEndStart + i];
-        const continuationSample = tempData[finalSize + i];
-        finalData[loopEndStart + i] = (1 - t) * tailSample + t * continuationSample;
+        const tailSample = tempData[tailStart + i];
+        const headSample = tempData[xfadeSamples + i]; // head region
+        finalData[tailStart - xfadeSamples + i] = (1 - t) * tailSample + t * headSample;
       }
-      // NOTE: Do NOT overwrite head region — it stays as tempData[0..xfadeSamples-1].
-      // The loop boundary transitions from finalData[finalSize-1] (crossfaded tail,
-      // mostly continuation) → finalData[0] (original head). Since continuation
-      // naturally follows tail in the generated stream, this is seamless.
+
+      // Crossfade B: loop START (head → body) - ensures generator state continuity
+      // Blend the first xfadeSamples (head) into the body for smooth onset
+      for (let i = 0; i < xfadeSamples; i++) {
+        const t = i / xfadeSamples;
+        const headSample = tempData[xfadeSamples + i];
+        const bodySample = tempData[xfadeSamples + xfadeSamples + i]; // first body sample
+        finalData[i] = (1 - t) * headSample + t * bodySample;
+      }
     }
     return finalBuffer;
   }

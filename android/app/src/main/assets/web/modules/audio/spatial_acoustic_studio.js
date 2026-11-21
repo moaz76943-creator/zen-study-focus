@@ -93,6 +93,17 @@
       this.dcBlockFilter.frequency.setValueAtTime(DC_BLOCK_HZ, ctx.currentTime);
       this.dcBlockFilter.Q.setValueAtTime(0.707, ctx.currentTime);
 
+      // Spatial/HRTF panner node for 3D positioning
+      this.spatialPanner = ctx.createPanner();
+      this.spatialPanner.panningModel = 'HRTF';
+      this.spatialPanner.distanceModel = 'exponential';
+      this.spatialPanner.refDistance = 1;
+      this.spatialPanner.maxDistance = 10000;
+      this.spatialPanner.rolloffFactor = 1;
+      this.spatialPanner.coneInnerAngle = 360;
+      this.spatialPanner.coneOuterAngle = 360;
+      this.spatialPanner.coneOuterGain = 0;
+
       this.eqFilters = EQ_FREQUENCIES.map((freq, idx) => {
         const filter = ctx.createBiquadFilter();
         if (idx === 0) {
@@ -108,8 +119,9 @@
         return filter;
       });
 
-      // Chain: DC block -> EQ filters -> AudioCore master output (masterGain -> limiter -> DC -> analyser -> destination)
-      this.dcBlockFilter.connect(this.eqFilters[0]);
+      // Chain: DC block -> Spatial Panner -> EQ filters -> AudioCore master output (masterGain -> limiter -> DC -> analyser -> destination)
+      this.dcBlockFilter.connect(this.spatialPanner);
+      this.spatialPanner.connect(this.eqFilters[0]);
       for (let i = 0; i < this.eqFilters.length - 1; i++) {
         this.eqFilters[i].connect(this.eqFilters[i + 1]);
       }
@@ -340,6 +352,39 @@
       }
 
       return { active: false };
+    }
+
+    /** Set spatial position in 3D coordinates (degrees azimuth, elevation, distance). */
+    setSpatialPosition(azimuthDeg, elevationDeg, distanceM) {
+      if (!this.spatialPanner) return false;
+      // Convert spherical to Cartesian
+      const az = (azimuthDeg || 0) * Math.PI / 180;
+      const el = (elevationDeg || 0) * Math.PI / 180;
+      const dist = distanceM || 1;
+      const x = dist * Math.cos(el) * Math.sin(az);
+      const y = dist * Math.sin(el);
+      const z = -dist * Math.cos(el) * Math.cos(az); // negative Z = forward
+      this.spatialPanner.positionX.setValueAtTime(x, this.audioCtx.currentTime);
+      this.spatialPanner.positionY.setValueAtTime(y, this.audioCtx.currentTime);
+      this.spatialPanner.positionZ.setValueAtTime(z, this.audioCtx.currentTime);
+      return true;
+    }
+
+    /** Set spatial orientation (forward/up vectors for HRTF). */
+    setSpatialOrientation(forwardX, forwardY, forwardZ, upX, upY, upZ) {
+      if (!this.spatialPanner) return false;
+      this.spatialPanner.orientationX.setValueAtTime(forwardX || 1, this.audioCtx.currentTime);
+      this.spatialPanner.orientationY.setValueAtTime(forwardY || 0, this.audioCtx.currentTime);
+      this.spatialPanner.orientationZ.setValueAtTime(forwardZ || 0, this.audioCtx.currentTime);
+      // Up vector is implicit in HRTF panner (always Y-up)
+      return true;
+    }
+
+    /** Enable/disable spatialization (bypass HRTF for mono/stereo compatibility). */
+    setSpatialEnabled(enabled) {
+      if (!this.spatialPanner) return false;
+      this.spatialPanner.panningModel = enabled ? 'HRTF' : 'equalpower';
+      return true;
     }
 
     setEqBandGain(bandIndex, gainDb) {

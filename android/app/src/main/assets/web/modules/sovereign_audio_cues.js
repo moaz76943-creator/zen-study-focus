@@ -1,36 +1,33 @@
 /**
  * DEEP FOCUS — Global Singleton Nature Audio Engine (v629.0.0)
- * Fixes:
- *   1. Never auto-plays on app startup.
- *   2. Global singleton stops ALL previous players before starting any new one (zero overlap/static).
- *   3. Smooth 1.2s fade-in without simultaneous multi-deck WebView distortion.
+ * Fully delegates to AudioCore for all Web Audio operations.
+ * Guarantees:
+ *   1. Never auto-plays on app startup (user gesture required via AudioCore)
+ *   2. Global singleton stops ALL previous players before starting any new one (zero overlap/static)
+ *   3. Smooth 1.2s fade-in without simultaneous multi-deck WebView distortion
+ *   4. User gesture gating for all playback (via AudioCore)
+ *   5. 100% pure nature sounds, no music, no synthetic tones
+ *   6. All OGG playback routed through AudioCore for zero-static, instant-stop, unified master chain
  */
 (function (global) {
-  "use strict";
+  'use strict';
 
-  // Uses AudioCore for all Web Audio operations.
   const audioCore = global.AudioCore;
 
   const SOUND_FILES = {
-    rain: "audio/rain_window.ogg",
-    thunder: "audio/rain_thunder.ogg",
-    forest: "audio/forest_birds.ogg",
-    birds: "audio/forest_birds.ogg",
-    water: "audio/flowing_water.ogg",
-    stream: "audio/flowing_water.ogg",
-    night: "audio/wind_breeze.ogg",
-    wind: "audio/wind_breeze.ogg",
-    cue: "audio/water_drop.ogg",
-    bell: "audio/water_drop.ogg",
-    brown: "audio/rain_window.ogg",
-    pink: "audio/flowing_water.ogg"
+    rain: 'audio/rain_window.ogg',
+    thunder: 'audio/rain_thunder.ogg',
+    forest: 'audio/forest_birds.ogg',
+    birds: 'audio/forest_birds.ogg',
+    water: 'audio/flowing_water.ogg',
+    stream: 'audio/flowing_water.ogg',
+    night: 'audio/wind_breeze.ogg',
+    wind: 'audio/wind_breeze.ogg',
+    cue: 'audio/water_drop.ogg',
+    bell: 'audio/water_drop.ogg',
+    brown: 'audio/rain_window.ogg',
+    pink: 'audio/flowing_water.ogg'
   };
-
-  const BROWN_POLE = audioCore ? audioCore.BROWN_POLE : 0.997;
-  const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
-  const BROWN_NOISE_AMP = (audioCore && audioCore.BROWN_NOISE_AMP) ? audioCore.BROWN_NOISE_AMP : 0.03;
-  const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
-  const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
 
   if (!global.__ZEN_AUDIO_SINGLETON__) {
     global.__ZEN_AUDIO_SINGLETON__ = {
@@ -39,19 +36,13 @@
       fadeTimers: new Set(),
       volume: 0.7,
       muted: false,
-      // userInteracted: false - DELEGATED to AudioCore
-      dspContext: null,
-      bufferCache: {},
-      bufferLoading: {},
-      noiseGeneration: 0,
-      activeSource: null,
-      activeGain: null,
-      activeDC: null,
-      activeHTML: [],
-      activeSources: []
+      userInteracted: false,
+      // AudioCore voice tracking for OGG playback
+      oggVoices: new Map()
     };
   }
-  var S = global.__ZEN_AUDIO_SINGLETON__;
+
+  const S = global.__ZEN_AUDIO_SINGLETON__;
 
   // Ensure required properties exist (singleton may have been initialized by another module)
   if (!S.players) S.players = [];
@@ -59,10 +50,14 @@
   if (!S.fadeTimers) S.fadeTimers = new Set();
   if (typeof S.volume !== 'number') S.volume = 0.7;
   if (typeof S.muted !== 'boolean') S.muted = false;
-  if (!S.activeHTML) S.activeHTML = [];
-  if (!S.activeSources) S.activeSources = [];
+  if (typeof S.userInteracted !== 'boolean') S.userInteracted = false;
+  if (!S.oggVoices) S.oggVoices = new Map();
 
   // Gesture detection delegated to AudioCore - no local binding
+  // Kept for backward compat: S.userInteracted mirrors AudioCore gesture state
+  if (audioCore) {
+    S.userInteracted = audioCore.isGestureReceived();
+  }
 
   function stopAllGlobal() {
     if (S.fadeTimer) {
@@ -72,6 +67,11 @@
     if (S.fadeTimers && S.fadeTimers.size) {
       S.fadeTimers.forEach(function (t) { clearInterval(t); });
       S.fadeTimers.clear();
+    }
+    // Stop AudioCore-tracked OGG voices
+    if (audioCore) {
+      audioCore.stopAllVoices();
+      S.oggVoices.clear();
     }
     for (var i = 0; i < S.players.length; i++) {
       try {
@@ -90,10 +90,33 @@
     }
   }
 
+  async function playOggViaAudioCore(src, loop, targetVol) {
+    if (!audioCore) return null;
+    if (!audioCore.isGestureReceived()) return null; // Hard gate
+
+    const ctx = audioCore.getContext();
+    if (!ctx) return null;
+
+    const buffer = await audioCore.loadOggBuffer(src);
+    if (!buffer) return null;
+
+    const voice = audioCore.createVoice(buffer, loop);
+    if (!voice) return null;
+
+    // Scale voice gain to respect limiter ceiling
+    const targetGain = Math.max(0.0001, targetVol * (audioCore.LIMITER_LINEAR || 0.5));
+    const now = ctx.currentTime;
+    voice.gain.gain.cancelScheduledValues(now);
+    voice.gain.gain.setValueAtTime(0.0001, now);
+    voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.03);
+
+    return voice;
+  }
+
   function playSingleClean(src, loop, targetVol) {
     if (typeof Audio === "undefined") return null;
     // Gesture gate via AudioCore (single source of truth)
-    if (!audioCore || !audioCore.isGestureReceived || !audioCore.isGestureReceived()) return null; // BLOCKED: User gesture required
+    if (!audioCore || !audioCore.isGestureReceived()) return null; // BLOCKED: User gesture required
 
     // Prefer AudioCore's zero-static, limiter-protected, seamlessly looped .ogg voice path.
     // Falls back to native HTMLAudioElement only when AudioCore lacks loadOggBuffer/createVoice.
@@ -102,9 +125,6 @@
       if (ctx) {
         audioCore.loadOggBuffer(src).then(function (decodedBuf) {
           if (!decodedBuf || S.muted) return null;
-          // AudioCore.loadOggBuffer returns an already seamlessly-processed
-          // AudioBuffer (DC-removed, peak-limited, crossfaded). No need to
-          // re-wrap it — pass it directly to createVoice.
           var voice = audioCore.createVoice(decodedBuf, true);
           if (!voice) return null;
 
@@ -204,6 +224,10 @@
         for (var i = 0; i < S.players.length; i++) {
           try { S.players[i].volume = S.muted ? 0 : S.volume; } catch (e) {}
         }
+        // Update AudioCore OGG voices volume
+        if (audioCore) {
+          audioCore.setMasterVolume(S.volume);
+        }
       }
       return this.volume;
     },
@@ -212,6 +236,10 @@
       this.muted = S.muted;
       for (var i = 0; i < S.players.length; i++) {
         try { S.players[i].volume = S.muted ? 0 : S.volume; } catch (e) {}
+      }
+      // Mute AudioCore master
+      if (audioCore) {
+        audioCore.muteMaster(S.muted);
       }
       return this.muted;
     }
@@ -224,76 +252,6 @@
     binaural: { active: false, start: function () { this.active = true; return SovereignRealAudio.playAmbient("water"); }, stop: function () { this.active = false; return SovereignRealAudio.stopAmbient(); } },
     guardian: { init: function () {}, getState: function () { return "ready"; } },
     visualizer: { getSpectrumBins: function () { return [32, 48, 64, 48, 32, 24, 16, 12]; } }
-  };
-
-  global.SovereignAmbientDSP = {
-    version: "629.0.0",
-    activeNoiseType: null,
-    generateNoiseBuffer: function (type, durationSec, sampleRate) {
-      var sr = sampleRate || 44100;
-      var len = Math.floor(Math.max(1, durationSec || 1) * sr);
-      var buf = new Float32Array(len);
-      var t = (type || "white").toLowerCase();
-      if (t === "brown") {
-        // Leaky integrator of WHITE noise (true brown slope). Fixed output
-        // scale — raw accumulation reaches ±10 and must never be hard-clamped.
-        var last = 0;
-        for (var i = 0; i < len; i++) {
-          var white = Math.random() * 2 - 1;
-          last = BROWN_POLE * last + white * BROWN_GAIN;
-          buf[i] = last * BROWN_NOISE_AMP;
-        }
-      } else if (t === "pink") {
-        // Paul Kellet pink noise approximation
-        var b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-        for (var j = 0; j < len; j++) {
-          var w = Math.random() * 2 - 1;
-          b0 = 0.99886 * b0 + w * 0.0555179;
-          b1 = 0.99332 * b1 + w * 0.0750759;
-          b2 = 0.96900 * b2 + w * 0.1538520;
-          b3 = 0.86650 * b3 + w * 0.3104856;
-          b4 = 0.55000 * b4 + w * 0.5329522;
-          b5 = -0.7616 * b5 - w * 0.0168980;
-          b6 = w * 0.115926;
-          var pink = b0 + b1 + b2 + b3 + b4 + b5 + b6 + w * 0.5362;
-          buf[j] = pink * PINK_NOISE_AMP;
-        }
-      } else {
-        // white noise — properly filled buffer (never a silent zero buffer);
-        // 0.5 was audible static hiss, 0.06 matches the other engines.
-        for (var k = 0; k < len; k++) {
-          buf[k] = (Math.random() * 2 - 1) * WHITE_NOISE_AMP;
-        }
-      }
-      // DC-removal pass: kill residual sample-average hum (constant static)
-      // before the buffer reaches a gain node.
-      var mean = 0;
-      for (var m = 0; m < len; m++) mean += buf[m];
-      mean /= len;
-      for (var d = 0; d < len; d++) buf[d] -= mean;
-
-      // Peak limiter: attenuate-only — never amplify quiet noise floor into hiss.
-      var peak = 0;
-      for (var p = 0; p < len; p++) {
-        var a = buf[p] < 0 ? -buf[p] : buf[p];
-        if (a > peak) peak = a;
-      }
-      if (peak > 0.95) {
-        var norm = 0.95 / peak;
-        for (var n = 0; n < len; n++) buf[n] *= norm;
-      }
-
-      // Hard safety clamp: [-1, 1]
-      for (var c = 0; c < len; c++) {
-        if (buf[c] > 1.0) buf[c] = 1.0;
-        else if (buf[c] < -1.0) buf[c] = -1.0;
-      }
-      return buf;
-    },
-    playNoise: function (type, vol) { this.activeNoiseType = type || "rain"; return SovereignRealAudio.playAmbient(type, vol); },
-    stopNoise: function () { this.activeNoiseType = null; return SovereignRealAudio.stopAmbient(); },
-    getActiveNoiseType: function () { return this.activeNoiseType; },
-    setVolume: function (v) { return SovereignRealAudio.setVolume(v); }
   };
 
   global.SovereignAudioCues = SovereignRealAudio;
