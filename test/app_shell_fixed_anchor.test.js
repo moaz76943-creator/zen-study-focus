@@ -31,9 +31,9 @@ console.log('✔ .app-shell is free of containing-block creators (transform/filt
 // --df-webview-padding-bottom is pinned to 0px by calibrator; bottom-nav-capsule uses --df-dock-bottom (dock gap only).
 assert.ok(html.includes('bottom: var(--df-dock-bottom, 12px)'),
   'bottom-nav-capsule must dock via --df-dock-bottom (dock gap only)');
-// Studios pill uses --df-studios-pill-bottom (calibrator computes: dock gap + capsuleHeight + 8px).
-// Initial CSS fallback is 120px (matching calibrator minimum: 12 + 100 + 8, for 100dp capsule).
-assert.ok(html.includes('--df-studios-pill-bottom: 120px'),
+// Studios pill uses --df-studios-pill-bottom (calibrator computes: dock gap + capsuleHeight + pillHeight + gap).
+// Initial CSS fallback is 168px (matching calibrator minimum: 12 + 100 + 48 + 8, for 100dp capsule).
+assert.ok(html.includes('--df-studios-pill-bottom: 168px'),
   'Studios pill must dock above the capsule via --df-studios-pill-bottom');
 console.log('✔ Dock formulas use the calibrated single-owner inset variables.');
 

@@ -136,6 +136,49 @@
     },
 
     /**
+     * Computes the Studios pill bottom position (above capsule, no overlap).
+     * Studios pill height = 48px. Capsule top = dockGap(12) + capsuleHeight.
+     * Studios pill bottom = capsuleTop + pillHeight + gap(8) = capsuleHeight + 68.
+     * @param {number} capsuleHeight Computed capsule height
+     * @returns {number} Studios pill bottom position in px
+     */
+    _computeStudiosPillBottom: function (capsuleHeight) {
+      // dockGap(12) + capsuleHeight + studiosPillHeight(48) + gap(8) = capsuleHeight + 68
+      return capsuleHeight + 68;
+    },
+
+    /**
+     * Computes the FAB bottom position (above Studios pill, no overlap).
+     * FAB height = 54px. Studios pill bottom = computed above.
+     * FAB bottom = studiosPillBottom + FABHeight(54) + gap(8) = capsuleHeight + 130.
+     * @param {number} capsuleHeight Computed capsule height
+     * @param {number} studiosPillBottom Studios pill bottom position
+     * @returns {number} FAB bottom position in px
+     */
+    _computeFabBottom: function (capsuleHeight, studiosPillBottom) {
+      // studiosPillBottom + FABHeight(54) + gap(8) = capsuleHeight + 130
+      return studiosPillBottom + 54 + 8;
+    },
+
+    /**
+     * Computes the bottom nav clearance for in-flow content.
+     * Must clear the highest floating layer (FAB top) + gap.
+     * FAB top = fabBottom + FABHeight(54) = capsuleHeight + 184.
+     * Clearance = FAB top + gap(12) = capsuleHeight + 196.
+     * @param {number} capsuleHeight Computed capsule height
+     * @param {number} paddingBottom Floored padding bottom (nav or IME)
+     * @returns {number} Bottom nav clearance in px
+     */
+    _computeBottomNavClearance: function (capsuleHeight, paddingBottom) {
+      // FAB top = capsuleHeight + 184, +12 gap = capsuleHeight + 196
+      var floatingLayerClearance = capsuleHeight + 196;
+      // IME clearance: if paddingBottom > 500 (IME), use 300; else paddingBottom + 12
+      var imeClearance = paddingBottom > 500 ? 300 : paddingBottom + 12;
+      // Minimum 300px (covers Xiaomi 3-button nav up to ~160dp capsule)
+      return Math.max(floatingLayerClearance, imeClearance, 300);
+    },
+
+    /**
      * Injects CSS variables onto documentElement with !important to override conflicting rules.
      * Design (Android 15 / Xiaomi edge-to-edge): MainActivity pads the WebView's PARENT
      * FrameLayout with the FLOORED system-bar insets (including defensive floors for Xiaomi
@@ -171,14 +214,14 @@
       var capsuleHeight = this._computeCapsuleHeight(insets);
       root.style.setProperty('--df-capsule-height', capsuleHeight + 'px', 'important');
 
-      // Studios pill position: docked above capsule
-      // bottom = dock-gap(12) + capsuleHeight + gap(8) = capsuleHeight + 20
-      var studiosPillBottom = capsuleHeight + 20;
+      // Studios pill position: docked above capsule with no overlap
+      // bottom = dockGap(12) + capsuleHeight + studiosPillHeight(48) + gap(8) = capsuleHeight + 68
+      var studiosPillBottom = this._computeStudiosPillBottom(capsuleHeight);
       root.style.setProperty('--df-studios-pill-bottom', studiosPillBottom + 'px', 'important');
 
       // FAB position: above Studios pill with 8px gap
-      // bottom = studiosPillBottom + StudiosHeight(48) + gap(8) = capsuleHeight + 76
-      var fabBottom = studiosPillBottom + 48 + 8;
+      // bottom = studiosPillBottom + FABHeight(54) + gap(8) = capsuleHeight + 130
+      var fabBottom = this._computeFabBottom(capsuleHeight, studiosPillBottom);
       root.style.setProperty('--df-fab-bottom', fabBottom + 'px', 'important');
 
       // Legacy float-bottom for backward compat (points to Studios pill position)
@@ -188,7 +231,7 @@
       root.style.setProperty('--df-dock-bottom', '12px', 'important');
 
       // Bottom nav clearance for in-flow content: must clear the highest floating layer
-      // (FAB top = fabBottom + FABheight(54) = capsuleHeight + 130) + gap(12) = capsuleHeight + 142 minimum.
+      // (FAB top = fabBottom + FABHeight(54) = capsuleHeight + 184) + gap(12) = capsuleHeight + 196.
       // Also handle IME: insets.paddingBottom = max(flooredNavBottom, IME height).
       // When keyboard opens, content must clear the keyboard.
       // Xiaomi 3-button nav floor is 160dp; typical IME is 200-500dp.
@@ -197,10 +240,8 @@
       // already reduced by native parent padding). It must always be at least
       // floatingLayerClearance to clear the FAB/Studios pill; never cap it by the
       // viewport height because the viewport is already short on tall-nav-bar devices.
-      var floatingLayerClearance = fabBottom + 54 + 12; // capsuleHeight + 142
       var paddingBottom = insets.paddingBottom || insets.bottom || 120;
-      var imeClearance = paddingBottom > 500 ? 300 : paddingBottom + 12;
-      var bottomNavClearance = Math.max(floatingLayerClearance, imeClearance, 300);
+      var bottomNavClearance = this._computeBottomNavClearance(capsuleHeight, paddingBottom);
       root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
 
       // Inflow bottom for body padding (resolves to bottom-nav-clearance since webview-padding-bottom is 0)
