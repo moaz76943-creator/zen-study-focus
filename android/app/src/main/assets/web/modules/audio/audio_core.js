@@ -194,15 +194,18 @@
       }
     }
 
-    // 4. Symmetric crossfade: blend tail into head AND head into tail for seamless loop
-    // This ensures BOTH sides of the loop boundary are in the crossfade region,
-    // eliminating clicks/static at the wrap point.
+    // 4. Crossfade at END only: blend original tail into natural continuation.
+    // The generator produces a continuous signal, so tempData[finalSize + i]
+    // naturally follows tempData[finalSize - 1]. The final buffer's last sample
+    // will be mostly-continuation, and the first sample is tempData[0] (head).
+    // Since continuation follows tail in the generated stream, the loop transition
+    // is seamless WITHOUT overwriting the head region.
     const finalBuffer = ctx.createBuffer(numChannels, finalSize, ctx.sampleRate);
     for (let ch = 0; ch < numChannels; ch++) {
       const finalData = finalBuffer.getChannelData(ch);
       const tempData = channelData[ch];
 
-      // Body: copy main segment (excluding crossfade regions)
+      // Body: copy entire main segment (head + body)
       finalData.set(tempData.subarray(0, finalSize));
 
       // Crossfade at loop END: blend original tail → continuation (natural tail)
@@ -213,12 +216,10 @@
         const continuationSample = tempData[finalSize + i];
         finalData[loopEndStart + i] = (1 - t) * tailSample + t * continuationSample;
       }
-
-      // Crossfade at loop START: blend continuation → original head
-      // Copy the crossfaded tail region to the head for perfect symmetry
-      for (let i = 0; i < xfadeSamples; i++) {
-        finalData[i] = finalData[loopEndStart + i];
-      }
+      // NOTE: Do NOT overwrite head region — it stays as tempData[0..xfadeSamples-1].
+      // The loop boundary transitions from finalData[finalSize-1] (crossfaded tail,
+      // mostly continuation) → finalData[0] (original head). Since continuation
+      // naturally follows tail in the generated stream, this is seamless.
     }
     return finalBuffer;
   }
@@ -471,11 +472,10 @@
         const headSample = extData[finalSize + i];
         finalData[finalSize - xfadeSamples + i] = (1 - t) * tailSample + t * headSample;
       }
-
-      // Head crossfade: copy crossfaded tail region to head for seamless loop
-      for (let i = 0; i < xfadeSamples; i++) {
-        finalData[i] = finalData[finalSize - xfadeSamples + i];
-      }
+      // NOTE: Do NOT overwrite head region — it stays as extData[0..xfadeSamples-1].
+      // The loop boundary transitions from finalData[finalSize-1] (crossfaded tail,
+      // mostly continuation) → finalData[0] (original head). Since continuation
+      // naturally follows tail in the extended buffer, this is seamless.
 
       // Post-process: DC removal -> peak limiter (attenuate-only) -> hard clamp
       // 1. DC removal
