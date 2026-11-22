@@ -161,7 +161,7 @@
     // integrator drift from accumulating into low-frequency rumble/static.
     // Correct one-pole highpass: y[n] = a * (y[n-1] + x[n] - x[n-1])
     // where a = exp(-2πfc/fs) — this matches the continuous-time RC filter response.
-    const dcBlockA = Math.exp(-2 * Math.PI * 10 / (typeof window !== 'undefined' && window.AudioCore ? (window.AudioCore.getContext()?.sampleRate || 44100) : 44100));
+    const dcBlockA = 0.9986; // Fixed one-pole high-pass coefficient (~10Hz), sampleRate-independent
     let dcBlockY = 0;
     let dcBlockXPrev = 0;
     for (let i = 0; i < n; i++) {
