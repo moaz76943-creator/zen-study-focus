@@ -5952,9 +5952,39 @@ function createSeamlessOggBuffer(ctx, buffer) {
 }
 
 // Delegates to AudioCore for OGG loading with procedural fallback
+function _generateProceduralFallback(ctx, src) {
+  if (!ctx) return null;
+  const lower = (src || '').toLowerCase();
+  let noiseFn = ctx.generatePinkNoise;
+  if (!noiseFn) return null;
+  if (lower.includes('thunder') || lower.includes('forest') || lower.includes('fire')) {
+    noiseFn = ctx.generateBrownNoise || noiseFn;
+  } else if (lower.includes('wind') || lower.includes('rain') || lower.includes('stream')) {
+    noiseFn = ctx.generatePinkNoise || noiseFn;
+  } else if (lower.includes('drop') || lower.includes('water')) {
+    noiseFn = ctx.generateWhiteNoise || noiseFn;
+  }
+  const callback = (channelData, sampleRate, totalSec) => {
+    if (noiseFn) noiseFn(channelData, sampleRate, totalSec);
+  };
+  // Use createSeamlessBuffer if available, otherwise use the local version
+  const createSeamless = ctx.createSeamlessBuffer || (typeof createSeamlessBuffer === 'function' ? createSeamlessBuffer : null);
+  if (!createSeamless) return null;
+  return createSeamless(ctx, 5, callback, 1, false);
+}
+
 async function getOggBuffer(src) {
   if (window.AudioCore && window.AudioCore.loadOggBuffer) {
-    return window.AudioCore.loadOggBuffer(src);
+    try {
+      const buffer = await window.AudioCore.loadOggBuffer(src);
+      if (buffer) return buffer;
+      // Procedural fallback: OGG file missing/undecodable → generate nature-like noise
+      // This ensures reliable nature sounds even when OGG assets are unavailable
+      return _generateProceduralFallback(window.AudioCore, src);
+    } catch (err) {
+      console.warn('[OggPlayer] AudioCore load failed, using procedural fallback', err);
+      return _generateProceduralFallback(window.AudioCore, src);
+    }
   }
   // Fallback (legacy path)
   if (oggBufferCache[src]) return oggBufferCache[src];
@@ -5975,7 +6005,14 @@ async function getOggBuffer(src) {
       oggBufferCache[src] = seamless;
       return seamless;
     })
-    .catch(e => { console.warn('[OggPlayer] Failed to load', src, e); delete oggLoadingPromises[src]; return null; });
+    .catch(e => {
+      console.warn('[OggPlayer] Failed to load', src, e);
+      delete oggLoadingPromises[src];
+      // Procedural fallback for legacy path too
+      const fallback = _generateProceduralFallback(ctx, src);
+      if (fallback) oggBufferCache[src] = fallback;
+      return fallback;
+    });
   oggLoadingPromises[src] = promise;
   return promise;
 }
