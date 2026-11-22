@@ -166,11 +166,11 @@ public class MainActivity extends AppCompatActivity {
             }
 
             // HEURISTIC FALLBACK: If NOT detected as Xiaomi but we have a gesture handle with NO visible
-            // nav bar AND the reported raw nav height is small (< 50dp), this strongly indicates a
+            // nav bar AND the reported raw nav height is small (< 100dp), this strongly indicates a
             // 3-button nav bar that's under-reporting (common on some OEM Android 15 builds). Apply the
             // 3-button floor to prevent content clipping. This is a safe default: extra padding on true
             // gesture nav (handle ~32dp) just adds harmless empty space; missing the 3-button bar clips UI.
-            if (!isXiaomi && hasGestureHandle && !hasVisibleNavBar && rawNavBottom < Math.round(50 * density)) {
+            if (!isXiaomi && hasGestureHandle && !hasVisibleNavBar && rawNavBottom < Math.round(100 * density)) {
                 isGestureNav = false;
             }
 
@@ -186,11 +186,11 @@ public class MainActivity extends AppCompatActivity {
             // minimum floor. This handles edge cases where detection fails and the
             // reported insets are zero or too small. The cost is extra padding (harmless
             // empty space); the benefit is never clipping content or overlapping the
-            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can reach ~220-240dp on Android 15;
-            // use 240dp floor to guarantee the WebView viewport never intrudes into the
-            // nav bar area. DO NOT apply for gesture navigation (handle ~32dp).
+            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can reach ~240-260dp on Android 15;
+            // use 260dp floor to guarantee the WebView viewport never intrudes into the
+            // nav bar area (matches calibrator capsule cap at 260px). DO NOT apply for gesture navigation (handle ~32dp).
             if (isXiaomi && !isGestureNav) {
-                int absoluteMinNavDp = 240; // Covers 3-button bars up to ~240dp on HyperOS Android 15
+                int absoluteMinNavDp = 260; // Covers 3-button bars up to ~260dp on HyperOS Android 15
                 int absoluteMinNavPx = Math.round(absoluteMinNavDp * density);
                 if (navBottom < absoluteMinNavPx) navBottom = absoluteMinNavPx;
             }
