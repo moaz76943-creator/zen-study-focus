@@ -160,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
             // missing the nav bar on 3-button clips content and overlaps the Studios pill.
             if (isXiaomi && hasGestureHandle && !hasVisibleNavBar) {
                 // Xiaomi with gesture handle but no visible 3-button bar = treat as 3-button nav.
-                // The 240dp absolute floor below will guarantee the WebView viewport never intrudes
+                // The 260dp absolute floor below will guarantee the WebView viewport never intrudes
                 // into the nav bar area. This covers all misreporting cases (any handle height > 0).
                 isGestureNav = false;
             }
@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
             // minimum floor. This handles edge cases where detection fails and the
             // reported insets are zero or too small. The cost is extra padding (harmless
             // empty space); the benefit is never clipping content or overlapping the
-            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can reach ~240-260dp on Android 15;
+            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can reach ~260dp on Android 15;
             // use 260dp floor to guarantee the WebView viewport never intrudes into the
             // nav bar area (matches calibrator capsule cap at 260px). DO NOT apply for gesture navigation (handle ~32dp).
             if (isXiaomi && !isGestureNav) {

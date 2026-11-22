@@ -32,15 +32,15 @@
      */
     init: function () {
       if (!this._hasRealInsets) {
-        // Use a conservative fallback bottom (240dp) matching the Xiaomi 3-button nav floor
-        // in MainActivity (absoluteMinNavDp = 240) so the initial reserve covers tall nav bars
+        // Use a conservative fallback bottom (260dp) matching the Xiaomi 3-button nav floor
+        // in MainActivity (absoluteMinNavDp = 260) so the initial reserve covers tall nav bars
         // before real insets arrive. Real gesture nav (~32dp) will quickly correct to a smaller capsule.
         this.applyCSSVariables({
           top: 24,
-          bottom: 240,
+          bottom: 260,
           left: 0,
           right: 0,
-          paddingBottom: 240
+          paddingBottom: 260
         });
       }
       if (typeof window !== 'undefined') {
@@ -156,6 +156,7 @@
       // IME clearance: if paddingBottom > 500 (IME), use 300; else paddingBottom + 12
       var imeClearance = paddingBottom > 500 ? 300 : paddingBottom + 12;
       // Minimum 300px (capsule 56px + floating stack 196px + 12px gap = 264px, floored to 300px)
+      // On Xiaomi 3-button nav (up to 260dp), clearance = 260 + 196 = 456px (covers full stack).
       return Math.max(floatingLayerClearance, imeClearance, 300);
     },
 
@@ -163,7 +164,7 @@
      * Injects CSS variables onto documentElement with !important to override conflicting rules.
      * Design (Android 15 / Xiaomi edge-to-edge): MainActivity pads the WebView's PARENT
      * FrameLayout with the FLOORED system-bar insets (including defensive floors for Xiaomi
-     * HyperOS 3-button nav up to 160dp), so the WebView's layout viewport
+     * HyperOS 3-button nav up to 260dp), so the WebView's layout viewport
      * already ends above the status bar, cutout and 3-button nav bar. Native padding
      * is the single owner of the insets — if CSS re-added them (via --df-safe-top /
      * --df-safe-bottom / --df-webview-padding-bottom) every dock offset and body
