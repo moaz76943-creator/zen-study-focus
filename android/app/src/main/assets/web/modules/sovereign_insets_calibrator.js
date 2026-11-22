@@ -82,57 +82,30 @@
     },
 
     /**
-     * Computes the effective capsule height based on actual nav bar insets and viewport width.
-     * On narrow screens (<430px), the CSS adds extra padding-block-start to the capsule,
-     * so we must account for that in our dock calculations.
-     * @param {Object} insets Current insets
+     * Computes the app's bottom nav capsule height based on CSS design constants.
+     * The capsule is an APP-LEVEL UI element (the 7-tab glass navigation bar).
+     * Its height is determined by CSS, NOT by system nav bar insets.
+     * System nav bar insets are handled by native parent padding in MainActivity.
+     * On narrow screens (<430px), CSS adds extra padding-block-start to the capsule.
+     * @param {Object} insets Current insets (used only for viewport width via this._viewportWidth)
      * @returns {number} Capsule height in px (CSS px == DP in WebView)
      */
     _computeCapsuleHeight: function (insets) {
-      // Base capsule height from actual reported nav bar height (raw, no defensive floors)
-      // insets.bottom = rawNavBottomDp from MainActivity (actual reported nav bar height)
-      // insets.paddingBottom = floored navBottom (includes Xiaomi 160dp floor) or IME height
-      var rawNavBottom = insets.bottom;      // Actual reported nav bar height (0 on gesture, ~32 on Xiaomi 3-button misreport, ~96-150 on 3-button)
-      var flooredNavBottom = insets.paddingBottom; // Floored value (160dp on Xiaomi 3-button, 32dp on gesture, or IME)
-
-      // Determine effective nav bar height for capsule sizing
-      // Prefer flooredNavBottom when it represents the 3-button nav bar floor
-      // (floored > raw indicates a defensive floor was applied; floored <= 500 excludes IME).
-      // This handles Xiaomi misreporting where mandatorySystemGestures reports a handle
-      // height (e.g., 32-100dp) but the actual 3-button nav bar is 160dp.
-      var effectiveNavHeight;
-      if (flooredNavBottom > rawNavBottom && flooredNavBottom <= 500) {
-        // 3-button nav with defensive floor applied (Xiaomi 160dp floor), or severe under-reporting (raw=0)
-        effectiveNavHeight = flooredNavBottom;
-      } else if (rawNavBottom > 0) {
-        // Gesture nav (raw ~ floored ~ 32), honest 3-button (raw == floored),
-        // or IME open (floored > 500, raw is the nav bar height).
-        effectiveNavHeight = rawNavBottom;
-      } else {
-        effectiveNavHeight = 100;
-      }
-
-      // Apply minimum floors based on navigation type heuristic
-      // > 50dp = likely 3-button nav (Material spec 56dp, Xiaomi HyperOS up to ~160dp)
-      // <= 50dp = likely gesture nav (handle ~32dp)
-      var minCapsuleHeight = effectiveNavHeight > 50 ? 100 : 32;
-      var capsuleHeight = Math.max(effectiveNavHeight, minCapsuleHeight);
-
-      // Cap at reasonable maximum for Xiaomi HyperOS 3-button (240dp floor + some margin)
-      if (capsuleHeight > 260) capsuleHeight = 260;
+      // Base capsule height from CSS design: ~56px (button area 44px + 12px vertical padding)
+      // This is the height of .bottom-nav-capsule on wide screens (>= 430px)
+      var baseCapsuleHeight = 56;
 
       // Account for narrow-screen extra padding in CSS (media query max-width: 430px)
       // CSS adds padding-block-start: clamp(40px, 2.5rem, 80px) to .bottom-nav-capsule
-      // Base capsule content height ~56px (44px button + 12px padding)
       // With extra padding: 96px to 136px total
       if (this._viewportWidth > 0 && this._viewportWidth < 430) {
         var extraPadding = Math.min(80, Math.max(40, this._viewportWidth * 0.0625)); // clamp(40px, 2.5rem, 80px) approx
-        var narrowCapsuleHeight = 56 + extraPadding; // ~96-136px
-        // Use the larger of nav-bar-based height and narrow-screen layout height
-        capsuleHeight = Math.max(capsuleHeight, narrowCapsuleHeight);
+        var narrowCapsuleHeight = baseCapsuleHeight + extraPadding; // ~96-136px
+        return narrowCapsuleHeight;
       }
 
-      return capsuleHeight;
+      // Wide screens: use base capsule height
+      return baseCapsuleHeight;
     },
 
     /**
@@ -182,7 +155,7 @@
       var floatingLayerClearance = capsuleHeight + 196;
       // IME clearance: if paddingBottom > 500 (IME), use 300; else paddingBottom + 12
       var imeClearance = paddingBottom > 500 ? 300 : paddingBottom + 12;
-      // Minimum 436px (covers Xiaomi 3-button nav up to ~240dp capsule)
+      // Minimum 300px (capsule 56px + floating stack 196px + 12px gap = 264px, floored to 300px)
       return Math.max(floatingLayerClearance, imeClearance, 300);
     },
 
