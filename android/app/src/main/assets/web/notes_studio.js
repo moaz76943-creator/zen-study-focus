@@ -46,7 +46,7 @@ function nsTemplateText(code,part){
  // Lane 01 owns the inventory/key registry; Lane 02 imports approved 'notes' keys.
  return nsTranslate('tpl_'+code+'_'+part,base);
 }
-const NS_RTL_LOCALES=new Set(['ar','fa','ur','ps','yi','sd','ug']);
+const NS_RTL_LOCALES=new Set(['ar','fa','ur','ps']);
 function nsLocaleDir(){return NS_RTL_LOCALES.has(nsLanguage().split(/[-_]/)[0])?'rtl':'ltr';}
 const NS_STRINGS={
  en:['✦ NOTES STUDIO','Your ideas, organized','Write, revisit and develop your thoughts.','My notes','Pinned','+ New note','Ready-to-use templates','Tap to start','Pinned only',(window.UniversalI18nHotSwap && window.UniversalI18nHotSwap.t ? window.UniversalI18nHotSwap.t('ui_sort_label') : 'Sort'),'Recent','Oldest','Title','results','No notes match. Use a template to begin.','New note','Edit note','Title','Type','Date','Content','Pin','Favorite','words','characters','Save note','Save changes','Replace your text with this template?','Edit','Duplicate','Copy','Calendar','Delete','Reveal answer','Could not copy.','Saved'],

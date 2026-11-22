@@ -63,7 +63,7 @@
     "ar", "en", "de", "fr", "es", "tr", "ru", "zh", "ja", "ko",
     "id", "ms", "hi", "ur", "fa", "pt", "it", "nl", "pl", "vi"
   ]);
-  const RTL_LANGS = new Set(["ar", "ur", "fa"]);
+  const RTL_LANGS = new Set(["ar", "ur", "fa", "ps"]);
   const FORBIDDEN_LANG_CODES = new Set([
     "he", "iw", "syc", "ber", "zgh", "kab", "yi", "ji", "tmh", "tzm", "shi"
   ]);
