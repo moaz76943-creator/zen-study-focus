@@ -209,27 +209,37 @@
   /** 40Hz gamma binaural beat baked into a stereo buffer (216Hz L, 256Hz R). */
   generateBinaural40HzBuffer(durationSec = 5) {
     const ctx = this.initAudioContext();
-    if (!audioCore || !audioCore.createSeamlessBuffer) return null;
+    if (!audioCore) return null;
     // Ensure duration contains integer cycles of both 216Hz and 256Hz
     // LCM of periods: 216 and 256 -> 216=2^3*3^3, 256=2^8 -> LCM=2^8*3^3=6912
     // Fundamental period = 6912/216 = 32 seconds for 216Hz, 6912/256 = 27 seconds for 256Hz
     // For 5 seconds: 216*5=1080 cycles (integer), 256*5=1280 cycles (integer) - perfect!
-    return audioCore.createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
-      const left = channelData[0];
-      const right = channelData[1];
-      const bufferSize = Math.floor(sampleRate * totalSec);
+    // CRITICAL: For perfectly periodic signals with integer cycles, we MUST NOT apply
+    // a crossfade — it introduces a phase discontinuity at the loop boundary.
+    // Create buffer directly with exact sample count for integer cycles.
+    const sampleRate = ctx.sampleRate;
+    const exactSize = Math.round(sampleRate * durationSec); // exact integer samples
+    const buffer = ctx.createBuffer(2, exactSize, sampleRate);
+    const left = buffer.getChannelData(0);
+    const right = buffer.getChannelData(1);
 
-      const amp = 0.18;
-      const TWO_PI = Math.PI * 2;
-      // Sine waves have zero DC offset by construction — no DC block needed.
-      // The createSeamlessBuffer DC-removal pass is belt-and-suspenders.
-      for (let i = 0; i < bufferSize; i++) {
-        const t = i / sampleRate;
-        left[i] = Math.sin(TWO_PI * 216 * t) * amp;
-        right[i] = Math.sin(TWO_PI * 256 * t) * amp;
+    const amp = 0.18;
+    const TWO_PI = Math.PI * 2;
+    // Sine waves have zero DC offset by construction — no DC block needed.
+    for (let i = 0; i < exactSize; i++) {
+      const t = i / sampleRate;
+      left[i] = Math.sin(TWO_PI * 216 * t) * amp;
+      right[i] = Math.sin(TWO_PI * 256 * t) * amp;
+    }
+    // Hard safety clamp (defensive — sine waves never exceed amp=0.18)
+    for (let ch = 0; ch < 2; ch++) {
+      const data = buffer.getChannelData(ch);
+      for (let i = 0; i < exactSize; i++) {
+        if (data[i] > 1.0) data[i] = 1.0;
+        else if (data[i] < -1.0) data[i] = -1.0;
       }
-      // AudioCore's createSeamlessBuffer handles clamp
-    }, 2, false);
+    }
+    return buffer;
   }
 
     startPreset(presetName = 'pink_noise') {

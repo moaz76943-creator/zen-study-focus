@@ -164,7 +164,7 @@
   }
 
   // ---------- Real noise synthesis (white / pink / brown) ----------
-  function synthNoiseInto(data, color) {
+  function synthNoiseInto(data, color, sampleRate) {
     const n = data.length;
     if (color === 'white') {
       // Full-band white at low amplitude — 0.3 was audible hiss; 0.08 is a
@@ -178,7 +178,9 @@
     // integrator drift from accumulating into low-frequency rumble/static.
     // Correct one-pole highpass: y[n] = a * (y[n-1] + x[n] - x[n-1])
     // where a = exp(-2πfc/fs) — this matches the continuous-time RC filter response.
-    const dcBlockA = 0.9986; // Fixed one-pole high-pass coefficient (~10Hz), sampleRate-independent
+    // Compute coefficient based on actual sample rate for accuracy across all devices.
+    const fc = 10; // ~10Hz cutoff
+    const dcBlockA = Math.exp(-2 * Math.PI * fc / (sampleRate || 44100));
     let dcBlockY = 0;
     let dcBlockXPrev = 0;
     for (let i = 0; i < n; i++) {
@@ -224,7 +226,7 @@
     const tempSize = finalSize + 2 * xfadeSamples; // extra head + tail for seamless crossfade
     const temp = ctx.createBuffer(1, tempSize, ctx.sampleRate);
     const tempData = temp.getChannelData(0);
-    synthNoiseInto(tempData, color);
+    synthNoiseInto(tempData, color, ctx.sampleRate);
 
     const out = ctx.createBuffer(1, finalSize, ctx.sampleRate);
     const outData = out.getChannelData(0);
@@ -524,7 +526,7 @@
     generateNoiseBuffer: function (type, durationSec, sampleRate) {
       const len = Math.floor(Math.max(1, durationSec || 1) * (sampleRate || 44100));
       const out = new Float32Array(len);
-      synthNoiseInto(out, String(type || 'pink').toLowerCase());
+      synthNoiseInto(out, String(type || 'pink').toLowerCase(), sampleRate || 44100);
       return out;
     },
     playNoise: function (type, vol) {
