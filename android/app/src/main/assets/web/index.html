@@ -477,8 +477,8 @@
     }
     .stile-switch { width: 48px; height: 32px; border-radius: var(--radius-pill); background: rgba(255,255,255,0.35); position: relative; min-width: 48px; min-height: 32px; }
     .sound-Rich-tile.playing .stile-switch { background: #00d2ff; }
-    .stile-knob { width: 18px; height: 18px; border-radius: 50%; background: #ffffff; position: absolute; top: 7px; right: 7px; transition: 0.2s; }
-    .sound-Rich-tile.playing .stile-knob { transform: translateX(-18px); }
+    .stile-knob { width: 18px; height: 18px; border-radius: 50%; background: #ffffff; position: absolute; top: 3px; left: 3px; right: auto; transition: left 0.15s var(--df25-ease), background 0.15s var(--df25-ease); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+    .sound-Rich-tile.playing .stile-knob { left: calc(3px - 18px); background: var(--primary); }
     .stile-name { font-size: 0.82rem; font-weight: 800; text-shadow: 0 2px 4px rgba(0,0,0,0.85); }
     .stile-vol { width: 100%; -webkit-appearance: none; background: rgba(255,255,255,0.4); height: 3.5px; border-radius: 2px; outline: none; margin-top: 6px; }
     .stile-vol::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: #ffffff; cursor: pointer; }
