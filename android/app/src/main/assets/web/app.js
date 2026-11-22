@@ -64043,6 +64043,7 @@ function() {
 
     function dfSpatialSetCollapsed(collapsed) {
       window.__dfSpatialCollapsed = !!collapsed;
+      if (host) host.setAttribute('aria-expanded', String(!window.__dfSpatialCollapsed));
       if (bodyWrap) bodyWrap.style.display = window.__dfSpatialCollapsed ? 'none' : 'flex';
       if (collapseBtn) collapseBtn.setAttribute('aria-expanded', String(!window.__dfSpatialCollapsed));
       const lbl = window.__dfSpatialCollapsed ? DF_SPATIAL_LBL_EXPAND : DF_SPATIAL_LBL_COLLAPSE;
