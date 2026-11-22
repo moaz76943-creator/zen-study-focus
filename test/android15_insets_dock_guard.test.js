@@ -84,17 +84,17 @@ console.log('✔ Calibrator pins safe-area variables to 0px and publishes the do
 // Body must reserve clearance above the native inset edge using --df-inflow-bottom
 // (which resolves to --df-bottom-nav-clearance since --df-webview-padding-bottom is 0px).
 // The pillar7 rule (later, !important) and the weak rule up top must both stay on the same formula.
-const bodyReserve = /padding-bottom:\s*var\(--df-inflow-bottom,\s*436px\)/g;
+const bodyReserve = /padding-bottom:\s*var\(--df-inflow-bottom,\s*300px\)/g;
 assert.ok((html.match(bodyReserve) || []).length >= 2,
   'body must reserve --df-inflow-bottom above the native inset edge (all body rules)');
 console.log('✔ index.html body reserves clearance via calibrated variables.');
 
-// Studios pill fallback updated to 380px (clearance - 56) to prevent content overlap.
-// FAB fallback updated to 442px (studiosPillBottom + 62).
-assert.ok(html.includes('--df-studios-pill-bottom: 380px'),
-  'Studios pill fallback must be 380px (clearance - pillHeight - gap)');
-assert.ok(html.includes('--df-fab-bottom: 442px'),
-  'FAB fallback must be 442px (studiosPillBottom + FABHeight + gap)');
+// Studios pill fallback updated to 244px (clearance 300 - pillHeight 48 - gap 8).
+// FAB fallback updated to 306px (studiosPillBottom 244 + FABHeight 54 + gap 8).
+assert.ok(html.includes('--df-studios-pill-bottom: 244px'),
+  'Studios pill fallback must be 244px (clearance - pillHeight - gap)');
+assert.ok(html.includes('--df-fab-bottom: 306px'),
+  'FAB fallback must be 306px (studiosPillBottom + FABHeight + gap)');
 
 // ---- touch_restorer.css: no fixed bar parked at bottom: 0 ----
 const barBlock = touchRestorer.slice(touchRestorer.indexOf('.bottom-nav-bar {'));
