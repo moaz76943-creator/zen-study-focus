@@ -135,20 +135,42 @@ public class MainActivity extends AppCompatActivity {
             boolean hasVisibleNavBar = navigationBars.bottom > 0 || systemBars.bottom > 0;
             boolean isGestureNav = hasGestureHandle && !hasVisibleNavBar;
 
+            // Robust Xiaomi/Redmi/POCO/HyperOS detection: check MANUFACTURER, BRAND, DEVICE, MODEL.
+            // Some HyperOS variants report non-standard manufacturer strings.
+            String manufacturer = Build.MANUFACTURER;
+            String brand = Build.BRAND;
+            String device = Build.DEVICE;
+            String model = Build.MODEL;
+            boolean isXiaomi = "xiaomi".equalsIgnoreCase(manufacturer)
+                    || "redmi".equalsIgnoreCase(manufacturer)
+                    || "poco".equalsIgnoreCase(manufacturer)
+                    || "xiaomi".equalsIgnoreCase(brand)
+                    || "redmi".equalsIgnoreCase(brand)
+                    || "poco".equalsIgnoreCase(brand)
+                    || (device != null && device.toLowerCase().contains("xiaomi"))
+                    || (model != null && model.toLowerCase().contains("xiaomi"));
+            // Density must be available BEFORE any dp<->px conversion (used in Xiaomi overrides below).
+            float density = getResources().getDisplayMetrics().density;
+
             // Xiaomi-specific override: on HyperOS, mandatorySystemGestures.bottom may be > 0 even in 3-button mode,
             // and navigationBars/systemBars may under-report (report 0). If the device is Xiaomi and we have a
-            // gesture handle but no visible nav bar, assume 3-button nav and apply the 160dp absolute floor.
+            // gesture handle but no visible nav bar, assume 3-button nav and apply the absolute floor.
             // This is safer than relying on height thresholds (32dp/100dp) which have a gap: a misreported
             // 3-button bar at 32-100dp would be missed. Extra padding on gesture nav is harmless (empty space);
             // missing the nav bar on 3-button clips content and overlaps the Studios pill.
-            String manufacturer = Build.MANUFACTURER;
-            boolean isXiaomi = "xiaomi".equalsIgnoreCase(manufacturer) || "redmi".equalsIgnoreCase(manufacturer) || "poco".equalsIgnoreCase(manufacturer);
-            // Density must be available BEFORE any dp<->px conversion (used in Xiaomi overrides below).
-            float density = getResources().getDisplayMetrics().density;
             if (isXiaomi && hasGestureHandle && !hasVisibleNavBar) {
                 // Xiaomi with gesture handle but no visible 3-button bar = treat as 3-button nav.
-                // The 120dp absolute floor below will guarantee the WebView viewport never intrudes
+                // The 240dp absolute floor below will guarantee the WebView viewport never intrudes
                 // into the nav bar area. This covers all misreporting cases (any handle height > 0).
+                isGestureNav = false;
+            }
+
+            // HEURISTIC FALLBACK: If NOT detected as Xiaomi but we have a gesture handle with NO visible
+            // nav bar AND the reported raw nav height is small (< 50dp), this strongly indicates a
+            // 3-button nav bar that's under-reporting (common on some OEM Android 15 builds). Apply the
+            // 3-button floor to prevent content clipping. This is a safe default: extra padding on true
+            // gesture nav (handle ~32dp) just adds harmless empty space; missing the 3-button bar clips UI.
+            if (!isXiaomi && hasGestureHandle && !hasVisibleNavBar && rawNavBottom < Math.round(50 * density)) {
                 isGestureNav = false;
             }
 
