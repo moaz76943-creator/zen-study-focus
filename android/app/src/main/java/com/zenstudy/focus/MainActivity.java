@@ -105,6 +105,10 @@ public class MainActivity extends AppCompatActivity {
         insetFrame.setBackgroundColor(0xFF000000);
         insetFrame.setClipToPadding(true);
         // Register insets listener BEFORE setContentView so the initial dispatch is caught.
+        // Ensure insetFrame fills the window so its padding constrains the WebView layout viewport.
+        insetFrame.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT));
         ViewCompat.setOnApplyWindowInsetsListener(insetFrame, (v, windowInsets) -> {
             // Android 15 (API 35) edge-to-edge: systemBars() returns status + navigation bars (3-button).
             // On Xiaomi gesture navigation, navigationBars() returns 0; mandatorySystemGestures() provides the gesture handle height.
@@ -235,7 +239,9 @@ public class MainActivity extends AppCompatActivity {
                     .build();
         });
 
-        insetFrame.addView(webView);
+        insetFrame.addView(webView, new android.widget.LinearLayout.LayoutParams(
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT,
+                android.view.ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(insetFrame);
         // Force initial insets dispatch now that the view is attached.
         ViewCompat.requestApplyInsets(insetFrame);
