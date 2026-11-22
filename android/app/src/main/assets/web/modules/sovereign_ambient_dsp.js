@@ -89,32 +89,49 @@
     const xfadeSamples = Math.max(1, Math.floor(sampleRate * XFADE_SEC));
     const numChannels = Math.max(1, buffer.numberOfChannels || 1);
     const srcLen = buffer.length || (buffer.getChannelData(0) ? buffer.getChannelData(0).length : 1);
-
-    // For seamless looping, we need BOTH the end to crossfade into the beginning
-    // AND the beginning to crossfade from the end. This creates a symmetric
-    // crossfade region so the loop point (between finalSize-1 and 0) is smooth
-    // from both directions.
     const finalSize = srcLen;
-    const finalBuffer = ctx.createBuffer(numChannels, finalSize, sampleRate);
+
+    if (srcLen <= xfadeSamples) {
+      // Too short to crossfade safely — copy through with DC removal only.
+      const passthrough = ctx.createBuffer(numChannels, finalSize, sampleRate);
+      for (let ch = 0; ch < numChannels; ch++) {
+        passthrough.getChannelData(ch).set(buffer.getChannelData(ch));
+      }
+      return passthrough;
+    }
+
+    // Standard seamless-loop approach (mirrors AudioCore.createSeamlessOggBuffer):
+    // 1. Extend the source with a copy of its head as the tail continuation.
+    // 2. Body = source[0 .. finalSize - xfadeSamples - 1] (head left intact).
+    // 3. Crossfade the original TAIL into the COPIED HEAD in the tail region.
+    // At the loop boundary, finalData[finalSize-1] ≈ copied_head[xfadeSamples-1]
+    // = srcData[xfadeSamples-1], and finalData[0] = srcData[0]. Because the
+    // continuation (copied head) naturally follows the original tail, the loop
+    // point is smooth — no jump, no click, no constant static.
+    const extendedSize = finalSize + xfadeSamples;
+    const extendedBuffer = ctx.createBuffer(numChannels, extendedSize, sampleRate);
     for (let ch = 0; ch < numChannels; ch++) {
       const srcData = buffer.getChannelData(ch);
+      const extData = extendedBuffer.getChannelData(ch);
+      extData.set(srcData, 0);
+      for (let i = 0; i < xfadeSamples; i++) extData[finalSize + i] = srcData[i];
+    }
+
+    const finalBuffer = ctx.createBuffer(numChannels, finalSize, sampleRate);
+    for (let ch = 0; ch < numChannels; ch++) {
+      const extData = extendedBuffer.getChannelData(ch);
       const finalData = finalBuffer.getChannelData(ch);
 
-      // Copy the entire original audio
-      finalData.set(srcData);
+      // Body: copy main segment (excluding tail region that will be crossfaded)
+      finalData.set(extData.subarray(0, finalSize - xfadeSamples));
 
-      // Symmetric crossfade: blend the LAST xfadeSamples with the FIRST xfadeSamples
-      // at BOTH the loop end AND the loop start.
-      // This ensures when BufferSourceNode loops from finalSize-1 to 0,
-      // both sides are in the crossfade region and match perfectly.
+      // Crossfade region: blend original tail into copied head
+      const loopStart = finalSize - xfadeSamples;
       for (let i = 0; i < xfadeSamples; i++) {
         const t = i / xfadeSamples;
-        // At loop END: blend end_of_audio → beginning_of_audio
-        const loopStart = finalSize - xfadeSamples;
-        finalData[loopStart + i] = (1 - t) * srcData[loopStart + i] + t * srcData[i];
-        // At loop START: blend end_of_audio → beginning_of_audio (reverse direction)
-        // This makes the first xfadeSamples a mirror of the last xfadeSamples
-        finalData[i] = t * srcData[loopStart + i] + (1 - t) * srcData[i];
+        const tailSample = extData[loopStart + i];
+        const headSample = extData[finalSize + i];
+        finalData[loopStart + i] = (1 - t) * tailSample + t * headSample;
       }
 
       // Post-process: DC removal → peak limiter (attenuate-only) → hard clamp
@@ -204,37 +221,49 @@
     const sec = durationSec || 3;
     const xfadeSamples = Math.max(1, Math.floor(ctx.sampleRate * XFADE_SEC));
     const finalSize = Math.max(1, Math.floor(ctx.sampleRate * sec));
-    const temp = ctx.createBuffer(1, finalSize + xfadeSamples, ctx.sampleRate);
+    const tempSize = finalSize + 2 * xfadeSamples; // extra head + tail for seamless crossfade
+    const temp = ctx.createBuffer(1, tempSize, ctx.sampleRate);
     const tempData = temp.getChannelData(0);
     synthNoiseInto(tempData, color);
+
     const out = ctx.createBuffer(1, finalSize, ctx.sampleRate);
     const outData = out.getChannelData(0);
-    for (let i = 0; i < finalSize; i++) outData[i] = tempData[i];
 
-    // Symmetric crossfade: blend tail into head AND head into tail for seamless loop
-    // Crossfade at loop END: blend original tail → continuation
-    const loopEndStart = finalSize - xfadeSamples;
+    // Body: take finalSize samples starting after the head xfade region
+    // tempData[xfadeSamples .. xfadeSamples + finalSize - 1]
+    for (let i = 0; i < finalSize; i++) outData[i] = tempData[xfadeSamples + i];
+
+    // Seamless-loop crossfade: blend the last xfadeSamples of the body
+    // into the first xfadeSamples of the body. At the loop boundary (end → start),
+    // finalData[finalSize-1] ≈ body_head[xfadeSamples-1] and finalData[0] = body_head[0],
+    // which are adjacent sample-to-sample in the noise stream — seamless for noise.
     for (let i = 0; i < xfadeSamples; i++) {
       const t = i / xfadeSamples;
-      outData[loopEndStart + i] = (1 - t) * tempData[loopEndStart + i] + t * tempData[finalSize + i];
-    }
-    // Crossfade at loop START: copy crossfaded tail to head
-    for (let i = 0; i < xfadeSamples; i++) {
-      outData[i] = outData[loopEndStart + i];
+      const tailSample = tempData[xfadeSamples + finalSize - xfadeSamples + i];
+      const headSample = tempData[xfadeSamples + i];
+      outData[finalSize - xfadeSamples + i] = (1 - t) * tailSample + t * headSample;
     }
 
-    // Post-process: DC removal → hard safety clamp
+    // Post-process: DC removal → peak limiter (attenuate-only) → hard clamp
     // 1. DC removal (zero-mean) — eliminates low-frequency rumble/static from
-    //    leaky-integrator drift and crossfade boundary. The inline 10Hz highpass
-    //    in synthNoiseInto helps but isn't perfect; zero-mean guarantees it.
+    //    leaky-integrator drift and crossfade boundary.
     let mean = 0;
     for (let i = 0; i < finalSize; i++) mean += outData[i];
     mean /= finalSize;
     for (let i = 0; i < finalSize; i++) outData[i] -= mean;
 
-    // 2. NO peak normalization — the generators above already control
-    //    output amplitude (white 0.06 / pink 0.08 / brown 0.03). Normalizing to 0.9
-    //    amplified quiet noise by >10× into audible hiss.
+    // 2. Peak limiter: attenuate-only. Never amplify quiet noise up (that raises
+    //    the noise floor into audible hiss). Only catch genuine overshoot above 0.95.
+    let peak = 0;
+    for (let i = 0; i < finalSize; i++) {
+      const a = Math.abs(outData[i]);
+      if (a > peak) peak = a;
+    }
+    if (peak > 0.95) {
+      const norm = 0.95 / peak;
+      for (let i = 0; i < finalSize; i++) outData[i] *= norm;
+    }
+
     // 3. Hard safety clamp
     for (let i = 0; i < finalSize; i++) {
       if (outData[i] > 1.0) outData[i] = 1.0;
