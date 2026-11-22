@@ -68,9 +68,9 @@
       font-variant-numeric: tabular-nums lining-nums;
       -webkit-tap-highlight-color: transparent;
     }
-    // Reserve clears the docked bottom stack; the pillar7 body rule (later, !important)
-       // computes the same reserve. Keep both identical: uses --df-inflow-bottom which
-       // resolves to --df-bottom-nav-clearance (436px fallback, calibrator updates).
+    /* Reserve clears the docked bottom stack; the pillar7 body rule (later, !important)
+       computes the same reserve. Keep both identical: uses --df-inflow-bottom which
+       resolves to --df-bottom-nav-clearance (436px fallback, calibrator updates). */
     body { background-color: var(--bg-sheet); color: var(--text-main); min-height: 100vh; min-height: 100dvh; display: flex; flex-direction: column; align-items: center; padding-bottom: var(--df-inflow-bottom, 436px); overflow-x: hidden; user-select: none; }
     input, textarea { user-select: text; text-align: start; }
 
