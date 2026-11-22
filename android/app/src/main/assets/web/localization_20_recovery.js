@@ -11,7 +11,7 @@
   'use strict';
   const LANGUAGES = Object.freeze(["en","ar","es","zh","hi","fr","de","ru","pt","ja","id","tr","ko","vi","it","bn","ur","fa","pl","nl"]);
   const KEYS = Object.freeze(["analyticsTitle","activity","period","from","to","minutes","sessions","average","streak","noSessions","goal","noGoals","completedTasks","chart","year","export","details","grouping","daily","weekly","monthly","all","study","reading","work","fitness","excluded","minute","heatmapYear"]);
-  const RTL = new Set(['ar', 'fa', 'ur']);
+  const RTL = new Set(['ar', 'fa', 'ur', 'ps', 'prs']);
   const rows = {
     en: ["Recorded analytics","Activity","Period","From","To","Recorded minutes","Sessions","Average session","Current streak","No recorded sessions in this period","Goal comparison","No daily goals configured","Completed tasks","Daily distribution","Year","Export CSV","Select a day for details","Grouping","Daily","Weekly","Monthly","All","Study","Reading","Work","Fitness","Excluded sessions","minutes","Yearly activity"],
     ar: ["تحليلات النشاط المسجّل","النشاط","الفترة","من","إلى","الدقائق المسجّلة","الجلسات","متوسط الجلسة","سلسلة الاستمرارية","لا توجد جلسات مسجّلة في هذه الفترة","مقارنة الأهداف","لم تُحدّد أهداف يومية","المهام المكتملة","التوزيع اليومي","السنة","تصدير CSV","اختر يومًا لعرض التفاصيل","التجميع","يومي","أسبوعي","شهري","الكل","الدراسة","القراءة","العمل","الرياضة","الجلسات المستبعدة","دقيقة","النشاط السنوي"],

@@ -227,7 +227,7 @@
     card.appendChild(field);
     host.replaceChildren(card);
     host.setAttribute('aria-label',localize(code,'title'));
-    host.setAttribute('dir',/^(ar|fa|ur)$/.test(code)?'rtl':'ltr');
+    host.setAttribute('dir',/^(ar|fa|ps|ur)$/.test(code)?'rtl':'ltr');
     host.dataset.df09Locale=code;
     return true;
   }

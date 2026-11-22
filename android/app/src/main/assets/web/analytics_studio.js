@@ -45,7 +45,7 @@
     historicalGoals:'الأهداف الأصلية المؤرخة',noHistoricalGoals:'لا توجد أهداف تاريخية مسجلة بالتواريخ',
     exportUnavailable:'تصدير CSV غير متاح على أندرويد حتى دعم الحفظ الأصلي'
   });
-  const RTL=new Set(['ar','fa','ur','ps','ckb','ug','sd']);
+  const RTL=new Set(['ar','fa','ur','ps','prs']);
   function normalizedLocale(locale){
     const code=typeof globalThis.DF99Locale?.normalize==='function'
       ? globalThis.DF99Locale.normalize(locale)
