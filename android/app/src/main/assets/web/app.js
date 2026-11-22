@@ -41521,8 +41521,8 @@ window.dfApplySafeAreaInsets = function() {
     }
     body {
       padding-top: var(--safe-top) !important;
-      /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (396px fallback). */
-      padding-bottom: var(--df-inflow-bottom, 396px) !important;
+      /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (436px fallback). */
+      padding-bottom: var(--df-inflow-bottom, 436px) !important;
       padding-left: var(--safe-left) !important;
       padding-right: var(--safe-right) !important;
       box-sizing: border-box !important;
@@ -48128,8 +48128,8 @@ window.dfApplySafeAreaInsets = function(rootEl) {
       '}',
       'body {',
       '  padding-top: var(--safe-top);',
-      '  /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (396px fallback). */',
-      '  padding-bottom: var(--df-inflow-bottom, 396px);',
+      '  /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (436px fallback). */',
+      '  padding-bottom: var(--df-inflow-bottom, 436px);',
       '}'
     ].join('\n');
     if (document.head) document.head.appendChild(styleEl);
@@ -51292,7 +51292,7 @@ window.dfScratchpadModal = {
       // Dock on the LEFT (mirrors FAB horizontal position) at Studios pill height.
       // Studios pill sits on the RIGHT at --df-studios-pill-bottom; FAB sits on the LEFT at --df-fab-bottom.
       // This avoids the Studios (10) pill overlap on the right while keeping the same dock layer (z-index 150).
-      btn.style.bottom = "var(--df-studios-pill-bottom, 340px)";
+      btn.style.bottom = "var(--df-studios-pill-bottom, 380px)";
       btn.style.left = '24px';
       btn.style.maxWidth = 'min(280px, calc(100vw - 96px))';
       btn.style.minHeight = '48px';

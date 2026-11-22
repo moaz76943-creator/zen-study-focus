@@ -182,7 +182,7 @@
       var floatingLayerClearance = capsuleHeight + 196;
       // IME clearance: if paddingBottom > 500 (IME), use 300; else paddingBottom + 12
       var imeClearance = paddingBottom > 500 ? 300 : paddingBottom + 12;
-      // Minimum 396px (covers Xiaomi 3-button nav up to ~200dp capsule)
+      // Minimum 436px (covers Xiaomi 3-button nav up to ~240dp capsule)
       return Math.max(floatingLayerClearance, imeClearance, 300);
     },
 
