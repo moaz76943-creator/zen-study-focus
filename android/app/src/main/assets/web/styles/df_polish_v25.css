@@ -280,7 +280,7 @@ textarea:focus-visible,
 .stile-vol { flex: 1; margin-left: 8px; accent-color: var(--primary); }
 
 /* ---------- 3D Spatial studio: clean collapsible chrome ------------------ */
-#dfPillar5SpatialMount .df-spatial-body { max-height: none; }
+#dfPillar5SpatialMount .df-spatial-body { max-height: none; will-change: transform, opacity; }
 #dfSpatialCollapseToggle { min-height: 48px; min-width: 48px; }
 #dfSpatialCollapseToggle:hover { background: #eef2ff !important; border-color: #c4b5fd !important; }
 #dfSpatialCollapseToggle:focus-visible { outline: var(--df25-ring) !important; outline-offset: 2px; }
@@ -288,6 +288,9 @@ textarea:focus-visible,
 /* Collapsed spatial studio: compact header + toggle affordance */
 #dfPillar5SpatialMount[aria-expanded="false"] .df-spatial-body { display: none !important; }
 #dfPillar5SpatialMount .df-spatial-body:empty { display: none; }
+
+/* 120Hz smooth compositing for animated sound tiles */
+#soundsGridBox .sound-Rich-tile { will-change: transform; transform: translateZ(0); }
 
 /* Spatial sub-tabs */
 #dfPillar5SpatialMount .df-white-premium {
