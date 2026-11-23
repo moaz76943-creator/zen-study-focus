@@ -82701,19 +82701,13 @@ window.SovereignChimes = (function() {
         // ALWAYS delegate to AudioCore — it is the single shared context.
         // Creating a second context here (window.audioContext) bypassed the
         // master limiter/DC-block chain and produced static/hiss from
-        // cross-context connections.
+        // cross-context connections. NEVER create a fallback context.
         if (window.AudioCore && typeof window.AudioCore.getContext === 'function') {
             return window.AudioCore.getContext();
         }
-        if (!window.audioContext) {
-            const AudioCtx = window.AudioContext || window.webkitAudioContext;
-            if (AudioCtx) window.audioContext = new AudioCtx();
-        }
-        // Zero-autoplay: resume only with an explicit prior user gesture.
-        if (window.audioContext && window.audioContext.state === "suspended" && typeof audioContextUserGestureReceived !== "undefined" && audioContextUserGestureReceived) {
-            window.audioContext.resume();
-        }
-        return window.audioContext;
+        // AudioCore is the ONLY path — no fallback context creation.
+        // If AudioCore is unavailable, audio cannot work (zero-autoplay invariant).
+        return null;
     }
 
     function getDestination(ctx) {
