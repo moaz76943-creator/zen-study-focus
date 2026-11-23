@@ -113,14 +113,19 @@ public class MainActivity extends AppCompatActivity {
             // Android 15 (API 35) edge-to-edge: query each inset type separately to avoid combined-mask
             // quirks on Xiaomi HyperOS. systemBars() returns status + nav (3-button); navigationBars()
             // returns nav only; mandatorySystemGestures() returns gesture handle. displayCutout() is separate.
+            // CRITICAL: Query statusBars() explicitly — zeroing systemBars() alone does not reliably
+            // clear statusBars() on Xiaomi Android 15, causing double-counting (native padding +
+            // WebView safe-area-inset-top) and content overlap under the status bar.
+            Insets statusBars = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars());
             Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets displayCutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
             Insets navigationBars = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars());
             Insets mandatorySystemGestures = windowInsets.getInsets(WindowInsetsCompat.Type.mandatorySystemGestures());
             Insets ime = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
 
-            // Status bar top: max of system bars top and display cutout top
-            int paddingTop = Math.max(systemBars.top, displayCutout.top);
+            // Status bar top: max of status bars top and display cutout top (statusBars() is the
+            // authoritative source for status bar height; systemBars().top is not reliable on Xiaomi).
+            int paddingTop = Math.max(statusBars.top, displayCutout.top);
 
             // Navigation bottom: max of navigationBars (3-button), systemBars.bottom (3-button), mandatorySystemGestures (gesture handle)
             // On Xiaomi 3-button: navigationBars.bottom > 0 AND systemBars.bottom > 0 (both report nav bar)
@@ -252,8 +257,11 @@ public class MainActivity extends AppCompatActivity {
             // the keyboard opens/hides, preventing ghost padding after IME dismissal.
             // Call setInsets separately for each type — combined type masks are not
             // reliably handled by WindowInsetsCompat.Builder on all Android versions.
+            // Explicitly zero statusBars() — systemBars() zeroing alone does not clear
+            // statusBars() on Xiaomi Android 15, leaving safe-area-inset-top active.
             return new WindowInsetsCompat.Builder(windowInsets)
                     .setInsets(WindowInsetsCompat.Type.systemBars(), Insets.NONE)
+                    .setInsets(WindowInsetsCompat.Type.statusBars(), Insets.NONE)
                     .setInsets(WindowInsetsCompat.Type.displayCutout(), Insets.NONE)
                     .setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.NONE)
                     .setInsets(WindowInsetsCompat.Type.mandatorySystemGestures(), Insets.NONE)
