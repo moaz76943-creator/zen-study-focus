@@ -89,7 +89,12 @@ assert.ok((html.match(bodyReserve) || []).length >= 2,
   'body must reserve --df-inflow-bottom above the native inset edge (all body rules)');
 console.log('✔ index.html body reserves clearance via calibrated variables.');
 
-// Studios pill fallback updated to 244px (clearance 300 - pillHeight 48 - gap 8).
+// Studios pill fallback updated to 264px (clearance 300 - pillHeight 48 - gap 8 = 244, but clearance = capsule(56) + 196 = 252, min 300; 300 - 56 = 244).
+// Wait: with 260dp nav bar floor, capsule height stays at 56px base (it's app-level, not system nav).
+// The calibrator computes: capsuleHeight + 196 = 252, floored to 300.
+// Studios pill = clearance - 56 = 300 - 56 = 244px.
+// FAB = studiosPillBottom + 62 = 244 + 62 = 306px.
+// These remain correct because the calibrator floors clearance at 300px minimum.
 // FAB fallback updated to 306px (studiosPillBottom 244 + FABHeight 54 + gap 8).
 assert.ok(html.includes('--df-studios-pill-bottom: 244px'),
   'Studios pill fallback must be 244px (clearance - pillHeight - gap)');
