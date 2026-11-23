@@ -117,7 +117,6 @@ public class MainActivity extends AppCompatActivity {
             // clear statusBars() on Xiaomi Android 15, causing double-counting (native padding +
             // WebView safe-area-inset-top) and content overlap under the status bar.
             Insets statusBars = windowInsets.getInsets(WindowInsetsCompat.Type.statusBars());
-            Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
             Insets displayCutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
             Insets navigationBars = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars());
             Insets mandatorySystemGestures = windowInsets.getInsets(WindowInsetsCompat.Type.mandatorySystemGestures());
@@ -127,17 +126,19 @@ public class MainActivity extends AppCompatActivity {
             // authoritative source for status bar height; systemBars().top is not reliable on Xiaomi).
             int paddingTop = Math.max(statusBars.top, displayCutout.top);
 
-            // Navigation bottom: max of navigationBars (3-button), systemBars.bottom (3-button), mandatorySystemGestures (gesture handle)
-            // On Xiaomi 3-button: navigationBars.bottom > 0 AND systemBars.bottom > 0 (both report nav bar)
-            // On Xiaomi gesture: navigationBars.bottom == 0, systemBars.bottom == 0, mandatorySystemGestures.bottom > 0 (gesture handle)
-            int rawNavBottom = Math.max(Math.max(navigationBars.bottom, systemBars.bottom), mandatorySystemGestures.bottom);
+            // Navigation bottom: max of navigationBars (3-button) and mandatorySystemGestures (gesture handle).
+            // Do NOT use systemBars() — it's a combined mask (status + nav) that misreports on Xiaomi HyperOS.
+            // On Xiaomi 3-button: navigationBars.bottom > 0 reports nav bar height.
+            // On Xiaomi gesture: navigationBars.bottom == 0, mandatorySystemGestures.bottom > 0 (gesture handle).
+            int rawNavBottom = Math.max(navigationBars.bottom, mandatorySystemGestures.bottom);
 
             // Detect gesture navigation robustly for Xiaomi Android 15:
             // - Gesture nav: mandatorySystemGestures.bottom > 0 (gesture handle) AND no visible 3-button bar
-            // - 3-button nav: navigationBars.bottom > 0 OR systemBars.bottom > 0 (both report nav bar height)
+            // - 3-button nav: navigationBars.bottom > 0 (reports nav bar height)
             // Do NOT use mandatorySystemGestures.left/right (back gesture areas) as Xiaomi reports them even in 3-button mode.
+            // Do NOT use systemBars() — combined mask misreports on Xiaomi HyperOS.
             boolean hasGestureHandle = mandatorySystemGestures.bottom > 0;
-            boolean hasVisibleNavBar = navigationBars.bottom > 0 || systemBars.bottom > 0;
+            boolean hasVisibleNavBar = navigationBars.bottom > 0;
             boolean isGestureNav = hasGestureHandle && !hasVisibleNavBar;
 
             // Robust Xiaomi/Redmi/POCO/HyperOS detection: check MANUFACTURER, BRAND, DEVICE, MODEL.
@@ -158,7 +159,7 @@ public class MainActivity extends AppCompatActivity {
             float density = getResources().getDisplayMetrics().density;
 
             // Xiaomi-specific override: on HyperOS, mandatorySystemGestures.bottom may be > 0 even in 3-button mode,
-            // and navigationBars/systemBars may under-report (report 0). If the device is Xiaomi and we have a
+            // and navigationBars may under-report (report 0). If the device is Xiaomi and we have a
             // gesture handle but no visible nav bar, assume 3-button nav and apply the absolute floor.
             // This is safer than relying on height thresholds (32dp/100dp) which have a gap: a misreported
             // 3-button bar at 32-100dp would be missed. Extra padding on gesture nav is harmless (empty space);
@@ -209,8 +210,8 @@ public class MainActivity extends AppCompatActivity {
             // relative to the viewport bottom (which already ends above the nav bar due to parent padding).
             int rawNavBottomDp = Math.round(rawNavBottom / density);
 
-            int paddingLeft = systemBars.left;
-            int paddingRight = systemBars.right;
+            int paddingLeft = displayCutout.left;
+            int paddingRight = displayCutout.right;
 
             v.setPadding(paddingLeft, paddingTop, paddingRight, paddingBottom);
             // Parent FrameLayout padding shrinks the WebView; nothing to clip inside it.
