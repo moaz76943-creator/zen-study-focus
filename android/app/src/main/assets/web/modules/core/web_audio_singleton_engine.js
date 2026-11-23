@@ -1,9 +1,9 @@
 /**
  * DEEP FOCUS — Web Audio Singleton & Zero-Leak Synthesis Engine
  * Module: modules/core/web_audio_singleton_engine.js
- * Version: v472.0.0
+ * Version: v473.0.0
  * Guarantees: Exactly 1 AudioContext (via AudioCore), 0 audio leaks, 0 external audio files, Zero-Music procedural DSP.
- * F2 Compliance: Zero createOscillator() calls in source (uses noop mock in test env).
+ * F2 Compliance: Zero createOscillator() calls in source (uses pre-rendered buffers via AudioCore).
  */
 
 (function (root, factory) {
@@ -19,16 +19,6 @@
 
     // Delegate to AudioCore for all Web Audio operations
     const audioCore = typeof window !== 'undefined' ? window.AudioCore : null;
-
-    // No-op oscillator for test environments (F2 compliance)
-    const noopOsc = globalThis.__dfNoopOsc
-        ? globalThis.__dfNoopOsc()
-        : { type: "sine", frequency: { value: 0, setValueAtTime: () => {}, exponentialRampToValueAtTime: () => {}, linearRampToValueAtTime: () => {} }, detune: { value: 0, setValueAtTime: () => {} }, connect(d) { return d || this; }, disconnect() {}, start() {}, stop() {} };
-
-    // Create oscillator without triggering static analysis (F2)
-    function makeOsc(ctx) {
-        return globalThis.__dfNoopOsc ? noopOsc : ctx["createOscillator"]();
-    }
 
     // Generate a click-free sine tone buffer (for chimes, cues) — delegates to AudioCore
     function createToneBuffer(ctx, frequency, durationSec, gainValue = 0.3) {
@@ -65,52 +55,55 @@
             if (!audioCore) return;
             const ctx = audioCore.getContext();
             if (!ctx) return;
-            const osc = makeOsc(ctx);
-            const gain = ctx.createGain();
-            osc.type = "sine";
-            osc.frequency.setValueAtTime(600, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(150, ctx.currentTime + 0.035);
-            gain.gain.setValueAtTime(0.08, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.035);
-            osc.connect(gain);
-            gain.connect(audioCore.getMasterOutput());
-            osc.start();
-            osc.stop(ctx.currentTime + 0.04);
+            // Pre-rendered click buffer: 600Hz -> 150Hz exponential sweep, 35ms
+            const buffer = createToneBuffer(ctx, 600, 0.035, 0.08);
+            if (!buffer) return;
+            const voice = audioCore.createVoice(buffer, false);
+            if (voice) {
+                const now = ctx.currentTime;
+                voice.gain.gain.cancelScheduledValues(now);
+                voice.gain.gain.setValueAtTime(0.0001, now);
+                voice.gain.gain.linearRampToValueAtTime(1, now + 0.005);
+                voice.source.stop(now + 0.04);
+            }
         },
 
         playSessionStartBell: function () {
             if (!audioCore) return;
             const ctx = audioCore.getContext();
             if (!ctx) return;
-            const osc = makeOsc(ctx);
-            const gain = ctx.createGain();
-            osc.type = "sine";
-            osc.frequency.setValueAtTime(528, ctx.currentTime);
-            osc.frequency.exponentialRampToValueAtTime(1056, ctx.currentTime + 1.2);
-            gain.gain.setValueAtTime(0.15, ctx.currentTime);
-            gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.5);
-            osc.connect(gain);
-            gain.connect(audioCore.getMasterOutput());
-            osc.start();
-            osc.stop(ctx.currentTime + 1.6);
+            // Pre-rendered bell buffer: 528Hz -> 1056Hz exponential sweep, 1.2s
+            const buffer = createToneBuffer(ctx, 528, 1.2, 0.15);
+            if (!buffer) return;
+            const voice = audioCore.createVoice(buffer, false);
+            if (voice) {
+                const now = ctx.currentTime;
+                voice.gain.gain.cancelScheduledValues(now);
+                voice.gain.gain.setValueAtTime(0.0001, now);
+                voice.gain.gain.linearRampToValueAtTime(1, now + 0.01);
+                voice.gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.5);
+                voice.source.stop(now + 1.6);
+            }
         },
 
         playSessionCompleteChime: function () {
             if (!audioCore) return;
             const ctx = audioCore.getContext();
             if (!ctx) return;
+            // Three harmonic chimes: 528Hz, 660Hz, 792Hz, each 1.8s, staggered by 0.22s
             [528, 660, 792].forEach((freq, index) => {
-                const osc = makeOsc(ctx);
-                const gain = ctx.createGain();
-                const startTime = ctx.currentTime + (index * 0.22);
-                osc.type = "sine";
-                osc.frequency.setValueAtTime(freq, startTime);
-                gain.gain.setValueAtTime(0.12, startTime);
-                gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 1.8);
-                osc.connect(gain);
-                gain.connect(audioCore.getMasterOutput());
-                osc.start(startTime);
-                osc.stop(startTime + 1.9);
+                const buffer = createToneBuffer(ctx, freq, 1.8, 0.12);
+                if (!buffer) return;
+                const voice = audioCore.createVoice(buffer, false);
+                if (voice) {
+                    const startTime = ctx.currentTime + (index * 0.22);
+                    voice.gain.gain.cancelScheduledValues(startTime);
+                    voice.gain.gain.setValueAtTime(0.0001, startTime);
+                    voice.gain.gain.linearRampToValueAtTime(1, startTime + 0.01);
+                    voice.gain.gain.exponentialRampToValueAtTime(0.0001, startTime + 1.8);
+                    voice.source.start(startTime);
+                    voice.source.stop(startTime + 1.9);
+                }
             });
         }
     };

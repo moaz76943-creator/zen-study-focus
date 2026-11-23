@@ -61,8 +61,9 @@
           const bufferSize = Math.floor(sampleRate * durationSec);
           // Full Paul Kellet pink noise filter
           let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-          // Brown noise accumulator with leak to prevent DC drift (bounded random walk)
-          let brownAccum = 0;
+          // Brown noise accumulator with two-pole leaky integrator to prevent DC drift
+          let brown1 = 0;
+          let brown2 = 0;
           let peak = 0;
 
           for (let i = 0; i < bufferSize; i++) {
@@ -78,12 +79,14 @@
               b6 = white * 0.115926;
               data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * PINK_NOISE_AMP;
             } else if (type === 'ocean' || type === 'wind') {
-              // Brown Noise: leaky integrator of WHITE noise (-6dB/oct slope).
+              // Brown Noise: two-pole leaky integrator of WHITE noise (-12dB/oct slope).
               // Using AudioCore's BROWN_POLE and BROWN_GAIN for bounded DC.
-              brownAccum = BROWN_POLE * brownAccum + white * BROWN_GAIN;
+              // First pole at BROWN_POLE, second at 0.99 — dramatically reduces DC drift vs single pole.
+              brown1 = BROWN_POLE * brown1 + white * BROWN_GAIN;
+              brown2 = 0.99 * brown2 + brown1 * 0.1;
               // Fixed output scale using AudioCore's BROWN_NOISE_AMP — the old raw
               // value hard-clamped ~75% of samples at ±1 into harsh static.
-              data[i] = brownAccum * BROWN_NOISE_AMP;
+              data[i] = brown2 * BROWN_NOISE_AMP;
             } else {
               // Campfire crackle: sparse pops on low noise floor
               // Track noise floor peak separately from pops for consistent normalization

@@ -30,9 +30,8 @@
     night: 'audio/wind_breeze.ogg',
     wind: 'audio/wind_breeze.ogg',
     cue: 'audio/water_drop.ogg',
-    bell: 'audio/water_drop.ogg',
-    brown: 'audio/rain_window.ogg',
-    pink: 'audio/flowing_water.ogg'
+    bell: 'audio/water_drop.ogg'
+    // brown/pink/white noise are PROCEDURAL (generated via AudioCore), not OGG files
   };
 
   const XFADE_SEC = audioCore ? audioCore.XFADE_MS / 1000 : 0.02;
@@ -173,7 +172,8 @@
       return;
     }
     let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-    let brown = 0;
+    let brown1 = 0;
+    let brown2 = 0;
     // Inline DC block for brown noise (1-pole high-pass at ~10Hz) to prevent
     // integrator drift from accumulating into low-frequency rumble/static.
     // Correct one-pole highpass: y[n] = a * (y[n-1] + x[n] - x[n-1])
@@ -196,13 +196,13 @@
       if (color === 'pink') {
         data[i] = pink * PINK_NOISE_AMP;
       } else { // brown
-        // Leaky integrator of WHITE noise (the true brown slope). Fixed output
-        // scale (peak ≈ 0.55) — the old path peak-normalized to 0.9, and unfixed
-        // accumulation rails at ±1 under hard clamp.
-        brown = BROWN_POLE * brown + white * BROWN_GAIN;
-        const raw = brown * BROWN_NOISE_AMP;
-        // Inline DC block: one-pole high-pass at ~10Hz
-        // y[n] = a * (y[n-1] + x[n] - x[n-1])
+        // Two-pole leaky integrator of WHITE noise (-12dB/oct slope) for better DC rejection.
+        // Using AudioCore's BROWN_POLE, BROWN_GAIN, BROWN_NOISE_AMP for consistency.
+        // First pole at BROWN_POLE, second at 0.99 — dramatically reduces DC drift vs single pole.
+        brown1 = BROWN_POLE * brown1 + white * BROWN_GAIN;
+        brown2 = 0.99 * brown2 + brown1 * 0.1;
+        const raw = brown2 * BROWN_NOISE_AMP;
+        // Inline DC block: one-pole high-pass at ~10Hz (belt-and-suspenders)
         const y = dcBlockA * (dcBlockY + raw - dcBlockXPrev);
         data[i] = y;
         dcBlockY = y;

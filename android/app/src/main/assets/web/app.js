@@ -5771,15 +5771,18 @@ function generateNoiseBuffer(ctx, color, durationSec = 5.0) {
             data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.08;
           }
         } else if (color === 'brown') {
-          // Fallback generators matching AudioCore's implementation
+          // Fallback generators matching AudioCore's improved two-pole implementation
           const BROWN_POLE = (window.AudioCore && window.AudioCore.BROWN_POLE) ? window.AudioCore.BROWN_POLE : 0.997;
           const BROWN_GAIN = (window.AudioCore && window.AudioCore.BROWN_GAIN) ? window.AudioCore.BROWN_GAIN : 0.4;
           const BROWN_NOISE_AMP = (window.AudioCore && window.AudioCore.BROWN_NOISE_AMP) ? window.AudioCore.BROWN_NOISE_AMP : 0.03;
-          let brown = 0;
+          let brown1 = 0;
+          let brown2 = 0;
           for (let i = 0; i < bufferSize; i++) {
             const white = Math.random() * 2 - 1;
-            brown = BROWN_POLE * brown + white * BROWN_GAIN;
-            data[i] = brown * BROWN_NOISE_AMP;
+            // Two-pole leaky integrator for -12dB/oct slope and less DC drift
+            brown1 = BROWN_POLE * brown1 + white * BROWN_GAIN;
+            brown2 = 0.99 * brown2 + brown1 * 0.1;
+            data[i] = brown2 * BROWN_NOISE_AMP;
           }
         }
       }
@@ -5859,19 +5862,48 @@ function dfTriggerTibetanSingingBell(vol = 0.65) {
     bellFilter.connect(masterBellGain);
     masterBellGain.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
 
-    partials.forEach(p => {
-      const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-      const pGain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(p.freq, now);
-      pGain.gain.setValueAtTime(0.0001, now);
-      pGain.gain.linearRampToValueAtTime(p.amp, now + 0.02);
-      pGain.gain.exponentialRampToValueAtTime(0.0001, now + p.decay);
-      osc.connect(pGain);
-      pGain.connect(bellFilter);
-      osc.start(now);
-      osc.stop(now + p.decay + 0.08);
-    });
+    // Use AudioCore's pre-rendered buffers instead of live oscillators
+    if (window.AudioCore && window.AudioCore.createSeamlessBuffer && window.AudioCore.createVoice) {
+      partials.forEach(p => {
+        // Generate a short buffer for each partial
+        const buffer = window.AudioCore.createSeamlessBuffer(ctx, p.decay + 0.1, (channelData, sampleRate, totalSec) => {
+          const data = channelData[0];
+          const bufferSize = Math.floor(sampleRate * totalSec);
+          const TWO_PI = Math.PI * 2;
+          for (let i = 0; i < bufferSize; i++) {
+            const t = i / sampleRate;
+            data[i] = Math.sin(TWO_PI * p.freq * t) * p.amp;
+          }
+        }, 1);
+        if (buffer) {
+          const voice = window.AudioCore.createVoice(buffer, false);
+          if (voice) {
+            const startTime = now;
+            voice.gain.gain.cancelScheduledValues(startTime);
+            voice.gain.gain.setValueAtTime(0.0001, startTime);
+            voice.gain.gain.linearRampToValueAtTime(p.amp, startTime + 0.02);
+            voice.gain.gain.exponentialRampToValueAtTime(0.0001, startTime + p.decay);
+            voice.source.start(startTime);
+            voice.source.stop(startTime + p.decay + 0.08);
+          }
+        }
+      });
+    } else {
+      // Fallback: use noop oscillator for test environments
+      partials.forEach(p => {
+        const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
+        const pGain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(p.freq, now);
+        pGain.gain.setValueAtTime(0.0001, now);
+        pGain.gain.linearRampToValueAtTime(p.amp, now + 0.02);
+        pGain.gain.exponentialRampToValueAtTime(0.0001, now + p.decay);
+        osc.connect(pGain);
+        pGain.connect(bellFilter);
+        osc.start(now);
+        osc.stop(now + p.decay + 0.08);
+      });
+    }
 
     setTimeout(() => {
       try {
@@ -5900,55 +5932,15 @@ function stopSoundTile(id) {
 const oggBufferCache = {};
 const oggLoadingPromises = {};
 
-// Create seamless looping OGG buffer with crossfade (fallback for non-AudioCore environments)
+// OGG files shipped with this app already have a 25ms loop crossfade baked in
+// (see LICENSES.json). We must NOT apply another crossfade — that would create
+// a double-crossfade artifact. Delegate to AudioCore for proper handling.
 function createSeamlessOggBuffer(ctx, buffer) {
-  const sampleRate = ctx.sampleRate;
-  const xfadeSamples = Math.max(1, Math.floor(sampleRate * (SEAMLESS_XFADE_MS / 1000)));
-  const numChannels = Math.max(1, buffer.numberOfChannels || 1);
-  // Resolve source length robustly (test mocks may omit ArrayBuffer.length)
-  const srcLen = buffer.length || (buffer.getChannelData(0) ? buffer.getChannelData(0).length : 1);
-  const finalSize = srcLen;
-
-  const finalBuffer = ctx.createBuffer(numChannels, finalSize, sampleRate);
-  for (let ch = 0; ch < numChannels; ch++) {
-    const srcData = buffer.getChannelData(ch);
-    const finalData = finalBuffer.getChannelData(ch);
-    // Copy the entire original audio
-    finalData.set(srcData);
-    // Crossfade the LAST xfadeSamples of the buffer (loop point) into the FIRST xfadeSamples
-    // This ensures when BufferSourceNode loops from finalSize-1 to 0, the transition is smooth
-    const loopStart = finalSize - xfadeSamples;
-    for (let i = 0; i < xfadeSamples; i++) {
-      const t = i / xfadeSamples;
-      // Blend: (1-t) * end_of_audio + t * beginning_of_audio
-      finalData[loopStart + i] = (1 - t) * srcData[loopStart + i] + t * srcData[i];
-    }
-
-    // Post-process: DC removal → peak limiter (attenuate-only) → hard clamp (matches AudioCore)
-    // 1. DC removal
-    let mean = 0;
-    for (let i = 0; i < finalSize; i++) mean += finalData[i];
-    mean /= finalSize;
-    for (let i = 0; i < finalSize; i++) finalData[i] -= mean;
-
-    // 2. Peak limiter: attenuate-only — never amplify quiet OGG noise floor
-    let peak = 0;
-    for (let i = 0; i < finalSize; i++) {
-      const a = Math.abs(finalData[i]);
-      if (a > peak) peak = a;
-    }
-    if (peak > 0.95) {
-      const norm = 0.95 / peak;
-      for (let i = 0; i < finalSize; i++) finalData[i] *= norm;
-    }
-
-    // 3. Hard safety clamp
-    for (let i = 0; i < finalSize; i++) {
-      if (finalData[i] > 1.0) finalData[i] = 1.0;
-      else if (finalData[i] < -1.0) finalData[i] = -1.0;
-    }
+  if (window.AudioCore && window.AudioCore.createSeamlessOggBuffer) {
+    return window.AudioCore.createSeamlessOggBuffer(ctx, buffer);
   }
-  return finalBuffer;
+  // Fallback (should never be used when AudioCore is loaded)
+  return buffer;
 }
 
 // Delegates to AudioCore for OGG loading with procedural fallback
@@ -38590,7 +38582,7 @@ window.dfGenerateNoiseBuffer = function(ctx, type) {
       case 'pink': return window.AudioCore.createSeamlessBuffer(ctx, 2.0, window.AudioCore.generatePinkNoise, 1, false);
     }
   }
-  // Fallback matching AudioCore's implementation exactly
+  // Fallback matching AudioCore's improved two-pole implementation
   const durationSec = 2;
   const XFADE_MS = 20;
   const extraSec = XFADE_MS / 1000;
@@ -38604,13 +38596,15 @@ window.dfGenerateNoiseBuffer = function(ctx, type) {
   const BROWN_NOISE_AMP = 0.03;
   const WHITE_NOISE_AMP = 0.06;
 
-  let brown = 0;
+  let brown1 = 0;
+  let brown2 = 0;
   for (let i = 0; i < bufferSize; i++) {
     const white = Math.random() * 2 - 1;
     if (type === "brown") {
-      // True brown noise: leaky integrator with AudioCore parameters
-      brown = BROWN_POLE * brown + white * BROWN_GAIN;
-      tempData[i] = brown * BROWN_NOISE_AMP;
+      // Two-pole leaky integrator for -12dB/oct slope and less DC drift
+      brown1 = BROWN_POLE * brown1 + white * BROWN_GAIN;
+      brown2 = 0.99 * brown2 + brown1 * 0.1;
+      tempData[i] = brown2 * BROWN_NOISE_AMP;
     } else {
       // White noise at AudioCore amplitude
       tempData[i] = white * WHITE_NOISE_AMP;

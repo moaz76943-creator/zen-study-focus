@@ -1,7 +1,7 @@
 /**
  * DEEP FOCUS — Exhaustive 3D Spatial Acoustic Studio & 10-Band Parametric EQ
  * Module: modules/audio/spatial_acoustic_studio.js
- * Version: v451.0.0
+ * Version: v452.0.0
  *
  * Zero-static procedural synthesis engine. Every sound source is a pre-rendered
  * AudioBuffer played through BufferSourceNode — no oscillators, no
@@ -10,7 +10,7 @@
  *   1. Paul Kellet 6-pole pink noise (pre-rendered buffer)
  *   2. Rain on glass (pre-rendered buffer + fixed biquad shaping)
  *   3. Ocean shoreline (brownian rumble with the swell baked into the buffer)
- *   4. 40Hz gamma binaural beat (216Hz L / 256Hz R baked into a stereo buffer)
+ *   4. Binaural beats: 40Hz Gamma, 10Hz Alpha, 6Hz Theta, 15Hz Beta (baked into stereo buffers)
  *   5. 10-band parametric EQ (31Hz … 16kHz)
  *   6. Analyser-backed visualiser
  *   7. Master safety ceiling (-6dB) + instant stop with click-free fade
@@ -29,7 +29,16 @@
   const STORAGE_EQ_KEY = 'df_acoustic_eq_state_v1';
   const EQ_FREQUENCIES = [31, 63, 125, 250, 500, 1000, 2000, 4000, 8000, 16000];
 
-  // Use AudioCore constants
+  // Binaural beat presets: { leftHz, rightHz, beatHz, carrierHz, durationSec }
+  // Duration chosen so both left and right frequencies complete integer cycles
+  // to avoid loop-boundary clicks (phase continuity at wrap).
+  const BINAURAL_PRESETS = {
+    gamma_40hz: { leftHz: 216, rightHz: 256, beatHz: 40, carrierHz: 236, durationSec: 5 },   // 216*5=1080, 256*5=1280 (integers)
+    alpha_10hz: { leftHz: 211, rightHz: 221, beatHz: 10, carrierHz: 216, durationSec: 5 },   // 211*5=1055, 221*5=1105 (integers)
+    theta_6hz:  { leftHz: 191, rightHz: 197, beatHz: 6,  carrierHz: 194, durationSec: 5 },   // 191*5=955,  197*5=985  (integers)
+    beta_15hz:  { leftHz: 242, rightHz: 257, beatHz: 15, carrierHz: 249.5, durationSec: 5 }, // 242*5=1210, 257*5=1285 (integers)
+  };
+
   const audioCore = typeof window !== 'undefined' ? window.AudioCore : null;
   const FADE_OUT_SEC = audioCore ? audioCore.FADE_OUT_MS / 1000 : 0.03;
   const XFADE_MS = audioCore ? audioCore.XFADE_MS : 20;
@@ -177,48 +186,50 @@
     }
 
   /**
-   * Ocean: brownian rumble with the shoreline swell baked directly into the
-   * buffer, so no LFO node has to be kept alive. Zero-static version.
-   * Uses a bounded leaky-integrator of white noise: no DC drift,
-   * no clipping static, peak-normalized below the limiter ceiling.
-   */
-  generateOceanBuffer(durationSec = 5) {
-    const ctx = this.initAudioContext();
-    if (!audioCore || !audioCore.createSeamlessBuffer) return null;
-    return audioCore.createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
-      const data = channelData[0];
-      const bufferSize = Math.floor(sampleRate * totalSec);
+   /** Ocean: brownian rumble with the shoreline swell baked directly into the
+      * buffer, so no LFO node has to be kept alive. Zero-static version.
+      * Uses a bounded leaky-integrator of white noise: no DC drift,
+      * no clipping static, peak-normalized below the limiter ceiling.
+      * Uses AudioCore's improved two-pole brown noise generator for better DC rejection.
+      */
+     generateOceanBuffer(durationSec = 5) {
+       const ctx = this.initAudioContext();
+       if (!audioCore || !audioCore.createSeamlessBuffer) return null;
+       return audioCore.createSeamlessBuffer(ctx, durationSec, (channelData, sampleRate, totalSec) => {
+         const data = channelData[0];
+         const bufferSize = Math.floor(sampleRate * totalSec);
 
-      // Brown noise: leaky integrator of WHITE noise (-6dB/oct slope).
-      // Using AudioCore's BROWN_NOISE_AMP (0.03) for consistent fixed-output scale.
-      // The old *0.05 with swell modulation caused loop-boundary discontinuities
-      // perceived as static/hiss. Fixed gain with AudioCore's crossfade is clean.
-      let brownAccum = 0;
-      for (let i = 0; i < bufferSize; i++) {
-        const white = Math.random() * 2 - 1;
-        // Leaky integrator: bounded DC, no drift (AudioCore's constants)
-        brownAccum = BROWN_POLE * brownAccum + white * BROWN_GAIN;
-        // Fixed output scale using AudioCore's BROWN_NOISE_AMP — no swell modulation,
-        // no amplitude variation that breaks seamless loop crossfade.
-        data[i] = brownAccum * BROWN_NOISE_AMP;
-      }
-      // AudioCore's createSeamlessBuffer handles DC removal, clamp, and 20ms crossfade.
-    }, 1, false);
-  }
+         // Brown noise: two-pole leaky integrator of WHITE noise (-12dB/oct slope).
+         // Using AudioCore's BROWN_NOISE_AMP (0.03) for consistent fixed-output scale.
+         // The old *0.05 with swell modulation caused loop-boundary discontinuities
+         // perceived as static/hiss. Fixed gain with AudioCore's crossfade is clean.
+         let brown1 = 0;
+         let brown2 = 0;
+         for (let i = 0; i < bufferSize; i++) {
+           const white = Math.random() * 2 - 1;
+           // Two-pole leaky integrator: first pole at BROWN_POLE, second at 0.99
+           brown1 = BROWN_POLE * brown1 + white * BROWN_GAIN;
+           brown2 = 0.99 * brown2 + brown1 * 0.1;
+           // Fixed output scale using AudioCore's BROWN_NOISE_AMP — no swell modulation,
+           // no amplitude variation that breaks seamless loop crossfade.
+           data[i] = brown2 * BROWN_NOISE_AMP;
+         }
+         // AudioCore's createSeamlessBuffer handles DC removal, clamp, and 20ms crossfade.
+       }, 1, false);
+     }
 
-  /** 40Hz gamma binaural beat baked into a stereo buffer (216Hz L, 256Hz R). */
-  generateBinaural40HzBuffer(durationSec = 5) {
+  /** Binaural beat baked into a stereo buffer (leftHz, rightHz). */
+  generateBinauralBuffer(presetKey = 'gamma_40hz') {
+    const preset = BINAURAL_PRESETS[presetKey];
+    if (!preset) return null;
+
     const ctx = this.initAudioContext();
     if (!audioCore) return null;
-    // Ensure duration contains integer cycles of both 216Hz and 256Hz
-    // LCM of periods: 216 and 256 -> 216=2^3*3^3, 256=2^8 -> LCM=2^8*3^3=6912
-    // Fundamental period = 6912/216 = 32 seconds for 216Hz, 6912/256 = 27 seconds for 256Hz
-    // For 5 seconds: 216*5=1080 cycles (integer), 256*5=1280 cycles (integer) - perfect!
-    // CRITICAL: For perfectly periodic signals with integer cycles, we MUST NOT apply
-    // a crossfade — it introduces a phase discontinuity at the loop boundary.
-    // Create buffer directly with exact sample count for integer cycles.
+
+    // Ensure duration contains integer cycles of both leftHz and rightHz
+    // This is guaranteed by the preset durations chosen above.
     const sampleRate = ctx.sampleRate;
-    const exactSize = Math.round(sampleRate * durationSec); // exact integer samples
+    const exactSize = Math.round(sampleRate * preset.durationSec); // exact integer samples
     const buffer = ctx.createBuffer(2, exactSize, sampleRate);
     const left = buffer.getChannelData(0);
     const right = buffer.getChannelData(1);
@@ -228,8 +239,8 @@
     // Sine waves have zero DC offset by construction — no DC block needed.
     for (let i = 0; i < exactSize; i++) {
       const t = i / sampleRate;
-      left[i] = Math.sin(TWO_PI * 216 * t) * amp;
-      right[i] = Math.sin(TWO_PI * 256 * t) * amp;
+      left[i] = Math.sin(TWO_PI * preset.leftHz * t) * amp;
+      right[i] = Math.sin(TWO_PI * preset.rightHz * t) * amp;
     }
     // Hard safety clamp (defensive — sine waves never exceed amp=0.18)
     for (let ch = 0; ch < 2; ch++) {
@@ -240,6 +251,11 @@
       }
     }
     return buffer;
+  }
+
+  /** @deprecated Use generateBinauralBuffer('gamma_40hz') */
+  generateBinaural40HzBuffer(durationSec = 5) {
+    return this.generateBinauralBuffer('gamma_40hz');
   }
 
     startPreset(presetName = 'pink_noise') {
@@ -260,8 +276,14 @@
         this.createRainSoundscape();
       } else if (presetName === 'ocean') {
         this.createOceanWavesSoundscape();
-      } else if (presetName === 'binaural_40hz') {
+      } else if (presetName === 'binaural_40hz' || presetName === 'gamma_40hz') {
         this.create40HzBinauralBeat();
+      } else if (presetName === 'binaural_10hz' || presetName === 'alpha_10hz') {
+        this.create10HzBinauralBeat();
+      } else if (presetName === 'binaural_6hz' || presetName === 'theta_6hz') {
+        this.create6HzBinauralBeat();
+      } else if (presetName === 'binaural_15hz' || presetName === 'beta_15hz') {
+        this.create15HzBinauralBeat();
       } else {
         this.createPinkNoiseSource();
       }
@@ -325,7 +347,19 @@
     }
 
     create40HzBinauralBeat() {
-      this._startBufferSource(this.generateBinaural40HzBuffer(5), null);
+      this._startBufferSource(this.generateBinauralBuffer('gamma_40hz'), null);
+    }
+
+    create10HzBinauralBeat() {
+      this._startBufferSource(this.generateBinauralBuffer('alpha_10hz'), null);
+    }
+
+    create6HzBinauralBeat() {
+      this._startBufferSource(this.generateBinauralBuffer('theta_6hz'), null);
+    }
+
+    create15HzBinauralBeat() {
+      this._startBufferSource(this.generateBinauralBuffer('beta_15hz'), null);
     }
 
     /** Instant stop with a 30ms click-free fade, tears down source node. */

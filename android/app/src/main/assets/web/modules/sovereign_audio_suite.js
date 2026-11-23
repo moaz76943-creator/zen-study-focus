@@ -26,8 +26,8 @@
     wind: "audio/wind_breeze.ogg",
     cue: "audio/water_drop.ogg",
     bell: "audio/water_drop.ogg",
-    brown: "audio/rain_window.ogg",
-    pink: "audio/flowing_water.ogg"
+    // Brown/pink/white noise are PROCEDURAL (generated via AudioCore), not OGG files
+    // Remove incorrect mappings that pointed brown->rain_window and pink->flowing_water
   };
 
   // Single shared singleton state (delegates to AudioCore for voice tracking)
@@ -122,9 +122,25 @@
       if (S.muted || typeof Audio === "undefined") return false;
       // Gesture gate via AudioCore (single source of truth)
       if (!audioCore || !audioCore.isGestureReceived()) return false;
-      var p = new Audio(SOUND_FILES.cue);
-      p.volume = S.volume;
-      p.play().catch(function () {});
+      // Use AudioCore for zero-static, click-free playback through master chain
+      const ctx = audioCore.getContext();
+      if (!ctx) return false;
+      // Play a short water drop sound via AudioCore voice (one-shot, no loop)
+      const file = SOUND_FILES.cue;
+      audioCore.loadOggBuffer(file).then(buffer => {
+        if (buffer) {
+          const voice = audioCore.createVoice(buffer, false);
+          if (voice) {
+            const targetGain = Math.max(0.0001, S.volume * (audioCore.LIMITER_LINEAR || 0.5));
+            const now = ctx.currentTime;
+            voice.gain.gain.cancelScheduledValues(now);
+            voice.gain.gain.setValueAtTime(0.0001, now);
+            voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.03);
+            // Auto-stop after ~1 second (water drop is short)
+            voice.source.stop(now + 1.0 + 0.005);
+          }
+        }
+      }).catch(() => {});
       return true;
     },
     playZenBell: function () { return SovereignRealAudio.playBell(); },

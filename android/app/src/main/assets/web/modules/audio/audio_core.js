@@ -255,18 +255,23 @@
   }
 
   function generateBrownNoise(channelData, sampleRate, durationSec) {
-    // Fixed-output-scale brown noise: bounded leaky integrator.
+    // Fixed-output-scale brown noise: bounded leaky integrator with DC rejection.
     // Output scaled by BROWN_NOISE_AMP — never peak-normalized UP (amplifying
     // quiet noise produced constant hiss/rumble) and never clamped into rails.
     // DC removal is handled by createSeamlessBuffer post-process pass (belt-and-suspenders).
+    // Use a two-pole leaky integrator for better -12dB/oct slope and less DC drift.
     for (let ch = 0; ch < channelData.length; ch++) {
       const data = channelData[ch];
       const len = data.length;
-      let brown = 0;
+      let brown1 = 0;
+      let brown2 = 0;
       for (let i = 0; i < len; i++) {
         const white = Math.random() * 2 - 1;
-        brown = BROWN_POLE * brown + white * BROWN_GAIN;
-        data[i] = brown * BROWN_NOISE_AMP;
+        // Two-pole leaky integrator: first pole at BROWN_POLE, second at 0.99
+        // This gives -12dB/oct slope and dramatically reduces DC drift vs single pole.
+        brown1 = BROWN_POLE * brown1 + white * BROWN_GAIN;
+        brown2 = 0.99 * brown2 + brown1 * 0.1;
+        data[i] = brown2 * BROWN_NOISE_AMP;
       }
     }
   }
@@ -432,50 +437,20 @@
     const numChannels = Math.max(1, buffer.numberOfChannels || 1);
     const srcLen = buffer.length || (buffer.getChannelData(0) ? buffer.getChannelData(0).length : 1);
 
-    // Standard seamless loop approach for fixed audio assets:
-    // 1. Create extended buffer: original audio + copy of first xfadeSamples (tail continuation)
-    // 2. Crossfade the ORIGINAL TAIL into the copied head (not head into itself)
-    // 3. Copy the crossfaded tail region to the head for seamless loop
-    // 4. Truncate to original length
-    // This preserves the original audio body and only modifies the loop boundary region.
+    // OGG files shipped with this app already have a 25ms loop crossfade baked in
+    // (see LICENSES.json). We must NOT apply another crossfade — that would create
+    // a double-crossfade artifact (audible as a subtle phasing/warble at loop point).
+    // Instead, just ensure the buffer length is preserved and apply post-processing:
+    // DC removal -> peak limiter (attenuate-only) -> hard clamp.
     const finalSize = srcLen;
-    const extendedSize = finalSize + xfadeSamples;
-    const extendedBuffer = ctx.createBuffer(numChannels, extendedSize, sampleRate);
+    const finalBuffer = ctx.createBuffer(numChannels, finalSize, sampleRate);
 
     for (let ch = 0; ch < numChannels; ch++) {
       const srcData = buffer.getChannelData(ch);
-      const extData = extendedBuffer.getChannelData(ch);
-
-      // Copy original audio
-      extData.set(srcData, 0);
-      // Append copy of head as tail continuation for crossfade
-      for (let i = 0; i < xfadeSamples; i++) {
-        extData[finalSize + i] = srcData[i];
-      }
-    }
-
-    // Now create final buffer with CORRECT crossfade: original tail → copied head
-    const finalBuffer = ctx.createBuffer(numChannels, finalSize, sampleRate);
-    for (let ch = 0; ch < numChannels; ch++) {
-      const extData = extendedBuffer.getChannelData(ch);
       const finalData = finalBuffer.getChannelData(ch);
 
-      // Body: copy main segment (excluding tail region that will be crossfaded)
-      finalData.set(extData.subarray(0, finalSize - xfadeSamples));
-
-      // Crossfade region: blend original tail into copied head
-      // extData[finalSize - xfadeSamples + i] = original tail
-      // extData[finalSize + i] = copied head (continuation for seamless loop)
-      for (let i = 0; i < xfadeSamples; i++) {
-        const t = i / xfadeSamples;
-        const tailSample = extData[finalSize - xfadeSamples + i];
-        const headSample = extData[finalSize + i];
-        finalData[finalSize - xfadeSamples + i] = (1 - t) * tailSample + t * headSample;
-      }
-      // NOTE: Do NOT overwrite head region — it stays as extData[0..xfadeSamples-1].
-      // The loop boundary transitions from finalData[finalSize-1] (crossfaded tail,
-      // mostly continuation) → finalData[0] (original head). Since continuation
-      // naturally follows tail in the extended buffer, this is seamless.
+      // Copy original audio (already has baked-in crossfade at loop boundary)
+      finalData.set(srcData);
 
       // Post-process: DC removal -> peak limiter (attenuate-only) -> hard clamp
       // 1. DC removal
