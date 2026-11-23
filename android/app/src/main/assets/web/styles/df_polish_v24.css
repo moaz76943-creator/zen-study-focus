@@ -47,7 +47,7 @@ textarea:focus-visible,
 
 /* ---------- 3D Spatial studio: clean collapsible chrome ------------------ */
 #dfPillar5SpatialMount .df-spatial-body { max-height: none; }
-#dfSpatialCollapseToggle { min-height: 32px; }
+#dfSpatialCollapseToggle { min-height: 48px; min-width: 48px; }
 #dfSpatialCollapseToggle:hover { background: #eef2ff !important; border-color: #c4b5fd !important; }
 
 /* Collapsed spatial studio: compact header + toggle affordance */
