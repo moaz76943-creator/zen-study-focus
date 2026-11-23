@@ -110,17 +110,17 @@ public class MainActivity extends AppCompatActivity {
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT,
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT));
         ViewCompat.setOnApplyWindowInsetsListener(insetFrame, (v, windowInsets) -> {
-            // Android 15 (API 35) edge-to-edge: systemBars() returns status + navigation bars (3-button).
-            // On Xiaomi gesture navigation, navigationBars() returns 0; mandatorySystemGestures() provides the gesture handle height.
-            // systemBars() on gesture nav returns only status bar (bottom = 0). Combine all three for true bar height.
-            Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars()
-                    | WindowInsetsCompat.Type.displayCutout());
+            // Android 15 (API 35) edge-to-edge: query each inset type separately to avoid combined-mask
+            // quirks on Xiaomi HyperOS. systemBars() returns status + nav (3-button); navigationBars()
+            // returns nav only; mandatorySystemGestures() returns gesture handle. displayCutout() is separate.
+            Insets systemBars = windowInsets.getInsets(WindowInsetsCompat.Type.systemBars());
+            Insets displayCutout = windowInsets.getInsets(WindowInsetsCompat.Type.displayCutout());
             Insets navigationBars = windowInsets.getInsets(WindowInsetsCompat.Type.navigationBars());
             Insets mandatorySystemGestures = windowInsets.getInsets(WindowInsetsCompat.Type.mandatorySystemGestures());
             Insets ime = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
 
-            // Status bar top from systemBars (includes cutout top)
-            int paddingTop = systemBars.top;
+            // Status bar top: max of system bars top and display cutout top
+            int paddingTop = Math.max(systemBars.top, displayCutout.top);
 
             // Navigation bottom: max of navigationBars (3-button), systemBars.bottom (3-button), mandatorySystemGestures (gesture handle)
             // On Xiaomi 3-button: navigationBars.bottom > 0 AND systemBars.bottom > 0 (both report nav bar)
@@ -186,11 +186,11 @@ public class MainActivity extends AppCompatActivity {
             // minimum floor. This handles edge cases where detection fails and the
             // reported insets are zero or too small. The cost is extra padding (harmless
             // empty space); the benefit is never clipping content or overlapping the
-            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can reach ~260dp on Android 15;
-            // use 260dp floor to guarantee the WebView viewport never intrudes into the
-            // nav bar area (matches calibrator capsule cap at 260px). DO NOT apply for gesture navigation (handle ~32dp).
+            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can reach ~300dp on Android 15;
+            // use 300dp floor to guarantee the WebView viewport never intrudes into the
+            // nav bar area (matches calibrator minimum clearance at 300px). DO NOT apply for gesture navigation (handle ~32dp).
             if (isXiaomi && !isGestureNav) {
-                int absoluteMinNavDp = 260; // Covers 3-button bars up to ~260dp on HyperOS Android 15
+                int absoluteMinNavDp = 300; // Covers 3-button bars up to ~300dp on HyperOS Android 15
                 int absoluteMinNavPx = Math.round(absoluteMinNavDp * density);
                 if (navBottom < absoluteMinNavPx) navBottom = absoluteMinNavPx;
             }

@@ -32,15 +32,15 @@
      */
     init: function () {
       if (!this._hasRealInsets) {
-        // Use a conservative fallback bottom (260dp) matching the Xiaomi 3-button nav floor
-        // in MainActivity (absoluteMinNavDp = 260) so the initial reserve covers tall nav bars
+        // Use a conservative fallback bottom (300dp) matching the Xiaomi 3-button nav floor
+        // in MainActivity (absoluteMinNavDp = 300) so the initial reserve covers tall nav bars
         // before real insets arrive. Real gesture nav (~32dp) will quickly correct to a smaller capsule.
         this.applyCSSVariables({
           top: 24,
-          bottom: 260,
+          bottom: 300,
           left: 0,
           right: 0,
-          paddingBottom: 260
+          paddingBottom: 300
         });
       }
       if (typeof window !== 'undefined') {
