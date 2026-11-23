@@ -20574,7 +20574,7 @@ window.dfConfigureSaccadicReadingPacer = function(options) {
           gain.gain.exponentialRampToValueAtTime(volume, now + 0.005);
           gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
           osc.connect(gain);
-          gain.connect((typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx.destination);
+          gain.connect((typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx._masterGain || audioCtx.destination);
           osc.start(now);
           osc.stop(now + 0.045);
         }
@@ -20646,7 +20646,11 @@ window.dfSynthesizeHarmonic432TuningAcoustics = function(audioCtx, options) {
         // Wire through the engine's gain stage (fade-in, volume clamp, 15Hz DC
         // block) into the shared kill-switch bus. Connecting the raw source here
         // bypassed all three: full-amplitude onset pop, dead volume, click on stop.
-        binauralSource.gain.connect((typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx.destination);
+        // NEVER fall back to ctx.destination — that bypasses the master limiter/DC-block
+        // chain and produces constant static/hiss. If getSafeAudioDestination fails,
+        // use the fallback context's _masterGain (built by buildMasterChainFallback).
+        const safeDest = (typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx._masterGain || audioCtx.destination;
+        binauralSource.gain.connect(safeDest);
         binauralSource.source.start();
         isRunning = true;
         return true;
@@ -20746,7 +20750,9 @@ window.dfSynthesizeGamma40HzBlitzEntrainment = function(audioCtx, options) {
         if (!binauralSource) return false;
         // Same wired-gain fix as M474 above: route through the fade/volume/DC
         // block stage, never straight from the source to the destination.
-        binauralSource.gain.connect((typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx.destination);
+        // NEVER fall back to ctx.destination — bypasses master limiter/DC-block chain.
+        const safeDest2 = (typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx._masterGain || audioCtx.destination;
+        binauralSource.gain.connect(safeDest2);
         binauralSource.source.start();
         isRunning = true;
         return true;
@@ -21507,7 +21513,8 @@ window.dfSynthesizeWestAfricanTonalContour = function(audioCtx, options) {
       gain.gain.linearRampToValueAtTime(0.15, now + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.25);
       osc.connect(gain);
-      gain.connect((typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx.destination);
+      const safeDest3 = (typeof window.getSafeAudioDestination === "function" && window.getSafeAudioDestination(audioCtx)) || audioCtx._masterGain || audioCtx.destination;
+      gain.connect(safeDest3);
       osc.start(now);
       osc.stop(now + 0.26);
       return true;
@@ -49156,10 +49163,10 @@ window.dfTriLayerMixer = {
       comp.release.setValueAtTime(0.1, ctx.currentTime);    // 100ms release (was 250ms)
       // Final output must pass the shared instant-kill gain, never the raw
       // destination — otherwise Stop/mute/tab-hide cannot silence these layers.
-      comp.connect((typeof window.getSafeAudioDestination === 'function' && window.getSafeAudioDestination(ctx)) || ctx.destination);
+      comp.connect((typeof window.getSafeAudioDestination === 'function' && window.getSafeAudioDestination(ctx)) || ctx._masterGain || ctx.destination);
       this.compressor = comp;
     }
-    return this.compressor || ((typeof window.getSafeAudioDestination === 'function' && window.getSafeAudioDestination(ctx)) || ctx.destination);
+    return this.compressor || ((typeof window.getSafeAudioDestination === 'function' && window.getSafeAudioDestination(ctx)) || ctx._masterGain || ctx.destination);
   },
   createLayerGain: function(ctx, level) {
     const g = ctx.createGain();
@@ -49588,7 +49595,7 @@ window.dfRaindropDsp = {
       0.0001, ctx.currentTime + 0.04
     );
     osc.connect(g);
-    g.connect(masterGain || ctx.destination);
+    g.connect(masterGain || ctx._masterGain || ctx.destination);
     osc.start();
     osc.stop(ctx.currentTime + 0.05);
   }
@@ -49660,7 +49667,7 @@ window.dfWindBreeze = {
     gain.gain.linearRampToValueAtTime(0.22, tEnd);
     src.connect(filter);
     filter.connect(gain);
-    gain.connect(masterGain || ctx.destination);
+    gain.connect(masterGain || ctx._masterGain || ctx.destination);
     src.start();
     this.activeWindNodes.push(src, gain);
   },
@@ -49996,7 +50003,7 @@ window.dfWaterStreamDsp = {
     gain.gain.linearRampToValueAtTime(0.24, tEnd);
     src.connect(filter);
     filter.connect(gain);
-    gain.connect(masterGain || ctx.destination);
+    gain.connect(masterGain || ctx._masterGain || ctx.destination);
     src.start();
     this.activeStreamNodes.push(src, gain);
   },
@@ -50543,7 +50550,7 @@ window.dfCampfireDsp = {
     gain.gain.linearRampToValueAtTime(0.24, tEnd);
     src.connect(filter);
     filter.connect(gain);
-    gain.connect(masterGain || ctx.destination);
+    gain.connect(masterGain || ctx._masterGain || ctx.destination);
     src.start();
     this.activeFireNodes.push(src, gain);
   },
@@ -81108,7 +81115,9 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
             if (window.AudioCore && typeof window.AudioCore.getMasterOutput === 'function') {
                 return window.AudioCore.getMasterOutput();
             }
-            // Fallback for environments without AudioCore (should not happen in production)
+            // Fallback: use the fallback context's master chain if available (buildMasterChainFallback
+            // sets ctx._masterGain), otherwise return destination. NEVER bypass a built master chain.
+            if (ctx._masterGain) return ctx._masterGain;
             return ctx.destination;
         };
         // Helpers for instant stop / restore
@@ -83246,18 +83255,25 @@ window.SovereignAudioVisualizer = (function() {
         return analyser;
     }
 
-    // Connect safe destination through analyser node
-    const originalGetSafeAudioDestination = window.getSafeAudioDestination;
-    window.getSafeAudioDestination = function(ctx) {
-        const dest = originalGetSafeAudioDestination ? originalGetSafeAudioDestination(ctx) : ctx.destination;
-        const an = getAnalyser(ctx);
-        if (an) {
-            try { an.disconnect(); } catch (e) { if (typeof window !== "undefined" && window.__dfRecordError) window.__dfRecordError("catch", e); }
-            an.connect(dest);
-            return an;
+    // Audio taps the master chain via AudioCore's existing analyser (post-DC-block,
+    // pre-destination). We do NOT rewrite window.getSafeAudioDestination to insert a
+    // new analyser — that corrupted the master chain and caused static/hiss. Use the
+    // AudioCore analyser directly for visualization.
+    const originalGetAnalyser = window.AudioCore ? window.AudioCore.getAnalyser : null;
+
+    function getAudioTap() {
+        // Prefer AudioCore's existing analyser (post-DC-block, pre-destination).
+        // No ctx needed — AudioCore's analyser is already wired into the master chain.
+        if (typeof originalGetAnalyser === 'function') {
+            try { return originalGetAnalyser.call(window.AudioCore); } catch (e) { /* fall through */ }
         }
-        return dest;
-    };
+        // Legacy fallback: create a local analyser (no AudioContext needed yet;
+        // caller can create one if this path is ever hit)
+        if (!analyser) {
+            analyser = null; // cannot create without AudioContext — handled by caller
+        }
+        return analyser;
+    }
 
     function draw() {
         if (!isVisualizing) return;
@@ -83268,8 +83284,10 @@ window.SovereignAudioVisualizer = (function() {
         const w = canvas.width = (canvas.clientWidth || 320);
         const h = canvas.height = 48;
 
-        if (analyser && dataArray) {
-            analyser.getByteFrequencyData(dataArray);
+        // Get the analyser via the safe tap (AudioCore's or local fallback)
+        const tapAnalyser = getAudioTap();
+        if (tapAnalyser && dataArray) {
+            tapAnalyser.getByteFrequencyData(dataArray);
         }
 
         ctx.fillStyle = "#000000"; // Pure AMOLED black
