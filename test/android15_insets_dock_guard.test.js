@@ -25,8 +25,8 @@ const appJs = fs.readFileSync(
 // ---- Native (MainActivity.java) ----
 assert.ok(java.includes('WindowCompat.setDecorFitsSystemWindows(getWindow(), false)'),
   'edge-to-edge: decor must not fit system windows');
-assert.ok(java.includes('WindowInsetsCompat.Type.systemBars()'),
-  'systemBars() insets must be consumed');
+assert.ok(java.includes('Type.statusBars()'),
+  'statusBars() insets must be consumed');
 assert.ok(java.includes('Type.displayCutout()'),
   'display cutout insets must be consumed');
 assert.ok(java.includes('Type.navigationBars()'),
@@ -35,6 +35,11 @@ assert.ok(java.includes('Type.mandatorySystemGestures()'),
   'mandatorySystemGestures() insets must be consumed (gesture handle on Xiaomi)');
 assert.ok(java.includes('Type.ime()'),
   'IME insets must be consumed (keyboard)');
+// systemBars() is a combined mask (status + nav) — zeroing it in the Builder
+// does not reliably clear individual types on Xiaomi Android 15. The fix zeros
+// each individual type explicitly. Verify systemBars() is NOT in the Builder.
+assert.ok(!/setInsets\(WindowInsetsCompat\.Type\.systemBars\(\)/.test(java),
+  'systemBars() combined mask must NOT be zeroed in Builder (causes double-counting on Xiaomi)');
 // Padding goes to the parent inset FrameLayout, never to the WebView itself
 // (WebView does not lay web content out inside its own padding).
 assert.ok(java.includes('ViewCompat.setOnApplyWindowInsetsListener(insetFrame'),
@@ -84,18 +89,21 @@ console.log('✔ Calibrator pins safe-area variables to 0px and publishes the do
 // Body must reserve clearance above the native inset edge using --df-inflow-bottom
 // (which resolves to --df-bottom-nav-clearance since --df-webview-padding-bottom is 0px).
 // The pillar7 rule (later, !important) and the weak rule up top must both stay on the same formula.
-const bodyReserve = /padding-bottom:\s*var\(--df-inflow-bottom,\s*300px\)/g;
+const bodyReserve = /padding-bottom:\s*var\(--df-inflow-bottom,\s*350px\)/g;
 assert.ok((html.match(bodyReserve) || []).length >= 2,
   'body must reserve --df-inflow-bottom above the native inset edge (all body rules)');
 console.log('✔ index.html body reserves clearance via calibrated variables.');
 
 // Studios pill fallback updated to 124px (capsuleHeight 56 + 68).
 // FAB fallback updated to 186px (studiosPillBottom 124 + FABHeight 54 + gap 8).
+// Scratchpad trigger fallback at 155px (midway between Studios pill 124px and FAB 186px).
 // These remain correct because the calibrator computes positions relative to the
 // viewport bottom (safe content edge), which already excludes the nav bar via
-// native parent padding. The clearance (300px minimum) is for in-flow body padding only.
+// native parent padding. The clearance (350px minimum) is for in-flow body padding only.
 assert.ok(html.includes('--df-studios-pill-bottom: 124px'),
   'Studios pill fallback must be 124px (capsuleHeight + 68)');
+assert.ok(html.includes('--df-scratchpad-bottom: 155px'),
+  'Scratchpad trigger fallback must be 155px (midway between Studios pill and FAB)');
 assert.ok(html.includes('--df-fab-bottom: 186px'),
   'FAB fallback must be 186px (studiosPillBottom + FABHeight + gap)');
 
@@ -109,7 +117,7 @@ console.log('✔ touch_restorer.css .bottom-nav-bar docks above the nav bar.');
 // ---- app.js dynamic layers: scratchpad trigger must dock via calibrator variables, below modals ----
 const scratch = appJs.slice(appJs.indexOf("'df-float-scratch-btn'"), appJs.indexOf('const self = this;', appJs.indexOf("'df-float-scratch-btn'")));
 assert.ok(scratch.includes("'fixed'"), 'scratchpad trigger must be position:fixed');
-assert.ok(scratch.includes('var(--df-studios-pill-bottom'),
+assert.ok(scratch.includes('var(--df-scratchpad-bottom'),
   'scratchpad trigger must dock via calibrated inset variables, never bottom: 24px');
 assert.ok(!/bottom\s*=\s*'24px'/.test(scratch), 'scratchpad trigger must not hardcode bottom: 24px');
 assert.ok(scratch.includes("zIndex = '150'"),

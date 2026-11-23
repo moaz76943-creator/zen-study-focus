@@ -38,8 +38,8 @@ assert.ok(html.includes('--df-studios-pill-bottom: 124px'),
 console.log('✔ Dock formulas use the calibrated single-owner inset variables.');
 
 // Body must reserve enough bottom clearance for the capsule + Studios pill + FAB zone.
-// --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (300px fallback).
-assert.ok(/padding-bottom:\s*var\(--df-inflow-bottom,\s*300px\)/.test(html),
+// --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (350px fallback).
+assert.ok(/padding-bottom:\s*var\(--df-inflow-bottom,\s*350px\)/.test(html),
   'body must reserve --df-inflow-bottom above the native inset edge');
 console.log('✔ Body bottom clearance reserves capsule + FAB zone above the safe content edge.');
 

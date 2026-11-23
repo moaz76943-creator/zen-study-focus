@@ -256,12 +256,12 @@ public class MainActivity extends AppCompatActivity {
             // (env() is zero here and must stay zero to avoid double padding).
             // Zeroing (not CONSUMED) keeps the WebView's internal state in sync when
             // the keyboard opens/hides, preventing ghost padding after IME dismissal.
-            // Call setInsets separately for each type — combined type masks are not
-            // reliably handled by WindowInsetsCompat.Builder on all Android versions.
-            // Explicitly zero statusBars() — systemBars() zeroing alone does not clear
-            // statusBars() on Xiaomi Android 15, leaving safe-area-inset-top active.
+            // Call setInsets separately for each type — combined type masks (systemBars)
+            // are not reliably handled by WindowInsetsCompat.Builder on all Android versions.
+            // Explicitly zero each individual type; do NOT zero systemBars() as it is a
+            // combined mask (status + nav) that fails to clear statusBars() on Xiaomi
+            // Android 15, leaving safe-area-inset-top active and causing content overlap.
             return new WindowInsetsCompat.Builder(windowInsets)
-                    .setInsets(WindowInsetsCompat.Type.systemBars(), Insets.NONE)
                     .setInsets(WindowInsetsCompat.Type.statusBars(), Insets.NONE)
                     .setInsets(WindowInsetsCompat.Type.displayCutout(), Insets.NONE)
                     .setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.NONE)

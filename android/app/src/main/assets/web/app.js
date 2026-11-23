@@ -51333,10 +51333,11 @@ window.dfScratchpadModal = {
       btn.id = 'df-float-scratch-btn';
       btn.textContent = '+ Note Idea';
       btn.style.position = 'fixed';
-      // Dock on the LEFT (mirrors FAB horizontal position) at Studios pill height.
-      // Studios pill sits on the RIGHT at --df-studios-pill-bottom; FAB sits on the LEFT at --df-fab-bottom.
-      // This avoids the Studios (10) pill overlap on the right while keeping the same dock layer (z-index 150).
-      btn.style.bottom = "var(--df-studios-pill-bottom, 380px)";
+      // Dock on the LEFT (mirrors FAB horizontal position) at scratchpad height.
+      // Scratchpad sits midway between Studios pill (right) and FAB (left, higher).
+      // This avoids the Studios (10) pill overlap on the right while keeping the
+      // same dock layer (z-index 150).
+      btn.style.bottom = "var(--df-scratchpad-bottom, 350px)";
       btn.style.left = '24px';
       btn.style.maxWidth = 'min(280px, calc(100vw - 96px))';
       btn.style.minHeight = '48px';
