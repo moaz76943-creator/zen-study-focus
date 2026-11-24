@@ -33,7 +33,7 @@
     init: function () {
       if (!this._hasRealInsets) {
         // Use a conservative fallback bottom (350dp) matching the Xiaomi 3-button nav floor
-        // in MainActivity (absoluteMinNavDp = 300) plus floating layer clearance so the
+        // in MainActivity (absoluteMinNavDp = 350) plus floating layer clearance so the
         // initial reserve covers tall nav bars before real insets arrive. Real gesture nav
         // (~32dp) will quickly correct to a smaller capsule.
         this.applyCSSVariables({
@@ -88,7 +88,10 @@
      * Its height is determined by CSS, NOT by system nav bar insets.
      * System nav bar insets are handled by native parent padding in MainActivity.
      * On narrow screens (<430px), CSS adds extra padding-block-start to the capsule.
-     * @param {Object} insets Current insets (used only for viewport width via this._viewportWidth)
+     * On devices with tall 3-button nav bars (paddingBottom >= 300dp), the viewport
+     * is significantly reduced; compress the capsule to base height to prevent the
+     * floating stack from consuming most of the viewport and overlapping content.
+     * @param {Object} insets Current insets (used for viewport width and paddingBottom)
      * @returns {number} Capsule height in px (CSS px == DP in WebView)
      */
     _computeCapsuleHeight: function (insets) {
@@ -96,16 +99,22 @@
       // This is the height of .bottom-nav-capsule on wide screens (>= 430px)
       var baseCapsuleHeight = 56;
 
+      // Detect tall system nav bar: paddingBottom >= 300dp indicates 3-button nav bar
+      // that reduces the WebView viewport. Compress capsule to base height to keep
+      // the floating stack (capsule + Studios pill + FAB) from overlapping content.
+      var hasTallNavBar = (insets.paddingBottom || insets.bottom || 0) >= 300;
+
       // Account for narrow-screen extra padding in CSS (media query max-width: 430px)
       // CSS adds padding-block-start: clamp(40px, 2.5rem, 80px) to .bottom-nav-capsule
       // With extra padding: 96px to 136px total
-      if (this._viewportWidth > 0 && this._viewportWidth < 430) {
+      // But if tall nav bar detected, skip narrow-screen expansion to compress stack.
+      if (!hasTallNavBar && this._viewportWidth > 0 && this._viewportWidth < 430) {
         var extraPadding = Math.min(80, Math.max(40, this._viewportWidth * 0.0625)); // clamp(40px, 2.5rem, 80px) approx
         var narrowCapsuleHeight = baseCapsuleHeight + extraPadding; // ~96-136px
         return narrowCapsuleHeight;
       }
 
-      // Wide screens: use base capsule height
+      // Wide screens or tall nav bar: use base capsule height
       return baseCapsuleHeight;
     },
 
@@ -163,12 +172,11 @@
       var floatingLayerClearance = capsuleHeight + 196;
       // IME clearance: if paddingBottom > 500 (IME), use 350; else paddingBottom + 12
       var imeClearance = paddingBottom > 500 ? 350 : paddingBottom + 12;
-      // Minimum 450px (covers narrow-screen floating stack up to ~332px + 12px gap = 344px,
-      // with 100px+ margin). On Xiaomi 3-button nav (up to 300dp), the native parent padding
-      // already handles the nav bar; this clearance only needs to cover the floating stack.
-      // The 450px floor ensures Studios pill (up to 204px) + FAB (up to 266px) + FAB height (54px)
-      // + gap (12px) = 332px top of stack is fully covered with comfortable margin.
-      return Math.max(floatingLayerClearance, imeClearance, 450);
+      // Minimum clearance: use the larger of floating stack clearance and IME clearance.
+      // The fixed 450px floor was removed because it exceeds the viewport on devices
+      // with tall 3-button nav bars (Xiaomi HyperOS), making bottom content inaccessible.
+      // floatingLayerClearance ranges 252-332px; imeClearance up to 362px for tall nav.
+      return Math.max(floatingLayerClearance, imeClearance, 200);
     },
 
     /**
@@ -212,12 +220,11 @@
       // (FAB top = fabBottom + FABHeight(54)) + gap(12).
       // Also handle IME: insets.paddingBottom = max(flooredNavBottom, IME height).
       // When keyboard opens, content must clear the keyboard.
-      // Xiaomi 3-button nav floor is 160dp; typical IME is 200-500dp.
+      // Xiaomi 3-button nav floor is 350dp; typical IME is 200-500dp.
       // If paddingBottom > 500dp, treat as nav bar floor (not IME) and use fixed minimum.
       // The clearance is additional body padding INSIDE the WebView viewport (which is
       // already reduced by native parent padding). It must always be at least
-      // floatingLayerClearance to clear the FAB/Studios pill; never cap it by the
-      // viewport height because the viewport is already short on tall-nav-bar devices.
+      // floatingLayerClearance to clear the FAB/Studios pill.
       var paddingBottom = insets.paddingBottom || insets.bottom || 120;
       var bottomNavClearance = this._computeBottomNavClearance(capsuleHeight, paddingBottom);
       root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
