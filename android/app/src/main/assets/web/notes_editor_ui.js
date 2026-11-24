@@ -317,7 +317,7 @@
       '#noteModal.nsux-focus .ns-editor{max-width:760px;width:100%;max-height:100dvh;border-radius:0}',
       '#noteModal.nsux-focus #nsEditorTemplates,#noteModal.nsux-focus .ns-meta,#noteModal.nsux-focus .ns-options{display:none}',
       '#noteModal.nsux-focus #inpNoteBody{max-height:55dvh;min-height:35dvh}',
-      '#noteModal .ns-editor{max-height:min(92dvh,calc(var(--nsux-height,100dvh) - 10px));overflow-y:auto;overscroll-behavior:contain;padding-bottom:max(15px,env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));}',
+      '#noteModal .ns-editor{max-height:min(92dvh,calc(var(--nsux-height,100dvh) - 10px));overflow-y:auto;overscroll-behavior:contain;padding-bottom:max(15px,var(--df-safe-bottom, 0px), var(--df-inflow-bottom, 300px));}',
       '@media(max-width:360px){.nsux-actions{gap:5px}.nsux-btn{padding:8px}.nsux-area{min-height:80px}}',
       '@media(prefers-reduced-motion:reduce){#noteModal .ns-editor{scroll-behavior:auto}}'
     ].join('\n');

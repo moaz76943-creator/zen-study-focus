@@ -169,8 +169,11 @@ test('keyboard avoidance: dynamic viewport units reflow under the IME', () => {
     'body uses 100dvh so content reflows when the keyboard opens');
   assert.ok(/min-height:\s*100vh/.test(FLAT),
     '100vh fallback for engines without dvh support');
-  assert.ok(/safe-area-inset-bottom/.test(FLAT),
-    'safe area insets honoured near the keyboard edge');
+  // Native parent padding owns system-bar insets; calibrator pins --df-safe-bottom to 0px.
+  // Do NOT use env(safe-area-inset-bottom) — it re-adds nav bar and causes double-counting on Xiaomi Android 15.
+  // The standalone focus_lab.css uses --focuslab-safe-bottom alias which resolves to var(--df-safe-bottom, 0px).
+  assert.ok(/var\(--df-safe-bottom\)|var\(--df-inflow-bottom\)|var\(--focuslab-safe-bottom\)/.test(FLAT),
+    'safe area clearance uses calibrator variables near the keyboard edge');
   assert.equal(
     ALL_DECLARATIONS.some((d) => d.property === 'height' && /^100v[hd]/.test(d.value)),
     false,

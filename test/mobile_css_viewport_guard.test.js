@@ -22,12 +22,14 @@ assert.ok(
 );
 console.log("✔ Test 2: Accessible wrapping touch targets verified for duration buttons.");
 
-// Test 3: Safe Area Inset Support
+// Test 3: Safe Area Inset Support (calibrator variables, not env())
+// Native parent padding owns system-bar insets; calibrator pins --df-safe-* to 0px.
+// Do NOT use env(safe-area-inset-*) — it re-adds bars and causes double-counting on Xiaomi Android 15.
 assert.ok(
-    cssContent.includes("env(safe-area-inset-bottom"),
-    "Bottom navigation must protect Android Safe Area insets."
+    cssContent.includes("var(--df-safe-bottom") || cssContent.includes("var(--df-inflow-bottom"),
+    "Bottom navigation must use calibrator variables for safe area clearance (not env())."
 );
-console.log("✔ Test 3: Android gesture safe-area-inset-bottom verified.");
+console.log("✔ Test 3: Android safe-area clearance via calibrator variables verified.");
 
 // Test 4: Small screen max-width 360px breakpoint
 assert.ok(

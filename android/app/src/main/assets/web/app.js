@@ -41552,10 +41552,12 @@ window.dfApplySafeAreaInsets = function() {
 
   const insetsCSS = `
     :root {
-      --safe-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
-      --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));
-      --safe-left: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
-      --safe-right: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
+      /* Native parent padding owns all system-bar insets; calibrator pins --df-safe-* to 0px.
+         Do NOT use env(safe-area-inset-*) — it re-adds bars and causes double-counting on Xiaomi Android 15. */
+      --safe-top: var(--df-safe-top, 0px);
+      --safe-bottom: var(--df-safe-bottom, 0px);
+      --safe-left: var(--df-safe-left, 0px);
+      --safe-right: var(--df-safe-right, 0px);
     }
     body {
       padding-top: var(--safe-top) !important;
@@ -43014,10 +43016,14 @@ window.dfNormalizeSystemInsets = function() {
 
   const insetsCSS = `
     .df-header {
-      padding-top: max(12px, env(safe-area-inset-top, 0px), var(--df-safe-top, 0px)) !important;
+      /* Native parent padding owns system-bar insets; calibrator pins --df-safe-top to 0px.
+         Do NOT use env(safe-area-inset-top) — it re-adds status bar and causes double-counting on Xiaomi Android 15. */
+      padding-top: max(12px, var(--df-safe-top, 0px)) !important;
     }
     .df-nav-tabs, .df-footer-controls {
-      padding-bottom: max(16px, env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px)) !important;
+      /* Native parent padding owns system-bar insets; calibrator pins --df-safe-bottom to 0px.
+         Do NOT use env(safe-area-inset-bottom) — it re-adds nav bar and causes double-counting on Xiaomi Android 15. */
+      padding-bottom: max(16px, var(--df-safe-bottom, 0px), var(--df-inflow-bottom, 300px)) !important;
     }
   `;
 
@@ -48161,8 +48167,10 @@ window.dfApplySafeAreaInsets = function(rootEl) {
     styleEl.id = 'df-safe-area-style';
     styleEl.textContent = [
       ':root {',
-      '  --safe-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));',
-      '  --safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));',
+      '  /* Native parent padding owns all system-bar insets; calibrator pins --df-safe-* to 0px.',
+      '     Do NOT use env(safe-area-inset-*) — it re-adds bars and causes double-counting on Xiaomi Android 15. */',
+      '  --safe-top: var(--df-safe-top, 0px);',
+      '  --safe-bottom: var(--df-safe-bottom, 0px);',
       '}',
       'body {',
       '  padding-top: var(--safe-top);',

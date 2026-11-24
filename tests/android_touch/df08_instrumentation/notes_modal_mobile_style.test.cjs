@@ -18,7 +18,9 @@ test('Save and Cancel stay real touch buttons at keyboard dismissal',()=>{
   // API30 measured position:static and Save y=1644 with a 748px visible viewport.
   // Assert an old-WebView-safe fallback and precedence over late injected styles.
   assert.ok(guard.includes('position: fixed !important'));
-  assert.ok(guard.includes('max(14px, env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px)) !important'));
+  // Native parent padding owns system-bar insets; calibrator pins --df-safe-bottom to 0px.
+  // Do NOT use env(safe-area-inset-bottom) — it re-adds nav bar and causes double-counting on Xiaomi Android 15.
+  assert.ok(guard.includes('max(14px, var(--df-safe-bottom, 0px), var(--df-inflow-bottom, 300px)) !important'));
   assert.ok(guard.includes('max-height: calc(var(--nsux-height'));
   assert.match(guard,/\.modal-actions\s*>\s*button/);
   assert.match(guard,/min-block-size:\s*44px/);

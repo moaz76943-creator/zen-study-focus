@@ -48,8 +48,10 @@
   );
   --focuslab-leading: var(--df22-leading, 1.5);
   --focuslab-space: var(--df22-space-4, 1rem);
-  --focuslab-safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));
-  --focuslab-safe-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
+  /* Native parent padding owns all system-bar insets; calibrator pins --df-safe-* to 0px.
+     Do NOT use env(safe-area-inset-*) — it re-adds bars and causes double-counting on Xiaomi Android 15. */
+  --focuslab-safe-bottom: var(--df-safe-bottom, 0px);
+  --focuslab-safe-top: var(--df-safe-top, 0px);
 }
 
 /* ---------- Base (mobile-first: authored for 320px and up) ---------- */

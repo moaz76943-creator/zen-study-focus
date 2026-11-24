@@ -5,8 +5,10 @@
  */
 
 :root {
-    --zen-safe-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));
-    --zen-safe-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
+    /* Native parent padding owns all system-bar insets; calibrator pins --df-safe-* to 0px.
+       Do NOT use env(safe-area-inset-*) — it re-adds bars and causes double-counting on Xiaomi Android 15. */
+    --zen-safe-bottom: var(--df-safe-bottom, 0px);
+    --zen-safe-top: var(--df-safe-top, 0px);
 }
 
 /* Fluid responsive timer display: Never wraps or clips */

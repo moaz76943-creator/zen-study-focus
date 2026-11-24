@@ -1459,7 +1459,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     /* Tall Aspect Ratio Resiliency (Xiaomi 17T Pro: 20.5:9, 1220x2712) */
     @media (max-width: 540px) and (min-aspect-ratio: 19/10) {
       body {
-        padding-top: max(16px, max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px))) !important;
+        /* Native parent padding owns system-bar insets; calibrator pins --df-safe-top to 0px.
+           Do NOT use env(safe-area-inset-top) — it re-adds status bar and causes double-counting on Xiaomi Android 15. */
+        padding-top: max(16px, var(--df-safe-top, 0px)) !important;
         /* Body padding-bottom = fixed clearance for floating
            elements (FAB, Studios pill). --df-webview-padding-bottom is 0px (calibrator). */
         padding-bottom: var(--df-inflow-bottom, 350px) !important;

@@ -11,11 +11,13 @@
 html, body {
   background-color: var(--df-bg-oled);
   color: var(--df-text-primary);
-  padding-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
+  /* Native parent padding owns all system-bar insets; calibrator pins --df-safe-* to 0px.
+     Do NOT use env(safe-area-inset-*) — it re-adds bars and causes double-counting on Xiaomi Android 15. */
+  padding-top: var(--df-safe-top, 0px);
   /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (300px fallback). */
   padding-bottom: var(--df-inflow-bottom, 300px);
-  padding-inline-start: max(env(safe-area-inset-left, 0px), var(--df-safe-left, 0px));
-  padding-inline-end: max(env(safe-area-inset-right, 0px), var(--df-safe-right, 0px));
+  padding-inline-start: var(--df-safe-left, 0px);
+  padding-inline-end: var(--df-safe-right, 0px);
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: contain;
 }
@@ -39,9 +41,10 @@ button, [role="button"], .df-touch-target {
 }
 
 /* Xiaomi 17T Pro Edge-to-Edge & Punch-Hole Calibration */
+/* Calibrator is single owner: --df-safe-* pinned to 0px; --df-inflow-bottom is the dock reserve. */
 :root {
-  --df-notch-top: max(env(safe-area-inset-top, 0px), var(--df-safe-top, 0px));
-  --df-nav-bottom: max(env(safe-area-inset-bottom, 0px), var(--df-safe-bottom, 0px));
+  --df-notch-top: var(--df-safe-top, 0px);
+  --df-nav-bottom: var(--df-inflow-bottom, 300px);
 }
 
 .df-safe-viewport {
