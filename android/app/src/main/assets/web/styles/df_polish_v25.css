@@ -113,8 +113,20 @@ textarea:focus-visible,
   transition-property: transform, box-shadow, border-color, color, background-color, opacity;
   transition-duration: .18s;
   transition-timing-function: var(--df25-ease);
+}
+
+/* Static compositor promotion is safe for the handful of chrome surfaces that
+   move on every tap. Sound tiles are excluded: there can be 30 of them, and a
+   blanket will-change would pin a layer per tile. They promote on demand
+   (see the #soundsGridBox rules further down). */
+.seg-pill,
+.bnav-btn,
+.task-mini-sel,
+.task_mini-sel,
+.zen-compact-suite-btn,
+.modal-card {
   will-change: transform, box-shadow, border-color, opacity;
-  transform: translateZ(0); /* Force compositor layer */
+  transform: translateZ(0);
 }
 
 .sound-Rich-tile:active,
@@ -261,19 +273,19 @@ textarea:focus-visible,
 }
 .stile-top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
 .stile-play-btn {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
   border: 1px solid var(--border-soft);
   background: var(--card-pure);
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   cursor: pointer;
   transition: all 0.15s var(--df25-ease);
 }
 .stile-play-btn:hover { background: var(--primary-soft); border-color: var(--primary); }
-.stile-switch { width: 44px; height: 24px; border-radius: 12px; background: #cbd5e1; position: relative; }
-.stile-knob { width: 18px; height: 18px; border-radius: 50%; background: #fff; position: absolute; top: 3px; left: 3px; right: auto; transition: left 0.15s var(--df25-ease), background 0.15s var(--df25-ease); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
-.sound-Rich-tile.playing .stile-knob { left: calc(100% - 21px); background: var(--primary); }
+.stile-switch { width: 48px; height: 28px; border-radius: 14px; background: #cbd5e1; position: relative; }
+.stile-knob { width: 22px; height: 22px; border-radius: 50%; background: #fff; position: absolute; top: 3px; left: 3px; right: auto; transition: left 0.15s var(--df25-ease), background 0.15s var(--df25-ease); box-shadow: 0 2px 6px rgba(0,0,0,0.15); }
+.sound-Rich-tile.playing .stile-knob { left: calc(100% - 25px); background: var(--primary); }
 .stile-name { font-weight: 700; color: var(--text-main); margin-top: 10px; }
 .stile-volume-label { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 0.8rem; color: var(--text-muted); }
 .stile-vol { flex: 1; margin-left: 8px; accent-color: var(--primary); }
@@ -288,8 +300,12 @@ textarea:focus-visible,
 #dfPillar5SpatialMount[aria-expanded="false"] .df-spatial-body { display: none !important; }
 #dfPillar5SpatialMount .df-spatial-body:empty { display: none; }
 
-/* 120Hz smooth compositing for animated sound tiles */
-#soundsGridBox .sound-Rich-tile { will-change: transform; transform: translateZ(0); }
+/* 120Hz smooth compositing: promote ONLY the active tile, never all 30.
+   A blanket will-change on every .sound-Rich-tile would pin 30 compositor
+   layers and starve the GPU on mobile WebView — the opposite of smooth. */
+#soundsGridBox .sound-Rich-tile.playing,
+#soundsGridBox .sound-Rich-tile:hover,
+#soundsGridBox .sound-Rich-tile:active { will-change: transform; transform: translateZ(0); }
 
 /* Spatial sub-tabs */
 #dfPillar5SpatialMount .df-white-premium {
@@ -333,8 +349,8 @@ textarea:focus-visible,
 .ring-bar { stroke-linecap: round; filter: drop-shadow(0 4px 12px rgba(37, 99, 235, 0.3)); }
 .ring-mode-txt { color: #5b6b82 !important; }
 .delta-chip {
-  min-height: 40px;
-  padding: 0 12px;
+  min-height: 48px;
+  padding: 0 14px;
   border-radius: 999px;
   background: var(--primary-soft);
   color: var(--primary);
@@ -363,7 +379,7 @@ textarea:focus-visible,
 }
 .domain-card:hover { transform: translateY(-1px); }
 .home-quick-chip {
-  min-height: 44px;
+  min-height: 48px;
   min-width: 64px;
   border-radius: 12px;
   border: 1px solid var(--border-soft);
@@ -426,9 +442,9 @@ textarea:focus-visible,
   gap: 8px;
 }
 #nsDraftRestore, #nsDraftDiscard {
-  min-height: 36px;
-  min-width: 36px;
-  padding: 6px 12px;
+  min-height: 48px;
+  min-width: 48px;
+  padding: 8px 14px;
   border-radius: 999px;
   border: 1px solid var(--border-soft);
   background: var(--card-pure);
@@ -439,7 +455,7 @@ textarea:focus-visible,
 #nsDraftRestore:hover { background: var(--emerald-soft); color: var(--emerald); border-color: var(--emerald); }
 #nsDraftDiscard:hover { background: var(--rose-soft); color: var(--rose); border-color: var(--rose); }
 #nsSaveButton {
-  min-height: 44px;
+  min-height: 48px;
   padding: 10px 20px;
   border-radius: 12px;
   background: var(--primary);
@@ -499,7 +515,7 @@ textarea:focus-visible,
   line-height: 1.5;
 }
 .flashcard-btn {
-  min-height: 44px;
+  min-height: 48px;
   min-width: 80px;
   padding: 10px 16px;
   border-radius: 999px;
