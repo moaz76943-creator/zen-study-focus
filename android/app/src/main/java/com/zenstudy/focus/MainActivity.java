@@ -122,9 +122,18 @@ public class MainActivity extends AppCompatActivity {
             Insets mandatorySystemGestures = windowInsets.getInsets(WindowInsetsCompat.Type.mandatorySystemGestures());
             Insets ime = windowInsets.getInsets(WindowInsetsCompat.Type.ime());
 
+            // Density must be available BEFORE any dp<->px conversion (used in floors below).
+            float density = getResources().getDisplayMetrics().density;
+
             // Status bar top: max of status bars top and display cutout top (statusBars() is the
             // authoritative source for status bar height; systemBars().top is not reliable on Xiaomi).
+            // Apply a minimum floor (24dp = standard status bar height) in case the system
+            // under-reports on some OEM Android 15 builds. This prevents content from rendering
+            // under the status bar when statusBars.top returns 0.
             int paddingTop = Math.max(statusBars.top, displayCutout.top);
+            int minStatusBarDp = 24;
+            int minStatusBarPx = Math.round(minStatusBarDp * density);
+            if (paddingTop < minStatusBarPx) paddingTop = minStatusBarPx;
 
             // Navigation bottom: max of navigationBars (3-button) and mandatorySystemGestures (gesture handle).
             // Do NOT use systemBars() — it's a combined mask (status + nav) that misreports on Xiaomi HyperOS.
@@ -143,20 +152,26 @@ public class MainActivity extends AppCompatActivity {
 
             // Robust Xiaomi/Redmi/POCO/HyperOS detection: check MANUFACTURER, BRAND, DEVICE, MODEL.
             // Some HyperOS variants report non-standard manufacturer strings.
+            // Also check DEVICE and MODEL for "redmi" and "poco" (not just "xiaomi") —
+            // many Xiaomi sub-brand devices (Redmi Note, POCO X/F series) omit "xiaomi" there.
             String manufacturer = Build.MANUFACTURER;
             String brand = Build.BRAND;
             String device = Build.DEVICE;
             String model = Build.MODEL;
+            String deviceLower = device != null ? device.toLowerCase() : "";
+            String modelLower = model != null ? model.toLowerCase() : "";
             boolean isXiaomi = "xiaomi".equalsIgnoreCase(manufacturer)
                     || "redmi".equalsIgnoreCase(manufacturer)
                     || "poco".equalsIgnoreCase(manufacturer)
                     || "xiaomi".equalsIgnoreCase(brand)
                     || "redmi".equalsIgnoreCase(brand)
                     || "poco".equalsIgnoreCase(brand)
-                    || (device != null && device.toLowerCase().contains("xiaomi"))
-                    || (model != null && model.toLowerCase().contains("xiaomi"));
-            // Density must be available BEFORE any dp<->px conversion (used in Xiaomi overrides below).
-            float density = getResources().getDisplayMetrics().density;
+                    || deviceLower.contains("xiaomi")
+                    || deviceLower.contains("redmi")
+                    || deviceLower.contains("poco")
+                    || modelLower.contains("xiaomi")
+                    || modelLower.contains("redmi")
+                    || modelLower.contains("poco");
 
             // Xiaomi-specific override: on HyperOS, mandatorySystemGestures.bottom may be > 0 even in 3-button mode,
             // and navigationBars may under-report (report 0). If the device is Xiaomi and we have a
