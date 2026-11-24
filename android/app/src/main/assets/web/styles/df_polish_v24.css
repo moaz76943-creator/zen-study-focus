@@ -23,9 +23,9 @@ textarea:focus-visible,
   border-radius: 12px;
 }
 
-/* ---------- Tap targets: enforce 48px on .seg-pill and .task_mini-sel.
+/* ---------- Tap targets: enforce 48px on .seg-pill and .task-mini-sel.
       design_tokens_v22.css forces 48px !important on buttons/role=button,
-      but .seg-pill and .task_mini-sel are not buttons — they were slipping
+      but .seg-pill and .task-mini-sel are not buttons — they were slipping
       below the Material/AA standard. This lifts them to 48px. ------------- */
 .seg-pill,
 .task-mini-sel {
@@ -67,7 +67,7 @@ textarea:focus-visible,
 .sound-Rich-tile,
 .seg-pill,
 .bnav-btn,
-.task_mini-sel,
+.task-mini-sel,
 .zen-compact-suite-btn,
 .ns-card,
 .pure-white-card,
@@ -81,7 +81,7 @@ textarea:focus-visible,
 .sound-Rich-tile:active,
 .seg-pill:active,
 .bnav-btn:active,
-.task_mini-sel:active,
+.task-mini-sel:active,
 .zen-compact-suite-btn:active { transform: scale(.96); }
 @media (hover: hover) {
   .sound-Rich-tile:hover { transform: translateY(-2px); }
@@ -101,7 +101,7 @@ textarea:focus-visible,
 /* ---------- Tap targets ≥ 44px on primary interactive chrome ------------- */
 .bnav-btn { min-height: 44px; }
 .zen-compact-suite-btn { min-height: 56px; }
-.bnav-btn, .seg-pill, .task_mini-sel, .zen-compact-suite-btn, .sound-Rich-tile {
+.bnav-btn, .seg-pill, .task-mini-sel, .zen-compact-suite-btn, .sound-Rich-tile {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
 }
@@ -111,7 +111,7 @@ textarea:focus-visible,
   .sound-Rich-tile,
   .seg-pill,
   .bnav-btn,
-  .task_mini-sel,
+  .task-mini-sel,
   .zen-compact-suite-btn,
   .ns-card,
   .pure-white-card,

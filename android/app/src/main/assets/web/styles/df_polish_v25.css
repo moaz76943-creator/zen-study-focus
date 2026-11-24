@@ -73,7 +73,7 @@ textarea:focus-visible,
 .bnav-btn { min-height: 48px; }
 .seg-pill,
 .task-mini-sel,
-.task_mini-sel {
+.task-mini-sel {
   min-height: 48px !important;
   min-width: 48px !important;
 }
@@ -82,7 +82,7 @@ textarea:focus-visible,
 .bnav-btn,
 .seg-pill,
 .task-mini-sel,
-.task_mini-sel,
+.task-mini-sel,
 .zen-compact-suite-btn,
 .sound-Rich-tile,
 .ns-card,
@@ -98,7 +98,7 @@ textarea:focus-visible,
 .seg-pill,
 .bnav-btn,
 .task-mini-sel,
-.task_mini-sel,
+.task-mini-sel,
 .zen-compact-suite-btn,
 .ns-card,
 .pure-white-card,
@@ -122,7 +122,7 @@ textarea:focus-visible,
 .seg-pill,
 .bnav-btn,
 .task-mini-sel,
-.task_mini-sel,
+.task-mini-sel,
 .zen-compact-suite-btn,
 .modal-card {
   will-change: transform, box-shadow, border-color, opacity;
@@ -133,7 +133,7 @@ textarea:focus-visible,
 .seg-pill:active,
 .bnav-btn:active,
 .task-mini-sel:active,
-.task_mini-sel:active,
+.task-mini-sel:active,
 .zen-compact-suite-btn:active {
   transform: scale(.96);
 }
@@ -646,7 +646,7 @@ select::placeholder {
   .seg-pill,
   .bnav-btn,
   .task-mini-sel,
-  .task_mini-sel,
+  .task-mini-sel,
   .zen-compact-suite-btn,
   .ns-card,
   .pure-white-card,
@@ -663,7 +663,7 @@ select::placeholder {
   .seg-pill:active,
   .bnav-btn:active,
   .task-mini-sel:active,
-  .task_mini-sel:active,
+  .task-mini-sel:active,
   .zen-compact-suite-btn:active {
     transform: none !important;
   }
