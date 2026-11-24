@@ -364,7 +364,7 @@
     .lcard-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.68rem; color: var(--text-light); }
 
     .floating-plus-fab {
-      position: fixed; bottom: var(--df-fab-bottom, 442px); left: 24px; width: 54px; height: 54px;
+      position: fixed; bottom: var(--df-fab-bottom, 186px); left: 24px; width: 54px; height: 54px;
       border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       border: none; color: #ffffff; font-size: 1.7rem; display: flex; align-items: center;
       justify-content: center; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
@@ -788,6 +788,9 @@ header, .app-header, .top-bar, .dynamic-hero-header {
 .app-shell, main, .screen-section {
     padding-left: var(--sal);
     padding-right: var(--sar);
+    /* Defensive: ensure screen sections reserve clearance for floating layers (FAB, Studios pill).
+       Uses calibrator variable --df-inflow-bottom (falls back to 350px). */
+    padding-bottom: var(--df-inflow-bottom, 350px);
 }
 /* Bottom safe area: in-flow body padding reserves a fixed clearance for the floating
    (--df-webview-padding-bottom) plus --df-bottom-nav-clearance (dock reserve for the
@@ -1637,7 +1640,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     border: 1px solid #CBD5E1 !important;
   }
   .fab, #addNoteFab, button[class*="fab"] {
-    bottom: var(--df-fab-bottom, 442px) !important;
+    bottom: var(--df-fab-bottom, 186px) !important;
     z-index: 40 !important;
   }
   nav button, .bottom-nav button, .nav-bar button {

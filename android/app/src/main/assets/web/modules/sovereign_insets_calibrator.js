@@ -163,10 +163,12 @@
       var floatingLayerClearance = capsuleHeight + 196;
       // IME clearance: if paddingBottom > 500 (IME), use 350; else paddingBottom + 12
       var imeClearance = paddingBottom > 500 ? 350 : paddingBottom + 12;
-      // Minimum 350px (capsule 56px + floating stack 196px + 12px gap = 264px, floored to 350px
-      // for extra safety margin on Xiaomi 3-button nav up to 300dp).
-      // On Xiaomi 3-button nav (up to 300dp), clearance = 300 + 196 = 496px (covers full stack).
-      return Math.max(floatingLayerClearance, imeClearance, 350);
+      // Minimum 450px (covers narrow-screen floating stack up to ~332px + 12px gap = 344px,
+      // with 100px+ margin). On Xiaomi 3-button nav (up to 300dp), the native parent padding
+      // already handles the nav bar; this clearance only needs to cover the floating stack.
+      // The 450px floor ensures Studios pill (up to 204px) + FAB (up to 266px) + FAB height (54px)
+      // + gap (12px) = 332px top of stack is fully covered with comfortable margin.
+      return Math.max(floatingLayerClearance, imeClearance, 450);
     },
 
     /**

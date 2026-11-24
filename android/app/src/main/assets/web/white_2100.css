@@ -305,7 +305,7 @@ body:not(.deep-lockdown) #sec-notes .floating-plus-fab {
   inset-inline-start: 24px;
   /* Use calibrator variable --df-fab-bottom (single owner: SovereignInsetsCalibrator).
      --df-webview-padding-bottom is pinned to 0px; calibrator computes FAB position above Studios pill. */
-  bottom: var(--df-fab-bottom, 442px);
+  bottom: var(--df-fab-bottom, 186px);
   width: 54px;
   height: 54px;
   border-radius: 50%;
