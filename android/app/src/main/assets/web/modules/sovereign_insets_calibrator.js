@@ -125,12 +125,22 @@
       // the floating stack (capsule + Studios pill + FAB) from overlapping content.
       var hasTallNavBar = (insets.paddingBottom || insets.bottom || 0) >= 300;
 
+      // Ensure viewport width is available — insets can arrive before DOMContentLoaded
+      // when _viewportWidth is still 0. Read directly from window/document as fallback.
+      var vpWidth = this._viewportWidth;
+      if (!vpWidth || vpWidth <= 0) {
+        vpWidth = (typeof window !== 'undefined' && window.innerWidth) ||
+                  (typeof document !== 'undefined' && document.documentElement.clientWidth) ||
+                  360;
+        this._viewportWidth = vpWidth;
+      }
+
       // Account for narrow-screen extra padding in CSS (media query max-width: 430px)
       // CSS adds padding-block-start: clamp(40px, 2.5rem, 80px) to .bottom-nav-capsule
       // With extra padding: 96px to 136px total
       // But if tall nav bar detected, skip narrow-screen expansion to compress stack.
-      if (!hasTallNavBar && this._viewportWidth > 0 && this._viewportWidth < 430) {
-        var extraPadding = Math.min(80, Math.max(40, this._viewportWidth * 0.0625)); // clamp(40px, 2.5rem, 80px) approx
+      if (!hasTallNavBar && vpWidth > 0 && vpWidth < 430) {
+        var extraPadding = Math.min(80, Math.max(40, vpWidth * 0.0625)); // clamp(40px, 2.5rem, 80px) approx
         var narrowCapsuleHeight = baseCapsuleHeight + extraPadding; // ~96-136px
         return narrowCapsuleHeight;
       }
