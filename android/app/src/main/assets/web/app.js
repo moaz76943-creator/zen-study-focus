@@ -63919,7 +63919,15 @@ function() {
         } else {
           window.__dfSpatialCollapsed = false;
           const bodyWrap = mount.querySelector('.df-spatial-body');
-          if (bodyWrap) bodyWrap.style.display = 'flex';
+          if (bodyWrap) {
+            bodyWrap.style.maxHeight = bodyWrap.scrollHeight + 'px';
+            bodyWrap.style.opacity = '1';
+            bodyWrap.style.pointerEvents = '';
+            clearTimeout(bodyWrap.__dfExpandTimer);
+            bodyWrap.__dfExpandTimer = setTimeout(function() {
+              if (!window.__dfSpatialCollapsed) bodyWrap.style.maxHeight = 'none';
+            }, 300);
+          }
         }
       }
       if (mount && typeof mount.scrollIntoView === 'function') {
@@ -64032,7 +64040,7 @@ function() {
     const bodyWrap = document.createElement('div');
     bodyWrap.className = 'df-spatial-body';
     bodyWrap.id = 'dfSpatialBody';
-    bodyWrap.style.cssText = 'display:flex;flex-direction:column;gap:14px;';
+    bodyWrap.style.cssText = 'display:flex;flex-direction:column;gap:14px;overflow:hidden;transition:max-height 0.28s cubic-bezier(0.22,1,0.36,1),opacity 0.22s ease,margin 0.28s;max-height:2000px;';
     bodyWrap.appendChild(navBar);
     bodyWrap.appendChild(tabContainer);
 
@@ -64054,7 +64062,26 @@ function() {
     function dfSpatialSetCollapsed(collapsed) {
       window.__dfSpatialCollapsed = !!collapsed;
       if (host) host.setAttribute('aria-expanded', String(!window.__dfSpatialCollapsed));
-      if (bodyWrap) bodyWrap.style.display = window.__dfSpatialCollapsed ? 'none' : 'flex';
+      // Animate via max-height/opacity for a smooth 120Hz collapse instead of hard display toggles.
+      if (bodyWrap) {
+        if (window.__dfSpatialCollapsed) {
+          // measure current height, then animate down to 0
+          bodyWrap.style.maxHeight = bodyWrap.scrollHeight + 'px';
+          // force reflow
+          void bodyWrap.offsetHeight;
+          bodyWrap.style.maxHeight = '0px';
+          bodyWrap.style.opacity = '0';
+          bodyWrap.style.pointerEvents = 'none';
+        } else {
+          bodyWrap.style.maxHeight = bodyWrap.scrollHeight + 'px';
+          bodyWrap.style.opacity = '1';
+          bodyWrap.style.pointerEvents = '';
+          clearTimeout(bodyWrap.__dfExpandTimer);
+          bodyWrap.__dfExpandTimer = setTimeout(function() {
+            if (!window.__dfSpatialCollapsed) bodyWrap.style.maxHeight = 'none';
+          }, 300);
+        }
+      }
       if (collapseBtn) collapseBtn.setAttribute('aria-expanded', String(!window.__dfSpatialCollapsed));
       const lbl = window.__dfSpatialCollapsed ? DF_SPATIAL_LBL_EXPAND : DF_SPATIAL_LBL_COLLAPSE;
       if (collapseLabel) collapseLabel.textContent = lbl;
