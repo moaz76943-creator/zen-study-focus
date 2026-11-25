@@ -127,10 +127,11 @@ public class MainActivity extends AppCompatActivity {
 
             // Status bar top: max of status bars top and display cutout top (statusBars() is the
             // authoritative source for status bar height; systemBars().top is not reliable on Xiaomi).
-            // Apply a minimum floor (32dp) in case the system under-reports on Xiaomi Android 15
+            // Apply a minimum floor (48dp) in case the system under-reports on Xiaomi Android 15
             // where status bar can be taller due to larger fonts, notch, or system UI density.
+            // 48dp covers tall status bars on HyperOS with large fonts / dynamic island cutouts.
             int paddingTop = Math.max(statusBars.top, displayCutout.top);
-            int minStatusBarDp = 32;
+            int minStatusBarDp = 48;
             int minStatusBarPx = Math.round(minStatusBarDp * density);
             if (paddingTop < minStatusBarPx) paddingTop = minStatusBarPx;
 
@@ -149,28 +150,33 @@ public class MainActivity extends AppCompatActivity {
             boolean hasVisibleNavBar = navigationBars.bottom > 0;
             boolean isGestureNav = hasGestureHandle && !hasVisibleNavBar;
 
-            // Robust Xiaomi/Redmi/POCO/HyperOS detection: check MANUFACTURER, BRAND, DEVICE, MODEL.
-            // Some HyperOS variants report non-standard manufacturer strings.
-            // Also check DEVICE and MODEL for "redmi" and "poco" (not just "xiaomi") —
-            // many Xiaomi sub-brand devices (Redmi Note, POCO X/F series) omit "xiaomi" there.
-            String manufacturer = Build.MANUFACTURER;
-            String brand = Build.BRAND;
-            String device = Build.DEVICE;
-            String model = Build.MODEL;
-            String deviceLower = device != null ? device.toLowerCase() : "";
-            String modelLower = model != null ? model.toLowerCase() : "";
-            boolean isXiaomi = "xiaomi".equalsIgnoreCase(manufacturer)
-                    || "redmi".equalsIgnoreCase(manufacturer)
-                    || "poco".equalsIgnoreCase(manufacturer)
-                    || "xiaomi".equalsIgnoreCase(brand)
-                    || "redmi".equalsIgnoreCase(brand)
-                    || "poco".equalsIgnoreCase(brand)
-                    || deviceLower.contains("xiaomi")
-                    || deviceLower.contains("redmi")
-                    || deviceLower.contains("poco")
-                    || modelLower.contains("xiaomi")
-                    || modelLower.contains("redmi")
-                    || modelLower.contains("poco");
+            // Robust Xiaomi/Redmi/POCO/BlackShark/HyperOS detection: check MANUFACTURER, BRAND, DEVICE, MODEL.
+            // Some HyperOS variants report non-standard manufacturer strings (e.g. "BlackShark").
+            // Also check DEVICE and MODEL for "redmi", "poco", "blackshark" and "mi " prefix
+            // (many Xiaomi sub-brand devices omit "xiaomi" in manufacturer/brand).
+                        String manufacturer = Build.MANUFACTURER;
+                        String brand = Build.BRAND;
+                        String device = Build.DEVICE;
+                        String model = Build.MODEL;
+                        String deviceLower = device != null ? device.toLowerCase() : "";
+                        String modelLower = model != null ? model.toLowerCase() : "";
+                        boolean isXiaomi = "xiaomi".equalsIgnoreCase(manufacturer)
+                                || "redmi".equalsIgnoreCase(manufacturer)
+                                || "poco".equalsIgnoreCase(manufacturer)
+                                || "blackshark".equalsIgnoreCase(manufacturer)
+                                || "xiaomi".equalsIgnoreCase(brand)
+                                || "redmi".equalsIgnoreCase(brand)
+                                || "poco".equalsIgnoreCase(brand)
+                                || "blackshark".equalsIgnoreCase(brand)
+                                || deviceLower.contains("xiaomi")
+                                || deviceLower.contains("redmi")
+                                || deviceLower.contains("poco")
+                                || deviceLower.contains("blackshark")
+                                || modelLower.contains("xiaomi")
+                                || modelLower.contains("redmi")
+                                || modelLower.contains("poco")
+                                || modelLower.contains("blackshark")
+                                || modelLower.contains("mi ");
 
             // Xiaomi-specific override: on HyperOS, mandatorySystemGestures.bottom may be > 0 even in 3-button mode,
             // and navigationBars may under-report (report 0). If the device is Xiaomi and we have a
@@ -180,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
             // missing the nav bar on 3-button clips content and overlaps the Studios pill.
             if (isXiaomi && hasGestureHandle && !hasVisibleNavBar) {
                 // Xiaomi with gesture handle but no visible 3-button bar = treat as 3-button nav.
-                // The 260dp absolute floor below will guarantee the WebView viewport never intrudes
+                // The 400dp absolute floor below will guarantee the WebView viewport never intrudes
                 // into the nav bar area. This covers all misreporting cases (any handle height > 0).
                 isGestureNav = false;
             }
@@ -197,7 +203,8 @@ public class MainActivity extends AppCompatActivity {
             // Apply minimum nav bar height fallback (Material spec: 56dp 3-button, 32dp gesture handle);
             // Xiaomi Android 15 3-button nav bar can reach ~96dp on HyperOS; use 100dp floor to prevent
             // WebView viewport from extending behind the nav bar, which clips bottom cards and
-            // causes the Studios pill to overlap content.
+            // causes the Studios pill to overlap content. An additional 400dp absolute floor is applied
+            // for detected Xiaomi 3-button devices (see below).
             int navBottom = rawNavBottom;
             int minNavDp = isGestureNav ? 32 : 100;
             int minNavPx = Math.round(minNavDp * density);
@@ -206,11 +213,11 @@ public class MainActivity extends AppCompatActivity {
             // minimum floor. This handles edge cases where detection fails and the
             // reported insets are zero or too small. The cost is extra padding (harmless
             // empty space); the benefit is never clipping content or overlapping the
-            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can reach ~350dp on Android 15;
-            // use 350dp floor to guarantee the WebView viewport never intrudes into the
+            // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can reach ~400dp on Android 15;
+            // use 400dp floor to guarantee the WebView viewport never intrudes into the
             // nav bar area. DO NOT apply for gesture navigation (handle ~32dp).
             if (isXiaomi && !isGestureNav) {
-                int absoluteMinNavDp = 350; // Covers 3-button bars up to ~350dp on HyperOS Android 15
+                int absoluteMinNavDp = 400; // Covers 3-button bars up to ~400dp on HyperOS Android 15
                 int absoluteMinNavPx = Math.round(absoluteMinNavDp * density);
                 if (navBottom < absoluteMinNavPx) navBottom = absoluteMinNavPx;
             }

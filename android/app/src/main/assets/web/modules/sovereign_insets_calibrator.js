@@ -32,16 +32,16 @@
      */
     init: function () {
       if (!this._hasRealInsets) {
-        // Use a conservative fallback bottom (350dp) matching the Xiaomi 3-button nav floor
-        // in MainActivity (absoluteMinNavDp = 350) plus floating layer clearance so the
+        // Use a conservative fallback bottom (400dp) matching the Xiaomi 3-button nav floor
+        // in MainActivity (absoluteMinNavDp = 400) plus floating layer clearance so the
         // initial reserve covers tall nav bars before real insets arrive. Real gesture nav
         // (~32dp) will quickly correct to a smaller capsule.
         this.applyCSSVariables({
           top: 24,
-          bottom: 350,
+          bottom: 400,
           left: 0,
           right: 0,
-          paddingBottom: 350
+          paddingBottom: 400
         });
       }
       if (typeof window !== 'undefined') {
@@ -171,16 +171,16 @@
     _computeBottomNavClearance: function (capsuleHeight, actualNavBottom, paddingBottom) {
       // FAB top = capsuleHeight + 184, +12 gap = capsuleHeight + 196
       var floatingLayerClearance = capsuleHeight + 196;
-      // IME detection: distinguish between (a) keyboard open and (b) OEM nav-bar floor (e.g. Xiaomi 350dp).
+      // IME detection: distinguish between (a) keyboard open and (b) OEM nav-bar floor (e.g. Xiaomi 400dp).
       // - IME open: paddingBottom >> actualNavBottom (typically > 200dp IME vs <= 100dp nav)
-      // - Xiaomi floor: paddingBottom ~350dp (exact floor) AND actualNavBottom < 200dp (actual nav
-      //   is normal height; the 350dp is a defensive floor applied in MainActivity).
-      // Heuristic: if paddingBottom in 300-360 range AND actualNavBottom < 200 -> treat as OEM floor, not IME.
-      var isXiaomiFloor = paddingBottom >= 300 && paddingBottom <= 360 && actualNavBottom < 200;
+      // - Xiaomi floor: paddingBottom ~400dp (exact floor) AND actualNavBottom < 200dp (actual nav
+      //   is normal height; the 400dp is a defensive floor applied in MainActivity).
+      // Heuristic: if paddingBottom in 300-420 range AND actualNavBottom < 200 -> treat as OEM floor, not IME.
+      var isXiaomiFloor = paddingBottom >= 300 && paddingBottom <= 420 && actualNavBottom < 200;
       var isImeOpen = !isXiaomiFloor && paddingBottom > actualNavBottom + 100;
-      var imeClearance = isImeOpen ? Math.min(paddingBottom, 350) : Math.min(actualNavBottom, 100) + 12;
+      var imeClearance = isImeOpen ? Math.min(paddingBottom, 450) : Math.min(actualNavBottom, 100) + 12;
       // Minimum clearance: use the larger of floating stack clearance and IME clearance.
-      // floatingLayerClearance ranges 252-332px; imeClearance capped at 112px (non-IME) or 350px (IME).
+      // floatingLayerClearance ranges 252-332px; imeClearance capped at 112px (non-IME) or 450px (IME).
       return Math.max(floatingLayerClearance, imeClearance, 200);
     },
 
@@ -188,7 +188,7 @@
      * Injects CSS variables onto documentElement with !important to override conflicting rules.
      * Design (Android 15 / Xiaomi edge-to-edge): MainActivity pads the WebView's PARENT
      * FrameLayout with the FLOORED system-bar insets (including defensive floors for Xiaomi
-     * HyperOS 3-button nav up to 260dp), so the WebView's layout viewport
+     * HyperOS 3-button nav up to 400dp), so the WebView's layout viewport
      * already ends above the status bar, cutout and 3-button nav bar. Native padding
      * is the single owner of the insets — if CSS re-added them (via --df-safe-top /
      * --df-safe-bottom / --df-webview-padding-bottom) every dock offset and body
@@ -225,7 +225,7 @@
       // (FAB top = fabBottom + FABHeight(54)) + gap(12).
       // Also handle IME: insets.paddingBottom = max(flooredNavBottom, IME height).
       // When keyboard opens, content must clear the keyboard.
-      // Xiaomi 3-button nav floor is 350dp; typical IME is 200-500dp.
+      // Xiaomi 3-button nav floor is 400dp; typical IME is 200-500dp.
       // If paddingBottom > 500dp, treat as nav bar floor (not IME) and use fixed minimum.
       // The clearance is additional body padding INSIDE the WebView viewport (which is
       // already reduced by native parent padding). It must always be at least
