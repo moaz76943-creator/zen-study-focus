@@ -935,8 +935,10 @@ window.playCompletionTone = playCompletionTone;
 
 // بناء بطاقة اختيار النغمة داخل واجهة أصوات الطبيعة
 function injectTonePickerUI() {
+  // #df-tone-picker-card is authored in index.html inside #sec-sounds already;
+  // this guard prevents a duplicate mount after tab re-renders.
   if (document.getElementById('df-tone-picker-card')) return;
-  const natureContainer = document.querySelector('#view-nature, [data-view="nature"], .nature-container') || document.querySelector('.sound-card')?.parentElement;
+  const natureContainer = document.getElementById('natureSoundsHeader') || document.querySelector('#sec-sounds [class*="ns-header"], .nature-container') || document.querySelector('.sound-card')?.parentElement;
   if (!natureContainer) return;
 
   const lang = (typeof cfg !== 'undefined' && cfg && cfg.lang) ? cfg.lang : 'en';
@@ -1010,10 +1012,9 @@ function injectTonePickerUI() {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // The picker card already exists in index.html; the guard prevents duplication.
+  // No MutationObserver is needed — tab re-renders do not remove the authored card.
   injectTonePickerUI();
-  // إعادة المحاولة عند التبديل بين الأقسام
-  const observer = new MutationObserver(injectTonePickerUI);
-  observer.observe(document.body, { childList: true, subtree: true });
 });
 
 
