@@ -20,7 +20,7 @@ test('Save and Cancel stay real touch buttons at keyboard dismissal',()=>{
   assert.ok(guard.includes('position: fixed !important'));
   // Native parent padding owns system-bar insets; calibrator pins --df-safe-bottom to 0px.
   // Do NOT use env(safe-area-inset-bottom) — it re-adds nav bar and causes double-counting on Xiaomi Android 15.
-  assert.ok(guard.includes('max(14px, var(--df-safe-bottom, 0px), var(--df-inflow-bottom, 300px)) !important'));
+  assert.ok(guard.includes('max(14px, var(--df-safe-bottom, 0px), var(--df-inflow-bottom, 350px)) !important'));
   assert.ok(guard.includes('max-height: calc(var(--nsux-height'));
   assert.match(guard,/\.modal-actions\s*>\s*button/);
   assert.match(guard,/min-block-size:\s*44px/);

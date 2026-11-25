@@ -32,10 +32,17 @@
      */
     init: function () {
       if (!this._hasRealInsets) {
-        // Use a conservative fallback bottom (400dp) matching the Xiaomi 3-button nav floor
-        // in MainActivity (absoluteMinNavDp = 400) plus floating layer clearance so the
-        // initial reserve covers tall nav bars before real insets arrive. Real gesture nav
-        // (~32dp) will quickly correct to a smaller capsule.
+        // Compute initial fallback based on viewport width to match real calibrator behavior.
+        // On narrow screens (<430px), capsule expands up to 136px (56 + 80), raising
+        // floatingLayerClearance to 332px. On wide screens, capsule stays at 56px (252px clearance).
+        // Use 400dp for bottom/paddingBottom to match MainActivity's Xiaomi 3-button floor.
+        var vpWidth = (typeof window !== 'undefined' && window.innerWidth) ||
+                      (typeof document !== 'undefined' && document.documentElement.clientWidth) ||
+                      360;
+        var isNarrow = vpWidth < 430;
+        var fallbackCapsuleHeight = isNarrow ? 136 : 56;
+        var fallbackClearance = fallbackCapsuleHeight + 196; // floatingLayerClearance = capsuleHeight + 196
+        // Apply fallback insets that produce the correct clearance for current viewport width
         this.applyCSSVariables({
           top: 24,
           bottom: 400,
@@ -43,6 +50,20 @@
           right: 0,
           paddingBottom: 400
         });
+        // Override the computed clearance with viewport-aware fallback
+        if (typeof document !== 'undefined' && document.documentElement) {
+          var root = document.documentElement;
+          root.style.setProperty('--df-inflow-bottom', fallbackClearance + 'px', 'important');
+          root.style.setProperty('--df-bottom-nav-clearance', fallbackClearance + 'px', 'important');
+          root.style.setProperty('--df-capsule-height', fallbackCapsuleHeight + 'px', 'important');
+          var studiosPillBottom = fallbackCapsuleHeight + 68;
+          var fabBottom = studiosPillBottom + 62;
+          var scratchpadBottom = Math.round((studiosPillBottom + fabBottom) / 2);
+          root.style.setProperty('--df-studios-pill-bottom', studiosPillBottom + 'px', 'important');
+          root.style.setProperty('--df-fab-bottom', fabBottom + 'px', 'important');
+          root.style.setProperty('--df-scratchpad-bottom', scratchpadBottom + 'px', 'important');
+          root.style.setProperty('--df-float-bottom', studiosPillBottom + 'px', 'important');
+        }
       }
       if (typeof window !== 'undefined') {
         this._viewportWidth = window.innerWidth || document.documentElement.clientWidth || 360;

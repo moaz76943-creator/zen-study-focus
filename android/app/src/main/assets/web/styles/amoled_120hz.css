@@ -14,8 +14,8 @@ html, body {
   /* Native parent padding owns all system-bar insets; calibrator pins --df-safe-* to 0px.
      Do NOT use env(safe-area-inset-*) — it re-adds bars and causes double-counting on Xiaomi Android 15. */
   padding-top: var(--df-safe-top, 0px);
-  /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (300px fallback). */
-  padding-bottom: var(--df-inflow-bottom, 300px);
+  /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (350px fallback). */
+  padding-bottom: var(--df-inflow-bottom, 350px);
   padding-inline-start: var(--df-safe-left, 0px);
   padding-inline-end: var(--df-safe-right, 0px);
   -webkit-tap-highlight-color: transparent;
@@ -44,7 +44,7 @@ button, [role="button"], .df-touch-target {
 /* Calibrator is single owner: --df-safe-* pinned to 0px; --df-inflow-bottom is the dock reserve. */
 :root {
   --df-notch-top: var(--df-safe-top, 0px);
-  --df-nav-bottom: var(--df-inflow-bottom, 300px);
+  --df-nav-bottom: var(--df-inflow-bottom, 350px);
 }
 
 .df-safe-viewport {

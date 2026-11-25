@@ -162,7 +162,7 @@ html[dir="rtl"] .df-v22 .df22-icon--next { transform: scaleX(-1); }
   overscroll-behavior-inline: contain;
   /* Native parent padding owns system-bar insets; calibrator pins --df-safe-* to 0px.
      Do NOT use env(safe-area-inset-*) — it re-adds bars and causes double-counting on Xiaomi Android 15. */
-  padding: 6px max(6px, var(--df-safe-right, 0px)) calc(6px + var(--df-inflow-bottom, 300px));
+  padding: 6px max(6px, var(--df-safe-right, 0px)) calc(6px + var(--df-inflow-bottom, 350px));
   border: 1px solid var(--df22-border);
   border-radius: var(--df22-radius-lg);
   background: var(--df22-surface);

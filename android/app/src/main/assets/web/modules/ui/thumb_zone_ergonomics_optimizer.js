@@ -44,7 +44,7 @@
                 /* Native parent padding owns system-bar insets; calibrator pins --df-safe-bottom to 0px.
                    Do NOT use env(safe-area-inset-bottom) — it re-adds nav bar and causes double-counting on Xiaomi Android 15. */
                 .bottom-controls, #zenStudioTriggerPill, .timer-presets {
-                    padding-bottom: max(16px, var(--df-safe-bottom, 0px), var(--df-inflow-bottom, 300px)) !important;
+                    padding-bottom: max(16px, var(--df-safe-bottom, 0px), var(--df-inflow-bottom, 350px)) !important;
                 }
                 /* High Tactile Feedback Animation */
                 button:active, [role=button]:active {
