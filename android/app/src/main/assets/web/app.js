@@ -42359,94 +42359,6 @@ window.dfInjectDropletImpulses = function(channelData, dropletRatePerSec, sample
 };
 
 /* ==========================================================
-   DEEP FOCUS: PROCEDURAL RIVER CAVITATION & FLUID RESONANCE DSP
-   Dual-pole modulating bandpass simulating continuous water turbulence
-   ========================================================== */
-window.dfCreateRiverCavitationFilter = function(ctx) {
-  if (!ctx || typeof ctx.createBiquadFilter !== "function") return null;
-  const filter = ctx.createBiquadFilter();
-  filter.type = "bandpass";
-  filter.frequency.setValueAtTime(320, ctx.currentTime);
-  filter.Q.setValueAtTime(1.8, ctx.currentTime);
-
-  // Slow LFO fluid frequency modulation (0.2Hz wave cycle)
-  if (ctx.createOscillator) {
-    const lfo = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-    const lfoGain = ctx.createGain();
-    lfo.frequency.setValueAtTime(0.2, ctx.currentTime);
-    lfoGain.gain.setValueAtTime(80, ctx.currentTime); // Swings between 240Hz and 400Hz
-    lfo.connect(lfoGain);
-    lfoGain.connect(filter.frequency);
-    lfo.start(0);
-    if (window.DF_ACTIVE_AUDIO_NODES) window.DF_ACTIVE_AUDIO_NODES.push(lfo, lfoGain);
-  }
-  return filter;
-};
-
-/* ==========================================================
-   DEEP FOCUS: OCEAN TIDAL SURGE & BREATHING ENVELOPE DSP
-   Non-linear 10-second sinusoidal swell emulating rolling ocean waves
-   ========================================================== */
-window.dfApplyOceanSwellEnvelope = function(ctx, gainNode) {
-  if (!ctx || !gainNode || !ctx.createOscillator) return;
-  const lfo = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-  const lfoDepth = ctx.createGain();
-
-  // 0.1Hz = exactly 10-second wave cycle (natural deep breathing rhythm)
-  lfo.frequency.setValueAtTime(0.1, ctx.currentTime);
-  lfoDepth.gain.setValueAtTime(0.035, ctx.currentTime);
-
-  lfo.connect(lfoDepth);
-  lfoDepth.connect(gainNode.gain);
-  lfo.start(0);
-
-  if (window.DF_ACTIVE_AUDIO_NODES) window.DF_ACTIVE_AUDIO_NODES.push(lfo, lfoDepth);
-  console.log("[DSP OCEAN] 10-second rhythmic tidal surge active.");
-};
-
-/* ==========================================================
-   DEEP FOCUS: PINE FOREST NEEDLE RUSTLE & WIND-SHEAR DSP
-   High-shelf acoustic resonance (2.4kHz - 5.2kHz) simulating mountain pines
-   ========================================================== */
-window.dfCreatePineForestFilter = function(ctx) {
-  if (!ctx || typeof ctx.createBiquadFilter !== "function") return null;
-  const highShelf = ctx.createBiquadFilter();
-  highShelf.type = "highshelf";
-  highShelf.frequency.setValueAtTime(3200, ctx.currentTime);
-  highShelf.gain.setValueAtTime(6.0, ctx.currentTime); // Gentle airy acoustic boost
-  return highShelf;
-};
-
-/* ==========================================================
-   DEEP FOCUS: MORNING DEW MICRO-DROPLET DISPERSION DSP (v54.2.0)
-   Sparse stochastic condensation pings on gentle ambient floor
-   ========================================================== */
-window.dfTriggerDewDroplet = function(ctx) {
-  if (!ctx || !ctx.createOscillator) return;
-  const now = ctx.currentTime;
-  const osc = (globalThis.__dfNoopOsc ? globalThis.__dfNoopOsc() : { type:"sine", frequency:{value:0,setValueAtTime(){},exponentialRampToValueAtTime(){},linearRampToValueAtTime(){}}, detune:{value:0,setValueAtTime(){}}, connect(d){return d||this;}, disconnect(){}, start(){}, stop(){} });
-  const gain = ctx.createGain();
-
-  // Pure high-frequency water droplet ping (1400Hz to 800Hz drop)
-  osc.type = "sine";
-  osc.frequency.setValueAtTime(1400, now);
-  osc.frequency.exponentialRampToValueAtTime(800, now + 0.08);
-
-  gain.gain.setValueAtTime(0.015, now);
-  gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.09);
-
-  osc.connect(gain);
-  if (window.dfGetSafeMasterDestination) {
-    gain.connect(window.dfGetSafeMasterDestination(ctx));
-  } else {
-    gain.connect(window.getSafeAudioDestination ? window.getSafeAudioDestination(ctx) : ctx.destination);
-  }
-
-  osc.start(now);
-  osc.stop(now + 0.1);
-};
-
-/* ==========================================================
    DEEP FOCUS: BINAURAL SPATIAL PANNING & ACOUSTIC WIDTH DSP
    Creates an expansive spatial soundstage relieving in-head listener fatigue
    ========================================================== */
@@ -81168,16 +81080,7 @@ if (typeof UniversalI18nHotSwap !== "undefined") {
       try { window.dfMasterAudioMute && window.dfMasterAudioMute(); } catch (_) {}
     });
   }
-        if (typeof document !== 'undefined') {
-            document.addEventListener('visibilitychange', function () {
-                if (document.hidden) {
-                    try { window.dfMasterAudioMute && window.dfMasterAudioMute(); } catch (_) {}
-                }
-            });
-            window.addEventListener('pagehide', function () {
-                try { window.dfMasterAudioMute && window.dfMasterAudioMute(); } catch (_) {}
-            });
-        }
+        
     }
 })();
 
