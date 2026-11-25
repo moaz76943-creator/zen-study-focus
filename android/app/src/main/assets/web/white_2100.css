@@ -670,8 +670,8 @@ body:not(.deep-lockdown) .bottom-nav-capsule .bnav-btn {
   body:not(.deep-lockdown) {
     /* Body content padding clears floating elements (FAB, Studios pill).
        Uses the calibrated single-owner clearance reserve (capsule + Studios pill + FAB + gaps).
-       --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (300px fallback). */
-    padding-bottom: var(--df-inflow-bottom, 300px) !important;
+       --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (350px fallback). */
+    padding-bottom: var(--df-inflow-bottom, 350px) !important;
   }
   body:not(.deep-lockdown) .bottom-nav-capsule {
     width: calc(100% - 4px);
@@ -793,7 +793,7 @@ body.timer-home:not(.deep-lockdown) .focus-hero-card .delta-chip {
     right: 20px;
     /* Native parent padding owns system-bar insets; calibrator pins --df-safe-bottom to 0px.
        Do NOT use env(safe-area-inset-bottom) — it re-adds nav bar and causes double-counting on Xiaomi Android 15. */
-    bottom: max(14px, var(--df-safe-bottom, 0px), var(--df-inflow-bottom, 300px)) !important;
+    bottom: max(14px, var(--df-safe-bottom, 0px), var(--df-inflow-bottom, 350px)) !important;
     z-index: 260;
     display: flex;
     max-inline-size: calc(100vw - 40px);

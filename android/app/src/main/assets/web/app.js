@@ -41562,8 +41562,8 @@ window.dfApplySafeAreaInsets = function() {
     }
     body {
       padding-top: var(--safe-top) !important;
-      /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (300px fallback). */
-      padding-bottom: var(--df-inflow-bottom, 300px) !important;
+      /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (350px fallback). */
+      padding-bottom: var(--df-inflow-bottom, 350px) !important;
       padding-left: var(--safe-left) !important;
       padding-right: var(--safe-right) !important;
       box-sizing: border-box !important;
@@ -42936,7 +42936,7 @@ window.dfNormalizeSystemInsets = function() {
     .df-nav-tabs, .df-footer-controls {
       /* Native parent padding owns system-bar insets; calibrator pins --df-safe-bottom to 0px.
          Do NOT use env(safe-area-inset-bottom) — it re-adds nav bar and causes double-counting on Xiaomi Android 15. */
-      padding-bottom: max(16px, var(--df-safe-bottom, 0px), var(--df-inflow-bottom, 300px)) !important;
+      padding-bottom: max(16px, var(--df-safe-bottom, 0px), var(--df-inflow-bottom, 350px)) !important;
     }
   `;
 
@@ -48087,8 +48087,8 @@ window.dfApplySafeAreaInsets = function(rootEl) {
       '}',
       'body {',
       '  padding-top: var(--safe-top);',
-      '  /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (300px fallback). */',
-      '  padding-bottom: var(--df-inflow-bottom, 300px);',
+      '  /* --df-webview-padding-bottom is 0px (calibrator); use --df-inflow-bottom (350px fallback). */',
+      '  padding-bottom: var(--df-inflow-bottom, 350px);',
       '}'
     ].join('\n');
     if (document.head) document.head.appendChild(styleEl);

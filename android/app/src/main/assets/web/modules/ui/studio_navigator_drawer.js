@@ -583,12 +583,13 @@
             pill.style.overflow = "hidden";
             pill.style.textOverflow = "ellipsis";
             pill.style.whiteSpace = "nowrap";
+            pill.style.minWidth = "0";
             pill.style.touchAction = "manipulation";
             pill.style.webkitTapHighlightColor = "transparent";
             pill.style.gap = "8px";
             pill.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.6)";
 
-            pill.innerHTML = '<span id="zenStudioTriggerLabel">' + ((document.documentElement.lang || "").toLowerCase().indexOf("ar") === 0 ? "✨ الاستوديوهات" : "✨ Studios") + '</span> <span style="opacity: 0.5; font-size: 0.75rem;">(10)</span>';
+            pill.innerHTML = '<span id="zenStudioTriggerLabel" style="min-width: 0;">' + ((document.documentElement.lang || "").toLowerCase().indexOf("ar") === 0 ? "✨ الاستوديوهات" : "✨ Studios") + '</span> <span style="opacity: 0.5; font-size: 0.75rem; min-width: 0; flex-shrink: 0;">(10)</span>';
 
             pill.onclick = () => {
                 this.toggleDrawer();
