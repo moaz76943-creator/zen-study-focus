@@ -164,18 +164,23 @@
      * FAB top = fabBottom + FABHeight(54) = capsuleHeight + 184.
      * Clearance = FAB top + gap(12) = capsuleHeight + 196.
      * @param {number} capsuleHeight Computed capsule height
-     * @param {number} paddingBottom Floored padding bottom (nav or IME)
+     * @param {number} actualNavBottom ACTUAL reported nav bar height (NO defensive floors)
+     * @param {number} paddingBottom Floored padding bottom (max of floored navBottom and IME)
      * @returns {number} Bottom nav clearance in px
      */
-    _computeBottomNavClearance: function (capsuleHeight, paddingBottom) {
+    _computeBottomNavClearance: function (capsuleHeight, actualNavBottom, paddingBottom) {
       // FAB top = capsuleHeight + 184, +12 gap = capsuleHeight + 196
       var floatingLayerClearance = capsuleHeight + 196;
-      // IME clearance: if paddingBottom > 500 (IME), use 350; else paddingBottom + 12
-      var imeClearance = paddingBottom > 500 ? 350 : paddingBottom + 12;
+      // IME detection: distinguish between (a) keyboard open and (b) OEM nav-bar floor (e.g. Xiaomi 350dp).
+      // - IME open: paddingBottom >> actualNavBottom (typically > 200dp IME vs <= 100dp nav)
+      // - Xiaomi floor: paddingBottom ~350dp (exact floor) AND actualNavBottom < 200dp (actual nav
+      //   is normal height; the 350dp is a defensive floor applied in MainActivity).
+      // Heuristic: if paddingBottom in 300-360 range AND actualNavBottom < 200 -> treat as OEM floor, not IME.
+      var isXiaomiFloor = paddingBottom >= 300 && paddingBottom <= 360 && actualNavBottom < 200;
+      var isImeOpen = !isXiaomiFloor && paddingBottom > actualNavBottom + 100;
+      var imeClearance = isImeOpen ? Math.min(paddingBottom, 350) : Math.min(actualNavBottom, 100) + 12;
       // Minimum clearance: use the larger of floating stack clearance and IME clearance.
-      // The fixed 450px floor was removed because it exceeds the viewport on devices
-      // with tall 3-button nav bars (Xiaomi HyperOS), making bottom content inaccessible.
-      // floatingLayerClearance ranges 252-332px; imeClearance up to 362px for tall nav.
+      // floatingLayerClearance ranges 252-332px; imeClearance capped at 112px (non-IME) or 350px (IME).
       return Math.max(floatingLayerClearance, imeClearance, 200);
     },
 
@@ -225,8 +230,10 @@
       // The clearance is additional body padding INSIDE the WebView viewport (which is
       // already reduced by native parent padding). It must always be at least
       // floatingLayerClearance to clear the FAB/Studios pill.
+      // Pass actual nav height (insets.bottom, NO floors) for non-IME clearance to avoid
+      // double-counting the Xiaomi 3-button floor already applied in native parent padding.
       var paddingBottom = insets.paddingBottom || insets.bottom || 120;
-      var bottomNavClearance = this._computeBottomNavClearance(capsuleHeight, paddingBottom);
+      var bottomNavClearance = this._computeBottomNavClearance(capsuleHeight, insets.bottom, paddingBottom);
       root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
 
       // Studios pill position: docked at the clearance boundary so content never overlaps.
