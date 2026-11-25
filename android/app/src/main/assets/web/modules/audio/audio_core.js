@@ -220,6 +220,13 @@
         const headSample = tempData[xfadeSamples + i];
         finalData[finalSize - xfadeSamples + i] = (1 - t) * tailSample + t * headSample;
       }
+
+      // 5. Zero-mean after crossfade — guarantee no static/hiss at the loop
+      //    boundary caused by any residual DC offset in the blended region.
+      let finalMean = 0;
+      for (let i = 0; i < finalSize; i++) finalMean += finalData[i];
+      finalMean /= finalSize;
+      for (let i = 0; i < finalSize; i++) finalData[i] -= finalMean;
     }
     return finalBuffer;
   }
