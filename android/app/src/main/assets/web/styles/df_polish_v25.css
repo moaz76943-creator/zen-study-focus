@@ -299,8 +299,11 @@ textarea:focus-visible,
 #dfSpatialCollapseToggle:hover { background: #eef2ff !important; border-color: #c4b5fd !important; }
 #dfSpatialCollapseToggle:focus-visible { outline: var(--df25-ring) !important; outline-offset: 2px; }
 
-/* Collapsed spatial studio: compact header + toggle affordance */
-#dfPillar5SpatialMount[aria-expanded="false"] .df-spatial-body { display: none !important; }
+/* Collapsed spatial studio: compact header + toggle affordance.
+   Removed 'display: none !important' from the aria-expanded=false selector —
+   the JS dfSpatialSetCollapsed() already drives visibility via max-height/opacity,
+   so forcing display:none on collapse kills the 120Hz smooth transition. Only
+   :empty keeps the card hidden once fully expanded with no content. */
 #dfPillar5SpatialMount .df-spatial-body:empty { display: none; }
 
 /* Spatial mount spacing: keep nature grid front-and-center, spatial one-tap away */

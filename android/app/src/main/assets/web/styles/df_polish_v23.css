@@ -86,8 +86,10 @@ textarea:focus-visible,
 #dfSpatialCollapseToggle { min-height: 48px; min-width: 48px; }
 #dfSpatialCollapseToggle:hover { background: #eef2ff !important; border-color: #c4b5fd !important; }
 
-/* Collapsed spatial studio: compact header + toggle affordance */
-#dfPillar5SpatialMount[aria-expanded="false"] .df-spatial-body { display: none !important; }
+/* Collapsed spatial studio: compact header + toggle affordance.
+   Removed 'display: none !important' from aria-expanded=false selector so the
+   JS max-height/opacity transition can complete cleanly. Only :empty keeps
+   the card hidden when there is no content. */
 #dfPillar5SpatialMount .df-spatial-body:empty { display: none; }
 
 /* ---------- Spacing rhythm: consistent vertical cadence per tab ----------- */
