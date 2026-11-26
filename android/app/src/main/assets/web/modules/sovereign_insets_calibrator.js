@@ -64,7 +64,7 @@
                root.style.setProperty('--df-inflow-bottom', fallbackClearance + 'px', 'important');
                root.style.setProperty('--df-bottom-nav-clearance', fallbackClearance + 'px', 'important');
                root.style.setProperty('--df-capsule-height', fallbackCapsuleHeight + 'px', 'important');
-               var studiosPillBottom = fallbackCapsuleHeight + 68;
+               var studiosPillBottom = fallbackClearance - 56;
                var fabBottom = studiosPillBottom + 62;
                var scratchpadBottom = Math.round((studiosPillBottom + fabBottom) / 2);
                root.style.setProperty('--df-studios-pill-bottom', studiosPillBottom + 'px', 'important');
@@ -157,19 +157,18 @@
     },
 
     /**
-         * Computes the Studios pill bottom position (above capsule, no overlap).
-         * Studios pill height = 48px. Capsule top = dockGap(12) + capsuleHeight.
-         * Studios pill bottom = capsuleTop + pillHeight + gap(8) = capsuleHeight + 68.
-         * This is relative to the viewport bottom (safe content edge), which already
-         * excludes the system nav bar due to native parent padding. Do NOT use
-         * bottomNavClearance (which includes nav bar height) for this calculation.
-         * @param {number} capsuleHeight Computed capsule height
-         * @returns {number} Studios pill bottom position in px
-         */
-        _computeStudiosPillBottom: function (capsuleHeight) {
-          // Legacy formula: dockGap(12) + capsuleHeight + studiosPillHeight(48) + gap(8) = capsuleHeight + 68
-          return capsuleHeight + 68;
-        },
+         /** Computes the Studios pill bottom position (above capsule, no overlap).
+              * Studios pill height = 48px. Gap between Studios pill and content = 8px.
+              * Studios pill bottom = clearance - gap(8) - pillHeight(48) = clearance - 56.
+              * This positions the Studios pill at the clearance boundary so content never overlaps.
+              * @param {number} bottomNavClearance The computed bottom nav clearance (body padding reserve)
+              * @returns {number} Studios pill bottom position in px
+              */
+                 _computeStudiosPillBottom: function (bottomNavClearance) {
+                   // Clearance boundary: content ends at 'clearance' px from viewport bottom.
+                   // Studios pill bottom = clearance - pillHeight(48) - gap(8) = clearance - 56.
+                   return bottomNavClearance - 56;
+                 },
 
         /**
          * Computes the scratchpad trigger bottom position (below Studios pill, above FAB).
@@ -275,7 +274,7 @@
 
            // Studios pill position: docked at the clearance boundary so content never overlaps.
            // bottom = clearance - gap(8) - pillHeight(48) = clearance - 56.
-           var studiosPillBottom = this._computeStudiosPillBottom(capsuleHeight);
+           var studiosPillBottom = this._computeStudiosPillBottom(bottomNavClearance);
            root.style.setProperty('--df-studios-pill-bottom', studiosPillBottom + 'px', 'important');
 
            // FAB position: above Studios pill with 8px gap.

@@ -104,18 +104,19 @@ assert.ok((html.match(bodyReserve) || []).length >= 2,
   'body must reserve --df-inflow-bottom above the native inset edge (all body rules)');
 console.log('✔ index.html body reserves clearance via calibrated variables.');
 
-// Studios pill fallback updated to 124px (capsuleHeight 56 + 68).
-// FAB fallback updated to 186px (studiosPillBottom 124 + FABHeight 54 + gap 8).
-// Scratchpad trigger fallback at 155px (midway between Studios pill 124px and FAB 186px).
+// Studios pill fallback updated to 294px (clearance 350 - 56).
+// FAB fallback updated to 356px (studiosPillBottom 294 + FABHeight 54 + gap 8).
+// Scratchpad trigger fallback at 325px (midway between Studios pill 294px and FAB 356px).
 // These remain correct because the calibrator computes positions relative to the
-// viewport bottom (safe content edge), which already excludes the nav bar via
-// native parent padding. The clearance (350px minimum) is for in-flow body padding only.
-assert.ok(html.includes('--df-studios-pill-bottom: 124px'),
-  'Studios pill fallback must be 124px (capsuleHeight + 68)');
-assert.ok(html.includes('--df-scratchpad-bottom: 155px'),
-  'Scratchpad trigger fallback must be 155px (midway between Studios pill and FAB)');
-assert.ok(html.includes('--df-fab-bottom: 186px'),
-  'FAB fallback must be 186px (studiosPillBottom + FABHeight + gap)');
+// bottom-nav clearance (body padding reserve), so floating layers dock at the
+// clearance boundary and content never overlaps. The clearance (350px minimum)
+// is for in-flow body padding only.
+assert.ok(html.includes('--df-studios-pill-bottom: 294px'),
+  'Studios pill fallback must be 294px (clearance - 56)');
+assert.ok(html.includes('--df-scratchpad-bottom: 325px'),
+  'Scratchpad trigger fallback must be 325px (midway between Studios pill and FAB)');
+assert.ok(html.includes('--df-fab-bottom: 356px'),
+  'FAB fallback must be 356px (studiosPillBottom + FABHeight + gap)');
 
 // ---- touch_restorer.css: no fixed bar parked at bottom: 0 ----
 const barBlock = touchRestorer.slice(touchRestorer.indexOf('.bottom-nav-bar {'));

@@ -51,15 +51,17 @@
          --df-bottom-nav-clearance is the dock reserve ABOVE the native inset only
          (capsule + Studios pill + FAB zone); it never includes the nav inset.
          Capsule height is CSS-driven: 56px base, 96-136px on narrow screens (<430px).
-         Calibrator minimum clearance = 350px (capsule 56 + 196 floating stack + 12 gap, floored to 350).
-         Fallbacks: capsule 56px, Studios pill 124px, FAB 186px, bottom clearance 350px. */
+         Calibrator minimum clearance = 350px (floating stack clearance floored to 350).
+         Studios pill bottom = clearance - 56px (pillHeight 48 + gap 8).
+         FAB bottom = studiosPillBottom + 62px (FABHeight 54 + gap 8).
+         Fallbacks: capsule 56px, Studios pill 294px, FAB 356px, scratchpad 325px, bottom clearance 350px. */
       --df-dock-gap: 12px;
       --df-capsule-height: 56px;
       --df-dock-bottom: calc(var(--df-dock-gap, 12px));
-      --df-studios-pill-bottom: 124px;
-      --df-scratchpad-bottom: 155px;
-      --df-fab-bottom: 186px;
-      --df-float-bottom: 124px;
+      --df-studios-pill-bottom: 294px;
+      --df-scratchpad-bottom: 325px;
+      --df-fab-bottom: 356px;
+      --df-float-bottom: 294px;
       --df-inflow-bottom: var(--df-bottom-nav-clearance, 350px);
       --df-bottom-nav-clearance: 350px;
     }

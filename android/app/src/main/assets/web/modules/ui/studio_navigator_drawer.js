@@ -553,7 +553,7 @@
             // Use calibrator CSS variable --df-studios-pill-bottom (single owner: SovereignInsetsCalibrator).
             // MainActivity pads the parent FrameLayout; --df-webview-padding-bottom is pinned to 0px by the calibrator.
             // The calibrator computes: clearance - pillHeight(48) - gap(8) = clearance - 56.
-            pill.style.bottom = "var(--df-studios-pill-bottom, 124px)";
+            pill.style.bottom = "var(--df-studios-pill-bottom, 294px)";
             pill.style.right = "12px";
             pill.style.left = "auto";
             pill.style.transform = "none";
