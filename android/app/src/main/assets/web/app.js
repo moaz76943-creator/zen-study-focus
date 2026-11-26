@@ -21174,7 +21174,7 @@ window.df_i18n = (function() {
       if (prohibited[lang]) return false;
       currentLang = lang;
       if (typeof document !== 'undefined') {
-        document.documentElement.dir = (lang === 'ar' || lang === 'ur' || lang === 'fa') ? 'rtl' : 'ltr';
+        document.documentElement.dir = (lang === 'ar' || lang === 'ur' || lang === 'fa' || lang === 'ps') ? 'rtl' : 'ltr';
         document.documentElement.lang = lang;
         window.df_i18n.translateAllDomElements();
       }
@@ -21303,7 +21303,7 @@ if (typeof window.dfGetLocalizedText !== 'function') {
 window.dfConfigureLayoutDirection = function(langCode) {
   var isRtl = typeof dfIsRtlLocale === 'function'
     ? dfIsRtlLocale(langCode)
-    : (langCode === 'ar' || langCode === 'ur' || langCode === 'fa');
+    : (langCode === 'ar' || langCode === 'ur' || langCode === 'fa' || langCode === 'ps');
   if (typeof document !== 'undefined') {
     document.documentElement.dir = isRtl ? 'rtl' : 'ltr';
     document.documentElement.lang = langCode;
@@ -28081,7 +28081,7 @@ window.dfTranslateAllUI = function(targetLang) {
     const k = el.getAttribute("data-i18n-ph");
     if (dict[k]) el.setAttribute("placeholder", dict[k]);
   });
-  document.documentElement.dir = (dict.dir || (["ar", "ur", "fa"].includes(lang) ? "rtl" : "ltr"));
+  document.documentElement.dir = (dict.dir || (["ar", "ur", "fa", "ps"].includes(lang) ? "rtl" : "ltr"));
   return { updatedLanguage: lang, appliedKeysCount: Object.keys(dict).length };
 };
 
@@ -28267,7 +28267,7 @@ window.dfRegisterExhaustiveItalianDictionary = function() {
 };
 
 window.dfEnforceLayoutDirection = function(langCode) {
-  const isRtl = ["ar", "ur", "fa"].includes(langCode);
+  const isRtl = ["ar", "ur", "fa", "ps"].includes(langCode);
   document.documentElement.dir = isRtl ? "rtl" : "ltr";
   return { dir: document.documentElement.dir, isRtl };
 };
@@ -73292,7 +73292,7 @@ window.dfHotSwapUiLanguageZeroReload = function(langCode) {
   return { activeLang: lc, reloaded: false };
 };
 window.dfMirrorLayoutForRtlLanguages = function(lang) {
-  const isRtl = String(lang) === 'ar';
+  const isRtl = ["ar", "ur", "fa", "ps"].includes(String(lang || '').split(/[-_]/)[0]);
   return { rtlLayout: isRtl, dir: isRtl ? 'rtl' : 'ltr' };
 };
 window.dfFormatLocalizedDateAndTime = function(ts) {

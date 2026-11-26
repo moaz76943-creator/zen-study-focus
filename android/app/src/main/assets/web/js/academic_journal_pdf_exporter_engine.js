@@ -120,7 +120,7 @@
 
   function generatePrintableHtml(markdownResult, userLocale) {
     var loc = resolveLocale(userLocale);
-    var isRtl = (loc === 'ar');
+    var isRtl = ['ar', 'fa', 'ur', 'ps'].indexOf(loc) !== -1;
 
     var html = '<!DOCTYPE html>\n<html lang="' + loc + '" dir="' + (isRtl ? 'rtl' : 'ltr') + '">\n<head>\n' +
       '<meta charset="UTF-8">\n' +
