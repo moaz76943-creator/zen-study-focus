@@ -291,7 +291,7 @@ textarea:focus-visible,
 .sound-Rich-tile.playing .stile-knob { left: calc(100% - 25px); background: var(--primary); }
 .stile-name { font-weight: 700; color: var(--text-main); margin-top: 10px; }
 .stile-volume-label { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; font-size: 0.8rem; color: var(--text-muted); }
-.stile-vol { flex: 1; margin-left: 8px; accent-color: var(--primary); }
+.stile-vol { flex: 1; margin-inline-start: 8px; accent-color: var(--primary); }
 
 /* ---------- 3D Spatial studio: clean collapsible chrome ------------------ */
 #dfPillar5SpatialMount .df-spatial-body { max-height: none; will-change: transform, opacity; }
