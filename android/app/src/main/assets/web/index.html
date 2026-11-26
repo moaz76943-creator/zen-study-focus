@@ -1614,9 +1614,6 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     input[type="search"], input[placeholder*="Search"], input[placeholder*="note"], input[placeholder*="ملاحظ"] {
       margin-bottom: 72px !important;
     }
-    .fab, [class*="fab"], button[style*="position: fixed"][style*="bottom"] {
-      z-index: 8000;
-    }
     /* Fix 3: Enforce Western Arabic numerals tabular layout */
     input, select, .timer, [class*="timer"], [class*="count"] {
       font-variant-numeric: tabular-nums;
@@ -1646,7 +1643,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     border: 1px solid #CBD5E1 !important;
   }
   .fab, #addNoteFab, button[class*="fab"] {
-    bottom: var(--df-fab-bottom, 186px) !important;
+    bottom: var(--df-fab-bottom, 356px) !important;
     z-index: 40 !important;
   }
   nav button, .bottom-nav button, .nav-bar button {
