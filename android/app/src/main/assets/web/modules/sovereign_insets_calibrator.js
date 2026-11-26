@@ -47,15 +47,17 @@
              // Calibrator init() must not reduce clearance below this safety floor.
              var minSafeClearance = 350;
              if (fallbackClearance < minSafeClearance) fallbackClearance = minSafeClearance;
-             // Apply fallback insets that produce the correct clearance for current viewport width.
-             // Use paddingBottom: 120 to avoid triggering hasTallNavBar (threshold 300).
-             this.applyCSSVariables({
+             // Prime currentInsets with viewport-aware fallbacks so onViewportChange doesn't zero them out
+             // before real insets arrive from Android.
+             var fallbackInsets = {
                top: 24,
                bottom: 120,
                left: 0,
                right: 0,
                paddingBottom: 120
-             });
+             };
+             this.currentInsets = fallbackInsets;
+             this.applyCSSVariables(fallbackInsets);
              // Override the computed clearance with viewport-aware fallback, respecting 350px minimum.
              if (typeof document !== 'undefined' && document.documentElement) {
                var root = document.documentElement;
