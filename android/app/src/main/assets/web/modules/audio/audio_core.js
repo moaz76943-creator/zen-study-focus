@@ -284,66 +284,83 @@
   }
 
   // ── Voice Management ──────────────────────────────────────────────
-  function createVoice(buffer, loop = true) {
-    const ctx = getAudioContext();
-    if (!ctx || !buffer) return null;
+    function createVoice(buffer, loop = true, shapers = null) {
+      const ctx = getAudioContext();
+      if (!ctx || !buffer) return null;
 
-    const source = ctx.createBufferSource();
-    source.buffer = buffer;
-    source.loop = loop;
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.loop = loop;
 
-    // Per-voice gain (fast ramp for click-free start)
-    const gain = ctx.createGain();
-    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(1, ctx.currentTime + FADE_IN_MS / 1000);
+      // Per-voice gain (fast ramp for click-free start)
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(1, ctx.currentTime + FADE_IN_MS / 1000);
 
-    // Per-voice DC block (belt-and-suspenders with master DC block)
-    const dcBlock = ctx.createBiquadFilter();
-    dcBlock.type = 'highpass';
-    dcBlock.frequency.setValueAtTime(DC_BLOCK_HZ, ctx.currentTime);
-    dcBlock.Q.setValueAtTime(0.707, ctx.currentTime);
+      // Per-voice DC block (belt-and-suspenders with master DC block)
+      const dcBlock = ctx.createBiquadFilter();
+      dcBlock.type = 'highpass';
+      dcBlock.frequency.setValueAtTime(DC_BLOCK_HZ, ctx.currentTime);
+      dcBlock.Q.setValueAtTime(0.707, ctx.currentTime);
 
-    // Connect: source → dcBlock → gain → masterGain → (limiter → DC → analyser → dest)
-    source.connect(dcBlock);
-    dcBlock.connect(gain);
-    gain.connect(getMasterOutput());
+      // Connect: source → dcBlock → [shapers...] → gain → masterGain → (limiter → DC → analyser → dest)
+      let lastNode = source;
+      lastNode.connect(dcBlock);
+      lastNode = dcBlock;
 
-    // Voice start = audible audio is desired: restore the master level that
-    // stopAllVoices/stopAllAudio hard-muted to 0 (instant stop).
-    // getMasterOutput() already called unmuteMaster() which does a click-free 30ms ramp.
-    // Do NOT cancel that ramp here — the smooth ramp prevents clicks on resume.
+      if (shapers && shapers.length) {
+        shapers.forEach(s => {
+          lastNode.connect(s);
+          lastNode = s;
+        });
+      }
 
-    source.start();
+      lastNode.connect(gain);
+      gain.connect(getMasterOutput());
 
-        // Stop function with instant fade - uses onended to disconnect AFTER fade completes
-        function stop() {
-          activeVoices.delete(voice);
-          try {
-            const now = ctx.currentTime;
-            const fade = FADE_OUT_MS / 1000;
-            gain.gain.cancelScheduledValues(now);
-            gain.gain.setValueAtTime(gain.gain.value, now);
-            gain.gain.linearRampToValueAtTime(0, now + fade);
-            source.stop(now + fade + 0.005);
-            // Defer disconnect until fade completes via onended — disconnecting immediately
-            // would cut off the scheduled fade ramp and produce a click.
-            source.onended = () => {
-              try { source.disconnect(); } catch (_) {}
-              try { dcBlock.disconnect(); } catch (_) {}
-              try { gain.disconnect(); } catch (_) {}
-            };
-          } catch (e) {
-            try { source.stop(); } catch (_) {}
+      // Voice start = audible audio is desired: restore the master level that
+      // stopAllVoices/stopAllAudio hard-muted to 0 (instant stop).
+      // getMasterOutput() already called unmuteMaster() which does a click-free 30ms ramp.
+      // Do NOT cancel that ramp here — the smooth ramp prevents clicks on resume.
+
+      source.start();
+
+      // Stop function with instant fade - uses onended to disconnect AFTER fade completes
+      function stop() {
+        activeVoices.delete(voice);
+        try {
+          const now = ctx.currentTime;
+          const fade = FADE_OUT_MS / 1000;
+          gain.gain.cancelScheduledValues(now);
+          gain.gain.setValueAtTime(gain.gain.value, now);
+          gain.gain.linearRampToValueAtTime(0, now + fade);
+          source.stop(now + fade + 0.005);
+          // Defer disconnect until fade completes via onended — disconnecting immediately
+          // would cut off the scheduled fade ramp and produce a click.
+          // Also disconnect any shapers that were inserted.
+          source.onended = () => {
             try { source.disconnect(); } catch (_) {}
             try { dcBlock.disconnect(); } catch (_) {}
+            if (shapers && shapers.length) {
+              shapers.forEach(s => { try { s.disconnect(); } catch (_) {} });
+            }
             try { gain.disconnect(); } catch (_) {}
+          };
+        } catch (e) {
+          try { source.stop(); } catch (_) {}
+          try { source.disconnect(); } catch (_) {}
+          try { dcBlock.disconnect(); } catch (_) {}
+          if (shapers && shapers.length) {
+            shapers.forEach(s => { try { s.disconnect(); } catch (_) {} });
           }
+          try { gain.disconnect(); } catch (_) {}
         }
+      }
 
-    const voice = { source, gain, dcBlock, stop };
-    activeVoices.add(voice);
-    return voice;
-  }
+      const voice = { source, gain, dcBlock, stop };
+      activeVoices.add(voice);
+      return voice;
+    }
 
   function stopAllVoices() {
     // Fast but click-free: fade master over 30ms while voices fade out

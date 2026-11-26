@@ -119,38 +119,86 @@
       const noiseBuffer = this.createNaturalNoiseBuffer(bufferType);
       if (!noiseBuffer) return;
 
-      // Use AudioCore's voice management for consistent behavior
-      const voice = audioCore.createVoice(noiseBuffer, true);
-      if (!voice) return;
+      // Build complete filter chain BEFORE starting source to avoid clicks/static
+      // Chain: source -> dcBlock -> shaperFilter -> gain -> AudioCore master output
+      const source = this.ctx.createBufferSource();
+      source.buffer = noiseBuffer;
+      source.loop = true;
 
-      // Apply volume (voice gain starts at 0.0001 and ramps to 1 in 30ms)
-      // Scale by volume * 0.5 to stay well under limiter
-      const targetGain = Math.max(0.0001, volume * 0.5);
-      const now = this.ctx.currentTime;
-      voice.gain.gain.cancelScheduledValues(now);
-      voice.gain.gain.setValueAtTime(0.0001, now);
-      voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.05);
+      // Per-voice gain (fast ramp for click-free start)
+      const gain = this.ctx.createGain();
+      const FADE_IN_MS = audioCore ? audioCore.FADE_IN_MS : 30;
+      gain.gain.setValueAtTime(0.0001, this.ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(1, this.ctx.currentTime + FADE_IN_MS / 1000);
 
-      // Add spectral shaping based on sound type
-      const filter = this.ctx.createBiquadFilter();
+      // Per-voice DC block (belt-and-suspenders with master DC block)
+      const dcBlock = this.ctx.createBiquadFilter();
+      const DC_BLOCK_HZ = audioCore ? audioCore.DC_BLOCK_HZ : 40;
+      dcBlock.type = 'highpass';
+      dcBlock.frequency.setValueAtTime(DC_BLOCK_HZ, this.ctx.currentTime);
+      dcBlock.Q.setValueAtTime(0.707, this.ctx.currentTime);
+
+      // Spectral shaping filter based on sound type
+      const shaperFilter = this.ctx.createBiquadFilter();
       if (bufferType === 'rain') {
-        filter.type = 'lowpass';
-        filter.frequency.value = 1000;
+        shaperFilter.type = 'lowpass';
+        shaperFilter.frequency.value = 1000;
       } else if (bufferType === 'ocean') {
-        filter.type = 'bandpass';
-        filter.frequency.value = 350;
-        filter.Q.value = 1.0;
+        shaperFilter.type = 'bandpass';
+        shaperFilter.frequency.value = 350;
+        shaperFilter.Q.value = 1.0;
       } else {
-        filter.type = 'lowpass';
-        filter.frequency.value = 800;
+        shaperFilter.type = 'lowpass';
+        shaperFilter.frequency.value = 800;
       }
 
-      // Insert filter between dcBlock and gain
-      voice.dcBlock.disconnect();
-      voice.dcBlock.connect(filter);
-      filter.connect(voice.gain);
+      // Connect chain: source -> dcBlock -> shaperFilter -> gain -> master
+      source.connect(dcBlock);
+      dcBlock.connect(shaperFilter);
+      shaperFilter.connect(gain);
+      gain.connect(audioCore.getMasterOutput());
 
-      this.activeTracks[soundKey] = { voice, filter };
+      // A new preset = audible audio desired: restore AudioCore's master
+      if (audioCore && typeof audioCore.unmuteMaster === 'function') {
+        audioCore.unmuteMaster();
+      }
+
+      source.start();
+
+      // Stop function with instant fade and full cleanup
+      const FADE_OUT_MS = audioCore ? audioCore.FADE_OUT_MS : 30;
+      function stop() {
+        try {
+          const now = this.ctx.currentTime;
+          const fade = FADE_OUT_MS / 1000;
+          gain.gain.cancelScheduledValues(now);
+          gain.gain.setValueAtTime(gain.gain.value, now);
+          gain.gain.linearRampToValueAtTime(0, now + fade);
+          source.stop(now + fade + 0.005);
+          // Defer disconnect until fade completes via onended
+          source.onended = () => {
+            try { source.disconnect(); } catch (_) {}
+            try { dcBlock.disconnect(); } catch (_) {}
+            try { shaperFilter.disconnect(); } catch (_) {}
+            try { gain.disconnect(); } catch (_) {}
+          };
+        } catch (e) {
+          try { source.stop(); } catch (_) {}
+          try { source.disconnect(); } catch (_) {}
+          try { dcBlock.disconnect(); } catch (_) {}
+          try { shaperFilter.disconnect(); } catch (_) {}
+          try { gain.disconnect(); } catch (_) {}
+        }
+      }
+
+      // Apply target volume (scale by 0.5 to stay well under limiter)
+      const targetGain = Math.max(0.0001, volume * 0.5);
+      const now = this.ctx.currentTime;
+      gain.gain.cancelScheduledValues(now);
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(targetGain, now + 0.05);
+
+      this.activeTracks[soundKey] = { voice: { source, gain, dcBlock, stop }, filter: shaperFilter };
     }
 
     setVolume(soundKey, volume) {

@@ -218,39 +218,30 @@
        }, 1, false);
      }
 
-  /** Binaural beat baked into a stereo buffer (leftHz, rightHz). */
+  /** Binaural beat baked into a stereo buffer (leftHz, rightHz). Uses AudioCore's createSeamlessBuffer for zero-click loops. */
   generateBinauralBuffer(presetKey = 'gamma_40hz') {
     const preset = BINAURAL_PRESETS[presetKey];
     if (!preset) return null;
 
     const ctx = this.initAudioContext();
-    if (!audioCore) return null;
+    if (!audioCore || !audioCore.createSeamlessBuffer) return null;
 
-    // Ensure duration contains integer cycles of both leftHz and rightHz
-    // This is guaranteed by the preset durations chosen above.
-    const sampleRate = ctx.sampleRate;
-    const exactSize = Math.round(sampleRate * preset.durationSec); // exact integer samples
-    const buffer = ctx.createBuffer(2, exactSize, sampleRate);
-    const left = buffer.getChannelData(0);
-    const right = buffer.getChannelData(1);
+    // Use createSeamlessBuffer for proper DC removal, peak limiting, clamp, and crossfade
+    return audioCore.createSeamlessBuffer(ctx, preset.durationSec, (channelData, sampleRate, totalSec) => {
+      const left = channelData[0];
+      const right = channelData[1];
+      const bufferSize = Math.floor(sampleRate * totalSec);
 
-    const amp = 0.18;
-    const TWO_PI = Math.PI * 2;
-    // Sine waves have zero DC offset by construction — no DC block needed.
-    for (let i = 0; i < exactSize; i++) {
-      const t = i / sampleRate;
-      left[i] = Math.sin(TWO_PI * preset.leftHz * t) * amp;
-      right[i] = Math.sin(TWO_PI * preset.rightHz * t) * amp;
-    }
-    // Hard safety clamp (defensive — sine waves never exceed amp=0.18)
-    for (let ch = 0; ch < 2; ch++) {
-      const data = buffer.getChannelData(ch);
-      for (let i = 0; i < exactSize; i++) {
-        if (data[i] > 1.0) data[i] = 1.0;
-        else if (data[i] < -1.0) data[i] = -1.0;
+      const amp = 0.18;
+      const TWO_PI = Math.PI * 2;
+      // Sine waves have zero DC offset by construction — no DC block needed.
+      // But createSeamlessBuffer will still apply DC removal, peak limiting, clamp, and crossfade for safety.
+      for (let i = 0; i < bufferSize; i++) {
+        const t = i / sampleRate;
+        left[i] = Math.sin(TWO_PI * preset.leftHz * t) * amp;
+        right[i] = Math.sin(TWO_PI * preset.rightHz * t) * amp;
       }
-    }
-    return buffer;
+    }, 2, false);
   }
 
   /** @deprecated Use generateBinauralBuffer('gamma_40hz') */
