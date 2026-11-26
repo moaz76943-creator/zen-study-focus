@@ -632,30 +632,18 @@
     // Timer settings chip
     const timerSettingsChip = document.getElementById('timerSettingsChip');
     if (timerSettingsChip) {
-      timerSettingsChip.addEventListener('click', function(e) {
-        e.preventDefault();
-        if (navigator.vibrate) ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(20) : false);
-        if (window.StudioNavigator) {
-          window.StudioNavigator.switchStudio('settings');
-        } else {
-          const modal = document.getElementById('timerSettingsModal') || document.getElementById('settingsDrawer');
-          if (modal) modal.classList.toggle('active');
-        }
-      });
+      // Intentionally removed: the inline onclick in index.html (openTimerSettings()) handles this.
+      // The former StudioNavigator.switchStudio('settings') call referenced a non-existent studio ID and
+      // would fire silently after the inline handler, causing a dead-button feel. The inline handler
+      // already vibrates and opens the timer settings modal correctly.
     }
 
     // Launch Speed Reader button
     const btnLaunchSpeedReader = document.getElementById('btnLaunchSpeedReader');
     if (btnLaunchSpeedReader) {
-      btnLaunchSpeedReader.addEventListener('click', function(e) {
-        e.preventDefault();
-        if (navigator.vibrate) ((navigator.vibrate && (!navigator.userActivation || navigator.userActivation.hasBeenActive)) ? navigator.vibrate(30) : false);
-        if (window.StudioNavigator) {
-          window.StudioNavigator.switchStudio('speed-reader');
-        } else if (window.FocalStreamRSVPEngine) {
-          window.FocalStreamRSVPEngine.init();
-        }
-      });
+      // Intentionally removed: the inline onclick in index.html (dfOpenSpeedReaderFromTimer()) handles this.
+      // The former StudioNavigator.switchStudio('speed-reader') call referenced a non-existent studio ID
+      // and would fire silently after the inline handler. The inline handler already navigates correctly.
     }
 
     // Universal auto-wire for any remaining unlinked buttons in index.html
