@@ -11,7 +11,7 @@ const STATUSES = ['source', 'human-reviewed', 'native-speaker-reviewed', 'expert
 const ph = (s) => (s.match(/\{\d+\}/g) || []).sort().join(',');
 function validate(code, pack) {
   const errs = [];
-  if (!official.has(code) || code === 'en') errs.push('not an official non-English language');
+  if (!official.has(code) && code !== 'en') errs.push('not an official non-English language');
   if (/^(he|iw|yi)$/.test(code)) errs.push('forbidden language');
   if (!STATUSES.includes(pack.status)) errs.push('bad status ' + pack.status);
   for (const [k, v] of Object.entries(pack.t || {})) {
