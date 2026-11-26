@@ -309,13 +309,9 @@
     gain.connect(getMasterOutput());
 
     // Voice start = audible audio is desired: restore the master level that
-    // stopAllVoices/stopAllAudio hard-muted to 0 (instant stop). Without this,
-    // nothing could ever play again after a Stop.
-    if (masterGain && sharedContext) {
-      const t = sharedContext.currentTime;
-      masterGain.gain.cancelScheduledValues(t);
-      masterGain.gain.setValueAtTime(MASTER_OPEN(), t);
-    }
+    // stopAllVoices/stopAllAudio hard-muted to 0 (instant stop).
+    // getMasterOutput() already called unmuteMaster() which does a click-free 30ms ramp.
+    // Do NOT cancel that ramp here — the smooth ramp prevents clicks on resume.
 
     source.start();
 
