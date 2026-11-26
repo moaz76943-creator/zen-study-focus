@@ -96,17 +96,16 @@ public class MainActivity extends AppCompatActivity {
         // viewport already ends above the status bar / 3-button nav bar and every
         // fixed dock offset in CSS can be measured from the safe content edge.
         // AMOLED black behind the inset strips so white status-bar icons stay visible.
-        // LinearLayout (vertical) constrains match_parent children to padded bounds,
-        // so the WebView's layout viewport = visible area (window minus system insets).
-        // This fixes position:fixed layers (capsule, Studios pill, FAB) anchoring to the
-        // full window bottom instead of the safe content edge.
-        android.widget.LinearLayout insetFrame = new android.widget.LinearLayout(this);
-        insetFrame.setOrientation(android.widget.LinearLayout.VERTICAL);
+        // FrameLayout constrains match_parent children to padded bounds reliably on Android 15
+        // edge-to-edge (LinearLayout can mis-measure on Xiaomi HyperOS). The WebView's layout
+        // viewport then equals the visible area (window minus system insets), fixing
+        // position:fixed layers (capsule, Studios pill, FAB) anchoring to the safe content edge.
+        android.widget.FrameLayout insetFrame = new android.widget.FrameLayout(this);
         insetFrame.setBackgroundColor(0xFF000000);
         insetFrame.setClipToPadding(true);
         // Register insets listener BEFORE setContentView so the initial dispatch is caught.
         // Ensure insetFrame fills the window so its padding constrains the WebView layout viewport.
-        insetFrame.setLayoutParams(new android.widget.LinearLayout.LayoutParams(
+        insetFrame.setLayoutParams(new android.widget.FrameLayout.LayoutParams(
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT,
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT));
         ViewCompat.setOnApplyWindowInsetsListener(insetFrame, (v, windowInsets) -> {
@@ -292,7 +291,7 @@ public class MainActivity extends AppCompatActivity {
                     .build();
         });
 
-        insetFrame.addView(webView, new android.widget.LinearLayout.LayoutParams(
+        insetFrame.addView(webView, new android.widget.FrameLayout.LayoutParams(
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT,
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(insetFrame);
