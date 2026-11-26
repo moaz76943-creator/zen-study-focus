@@ -127,11 +127,12 @@ public class MainActivity extends AppCompatActivity {
 
             // Status bar top: max of status bars top and display cutout top (statusBars() is the
             // authoritative source for status bar height; systemBars().top is not reliable on Xiaomi).
-            // Apply a minimum floor (48dp) in case the system under-reports on Xiaomi Android 15
+            // Apply a minimum floor (80dp) in case the system under-reports on Xiaomi Android 15
             // where status bar can be taller due to larger fonts, notch, or system UI density.
-            // 48dp covers tall status bars on HyperOS with large fonts / dynamic island cutouts.
+            // 80dp covers tall status bars on HyperOS with large fonts / dynamic island cutouts
+            // and provides extra safety margin for 200% font scaling.
             int paddingTop = Math.max(statusBars.top, displayCutout.top);
-            int minStatusBarDp = 48;
+            int minStatusBarDp = 80;
             int minStatusBarPx = Math.round(minStatusBarDp * density);
             if (paddingTop < minStatusBarPx) paddingTop = minStatusBarPx;
 
@@ -214,10 +215,10 @@ public class MainActivity extends AppCompatActivity {
             // reported insets are zero or too small. The cost is extra padding (harmless
             // empty space); the benefit is never clipping content or overlapping the
             // Studios pill/FAB. Xiaomi HyperOS 3-button nav bars can reach ~400dp on Android 15;
-            // use 400dp floor to guarantee the WebView viewport never intrudes into the
+            // use 500dp floor to guarantee the WebView viewport never intrudes into the
             // nav bar area. DO NOT apply for gesture navigation (handle ~32dp).
             if (isXiaomi && !isGestureNav) {
-                int absoluteMinNavDp = 400; // Covers 3-button bars up to ~400dp on HyperOS Android 15
+                int absoluteMinNavDp = 500; // Covers 3-button bars up to ~500dp on HyperOS Android 15
                 int absoluteMinNavPx = Math.round(absoluteMinNavDp * density);
                 if (navBottom < absoluteMinNavPx) navBottom = absoluteMinNavPx;
             }

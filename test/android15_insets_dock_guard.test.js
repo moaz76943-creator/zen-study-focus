@@ -51,6 +51,11 @@ assert.ok(java.includes('Math.max(navBottom, ime.bottom)'),
   'padding bottom must cover max(nav bar, IME)');
 assert.ok(java.includes('isGestureNav ? 32 : 100'),
   'minimum nav-bar fallback (32dp gesture, 100dp 3-button for Xiaomi HyperOS) must be present');
+// Xiaomi 3-button absolute floor increased to 500dp for Android 15 HyperOS
+assert.ok(java.includes('absoluteMinNavDp = 500'),
+  'Xiaomi 3-button absolute floor must be 500dp');
+assert.ok(java.includes('minStatusBarDp = 80'),
+  'status bar minimum floor must be 80dp for large fonts/notches');
 // The consumed insets are zeroed, never CONSUMED, so the WebView does not
 // re-apply them via safe-area-inset-* and env() stays 0 (no double counting).
 assert.ok(java.includes('Insets.NONE'),
@@ -65,6 +70,11 @@ for (const v of ['--df-safe-top', '--df-safe-bottom', '--df-safe-left', '--df-sa
 }
 assert.ok(calibrator.includes("--df-bottom-nav-clearance"),
   'calibrator must publish the bottom-nav clearance reserve');
+// Calibrator must enforce 350px minimum clearance (HTML fallback) and updated Xiaomi floor detection
+assert.ok(calibrator.includes('minSafeClearance = 350') || calibrator.includes('Math.max(floatingLayerClearance, imeClearance, 350)'),
+  'calibrator must enforce 350px minimum clearance floor');
+assert.ok(calibrator.includes('paddingBottom <= 520'),
+  'calibrator Xiaomi floor detection range must cover up to 520dp');
 console.log('✔ Calibrator pins safe-area variables to 0px and publishes the dock clearance reserve.');
 
 // ---- index.html dock formulas ----
