@@ -378,37 +378,25 @@
     buildLoopBuffer(ctx, srcKey).then(function (buffer) {
       if (gen !== (S.noiseGeneration || 0)) return; // stale request (stop happened)
       if (!buffer) return;
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.loop = !!loop;
-      const dc = ctx.createBiquadFilter();
-      dc.type = 'highpass';
-      dc.frequency.setValueAtTime(DC_BLOCK_HZ, ctx.currentTime);
-      dc.Q.setValueAtTime(0.707, ctx.currentTime);
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-      // Use VOICE_PEAK_CEILING for consistent gain staging with AudioCore.
-      // Buffer peak is ≤0.95 (enforced by createSeamlessBuffer/makeProceduralLoop),
-      // so actual peak ≈ VOICE_PEAK_CEILING * volume * 0.95.
+      // Use AudioCore's createVoice for consistent gain staging, DC blocking, and master connection.
+      // createVoice handles: per-voice DC block (40 Hz), VOICE_PEAK_CEILING gain, fade-in, master connection.
+      const voice = audioCore.createVoice(buffer, !!loop);
+      if (!voice) return;
+      // Scale the voice gain to target volume (createVoice ramps to VOICE_PEAK_CEILING at full volume)
       const targetGain = Math.max(0.0001, VOICE_PEAK_CEILING * finalVol(targetVol));
-      gain.gain.linearRampToValueAtTime(targetGain, ctx.currentTime + FADE_IN_SEC);
-      source.connect(dc);
-      dc.connect(gain);
-      gain.connect(getSafeDestination(ctx));
-      // A new ambient source = audible audio desired: restore AudioCore's master
-      if (audioCore && typeof audioCore.unmuteMaster === 'function') {
-        try { audioCore.unmuteMaster(); } catch (_) {}
-      }
-      source.start();
-      S.activeSource = source;
-      S.activeGain = gain;
-      S.activeDC = dc;
-      S.activeSources.push({ source: source, gain: gain, dc: dc });
-      source.onended = function () {
-        if (S.activeSource === source) {
+      const now = ctx.currentTime;
+      voice.gain.gain.cancelScheduledValues(now);
+      voice.gain.gain.setValueAtTime(voice.gain.gain.value, now);
+      voice.gain.gain.linearRampToValueAtTime(targetGain, now + FADE_IN_SEC);
+      S.activeSource = voice.source;
+      S.activeGain = voice.gain;
+      S.activeDC = voice.dcBlock;
+      S.activeSources.push({ source: voice.source, gain: voice.gain, dc: voice.dcBlock });
+      voice.source.onended = function () {
+        if (S.activeSource === voice.source) {
           S.activeSource = null; S.activeGain = null; S.activeDC = null;
         }
-        S.activeSources = (S.activeSources || []).filter(function (e) { return e.source !== source; });
+        S.activeSources = (S.activeSources || []).filter(function (e) { return e.source !== voice.source; });
       };
     }).catch(function () {});
     return { pending: true };

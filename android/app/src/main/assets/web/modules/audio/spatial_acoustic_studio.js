@@ -63,7 +63,7 @@
       this.eqFilters = [];
       this.sourceNode = null;
       this.analyser = null;
-      this.dcBlockFilter = null;
+      this.spatialPanner = null;
       // Gesture detection is handled by AudioCore - no local binding needed
 
       this.eqGains = new Array(EQ_FREQUENCIES.length).fill(0);
@@ -97,12 +97,6 @@
       this.analyser = ctx.createAnalyser();
       this.analyser.fftSize = 64;
 
-      // DC-blocking high-pass filter (40 Hz — protects transducer coils & brown noise rumble)
-      this.dcBlockFilter = ctx.createBiquadFilter();
-      this.dcBlockFilter.type = 'highpass';
-      this.dcBlockFilter.frequency.setValueAtTime(DC_BLOCK_HZ, ctx.currentTime);
-      this.dcBlockFilter.Q.setValueAtTime(0.707, ctx.currentTime);
-
       // Spatial/HRTF panner node for 3D positioning
       this.spatialPanner = ctx.createPanner();
       this.spatialPanner.panningModel = 'HRTF';
@@ -129,8 +123,8 @@
         return filter;
       });
 
-      // Chain: DC block -> Spatial Panner -> EQ filters -> AudioCore master output (masterGain -> limiter -> DC -> analyser -> destination)
-      this.dcBlockFilter.connect(this.spatialPanner);
+      // Chain: Spatial Panner -> EQ filters -> AudioCore master output (masterGain -> limiter -> DC -> analyser -> destination)
+      // REMOVED: Local dcBlockFilter — AudioCore's master chain already has a 40 Hz DC block.
       this.spatialPanner.connect(this.eqFilters[0]);
       for (let i = 0; i < this.eqFilters.length - 1; i++) {
         this.eqFilters[i].connect(this.eqFilters[i + 1]);
@@ -300,7 +294,7 @@
       const voiceGain = this.audioCtx.createGain();
       voiceGain.gain.setValueAtTime(1.0, this.audioCtx.currentTime);
 
-      // Build the chain: source -> shapers -> dcBlockFilter -> EQ filters -> AudioCore master
+      // Build the chain: source -> shapers -> spatialPanner -> EQ filters -> AudioCore master
       let lastNode = source;
       if (shapers && shapers.length) {
         shapers.forEach(s => {
@@ -309,10 +303,10 @@
         });
       }
       lastNode.connect(voiceGain);
-      voiceGain.connect(this.dcBlockFilter);
+      voiceGain.connect(this.spatialPanner);
       // The EQ chain is already built and connected to AudioCore master output
-      // in buildEqChain. The dcBlockFilter is the entry point to the EQ chain.
-      // So we just connect source/shapers to dcBlockFilter.
+      // in buildEqChain. The spatialPanner is the entry point to the EQ chain.
+      // So we just connect source/shapers to spatialPanner.
 
       // A new preset = audible audio desired: restore AudioCore's master
       if (audioCore && typeof audioCore.unmuteMaster === 'function') {

@@ -107,101 +107,93 @@
     }
 
     play(soundKey, volume = 0.7) {
-      // Zero-autoplay invariant: never start a nature loop while the tab is hidden.
-      if (typeof document !== 'undefined' && document.hidden) return;
-      if (!audioCore || !audioCore.isGestureReceived()) return; // Hard gate
-      this.initContext();
-      if (!this.ctx) return;
-      this.stop(soundKey);
+          // Zero-autoplay invariant: never start a nature loop while the tab is hidden.
+          if (typeof document !== 'undefined' && document.hidden) return;
+          if (!audioCore || !audioCore.isGestureReceived()) return; // Hard gate
+          this.initContext();
+          if (!this.ctx) return;
+          this.stop(soundKey);
 
-      const bufferType = (soundKey.includes('rain') || soundKey.includes('stream') || soundKey.includes('water')) ? 'rain' :
-                         (soundKey.includes('ocean') || soundKey.includes('wind')) ? 'ocean' : 'fire';
+          const bufferType = (soundKey.includes('rain') || soundKey.includes('stream') || soundKey.includes('water')) ? 'rain' :
+                             (soundKey.includes('ocean') || soundKey.includes('wind')) ? 'ocean' : 'fire';
 
-      const noiseBuffer = this.createNaturalNoiseBuffer(bufferType);
-      if (!noiseBuffer) return;
+          const noiseBuffer = this.createNaturalNoiseBuffer(bufferType);
+          if (!noiseBuffer) return;
 
-      // Build complete filter chain BEFORE starting source to avoid clicks/static
-      // Chain: source -> dcBlock -> shaperFilter -> gain -> AudioCore master output
-      const source = this.ctx.createBufferSource();
-      source.buffer = noiseBuffer;
-      source.loop = true;
+          // Build complete filter chain BEFORE starting source to avoid clicks/static
+          // Chain: source -> shaperFilter -> gain -> AudioCore master output
+          // REMOVED: Per-voice dcBlock — AudioCore's master chain has a 40 Hz DC block.
+          const source = this.ctx.createBufferSource();
+          source.buffer = noiseBuffer;
+          source.loop = true;
 
-      // Per-voice gain (fast ramp for click-free start)
-      // Target gain is VOICE_PEAK_CEILING scaled by volume (0..1).
-      // The buffer's intrinsic peak is ≤0.95, so actual peak ≈ VOICE_PEAK_CEILING * volume * 0.95.
-      const gain = this.ctx.createGain();
-      gain.gain.setValueAtTime(0.0001, this.ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(VOICE_PEAK_CEILING * volume, this.ctx.currentTime + FADE_IN_MS / 1000);
+          // Per-voice gain (fast ramp for click-free start)
+          // Target gain is VOICE_PEAK_CEILING scaled by volume (0..1).
+          // The buffer's intrinsic peak is ≤0.95, so actual peak ≈ VOICE_PEAK_CEILING * volume * 0.95.
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.0001, this.ctx.currentTime);
+          gain.gain.linearRampToValueAtTime(VOICE_PEAK_CEILING * volume, this.ctx.currentTime + FADE_IN_MS / 1000);
 
-      // Per-voice DC block (belt-and-suspenders with master DC block)
-      const dcBlock = this.ctx.createBiquadFilter();
-      dcBlock.type = 'highpass';
-      dcBlock.frequency.setValueAtTime(DC_BLOCK_HZ, this.ctx.currentTime);
-      dcBlock.Q.setValueAtTime(0.707, this.ctx.currentTime);
+          // Spectral shaping filter based on sound type
+          const shaperFilter = this.ctx.createBiquadFilter();
+          if (bufferType === 'rain') {
+            shaperFilter.type = 'lowpass';
+            shaperFilter.frequency.value = 1000;
+          } else if (bufferType === 'ocean') {
+            shaperFilter.type = 'bandpass';
+            shaperFilter.frequency.value = 350;
+            shaperFilter.Q.value = 1.0;
+          } else {
+            shaperFilter.type = 'lowpass';
+            shaperFilter.frequency.value = 800;
+          }
 
-      // Spectral shaping filter based on sound type
-      const shaperFilter = this.ctx.createBiquadFilter();
-      if (bufferType === 'rain') {
-        shaperFilter.type = 'lowpass';
-        shaperFilter.frequency.value = 1000;
-      } else if (bufferType === 'ocean') {
-        shaperFilter.type = 'bandpass';
-        shaperFilter.frequency.value = 350;
-        shaperFilter.Q.value = 1.0;
-      } else {
-        shaperFilter.type = 'lowpass';
-        shaperFilter.frequency.value = 800;
-      }
+          // Connect chain: source -> shaperFilter -> gain -> master
+          source.connect(shaperFilter);
+          shaperFilter.connect(gain);
+          gain.connect(audioCore.getMasterOutput());
 
-      // Connect chain: source -> dcBlock -> shaperFilter -> gain -> master
-      source.connect(dcBlock);
-      dcBlock.connect(shaperFilter);
-      shaperFilter.connect(gain);
-      gain.connect(audioCore.getMasterOutput());
+          // A new preset = audible audio desired: restore AudioCore's master
+          if (audioCore && typeof audioCore.unmuteMaster === 'function') {
+            audioCore.unmuteMaster();
+          }
 
-      // A new preset = audible audio desired: restore AudioCore's master
-      if (audioCore && typeof audioCore.unmuteMaster === 'function') {
-        audioCore.unmuteMaster();
-      }
+          source.start();
 
-      source.start();
+          // Stop function with instant fade and full cleanup
+          const FADE_OUT_MS = audioCore ? audioCore.FADE_OUT_MS : 30;
+          const stopCtx = this.ctx; // Capture ctx for closure (this binding fix)
+          function stop() {
+            try {
+              const now = stopCtx.currentTime;
+              const fade = FADE_OUT_MS / 1000;
+              gain.gain.cancelScheduledValues(now);
+              gain.gain.setValueAtTime(gain.gain.value, now);
+              gain.gain.linearRampToValueAtTime(0, now + fade);
+              source.stop(now + fade + 0.005);
+              // Defer disconnect until fade completes via onended
+              source.onended = () => {
+                try { source.disconnect(); } catch (_) {}
+                try { shaperFilter.disconnect(); } catch (_) {}
+                try { gain.disconnect(); } catch (_) {}
+              };
+            } catch (e) {
+              try { source.stop(); } catch (_) {}
+              try { source.disconnect(); } catch (_) {}
+              try { shaperFilter.disconnect(); } catch (_) {}
+              try { gain.disconnect(); } catch (_) {}
+            }
+          }
 
-      // Stop function with instant fade and full cleanup
-      const FADE_OUT_MS = audioCore ? audioCore.FADE_OUT_MS : 30;
-      const stopCtx = this.ctx; // Capture ctx for closure (this binding fix)
-      function stop() {
-        try {
-          const now = stopCtx.currentTime;
-          const fade = FADE_OUT_MS / 1000;
+          // Apply target volume scaled by VOICE_PEAK_CEILING
+          const targetGain = Math.max(0.0001, VOICE_PEAK_CEILING * volume);
+          const now = this.ctx.currentTime;
           gain.gain.cancelScheduledValues(now);
-          gain.gain.setValueAtTime(gain.gain.value, now);
-          gain.gain.linearRampToValueAtTime(0, now + fade);
-          source.stop(now + fade + 0.005);
-          // Defer disconnect until fade completes via onended
-          source.onended = () => {
-            try { source.disconnect(); } catch (_) {}
-            try { dcBlock.disconnect(); } catch (_) {}
-            try { shaperFilter.disconnect(); } catch (_) {}
-            try { gain.disconnect(); } catch (_) {}
-          };
-        } catch (e) {
-          try { source.stop(); } catch (_) {}
-          try { source.disconnect(); } catch (_) {}
-          try { dcBlock.disconnect(); } catch (_) {}
-          try { shaperFilter.disconnect(); } catch (_) {}
-          try { gain.disconnect(); } catch (_) {}
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.linearRampToValueAtTime(targetGain, now + 0.05);
+
+          this.activeTracks[soundKey] = { voice: { source, gain, stop }, filter: shaperFilter };
         }
-      }
-
-      // Apply target volume scaled by VOICE_PEAK_CEILING
-      const targetGain = Math.max(0.0001, VOICE_PEAK_CEILING * volume);
-      const now = this.ctx.currentTime;
-      gain.gain.cancelScheduledValues(now);
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.linearRampToValueAtTime(targetGain, now + 0.05);
-
-      this.activeTracks[soundKey] = { voice: { source, gain, dcBlock, stop }, filter: shaperFilter };
-    }
 
     setVolume(soundKey, volume) {
       const track = this.activeTracks[soundKey];

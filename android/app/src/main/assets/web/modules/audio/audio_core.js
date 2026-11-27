@@ -270,23 +270,34 @@
   }
 
   function generateBrownNoise(channelData, sampleRate, durationSec) {
-    // Fixed-output-scale brown noise: bounded leaky integrator with DC rejection.
+    // Fixed-output-scale brown noise with real-time DC rejection.
+    // Two-pole leaky integrator (-12dB/oct) + 1st-order highpass DC block (40 Hz equivalent)
+    // runs sample-by-sample to prevent DC drift accumulation before buffer post-processing.
     // Output scaled by BROWN_NOISE_AMP — never peak-normalized UP (amplifying
     // quiet noise produced constant hiss/rumble) and never clamped into rails.
-    // DC removal is handled by createSeamlessBuffer post-process pass (belt-and-suspenders).
-    // Use a two-pole leaky integrator for better -12dB/oct slope and less DC drift.
+    // DC removal is also handled by createSeamlessBuffer post-process pass (belt-and-suspenders).
+    // Highpass coefficient for ~40 Hz at 44.1/48 kHz: α = exp(-2π * 40 / sampleRate)
+    const hpAlpha = Math.exp(-2 * Math.PI * DC_BLOCK_HZ / sampleRate);
     for (let ch = 0; ch < channelData.length; ch++) {
       const data = channelData[ch];
       const len = data.length;
       let brown1 = 0;
       let brown2 = 0;
+      let hpState = 0;      // highpass filter state (previous output)
+      let prevInput = 0;    // previous input sample for highpass
       for (let i = 0; i < len; i++) {
         const white = Math.random() * 2 - 1;
         // Two-pole leaky integrator: first pole at BROWN_POLE, second at 0.99
         // This gives -12dB/oct slope and dramatically reduces DC drift vs single pole.
         brown1 = BROWN_POLE * brown1 + white * BROWN_GAIN;
         brown2 = 0.99 * brown2 + brown1 * 0.1;
-        data[i] = brown2 * BROWN_NOISE_AMP;
+        // Real-time 1st-order DC-blocking highpass: y[n] = α * (y[n-1] + x[n] - x[n-1])
+        // This prevents DC accumulation in the leaky integrator chain.
+        const brownRaw = brown2 * BROWN_NOISE_AMP;
+        const hpOut = hpAlpha * (hpState + brownRaw - prevInput);
+        hpState = hpOut;
+        prevInput = brownRaw;
+        data[i] = hpOut;
       }
     }
   }
