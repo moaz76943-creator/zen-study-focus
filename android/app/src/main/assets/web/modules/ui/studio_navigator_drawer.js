@@ -589,14 +589,22 @@
             pill.style.gap = "8px";
             pill.style.boxShadow = "0 8px 24px rgba(0, 0, 0, 0.6)";
 
-            pill.innerHTML = '<span id="zenStudioTriggerLabel" style="min-width: 0;">' + ((document.documentElement.lang || "").toLowerCase().indexOf("ar") === 0 ? "✨ الاستوديوهات" : "✨ Studios") + '</span> <span style="opacity: 0.5; font-size: 0.75rem; min-width: 0; flex-shrink: 0;">(10)</span>';
+            pill.innerHTML = '<span id="zenStudioTriggerLabel" style="min-width: 0;">' + ((document.documentElement.lang || "").toLowerCase().indexOf("ar") === 0 ? "\u2728 \u0627\u0644\u0627\u0633\u062A\u0648\u062F\u064A\u0648\u0647\u0627\u062A" : "\u2728 Studios") + '</span> <span style="opacity: 0.5; font-size: 0.75rem; min-width: 0; flex-shrink: 0;">(10)</span>';
 
-            pill.onclick = () => {
-                this.toggleDrawer();
-            };
+                        pill.onclick = () => {
+                            this.toggleDrawer();
+                        };
 
-            document.body.appendChild(pill);
-        },
+                        document.body.appendChild(pill);
+
+                        // Set CSS variable for Studios pill right clearance so body content never overlaps it.
+                        // Measure after layout to get actual rendered width (content-sized, not maxWidth).
+                        requestAnimationFrame(() => {
+                            const pillWidth = pill.offsetWidth;
+                            const clearance = pillWidth + 12; // pill width + 12px right gap
+                            document.documentElement.style.setProperty('--df-studios-pill-right-clearance', clearance + 'px', 'important');
+                        });
+                    },
 
         injectDrawerSheet: function () {
             if (document.getElementById("zenStudioDrawerOverlay")) return;

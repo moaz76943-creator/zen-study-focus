@@ -999,10 +999,11 @@ header, .app-header, .top-bar, .dynamic-hero-header {
       padding-top: var(--df-sat);
       /* Body content padding clears the floating
          elements (FAB, Studios pill) above the capsule.
-         --df-webview-padding-bottom is pinned to 0px by calibrator; use --df-inflow-bottom (350px fallback). */
+         --df-webview-padding-bottom is pinned to 0px by calibrator; use --df-inflow-bottom (350px fallback).
+         --df-studios-pill-right-clearance is set by studio_navigator_drawer.js after pill render. */
       padding-bottom: var(--df-inflow-bottom, 350px) !important;
       padding-left: var(--df-sal);
-      padding-right: var(--df-sar);
+      padding-right: calc(var(--df-sar) + var(--df-studios-pill-right-clearance, 0px)) !important;
     }
 
     .app-shell {
