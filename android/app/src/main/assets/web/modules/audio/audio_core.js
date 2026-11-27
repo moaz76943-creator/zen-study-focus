@@ -23,14 +23,23 @@
   const DC_BLOCK_HZ = 40;                                      // protects transducer coils & brown noise rumble
   const BROWN_POLE = 0.997;                                    // leakier = less DC drift
   const BROWN_GAIN = 0.4;                                      // input gain for brown noise
-  const BROWN_NOISE_AMP = 0.03;                                // fixed output scale — reduced from 0.045 for extra headroom against leaky-integrator tail peaks and DC drift
-  const WHITE_NOISE_AMP = 0.06;                                // consistent across all modules
-  const PINK_NOISE_AMP = 0.08;                                 // consistent across all modules
+  // Fixed output scale — reduced from 0.045 for extra headroom against
+  // leaky-integrator tail peaks and DC drift. This level ensures brown noise
+  // peaks stay well below the master limiter threshold (-3dB ≈ 0.707) even
+  // when multiple voices are stacked and master volume is at 1.0.
+  const BROWN_NOISE_AMP = 0.025;
+  const WHITE_NOISE_AMP = 0.05;                                // reduced from 0.06 for consistent noise floor
+  const PINK_NOISE_AMP = 0.065;                                // reduced from 0.08 for consistent noise floor
   // Master limiter threshold: -3dB (0.707) — high enough to NEVER engage on normal content
   // (voice peaks × master gain max ≈ 0.35). Only catches genuine overshoots > 0.7.
   // The old -12dB (0.25) threshold compressed the noise floor into audible hiss/static.
   const MASTER_LIMITER_THRESHOLD_DB = -3.0;
   const MASTER_LIMITER_THRESHOLD_LINEAR = Math.pow(10, MASTER_LIMITER_THRESHOLD_DB / 20); // ≈ 0.707
+  // Voice peak ceiling: voices are gain-scaled so their peak output never exceeds this.
+  // At master volume 1.0, master gain = LIMITER_LINEAR (0.501). Voice gain max = VOICE_PEAK_CEILING.
+  // Combined peak = 0.501 * VOICE_PEAK_CEILING. With 4 simultaneous voices (worst case
+  // coherent sum = 4x, incoherent = 2x), we stay well below limiter threshold.
+  const VOICE_PEAK_CEILING = 0.35;
 
   // ── AudioContext Singleton ────────────────────────────────────────
   let sharedContext = null;
@@ -283,20 +292,24 @@
   }
 
   // ── Voice Management ──────────────────────────────────────────────
-    function createVoice(buffer, loop = true, shapers = null) {
-      const ctx = getAudioContext();
-      if (!ctx || !buffer) return null;
+  function createVoice(buffer, loop = true, shapers = null) {
+    const ctx = getAudioContext();
+    if (!ctx || !buffer) return null;
 
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
-      source.loop = loop;
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
+    source.loop = loop;
 
-      // Per-voice gain (fast ramp for click-free start)
-      const gain = ctx.createGain();
-      gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(1, ctx.currentTime + FADE_IN_MS / 1000);
+    // Per-voice gain (fast ramp for click-free start)
+    // Target gain is VOICE_PEAK_CEILING — the buffer's intrinsic peak is already
+    // limited to ≤0.95 by createSeamlessBuffer/createSeamlessOggBuffer, so the
+    // actual output peak will be ≤ VOICE_PEAK_CEILING * 0.95 ≈ 0.33.
+    // This keeps summed voices well below the master limiter threshold.
+    const gain = ctx.createGain();
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.linearRampToValueAtTime(VOICE_PEAK_CEILING, ctx.currentTime + FADE_IN_MS / 1000);
 
-      // Per-voice DC block (belt-and-suspenders with master DC block)
+    // Per-voice DC block (belt-and-suspenders with master DC block)
       const dcBlock = ctx.createBiquadFilter();
       dcBlock.type = 'highpass';
       dcBlock.frequency.setValueAtTime(DC_BLOCK_HZ, ctx.currentTime);
@@ -540,6 +553,7 @@
     BROWN_NOISE_AMP,
     WHITE_NOISE_AMP,
     PINK_NOISE_AMP,
+    VOICE_PEAK_CEILING,
     MASTER_LIMITER_THRESHOLD_DB,
     MASTER_LIMITER_THRESHOLD_LINEAR,
   };

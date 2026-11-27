@@ -11,9 +11,13 @@
   const audioCore = typeof window !== 'undefined' ? window.AudioCore : null;
   const BROWN_POLE = audioCore ? audioCore.BROWN_POLE : 0.997;
   const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
-  const BROWN_NOISE_AMP = audioCore ? audioCore.BROWN_NOISE_AMP : 0.03;
-  const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
-  const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
+  const BROWN_NOISE_AMP = audioCore ? audioCore.BROWN_NOISE_AMP : 0.025;
+  const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.065;
+  const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.05;
+  const VOICE_PEAK_CEILING = audioCore ? audioCore.VOICE_PEAK_CEILING : 0.35;
+  const FADE_IN_MS = audioCore ? audioCore.FADE_IN_MS : 30;
+  const FADE_OUT_MS = audioCore ? audioCore.FADE_OUT_MS : 30;
+  const DC_BLOCK_HZ = audioCore ? audioCore.DC_BLOCK_HZ : 40;
 
   // Get the single shared master AudioContext (created only on user gesture)
   function getSharedContext() {
@@ -123,14 +127,14 @@
       source.loop = true;
 
       // Per-voice gain (fast ramp for click-free start)
+      // Target gain is VOICE_PEAK_CEILING scaled by volume (0..1).
+      // The buffer's intrinsic peak is ≤0.95, so actual peak ≈ VOICE_PEAK_CEILING * volume * 0.95.
       const gain = this.ctx.createGain();
-      const FADE_IN_MS = audioCore ? audioCore.FADE_IN_MS : 30;
       gain.gain.setValueAtTime(0.0001, this.ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(1, this.ctx.currentTime + FADE_IN_MS / 1000);
+      gain.gain.linearRampToValueAtTime(VOICE_PEAK_CEILING * volume, this.ctx.currentTime + FADE_IN_MS / 1000);
 
       // Per-voice DC block (belt-and-suspenders with master DC block)
       const dcBlock = this.ctx.createBiquadFilter();
-      const DC_BLOCK_HZ = audioCore ? audioCore.DC_BLOCK_HZ : 40;
       dcBlock.type = 'highpass';
       dcBlock.frequency.setValueAtTime(DC_BLOCK_HZ, this.ctx.currentTime);
       dcBlock.Q.setValueAtTime(0.707, this.ctx.currentTime);
@@ -189,8 +193,8 @@
         }
       }
 
-      // Apply target volume (scale by 0.5 to stay well under limiter)
-      const targetGain = Math.max(0.0001, volume * 0.5);
+      // Apply target volume scaled by VOICE_PEAK_CEILING
+      const targetGain = Math.max(0.0001, VOICE_PEAK_CEILING * volume);
       const now = this.ctx.currentTime;
       gain.gain.cancelScheduledValues(now);
       gain.gain.setValueAtTime(0.0001, now);
@@ -204,7 +208,7 @@
       if (track && track.voice && track.voice.gain) {
         // Smooth ramp (not a raw setValueAtTime) — click-free slider moves
         const t0 = this.ctx ? this.ctx.currentTime : 0;
-        const targetGain = Math.max(0.0001, volume * 0.5);
+        const targetGain = Math.max(0.0001, VOICE_PEAK_CEILING * volume);
         track.voice.gain.gain.setTargetAtTime(targetGain, t0, 0.03);
       }
     }

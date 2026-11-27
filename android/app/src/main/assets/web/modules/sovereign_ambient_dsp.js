@@ -39,10 +39,12 @@
   const FADE_OUT_SEC = audioCore ? audioCore.FADE_OUT_MS / 1000 : 0.03;
   const BROWN_POLE = audioCore ? audioCore.BROWN_POLE : 0.997;
   const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
-  const BROWN_NOISE_AMP = (audioCore && audioCore.BROWN_NOISE_AMP) ? audioCore.BROWN_NOISE_AMP : 0.03;
-  const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
-  const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
+  const BROWN_NOISE_AMP = (audioCore && audioCore.BROWN_NOISE_AMP) ? audioCore.BROWN_NOISE_AMP : 0.025;
+  const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.05;
+  const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.065;
   const DC_BLOCK_HZ = audioCore ? audioCore.DC_BLOCK_HZ : 40;
+  const VOICE_PEAK_CEILING = audioCore ? audioCore.VOICE_PEAK_CEILING : 0.35;
+  const LIMITER_LINEAR = audioCore ? audioCore.LIMITER_LINEAR : Math.pow(10, -6/20);
 
   if (!global.__ZEN_AUDIO_SINGLETON__) {
     global.__ZEN_AUDIO_SINGLETON__ = {
@@ -385,9 +387,10 @@
       dc.Q.setValueAtTime(0.707, ctx.currentTime);
       const gain = ctx.createGain();
       gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-      // Scale voice gain by LIMITER_LINEAR (0.5) to match other AudioCore paths
-      // and avoid double-gain (voice gain × master gain). finalVol() handles mute/clamp.
-      const targetGain = Math.max(0.0001, finalVol(targetVol) * (audioCore.LIMITER_LINEAR || 0.5));
+      // Use VOICE_PEAK_CEILING for consistent gain staging with AudioCore.
+      // Buffer peak is ≤0.95 (enforced by createSeamlessBuffer/makeProceduralLoop),
+      // so actual peak ≈ VOICE_PEAK_CEILING * volume * 0.95.
+      const targetGain = Math.max(0.0001, VOICE_PEAK_CEILING * finalVol(targetVol));
       gain.gain.linearRampToValueAtTime(targetGain, ctx.currentTime + FADE_IN_SEC);
       source.connect(dc);
       dc.connect(gain);
@@ -457,8 +460,8 @@
         const gain = ctx.createGain();
         const now = ctx.currentTime;
         gain.gain.setValueAtTime(0.0001, now);
-        // Scale voice gain by LIMITER_LINEAR (0.5) to match other AudioCore paths
-        const targetGain = Math.max(0.0001, finalVol(S.volume) * (audioCore.LIMITER_LINEAR || 0.5));
+        // Use VOICE_PEAK_CEILING for consistent gain staging.
+        const targetGain = Math.max(0.0001, VOICE_PEAK_CEILING * finalVol(S.volume));
         gain.gain.linearRampToValueAtTime(targetGain, now + 0.02);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.6);
         source.connect(gain);
@@ -484,8 +487,8 @@
         const vctx = S.activeCtx || S.dspContext;
         if (vctx) {
           const targets = (S.activeSources && S.activeSources.length) ? S.activeSources : (S.activeGain ? [{ gain: S.activeGain }] : []);
-          // Scale voice gain by LIMITER_LINEAR (0.5) to match other AudioCore paths
-          const scaledVol = Math.max(0.0001, finalVol(S.volume) * (audioCore && audioCore.LIMITER_LINEAR ? audioCore.LIMITER_LINEAR : 0.5));
+          // Use VOICE_PEAK_CEILING for consistent gain staging.
+          const scaledVol = Math.max(0.0001, VOICE_PEAK_CEILING * finalVol(S.volume));
           targets.forEach(function (entry) {
             try { entry.gain.gain.setValueAtTime(scaledVol, vctx.currentTime); } catch (e) {}
           });
@@ -503,7 +506,7 @@
       const vctx = S.activeCtx || S.dspContext;
       if (vctx) {
         const targets = (S.activeSources && S.activeSources.length) ? S.activeSources : (S.activeGain ? [{ gain: S.activeGain }] : []);
-        const scaledVol = Math.max(0.0001, finalVol(S.volume) * (audioCore && audioCore.LIMITER_LINEAR ? audioCore.LIMITER_LINEAR : 0.5));
+        const scaledVol = Math.max(0.0001, VOICE_PEAK_CEILING * finalVol(S.volume));
         targets.forEach(function (entry) {
           try {
             entry.gain.gain.cancelScheduledValues(vctx.currentTime);

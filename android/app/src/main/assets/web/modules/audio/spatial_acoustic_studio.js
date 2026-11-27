@@ -45,9 +45,10 @@
   const DC_BLOCK_HZ = (audioCore && audioCore.DC_BLOCK_HZ) ? audioCore.DC_BLOCK_HZ : 40;
   const BROWN_POLE = audioCore ? audioCore.BROWN_POLE : 0.997;
   const BROWN_GAIN = audioCore ? audioCore.BROWN_GAIN : 0.4;
-  const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.06;
-  const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.08;
-  const BROWN_NOISE_AMP = audioCore ? audioCore.BROWN_NOISE_AMP : 0.03;
+  const WHITE_NOISE_AMP = audioCore ? audioCore.WHITE_NOISE_AMP : 0.05;
+  const PINK_NOISE_AMP = audioCore ? audioCore.PINK_NOISE_AMP : 0.065;
+  const BROWN_NOISE_AMP = audioCore ? audioCore.BROWN_NOISE_AMP : 0.025;
+  const VOICE_PEAK_CEILING = audioCore ? audioCore.VOICE_PEAK_CEILING : 0.35;
 
   class AcousticStudio {
     constructor(options = {}) {
@@ -292,6 +293,13 @@
       source.buffer = buffer;
       source.loop = true;
 
+      // Per-voice gain for consistent gain staging with AudioCore.
+      // Buffers are generated at fixed amplitudes (see generators); we use unity gain
+      // here and rely on AudioCore's master volume for overall level control.
+      // This preserves the intentional loudness balance between presets.
+      const voiceGain = this.audioCtx.createGain();
+      voiceGain.gain.setValueAtTime(1.0, this.audioCtx.currentTime);
+
       // Build the chain: source -> shapers -> dcBlockFilter -> EQ filters -> AudioCore master
       let lastNode = source;
       if (shapers && shapers.length) {
@@ -300,7 +308,8 @@
           lastNode = s;
         });
       }
-      lastNode.connect(this.dcBlockFilter);
+      lastNode.connect(voiceGain);
+      voiceGain.connect(this.dcBlockFilter);
       // The EQ chain is already built and connected to AudioCore master output
       // in buildEqChain. The dcBlockFilter is the entry point to the EQ chain.
       // So we just connect source/shapers to dcBlockFilter.
@@ -312,6 +321,7 @@
 
       source.start();
       this.sourceNode = source;
+      this.voiceGain = voiceGain; // Track for potential future volume control
       return source;
     }
 
@@ -363,26 +373,28 @@
         try {
           const now = this.audioCtx.currentTime;
           const fade = FADE_OUT_SEC;
-          // Fade using a temporary gain node inserted before dcBlockFilter
-          // to avoid modifying the shared EQ chain.
-          const fadeGain = this.audioCtx.createGain();
-          fadeGain.gain.setValueAtTime(1, now);
-          fadeGain.gain.linearRampToValueAtTime(0, now + fade);
-
-          // Reconnect: source -> fadeGain -> dcBlockFilter (EQ chain)
-          source.disconnect();
-          source.connect(fadeGain);
-          fadeGain.connect(this.dcBlockFilter);
-
+          // Fade using the voiceGain node to avoid modifying the shared EQ chain.
+          if (this.voiceGain) {
+            this.voiceGain.gain.cancelScheduledValues(now);
+            this.voiceGain.gain.setValueAtTime(this.voiceGain.gain.value, now);
+            this.voiceGain.gain.linearRampToValueAtTime(0, now + fade);
+          }
           source.stop(now + fade + 0.005);
-          // Clean up fadeGain after fade completes
+          // Clean up after fade completes
           source.onended = () => {
             try { source.disconnect(); } catch (_) {}
-            try { fadeGain.disconnect(); } catch (_) {}
+            if (this.voiceGain) {
+              try { this.voiceGain.disconnect(); } catch (_) {}
+              this.voiceGain = null;
+            }
           };
         } catch (e) {
           try { source.stop(); } catch (_) {}
           try { source.disconnect(); } catch (_) {}
+          if (this.voiceGain) {
+            try { this.voiceGain.disconnect(); } catch (_) {}
+            this.voiceGain = null;
+          }
         }
       }
 

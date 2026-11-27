@@ -71,12 +71,12 @@
     const voice = audioCore.createVoice(buffer, loop);
     if (!voice) return null;
 
-    // Scale voice gain to respect limiter ceiling
-    const targetGain = Math.max(0.0001, targetVol * (audioCore.LIMITER_LINEAR || 0.5));
+    // AudioCore.createVoice now ramps to VOICE_PEAK_CEILING automatically.
+    // Scale by targetVol (0..1) for per-sound volume control.
     const now = ctx.currentTime;
     voice.gain.gain.cancelScheduledValues(now);
     voice.gain.gain.setValueAtTime(0.0001, now);
-    voice.gain.gain.linearRampToValueAtTime(targetGain, now + 0.03);
+    voice.gain.gain.linearRampToValueAtTime(audioCore.VOICE_PEAK_CEILING * targetVol, now + 0.03);
 
     return voice;
   }
@@ -131,7 +131,7 @@
         if (buffer) {
           const voice = audioCore.createVoice(buffer, false);
           if (voice) {
-            const targetGain = Math.max(0.0001, S.volume * (audioCore.LIMITER_LINEAR || 0.5));
+            const targetGain = Math.max(0.0001, audioCore.VOICE_PEAK_CEILING * S.volume);
             const now = ctx.currentTime;
             voice.gain.gain.cancelScheduledValues(now);
             voice.gain.gain.setValueAtTime(0.0001, now);
