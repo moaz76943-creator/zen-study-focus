@@ -231,9 +231,29 @@
                 if (!target) return;
                 const id = target.id;
                 if (id && self.handlers[id]) {
+                    self._lastDispatch = self._lastDispatch || {};
+                    self._lastDispatch[id] = Date.now();
                     self.handlers[id](target, e);
                 }
             }, true);
+        },
+
+        _lastDispatch: {},
+        dispatch: function (actionId, target, event) {
+            // Idempotency: delegation already handled the tap; skip if another
+            // thread (the capture listener) ran within the last 120ms.
+            if (this._lastDispatch && typeof this._lastDispatch[actionId] === 'number') {
+                const now = Date.now();
+                if (now - this._lastDispatch[actionId] < 120) return false;
+            }
+            this._lastDispatch = {};
+            this._lastDispatch[actionId] = now;
+
+            const handler = this.handlers[actionId];
+            if (typeof handler !== "function") return false;
+            try { handler(target, event); } catch (e) { /* guard handler errors */ }
+            finally { delete this.handlers[actionId]; this._lastDispatch[actionId] = undefined; }
+            return true;
         }
     };
 
