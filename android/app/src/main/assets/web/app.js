@@ -6125,6 +6125,13 @@ function toggleSoundTile(id) {
   }
   const ctx = ensureProceduralAudioContext();
   if (!ctx) { showToast(cfg.lang === 'ar' ? '⚠️ مشغل الصوت غير متاح' : '⚠️ Audio output unavailable'); return Promise.resolve(); }
+  // Restore master gain after an instant-stop (stopAllAudio / Stop AllAudio)
+  // so any newly-played tile isn't silently muted.
+  try {
+    if (typeof window.dfMasterAudioUnmute === 'function') {
+      window.dfMasterAudioUnmute();
+    }
+  } catch (_) {}
   if (ctx.state === 'suspended') ctx.resume();
   
   return getOggBuffer(s.src).then(buffer => {
