@@ -196,11 +196,12 @@
       }
     }
 
-    // 4. Seamless-loop crossfade.
-    //    The final buffer is the main body (finalSize samples from tempData[xfadeSamples..]).
-    //    The last xfadeSamples of the body are crossfaded INTO the first xfadeSamples of
-    //    the body, so the loop boundary (end → start) is a smooth morph instead of a jump
-    //    to zero. This mirrors the proven createSeamlessOggBuffer strategy.
+    // 4. Seamless-loop crossfade — blends the LAST xfadeSamples of the body
+    //    with the FIRST xfadeSamples of the body (indices 0..xfadeSamples-1).
+    //    At i = xfadeSamples-1 (t≈1): finalData[finalSize-1] ≈ body_head[xfadeSamples-1].
+    //    Loop boundary: finalData[finalSize-1] (≈ head[xfadeSamples-1]) → finalData[0] (head[0]).
+    //    For noise with correlation time << xfadeSamples, this jump is inaudible.
+    //    This is the standard technique for seamless stochastic looping.
     const finalBuffer = ctx.createBuffer(numChannels, finalSize, ctx.sampleRate);
     for (let ch = 0; ch < numChannels; ch++) {
       const finalData = finalBuffer.getChannelData(ch);
@@ -209,15 +210,13 @@
       // Main body: tempData[xfadeSamples .. xfadeSamples + finalSize - 1]
       finalData.set(tempData.subarray(xfadeSamples, xfadeSamples + finalSize));
 
-      // Crossfade the tail (last xfadeSamples) into the head (first xfadeSamples).
-      // finalData[finalSize - xfadeSamples + i] = (1-t)*body_tail[i] + t*body_head[i]
-      // At i = xfadeSamples-1 (t≈1): finalData[finalSize-1] ≈ body_head[xfadeSamples-1]
-      // Loop boundary: finalData[finalSize-1] (≈ head-end) → finalData[0] (head-start)
-      // For noise, this jump is indistinguishable from normal sample-to-sample variation.
+      // Crossfade the tail (last xfadeSamples of body) into the head (first xfadeSamples of body).
+      // body_tail[i] = tempData[xfadeSamples + finalSize - xfadeSamples + i] = body[finalSize-xfadeSamples+i]
+      // body_head[i] = tempData[xfadeSamples + i] = body[i]
       for (let i = 0; i < xfadeSamples; i++) {
         const t = i / xfadeSamples;
-        const tailSample = tempData[xfadeSamples + finalSize - xfadeSamples + i];
-        const headSample = tempData[xfadeSamples + i];
+        const tailSample = tempData[xfadeSamples + finalSize - xfadeSamples + i]; // body[finalSize-xfadeSamples+i]
+        const headSample = tempData[xfadeSamples + i];                             // body[i]
         finalData[finalSize - xfadeSamples + i] = (1 - t) * tailSample + t * headSample;
       }
 

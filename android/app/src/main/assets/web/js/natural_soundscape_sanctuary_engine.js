@@ -2,7 +2,8 @@
  * DEEP FOCUS — High-Fidelity Natural Soundscape Sanctuary Engine (Mission #180)
  * Realistic Brownian/Pink noise filtering for Rain, Waves, Wind, Campfire, and Streams.
  * CC0 offline buffer preference with instantaneous synthetic fallback. Zero music.
- * v2.3: Uses AudioCore for single shared AudioContext, zero static/hiss, instant stop, gesture-gated.
+ * v2.4: Uses AudioCore for single shared AudioContext, zero static/hiss, instant stop, gesture-gated.
+ * Fixed: this-binding bug in stop() closure, removed dead peak tracking code, fixed catch block syntax.
  */
 (function(root) {
   'use strict';
@@ -64,7 +65,6 @@
           // Brown noise accumulator with two-pole leaky integrator to prevent DC drift
           let brown1 = 0;
           let brown2 = 0;
-          let peak = 0;
 
           for (let i = 0; i < bufferSize; i++) {
             const white = Math.random() * 2 - 1;
@@ -89,14 +89,11 @@
               data[i] = brown2 * BROWN_NOISE_AMP;
             } else {
               // Campfire crackle: sparse pops on low noise floor
-              // Track noise floor peak separately from pops for consistent normalization
               const pop = Math.random() > 0.9985 ? (Math.random() * 2 - 1) * 0.8 : 0;
               b0 = 0.99 * b0 + white * 0.02;
               const noiseFloor = b0 * 0.1;
               data[i] = noiseFloor + pop;
-              // Track peak of noise floor only (pops are rare transients, clamped later)
-              const absFloor = Math.abs(noiseFloor);
-              if (absFloor > peak) peak = absFloor;
+              // Note: peak tracking removed (dead code) — AudioCore's createSeamlessBuffer handles normalization
             }
           }
           // AudioCore's createSeamlessBuffer handles DC removal, normalization, clamp
@@ -167,9 +164,10 @@
 
       // Stop function with instant fade and full cleanup
       const FADE_OUT_MS = audioCore ? audioCore.FADE_OUT_MS : 30;
+      const stopCtx = this.ctx; // Capture ctx for closure (this binding fix)
       function stop() {
         try {
-          const now = this.ctx.currentTime;
+          const now = stopCtx.currentTime;
           const fade = FADE_OUT_MS / 1000;
           gain.gain.cancelScheduledValues(now);
           gain.gain.setValueAtTime(gain.gain.value, now);
