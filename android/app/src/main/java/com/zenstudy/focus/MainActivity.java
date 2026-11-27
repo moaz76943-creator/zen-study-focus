@@ -272,23 +272,14 @@ public class MainActivity extends AppCompatActivity {
                     webView.evaluateJavascript(js, null);
                 }
             });
-            // The parent padding already keeps content clear of every bar, so the
-            // WebView must not ALSO inject the same insets via safe-area-inset-*
-            // (env() is zero here and must stay zero to avoid double padding).
-            // Zeroing (not CONSUMED) keeps the WebView's internal state in sync when
-            // the keyboard opens/hides, preventing ghost padding after IME dismissal.
-            // Call setInsets separately for each type — combined type masks (systemBars)
-            // are not reliably handled by WindowInsetsCompat.Builder on all Android versions.
-            // Explicitly zero each individual type; do NOT zero systemBars() as it is a
-            // combined mask (status + nav) that fails to clear statusBars() on Xiaomi
-            // Android 15, leaving safe-area-inset-top active and causing content overlap.
-            return new WindowInsetsCompat.Builder(windowInsets)
-                    .setInsets(WindowInsetsCompat.Type.statusBars(), Insets.NONE)
-                    .setInsets(WindowInsetsCompat.Type.displayCutout(), Insets.NONE)
-                    .setInsets(WindowInsetsCompat.Type.navigationBars(), Insets.NONE)
-                    .setInsets(WindowInsetsCompat.Type.mandatorySystemGestures(), Insets.NONE)
-                    .setInsets(WindowInsetsCompat.Type.ime(), Insets.NONE)
-                    .build();
+            // The parent FrameLayout padding (set above) is the single owner of system-bar
+            // insets. To prevent the WebView from also receiving insets and applying
+            // safe-area-inset-* (which causes double padding and content overlap on
+            // Xiaomi Android 15), we return CONSUMED. This ensures the WebView's layout
+            // viewport matches the padded FrameLayout bounds exactly.
+            // Native side handles IME via paddingBottom = max(navBottom, ime.bottom) and
+            // the calibrator receives paddingBottomDp for CSS clearance updates.
+            return WindowInsetsCompat.CONSUMED;
         });
 
         insetFrame.addView(webView, new android.widget.FrameLayout.LayoutParams(

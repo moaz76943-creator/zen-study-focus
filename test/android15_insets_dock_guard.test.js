@@ -35,9 +35,12 @@ assert.ok(java.includes('Type.mandatorySystemGestures()'),
   'mandatorySystemGestures() insets must be consumed (gesture handle on Xiaomi)');
 assert.ok(java.includes('Type.ime()'),
   'IME insets must be consumed (keyboard)');
-// systemBars() is a combined mask (status + nav) — zeroing it in the Builder
-// does not reliably clear individual types on Xiaomi Android 15. The fix zeros
-// each individual type explicitly. Verify systemBars() is NOT in the Builder.
+// The insets listener must return CONSUMED to prevent insets from propagating
+// to the WebView (which would cause safe-area-inset-* double padding and
+// content overlap on Xiaomi Android 15). The parent FrameLayout padding is
+// the single owner of insets.
+assert.ok(java.includes('WindowInsetsCompat.CONSUMED'),
+  'insets listener must return CONSUMED to prevent WebView from receiving insets');
 assert.ok(!/setInsets\(WindowInsetsCompat\.Type\.systemBars\(\)/.test(java),
   'systemBars() combined mask must NOT be zeroed in Builder (causes double-counting on Xiaomi)');
 // Padding goes to the parent inset FrameLayout, never to the WebView itself
@@ -56,11 +59,7 @@ assert.ok(java.includes('absoluteMinNavDp = 500'),
   'Xiaomi 3-button absolute floor must be 500dp');
 assert.ok(java.includes('minStatusBarDp = 80'),
   'status bar minimum floor must be 80dp for large fonts/notches');
-// The consumed insets are zeroed, never CONSUMED, so the WebView does not
-// re-apply them via safe-area-inset-* and env() stays 0 (no double counting).
-assert.ok(java.includes('Insets.NONE'),
-  'consumed insets must be zeroed so CSS env()/safe-area stay 0');
-console.log('✔ MainActivity consumes status bar, cutout, 3-button nav bar, gesture handle and IME; parent padding owns the inset.');
+console.log('✔ MainActivity consumes status bar, cutout, 3-button nav bar, gesture handle and IME; parent padding owns the inset; CONSUMED returned to prevent WebView double-padding.');
 
 // ---- CSS calibrator (single owner = native padding; variables pinned to 0) ----
 for (const v of ['--df-safe-top', '--df-safe-bottom', '--df-safe-left', '--df-safe-right', '--df-webview-padding-bottom']) {
