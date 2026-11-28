@@ -90,7 +90,7 @@ console.log('✔ Calibrator pins safe-area variables to 0px and publishes the do
   for (const block of shellBlocks) {
     // Only inspect actual rule bodies (selector-ish start, excludes prose/comments mentioning the class poorly).
     if (!/^\s*\.app-shell\s*[,{]/.test(block)) continue;
-    for (const bad of ['transform:', 'filter:', 'backdrop-filter:', 'perspective:', 'will-change: transform', 'will-change:transform']) {
+    for (const bad of ['transform:', 'filter:', 'backdrop-filter:', 'perspective:', 'will-change:']) {
       assert.ok(!block.includes(bad), '.app-shell rule must not declare ' + bad + ' — got: ' + block.slice(0, 120));
     }
   }

@@ -1,7 +1,7 @@
 // Regression gate: position:fixed docked layers (bottom nav capsule, Studios pill,
 // FAB) must stay anchored to the VIEWPORT so they never drift to page bottom or
 // cover the last card. A transform/filter/perspective/backdrop-filter (or
-// will-change: transform) on an ancestor such as .app-shell would make it the
+// will-change: <any-value>) on an ancestor such as .app-shell would make it the
 // containing block for fixed descendants (CSS Transforms spec), re-anchoring
 // them to the page and re-creating the Xiaomi Android 15 overlap defects.
 const assert = require('assert');
@@ -21,10 +21,10 @@ function ruleBlock(selector) {
 }
 
 const shell = ruleBlock('.app-shell {');
-for (const bad of ['transform:', 'filter:', 'backdrop-filter:', 'perspective:', 'will-change: transform']) {
+for (const bad of ['transform:', 'filter:', 'backdrop-filter:', 'perspective:', 'will-change:']) {
   assert.ok(!shell.includes(bad), '.app-shell must not declare ' + bad + ' (it would trap fixed children at page bottom)');
 }
-console.log('✔ .app-shell is free of containing-block creators (transform/filter/perspective).');
+console.log('✔ .app-shell is free of containing-block creators (transform/filter/perspective/will-change).');
 
 // The dock formulas must reference the calibrator-pinned variables, never raw hardcoded
 // safe-area values that would double-count the native parent padding.
