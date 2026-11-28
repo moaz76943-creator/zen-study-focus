@@ -57,8 +57,8 @@ assert.ok(java.includes('isGestureNav ? 32 : 100'),
 // Xiaomi 3-button absolute floor increased to 500dp for Android 15 HyperOS
 assert.ok(java.includes('absoluteMinNavDp = 500'),
   'Xiaomi 3-button absolute floor must be 500dp');
-assert.ok(java.includes('minStatusBarDp = 80'),
-  'status bar minimum floor must be 80dp for large fonts/notches');
+assert.ok(java.includes('minStatusBarDp = 100'),
+  'status bar minimum floor must be 100dp for large fonts/notches/dynamic island');
 console.log('✔ MainActivity consumes status bar, cutout, 3-button nav bar, gesture handle and IME; parent padding owns the inset; CONSUMED returned to prevent WebView double-padding.');
 
 // ---- CSS calibrator (single owner = native padding; variables pinned to 0) ----

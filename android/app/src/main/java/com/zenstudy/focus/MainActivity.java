@@ -126,12 +126,12 @@ public class MainActivity extends AppCompatActivity {
 
             // Status bar top: max of status bars top and display cutout top (statusBars() is the
             // authoritative source for status bar height; systemBars().top is not reliable on Xiaomi).
-            // Apply a minimum floor (80dp) in case the system under-reports on Xiaomi Android 15
-            // where status bar can be taller due to larger fonts, notch, or system UI density.
-            // 80dp covers tall status bars on HyperOS with large fonts / dynamic island cutouts
-            // and provides extra safety margin for 200% font scaling.
+            // Apply a minimum floor (100dp) in case the system under-reports on Xiaomi Android 15
+            // where status bar can be taller due to larger fonts, notch, dynamic island cutouts,
+            // or system UI density. 100dp covers tall status bars on HyperOS with 200% font scaling
+            // and provides extra safety margin for Android 15 edge-to-edge enforcement.
             int paddingTop = Math.max(statusBars.top, displayCutout.top);
-            int minStatusBarDp = 80;
+            int minStatusBarDp = 100;
             int minStatusBarPx = Math.round(minStatusBarDp * density);
             if (paddingTop < minStatusBarPx) paddingTop = minStatusBarPx;
 

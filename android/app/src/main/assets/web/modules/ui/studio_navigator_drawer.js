@@ -554,7 +554,7 @@
             // MainActivity pads the parent FrameLayout; --df-webview-padding-bottom is pinned to 0px by the calibrator.
             // The calibrator computes: clearance - pillHeight(48) - gap(8) = clearance - 56.
             pill.style.bottom = "var(--df-studios-pill-bottom, 294px)";
-            pill.style.right = "12px";
+            pill.style.right = "var(--df-safe-right, 12px)";
             pill.style.left = "auto";
             pill.style.transform = "none";
             // High contrast on AMOLED/dark content; WCAG-large text, 48px tap target.
@@ -563,8 +563,10 @@
             pill.style.setProperty("color", "#ffffff", "important");
             pill.style.width = "auto";
             // Reserve space for FAB (left:24px + width:54px + 12px gap = 90px from left)
-            // so Studios pill never overlaps the FAB on narrow screens.
-            pill.style.maxWidth = "min(320px, calc(100vw - 102px))";
+            // plus safe-area-inset-right so Studios pill never overlaps the FAB on narrow screens
+            // or devices with right-edge cutouts. Use calc with calibrator variable for precision.
+            pill.style.maxWidth = "min(320px, calc(100vw - var(--df-safe-right, 12px) - 102px))";
+            pill.style.minWidth = "min(180px, calc(100vw - var(--df-safe-right, 12px) - 102px))";
             pill.style.minHeight = "48px";
             pill.style.background = "rgba(17, 24, 39, 0.97)";
             pill.style.backdropFilter = "blur(12px)";
@@ -583,7 +585,6 @@
             pill.style.overflow = "hidden";
             pill.style.textOverflow = "ellipsis";
             pill.style.whiteSpace = "nowrap";
-            pill.style.minWidth = "0";
             pill.style.touchAction = "manipulation";
             pill.style.webkitTapHighlightColor = "transparent";
             pill.style.gap = "8px";
