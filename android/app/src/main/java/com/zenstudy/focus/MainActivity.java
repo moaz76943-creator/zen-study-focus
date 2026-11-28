@@ -286,6 +286,15 @@ public class MainActivity extends AppCompatActivity {
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT,
                 android.view.ViewGroup.LayoutParams.MATCH_PARENT));
         setContentView(insetFrame);
+
+        // DEFENSE IN DEPTH: On Xiaomi HyperOS Android 15, the parent FrameLayout's CONSUMED
+        // return may not reliably prevent WebView from receiving insets. Install a second
+        // listener on the WebView itself that also returns CONSUMED (without padding) to
+        // guarantee the WebView's layout viewport never extends behind system bars.
+        ViewCompat.setOnApplyWindowInsetsListener(webView, (v, windowInsets) -> {
+            return WindowInsetsCompat.CONSUMED;
+        });
+
         // Force initial insets dispatch now that the view is attached.
         ViewCompat.requestApplyInsets(insetFrame);
 
