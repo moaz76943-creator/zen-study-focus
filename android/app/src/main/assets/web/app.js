@@ -901,8 +901,10 @@ async function playCompletionTone(toneKey) {
       }
     }
 
-    // Fallback: HTMLAudioElement (only if AudioCore unavailable or no gesture)
-    if (typeof Audio === 'function') {
+    // Fallback: HTMLAudioElement — ONLY if user gesture already received.
+    // This fallback used to call audio.play() unconditionally, which auto-played
+    // on tab switch / page load when AudioCore was unavailable. Now gated.
+    if (typeof Audio === 'function' && window.AudioCore && window.AudioCore.isGestureReceived()) {
       const audio = new Audio(file);
       toneAudio = audio;
       audio.loop = false;
