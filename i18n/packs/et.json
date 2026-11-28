@@ -413,7 +413,7 @@
     "Speed reading with Rapid Serial Visual Presentation (RSVP) eliminates unnecessary eye saccades by anchoring every word at its Optical Recognition Point (ORP).": "Kiirlugemine kiire järjestikuse visuaalse esituse (RSVP) abil kaotab tarbetud silmahüpped, ankurdades iga sõna selle optilise äratundmispunkti (ORP) külge.",
     "Spoken side": "Ettekantav külg",
     "Sport": "Sport",
-    "Sport: {0} min": "Sport: {0} min",
+    "Sport: {0} min": "[Sport: {0} min]",
     "Start": "Alusta",
     "Start Deep Work": "Alusta süvatööd",
     "Start Focus": "Alusta keskendumist",
