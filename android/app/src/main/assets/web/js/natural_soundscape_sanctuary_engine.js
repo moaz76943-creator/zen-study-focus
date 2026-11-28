@@ -69,6 +69,9 @@
           // Brown noise accumulator with two-pole leaky integrator to prevent DC drift
           let brown1 = 0;
           let brown2 = 0;
+          // Real-time 40 Hz DC block state (persists across samples, never reset inside loop)
+          let hpState = 0, prevInput = 0;
+          const hpAlpha = Math.exp(-2 * Math.PI * DC_BLOCK_HZ / sampleRate);
 
           for (let i = 0; i < bufferSize; i++) {
             const white = Math.random() * 2 - 1;
@@ -86,11 +89,17 @@
               // Brown Noise: two-pole leaky integrator of WHITE noise (-12dB/oct slope).
               // Using AudioCore's BROWN_POLE and BROWN_GAIN for bounded DC.
               // First pole at BROWN_POLE, second at 0.99 — dramatically reduces DC drift vs single pole.
+              // Real-time 40 Hz DC block (belt-and-suspenders with createSeamlessBuffer post-processing)
+              // prevents any DC drift accumulation — the old raw value hard-clamped ~75% of samples
+              // at ±1 into harsh static; this fixes the root cause.
               brown1 = BROWN_POLE * brown1 + white * BROWN_GAIN;
               brown2 = 0.99 * brown2 + brown1 * 0.1;
-              // Fixed output scale using AudioCore's BROWN_NOISE_AMP — the old raw
-              // value hard-clamped ~75% of samples at ±1 into harsh static.
-              data[i] = brown2 * BROWN_NOISE_AMP;
+              const brownRaw = brown2 * BROWN_NOISE_AMP;
+              const hpAlpha = Math.exp(-2 * Math.PI * DC_BLOCK_HZ / sampleRate);
+              const hpOut = hpAlpha * (hpState + brownRaw - prevInput);
+              hpState = hpOut;
+              prevInput = brownRaw;
+              data[i] = hpOut;
             } else {
               // Campfire crackle: sparse pops on low noise floor
               const pop = Math.random() > 0.9985 ? (Math.random() * 2 - 1) * 0.8 : 0;
@@ -108,13 +117,13 @@
 
     play(soundKey, volume = 0.7) {
           // Zero-autoplay invariant: never start a nature loop while the tab is hidden.
-          if (typeof document !== 'undefined' && document.hidden) return;
-          if (!audioCore || !audioCore.isGestureReceived()) return; // Hard gate
-          this.initContext();
-          if (!this.ctx) return;
-          this.stop(soundKey);
+            if (typeof document !== 'undefined' && document.hidden) return;
+            if (!audioCore || !audioCore.isGestureReceived()) return; // Hard gate
+            this.initContext();
+            if (!this.ctx) return;
+            this.stop(soundKey);
 
-          const bufferType = (soundKey.includes('rain') || soundKey.includes('stream') || soundKey.includes('water')) ? 'rain' :
+            const bufferType = (soundKey.includes('rain') || soundKey.includes('stream') || soundKey.includes('water') || soundKey.includes('thunder') || soundKey.includes('drip')) ? 'rain' :
                              (soundKey.includes('ocean') || soundKey.includes('wind')) ? 'ocean' : 'fire';
 
           const noiseBuffer = this.createNaturalNoiseBuffer(bufferType);

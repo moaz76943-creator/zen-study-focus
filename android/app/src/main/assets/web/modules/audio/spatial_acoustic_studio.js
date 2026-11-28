@@ -198,8 +198,13 @@
          // Using AudioCore's BROWN_NOISE_AMP (0.03) for consistent fixed-output scale.
          // The old *0.05 with swell modulation caused loop-boundary discontinuities
          // perceived as static/hiss. Fixed gain with AudioCore's crossfade is clean.
+         // Real-time 40 Hz DC block (belt-and-suspenders with createSeamlessBuffer mean
+         // subtraction) prevents slow DC wander from the high-DC-gain leaky integrator
+         // turning into low-frequency rumble/static.
          let brown1 = 0;
          let brown2 = 0;
+         let hpState = 0, prevInput = 0;
+         const hpAlpha = Math.exp(-2 * Math.PI * DC_BLOCK_HZ / sampleRate);
          for (let i = 0; i < bufferSize; i++) {
            const white = Math.random() * 2 - 1;
            // Two-pole leaky integrator: first pole at BROWN_POLE, second at 0.99
@@ -207,7 +212,12 @@
            brown2 = 0.99 * brown2 + brown1 * 0.1;
            // Fixed output scale using AudioCore's BROWN_NOISE_AMP — no swell modulation,
            // no amplitude variation that breaks seamless loop crossfade.
-           data[i] = brown2 * BROWN_NOISE_AMP;
+           const brownRaw = brown2 * BROWN_NOISE_AMP;
+           // Real-time 1st-order high-pass DC block
+           const hpOut = hpAlpha * (hpState + brownRaw - prevInput);
+           hpState = hpOut;
+           prevInput = brownRaw;
+           data[i] = hpOut;
          }
          // AudioCore's createSeamlessBuffer handles DC removal, clamp, and 20ms crossfade.
        }, 1, false);
