@@ -32,21 +32,22 @@
         init: function () {
            if (!this._hasRealInsets) {
              // Compute initial fallback based on viewport width to match real calibrator behavior.
-             // On narrow screens (<430px), capsule expands up to 136px (56 + 80), raising
-             // floatingLayerClearance to 332px. On wide screens, capsule stays at 56px (252px clearance).
-             // Use 120dp for bottom/paddingBottom to avoid falsely triggering tall nav bar detection
-             // (which requires >= 300dp). The HTML fallback of 350px for --df-inflow-bottom is the
-             // true safety floor; calibrator must not reduce it.
+             // On narrow screens (<430px), capsule expands up to 136px (56 + 80).
+             // On wide screens, capsule stays at 56px.
+             // Base clearance = capsuleHeight + 148. HTML fallback clearance = 350px (minimum).
+             // Expansion = max(0, 350 - baseClearance). Studios pill bottom = capsuleHeight + 20 + expansion.
              var vpWidth = (typeof window !== 'undefined' && window.innerWidth) ||
                            (typeof document !== 'undefined' && document.documentElement.clientWidth) ||
                            360;
              var isNarrow = vpWidth < 430;
              var fallbackCapsuleHeight = isNarrow ? 136 : 56;
-             var fallbackClearance = fallbackCapsuleHeight + 196; // floatingLayerClearance = capsuleHeight + 196
-             // HTML fallback for --df-inflow-bottom / --df-bottom-nav-clearance is 350px.
-             // Calibrator init() must not reduce clearance below this safety floor.
+             var baseClearance = fallbackCapsuleHeight + 148;
              var minSafeClearance = 350;
-             if (fallbackClearance < minSafeClearance) fallbackClearance = minSafeClearance;
+             var fallbackClearance = baseClearance > minSafeClearance ? baseClearance : minSafeClearance;
+             var expansion = fallbackClearance > baseClearance ? fallbackClearance - baseClearance : 0;
+             var fallbackStudiosPillBottom = fallbackCapsuleHeight + 20 + expansion;
+             var fallbackFabBottom = fallbackStudiosPillBottom + 62;
+             var fallbackScratchpadBottom = Math.round((fallbackStudiosPillBottom + fallbackFabBottom) / 2);
              // Prime currentInsets with viewport-aware fallbacks so onViewportChange doesn't zero them out
              // before real insets arrive from Android.
              var fallbackInsets = {
@@ -64,13 +65,10 @@
                root.style.setProperty('--df-inflow-bottom', fallbackClearance + 'px', 'important');
                root.style.setProperty('--df-bottom-nav-clearance', fallbackClearance + 'px', 'important');
                root.style.setProperty('--df-capsule-height', fallbackCapsuleHeight + 'px', 'important');
-               var studiosPillBottom = fallbackClearance - 56;
-               var fabBottom = studiosPillBottom + 62;
-               var scratchpadBottom = Math.round((studiosPillBottom + fabBottom) / 2);
-               root.style.setProperty('--df-studios-pill-bottom', studiosPillBottom + 'px', 'important');
-               root.style.setProperty('--df-fab-bottom', fabBottom + 'px', 'important');
-               root.style.setProperty('--df-scratchpad-bottom', scratchpadBottom + 'px', 'important');
-               root.style.setProperty('--df-float-bottom', studiosPillBottom + 'px', 'important');
+               root.style.setProperty('--df-studios-pill-bottom', fallbackStudiosPillBottom + 'px', 'important');
+               root.style.setProperty('--df-fab-bottom', fallbackFabBottom + 'px', 'important');
+               root.style.setProperty('--df-scratchpad-bottom', fallbackScratchpadBottom + 'px', 'important');
+               root.style.setProperty('--df-float-bottom', fallbackStudiosPillBottom + 'px', 'important');
              }
            }
            if (typeof window !== 'undefined') {
@@ -158,144 +156,156 @@
 
     /**
          /** Computes the Studios pill bottom position (above capsule, no overlap).
-              * Studios pill height = 48px. Gap between Studios pill and content = 8px.
-              * Studios pill bottom = clearance - gap(8) - pillHeight(48) = clearance - 56.
-              * This positions the Studios pill at the clearance boundary so content never overlaps.
+              * Studios pill height = 48px. Gap between capsule top and Studios pill = 8px.
+              * Capsule docked at --df-dock-bottom (12px) from viewport bottom.
+              * Base Studios pill bottom = dockGap(12) + capsuleHeight + gap(8) = capsuleHeight + 20.
+              * When clearance expands (IME/keyboard), the floating stack moves up with content:
+              *   studiosPillBottom = baseStudiosPillBottom + max(0, clearance - baseClearance).
+              * @param {number} capsuleHeight Computed capsule height
               * @param {number} bottomNavClearance The computed bottom nav clearance (body padding reserve)
+              * @param {number} baseClearance The base clearance without IME (capsuleHeight + 148)
               * @returns {number} Studios pill bottom position in px
               */
-                 _computeStudiosPillBottom: function (bottomNavClearance) {
-                   // Clearance boundary: content ends at 'clearance' px from viewport bottom.
-                   // Studios pill bottom = clearance - pillHeight(48) - gap(8) = clearance - 56.
-                   return bottomNavClearance - 56;
-                 },
+             _computeStudiosPillBottom: function (capsuleHeight, bottomNavClearance, baseClearance) {
+               // Base position: capsule top (dockGap + capsuleHeight) + 8px gap = capsuleHeight + 20.
+               var baseStudiosPillBottom = capsuleHeight + 20;
+               // If clearance expanded beyond base (IME), shift floating stack up by the difference.
+               var expansion = bottomNavClearance > baseClearance ? bottomNavClearance - baseClearance : 0;
+               return baseStudiosPillBottom + expansion;
+             },
 
-        /**
-         * Computes the scratchpad trigger bottom position (below Studios pill, above FAB).
-         * Placed midway between Studios pill bottom and FAB bottom to avoid horizontal
-         * overlap with Studios pill on narrow screens while keeping it on the left side.
-         * @param {number} studiosPillBottom Studios pill bottom position
-         * @param {number} fabBottom FAB bottom position
-         * @returns {number} Scratchpad trigger bottom position in px
-         */
-        _computeScratchpadBottom: function (studiosPillBottom, fabBottom) {
-          // Midway between Studios pill bottom and FAB bottom
-          return Math.round((studiosPillBottom + fabBottom) / 2);
-        },
+             /**
+              * Computes the FAB bottom position (above Studios pill, no overlap).
+              * FAB height = 54px. Gap between Studios pill top and FAB bottom = 8px.
+              * FAB bottom = Studios pill bottom + Studios pill height(48) + gap(8) + FAB height(54)? No.
+              * Correct: FAB bottom = Studios pill bottom + gap(8) + FAB height(54) = studiosPillBottom + 62.
+              * @param {number} studiosPillBottom Studios pill bottom position
+              * @returns {number} FAB bottom position in px
+              */
+             _computeFabBottom: function (studiosPillBottom) {
+               // Studios pill bottom + gap(8) + FAB height(54) = studiosPillBottom + 62.
+               return studiosPillBottom + 62;
+             },
 
-        /**
-         * Computes the FAB bottom position (above Studios pill, no overlap).
-         * FAB height = 54px. Studios pill bottom = computed above.
-         * FAB bottom = studiosPillBottom + FABHeight(54) + gap(8) = studiosPillBottom + 62.
-         * @param {number} studiosPillBottom Studios pill bottom position
-         * @returns {number} FAB bottom position in px
-         */
-        _computeFabBottom: function (studiosPillBottom) {
-          // studiosPillBottom + FABHeight(54) + gap(8) = studiosPillBottom + 62
-          return studiosPillBottom + 62;
-        },
+             /**
+              * Computes the scratchpad trigger bottom position (below Studios pill, above FAB).
+              * Placed midway between Studios pill bottom and FAB bottom to avoid horizontal
+              * overlap with Studios pill on narrow screens while keeping it on the left side.
+              * @param {number} studiosPillBottom Studios pill bottom position
+              * @param {number} fabBottom FAB bottom position
+              * @returns {number} Scratchpad trigger bottom position in px
+              */
+             _computeScratchpadBottom: function (studiosPillBottom, fabBottom) {
+               // Midway between Studios pill bottom and FAB bottom
+               return Math.round((studiosPillBottom + fabBottom) / 2);
+             },
 
-            /** Computes the bottom nav clearance for in-flow content.
-                 * Must clear the highest floating layer (FAB top) + gap.
-                 * FAB top = fabBottom + FABHeight(54) = capsuleHeight + 184.
-                 * Clearance = FAB top + gap(12) = capsuleHeight + 196.
-                 * @param {number} capsuleHeight Computed capsule height
-                 * @param {number} actualNavBottom ACTUAL reported nav bar height (NO defensive floors)
-                 * @param {number} paddingBottom Floored padding bottom (max of floored navBottom and IME)
-                 * @returns {number} Bottom nav clearance in px
-                 */
-                _computeBottomNavClearance: function (capsuleHeight, actualNavBottom, paddingBottom) {
-           // FAB top = capsuleHeight + 184, +12 gap = capsuleHeight + 196
-           var floatingLayerClearance = capsuleHeight + 196;
-           // IME detection: distinguish between (a) keyboard open and (b) OEM nav-bar floor (e.g. Xiaomi 500dp).
-           // - IME open: paddingBottom >> actualNavBottom (typically > 200dp IME vs <= 100dp nav)
-           // - Xiaomi floor: paddingBottom ~500dp (exact floor) AND actualNavBottom < 200dp (actual nav
-           //   is normal height; the 500dp is a defensive floor applied in MainActivity).
-           // Heuristic: if paddingBottom in 300-520 range AND actualNavBottom < 200 -> treat as OEM floor, not IME.
-           var isXiaomiFloor = paddingBottom >= 300 && paddingBottom <= 520 && actualNavBottom < 200;
-           var isImeOpen = !isXiaomiFloor && paddingBottom > actualNavBottom + 100;
-           var imeClearance = isImeOpen ? Math.min(paddingBottom, 450) : Math.min(actualNavBottom, 100) + 12;
-           // Minimum clearance: use the larger of floating stack clearance and IME clearance.
-           // floatingLayerClearance ranges 252-332px; imeClearance capped at 112px (non-IME) or 450px (IME).
-           // HTML fallback for --df-inflow-bottom is 350px; enforce this as absolute minimum.
-           return Math.max(floatingLayerClearance, imeClearance, 350);
-         },
+             /** Computes the bottom nav clearance for in-flow content.
+              * Must clear the highest floating layer (FAB top) + content gap(12px).
+              * Stack from viewport bottom:
+              *   Capsule: bottom = dockGap(12), height = capsuleHeight, top = 12 + capsuleHeight
+              *   Studios pill: bottom = capsule top + 8 = capsuleHeight + 20, height = 48, top = capsuleHeight + 68
+              *   FAB: bottom = Studios pill top + 8 = capsuleHeight + 76, height = 54, top = capsuleHeight + 130
+              *   Base clearance = FAB top + 12 = capsuleHeight + 142.
+              *   (Using 148 for extra 6px safety margin: capsuleHeight + 148)
+              * When IME opens, clearance expands to keyboard height; floating stack shifts up.
+              * @param {number} capsuleHeight Computed capsule height
+              * @param {number} actualNavBottom ACTUAL reported nav bar height (NO defensive floors)
+              * @param {number} paddingBottom Floored padding bottom (max of floored navBottom and IME)
+              * @returns {number} Bottom nav clearance in px
+              */
+             _computeBottomNavClearance: function (capsuleHeight, actualNavBottom, paddingBottom) {
+               // Base clearance = capsuleHeight + 148 (covers capsule + Studios pill + FAB + gaps).
+               var baseClearance = capsuleHeight + 148;
+               // IME detection: distinguish (a) keyboard open vs (b) OEM nav-bar floor (e.g. Xiaomi 500dp).
+               // - IME open: paddingBottom >> actualNavBottom (typically > 200dp IME vs <= 100dp nav).
+               // - Xiaomi floor: paddingBottom ~500dp (exact floor) AND actualNavBottom < 200dp.
+               // Heuristic: if paddingBottom in 300-520 range AND actualNavBottom < 200 -> OEM floor, not IME.
+               var isXiaomiFloor = paddingBottom >= 300 && paddingBottom <= 520 && actualNavBottom < 200;
+               var isImeOpen = !isXiaomiFloor && paddingBottom > actualNavBottom + 100;
+               var imeClearance = isImeOpen ? Math.min(paddingBottom, 450) : Math.min(actualNavBottom, 100) + 12;
+               // Minimum clearance: HTML fallback for --df-inflow-bottom is 350px; enforce as absolute floor.
+               return Math.max(baseClearance, imeClearance, 350);
+             },
 
              /** Injects CSS variables onto documentElement with !important to override conflicting rules.
-                  * Design (Android 15 / Xiaomi edge-to-edge): MainActivity pads the WebView's PARENT
-                  * FrameLayout with the FLOORED system-bar insets (including defensive floors for Xiaomi
-                  * HyperOS 3-button nav up to 500dp), so the WebView's layout viewport
-                  * already ends above the status bar, cutout and 3-button nav bar. Native padding
-                  * is the single owner of the insets — if CSS re-added them (via --df-safe-top /
-                  * --df-safe-bottom / --df-webview-padding-bottom) every dock offset and body
-                  * reserve would double-count, pushing the Studios pill over content and leaving
-                  * a thick empty band above the nav bar. These variables are therefore pinned to 0px;
-                  * raw device values remain available to JS via getInsets().
-                  * --df-bottom-nav-clearance: fixed reserve (dp) that clears the docked bottom capsule
-                  * plus FAB / Studios pill for in-flow content, measured from the safe content edge.
-                  * --df-studios-pill-bottom: explicit position for the Studios pill above the capsule.
-                  * --df-scratchpad-bottom: explicit position for the scratchpad trigger between Studios pill and FAB.
-                  * --df-fab-bottom: explicit position for the FAB above the Studios pill.
-                  * Capsule height is DYNAMIC based on actual nav bar insets and viewport width — the system
-                  * nav bar height is already handled by native parent padding. The capsule is an app-level
-                  * nav bar that sits just above the viewport bottom (12px dock gap) on both gesture and
-                  * 3-button navigation. Dock positions derive from this dynamic capsule height.
-                  */
-                 applyCSSVariables: function (insets) {
-           if (typeof document === 'undefined' || !document.documentElement) return;
+                              * Design (Android 15 / Xiaomi edge-to-edge): MainActivity pads the WebView's PARENT
+                              * FrameLayout with the FLOORED system-bar insets (including defensive floors for Xiaomi
+                              * HyperOS 3-button nav up to 500dp), so the WebView's layout viewport
+                              * already ends above the status bar, cutout and 3-button nav bar. Native padding
+                              * is the single owner of the insets — if CSS re-added them (via --df-safe-top /
+                              * --df-safe-bottom / --df-webview-padding-bottom) every dock offset and body
+                              * reserve would double-count, pushing the Studios pill over content and leaving
+                              * a thick empty band above the nav bar. These variables are therefore pinned to 0px;
+                              * raw device values remain available to JS via getInsets().
+                              * --df-bottom-nav-clearance: fixed reserve (dp) that clears the docked bottom capsule
+                              * plus FAB / Studios pill for in-flow content, measured from the safe content edge.
+                              * --df-studios-pill-bottom: explicit position for the Studios pill above the capsule.
+                              * --df-scratchpad-bottom: explicit position for the scratchpad trigger between Studios pill and FAB.
+                              * --df-fab-bottom: explicit position for the FAB above the Studios pill.
+                              * Capsule height is DYNAMIC based on actual nav bar insets and viewport width — the system
+                              * nav bar height is already handled by native parent padding. The capsule is an app-level
+                              * nav bar that sits just above the viewport bottom (12px dock gap) on both gesture and
+                              * 3-button navigation. Dock positions derive from this dynamic capsule height.
+                              */
+                             applyCSSVariables: function (insets) {
+                       if (typeof document === 'undefined' || !document.documentElement) return;
 
-           var root = document.documentElement;
+                       var root = document.documentElement;
 
-           // 0px: the native parent padding already keeps content clear of every bar.
-           root.style.setProperty('--df-safe-top', '0px', 'important');
-           root.style.setProperty('--df-safe-bottom', '0px', 'important');
-           root.style.setProperty('--df-safe-left', '0px', 'important');
-           root.style.setProperty('--df-safe-right', '0px', 'important');
-           root.style.setProperty('--df-webview-padding-bottom', '0px', 'important');
+                       // 0px: the native parent padding already keeps content clear of every bar.
+                       root.style.setProperty('--df-safe-top', '0px', 'important');
+                       root.style.setProperty('--df-safe-bottom', '0px', 'important');
+                       root.style.setProperty('--df-safe-left', '0px', 'important');
+                       root.style.setProperty('--df-safe-right', '0px', 'important');
+                       root.style.setProperty('--df-webview-padding-bottom', '0px', 'important');
 
-           // Dynamic capsule height based on actual nav bar insets and viewport width
-           var capsuleHeight = this._computeCapsuleHeight(insets);
-           root.style.setProperty('--df-capsule-height', capsuleHeight + 'px', 'important');
+                       // Dynamic capsule height based on actual nav bar insets and viewport width
+                       var capsuleHeight = this._computeCapsuleHeight(insets);
+                       root.style.setProperty('--df-capsule-height', capsuleHeight + 'px', 'important');
 
-           // Bottom nav clearance for in-flow content: must clear the highest floating layer
-           // (FAB top = fabBottom + FABHeight(54)) + gap(12).
-           // Also handle IME: insets.paddingBottom = max(flooredNavBottom, IME height).
-           // When keyboard opens, content must clear the keyboard.
-           // Xiaomi 3-button nav floor is 500dp; typical IME is 200-500dp.
-           // If paddingBottom > 500dp, treat as nav bar floor (not IME) and use fixed minimum.
-           // The clearance is additional body padding INSIDE the WebView viewport (which is
-           // already reduced by native parent padding). It must always be at least
-           // floatingLayerClearance to clear the FAB/Studios pill.
-           // Pass actual nav height (insets.bottom, NO floors) for non-IME clearance to avoid
-           // double-counting the Xiaomi 3-button floor already applied in native parent padding.
-           var paddingBottom = insets.paddingBottom || insets.bottom || 120;
-           var bottomNavClearance = this._computeBottomNavClearance(capsuleHeight, insets.bottom, paddingBottom);
-           root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
+                       // Base clearance (without IME) = capsuleHeight + 148 (covers capsule + Studios pill + FAB + gaps).
+                       var baseClearance = capsuleHeight + 148;
 
-           // Studios pill position: docked at the clearance boundary so content never overlaps.
-           // bottom = clearance - gap(8) - pillHeight(48) = clearance - 56.
-           var studiosPillBottom = this._computeStudiosPillBottom(bottomNavClearance);
-           root.style.setProperty('--df-studios-pill-bottom', studiosPillBottom + 'px', 'important');
+                       // Bottom nav clearance for in-flow content: must clear the highest floating layer
+                       // (FAB top = fabBottom + FABHeight(54)) + gap(12).
+                       // Also handle IME: insets.paddingBottom = max(flooredNavBottom, IME height).
+                       // When keyboard opens, content must clear the keyboard.
+                       // Xiaomi 3-button nav floor is 500dp; typical IME is 200-500dp.
+                       // If paddingBottom > 500dp, treat as nav bar floor (not IME) and use fixed minimum.
+                       // The clearance is additional body padding INSIDE the WebView viewport (which is
+                       // already reduced by native parent padding). It must always be at least
+                       // baseClearance to clear the FAB/Studios pill.
+                       // Pass actual nav height (insets.bottom, NO floors) for non-IME clearance to avoid
+                       // double-counting the Xiaomi 3-button floor already applied in native parent padding.
+                       var paddingBottom = insets.paddingBottom || insets.bottom || 120;
+                       var bottomNavClearance = this._computeBottomNavClearance(capsuleHeight, insets.bottom, paddingBottom);
+                       root.style.setProperty('--df-bottom-nav-clearance', bottomNavClearance + 'px', 'important');
 
-           // FAB position: above Studios pill with 8px gap.
-           // bottom = studiosPillBottom + FABHeight(54) + gap(8) = studiosPillBottom + 62.
-           var fabBottom = this._computeFabBottom(studiosPillBottom);
-           root.style.setProperty('--df-fab-bottom', fabBottom + 'px', 'important');
+                       // Studios pill position: docked above capsule at base position (capsuleHeight + 20),
+                       // shifts up with content when clearance expands (IME/keyboard).
+                       var studiosPillBottom = this._computeStudiosPillBottom(capsuleHeight, bottomNavClearance, baseClearance);
+                       root.style.setProperty('--df-studios-pill-bottom', studiosPillBottom + 'px', 'important');
 
-           // Scratchpad trigger position: midway between Studios pill and FAB to avoid
-           // horizontal overlap with Studios pill on narrow screens.
-           var scratchpadBottom = this._computeScratchpadBottom(studiosPillBottom, fabBottom);
-           root.style.setProperty('--df-scratchpad-bottom', scratchpadBottom + 'px', 'important');
+                       // FAB position: above Studios pill with 8px gap.
+                       // bottom = studiosPillBottom + gap(8) + FABHeight(54) = studiosPillBottom + 62.
+                       var fabBottom = this._computeFabBottom(studiosPillBottom);
+                       root.style.setProperty('--df-fab-bottom', fabBottom + 'px', 'important');
 
-           // Legacy float-bottom for backward compat (points to Studios pill position)
-           root.style.setProperty('--df-float-bottom', studiosPillBottom + 'px', 'important');
+                       // Scratchpad trigger position: midway between Studios pill and FAB to avoid
+                       // horizontal overlap with Studios pill on narrow screens.
+                       var scratchpadBottom = this._computeScratchpadBottom(studiosPillBottom, fabBottom);
+                       root.style.setProperty('--df-scratchpad-bottom', scratchpadBottom + 'px', 'important');
 
-           // Dock bottom gap (capsule dock position from viewport bottom)
-           root.style.setProperty('--df-dock-bottom', '12px', 'important');
+                       // Legacy float-bottom for backward compat (points to Studios pill position)
+                       root.style.setProperty('--df-float-bottom', studiosPillBottom + 'px', 'important');
 
-           // Inflow bottom for body padding (resolves to bottom-nav-clearance since webview-padding-bottom is 0)
-           root.style.setProperty('--df-inflow-bottom', bottomNavClearance + 'px', 'important');
-         },
+                       // Dock bottom gap (capsule dock position from viewport bottom)
+                       root.style.setProperty('--df-dock-bottom', '12px', 'important');
+
+                       // Inflow bottom for body padding (resolves to bottom-nav-clearance since webview-padding-bottom is 0)
+                       root.style.setProperty('--df-inflow-bottom', bottomNavClearance + 'px', 'important');
+                     },
 
     onViewportChange: function () {
       // Re-apply insets on orientation change or keyboard toggle

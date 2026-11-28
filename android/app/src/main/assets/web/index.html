@@ -52,16 +52,21 @@
          (capsule + Studios pill + FAB zone); it never includes the nav inset.
          Capsule height is CSS-driven: 56px base, 96-136px on narrow screens (<430px).
          Calibrator minimum clearance = 350px (floating stack clearance floored to 350).
-         Studios pill bottom = clearance - 56px (pillHeight 48 + gap 8).
-         FAB bottom = studiosPillBottom + 62px (FABHeight 54 + gap 8).
-         Fallbacks: capsule 56px, Studios pill 294px, FAB 356px, scratchpad 325px, bottom clearance 350px. */
+         Stack from viewport bottom:
+           Capsule: bottom = 12px, height = capsuleHeight
+           Studios pill: bottom = capsule top + 8 = capsuleHeight + 20, height = 48
+           FAB: bottom = Studios pill top + 8 = capsuleHeight + 76, height = 54
+           Base clearance = FAB top + 12 = capsuleHeight + 148.
+         When clearance expands (IME/keyboard), floating stack shifts up by (clearance - baseClearance).
+         Fallbacks (wide screen, capsule=56px, clearance=350px): capsule 56px, Studios pill 222px,
+         FAB 284px, scratchpad 253px, bottom clearance 350px. */
       --df-dock-gap: 12px;
       --df-capsule-height: 56px;
       --df-dock-bottom: calc(var(--df-dock-gap, 12px));
-      --df-studios-pill-bottom: 294px;
-      --df-scratchpad-bottom: 325px;
-      --df-fab-bottom: 356px;
-      --df-float-bottom: 294px;
+      --df-studios-pill-bottom: 222px;
+      --df-scratchpad-bottom: 253px;
+      --df-fab-bottom: 284px;
+      --df-float-bottom: 222px;
       --df-inflow-bottom: var(--df-bottom-nav-clearance, 350px);
       --df-bottom-nav-clearance: 350px;
       --df-ease: cubic-bezier(.2, .7, .3, 1);
@@ -367,7 +372,7 @@
     .lcard-foot { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 0.68rem; color: var(--text-light); }
 
     .floating-plus-fab {
-      position: fixed; bottom: var(--df-fab-bottom, 186px); left: 24px; width: 54px; height: 54px;
+      position: fixed; bottom: var(--df-fab-bottom, 284px); left: 24px; width: 54px; height: 54px;
       border-radius: 50%; background: linear-gradient(135deg, #10b981 0%, #059669 100%);
       border: none; color: #ffffff; font-size: 1.7rem; display: flex; align-items: center;
       justify-content: center; box-shadow: 0 10px 25px rgba(16, 185, 129, 0.45);
@@ -1648,7 +1653,7 @@ header, .app-header, .top-bar, .dynamic-hero-header {
     border: 1px solid #CBD5E1 !important;
   }
   .fab, #addNoteFab, button[class*="fab"] {
-    bottom: var(--df-fab-bottom, 356px) !important;
+    bottom: var(--df-fab-bottom, 284px) !important;
     z-index: 40 !important;
   }
   nav button, .bottom-nav button, .nav-bar button {
