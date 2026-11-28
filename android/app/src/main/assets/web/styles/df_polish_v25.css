@@ -249,9 +249,10 @@ textarea:focus-visible,
   font-weight: 800;
   letter-spacing: 0.5px;
   text-transform: uppercase;
-  color: var(--primary);
-  background: var(--primary-soft);
-  padding: 3px 8px;
+  color: #0f172a !important;
+  background: #ecfdf5 !important;
+  border: 1px solid #a7f3d0 !important;
+  padding: 3px 9px;
   border-radius: 999px;
 }
 .ns-header-subtitle {
@@ -320,13 +321,13 @@ textarea:focus-visible,
 
 /* Spatial sub-tabs */
 #dfPillar5SpatialMount .df-white-premium {
-  background: #ffffff;
-  color: #0f172a;
-  border: 1.5px solid #cbd5e1;
-  border-radius: 20px;
-  padding: 16px;
-  margin: 12px 0;
-  box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.08);
+  background: #ffffff !important;
+  color: #0f172a !important;
+  border: 1.5px solid #cbd5e1 !important;
+  border-radius: 20px !important;
+  padding: 16px !important;
+  margin: 12px 0 !important;
+  box-shadow: 0 8px 24px -8px rgba(15, 23, 42, 0.08) !important;
 }
 #dfPillar5SpatialMount button[role="tab"] {
   padding: 8px 14px;
